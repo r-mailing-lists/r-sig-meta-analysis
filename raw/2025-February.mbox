@@ -1,0 +1,1941 @@
+From ro@@@nev|||e @end|ng |rom ucd@|e  Thu Feb 13 18:27:46 2025
+From: ro@@@nev|||e @end|ng |rom ucd@|e (Ross Neville)
+Date: Thu, 13 Feb 2025 17:27:46 +0000
+Subject: [R-meta] nesting an inner | outer formula
+Message-ID: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+
+Hi Wolfgang
+
+I hope this email finds you well
+
+I was wondering if you could tell me whether the following list of random
+effects can be updated to make the the inner | outer formula conditional.
+
+random = list (~ 1 | StudyID, ~ Informant | TreatmentGroup)
+
+I would like for the different levels of Informant to be correlated within
+TreatmentGroup within StudyID, and I would like the different levels of
+TreatmentGroup to be correlated within StudyID too.
+
+In SAS Proc Mixed, I've managed to run this model and I want to replicate
+it in metafor rma.mv.
+
+random StudyID;
+random Informant/subject=StudyID, group=TreatmentGroup type=un;
+parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1/hold=14;
+
+Any help you can provide to let me know if this is possible in rma.mv would
+be much appreciated.
+
+Regards
+Ross
+
+-- 
+Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+Head of Subject - Sport Management
+School of Public Health, Physiotherapy and Sport Science
+University College Dublin (UCD)
+Room G6 - Woodview House
+Belfield, Dublin 4
+ross.neville at ucd.ie
++353 (0) 1 716 3419
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Feb 14 14:00:22 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 14 Feb 2025 13:00:22 +0000
+Subject: [R-meta] nesting an inner | outer formula
+In-Reply-To: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+References: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+Message-ID: <AS8PR08MB9193FB6B4C982587426BF81C8BFE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Ross,
+
+my proc mixed knowledge is a bit rusty, but unless I am confused, your proc mixed statement specifies a random intercept for StudyID and an UN structure for Informant within StudyID allowing for different variances/covariances for the different levels of TreatmentGroup.
+
+> random StudyID;
+> random Informant / subject=StudyID group=TreatmentGroup type=un;
+> parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1 / hold=14;
+
+I don't think this quite matches up with your description:
+
+> I would like for the different levels of Informant to be correlated within
+> TreatmentGroup within StudyID, and I would like the different levels of
+> TreatmentGroup to be correlated within StudyID too.
+
+For example, there is nothing in your proc mixed statement that allows for "TreatmentGroup to be correlated within StudyID". Also, the second random statement allows for Informant to be correlated within StudyID, but *not* "within TreatmentGroup within StudyID".
+
+So before I attempt to recreate the same structure, it would need to be clear exactly what kind of structure you really want.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Ross Neville <ross.neville at ucd.ie>
+> Sent: Thursday, February 13, 2025 18:28
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>;
+> r-sig-meta-analysis at r-project.org
+> Subject: nesting an inner | outer formula
+>
+> Hi Wolfgang
+>
+> I hope this email finds you well
+>
+> I was wondering if you could tell me whether the following list of random
+> effects can be updated to make the the inner | outer formula conditional.
+>
+> random = list (~ 1 | StudyID, ~ Informant | TreatmentGroup)
+>
+> I would like for the different levels of Informant to be correlated within
+> TreatmentGroup within StudyID, and I would like the different levels of
+> TreatmentGroup to be correlated within StudyID too.
+>
+> In SAS Proc Mixed, I've managed to run this model and I want to replicate it in
+> metafor rma.mv.
+>
+> random StudyID;
+> random Informant/subject=StudyID, group=TreatmentGroup type=un;
+> parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1/hold=14;
+>
+> Any help you can provide to let me know if this is possible in http://rma.mv
+> would be much appreciated.
+>
+> Regards
+> Ross
+>
+> --
+> Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+> Head of Subject - Sport Management
+> School of Public Health, Physiotherapy and Sport Science
+> University College Dublin (UCD)
+> Room G6 - Woodview House
+> Belfield, Dublin 4
+> mailto:ross.neville at ucd.ie
+> +353 (0) 1 716 3419
+
+From ro@@@nev|||e @end|ng |rom ucd@|e  Fri Feb 14 14:32:18 2025
+From: ro@@@nev|||e @end|ng |rom ucd@|e (Ross Neville)
+Date: Fri, 14 Feb 2025 13:32:18 +0000
+Subject: [R-meta] nesting an inner | outer formula
+In-Reply-To: <AS8PR08MB9193FB6B4C982587426BF81C8BFE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+ <AS8PR08MB9193FB6B4C982587426BF81C8BFE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <CAERR2oz65mSjfXP7gx8oKjtNbjGaM6VtgWL6-++mvzbjwz=Xtw@mail.gmail.com>
+
+Dear Wolfgang
+
+Thanks for the speedy response, and for seeking clarification and
+correcting my error.
+
+Rather than try to correct my interpretation of the SAS code, perhaps it
+would make more sense to tell you what structure I really want.
+
+The data structure is such that I have studies (*StudyID*) reporting
+post-intervention means for children in an experimental and control group (
+*TreatmentGroup*). The variable *Informant* tells us who is reporting on
+behalf of the child. Some studies have child report only (so two rows for
+such a StudyID corresponding to the post-intervention means for the
+experimental and control group). Studies with parent report or teacher
+report only are the same (two rows). There are also studies where there is
+data from child and parent, child and teacher, teacher and parent, or even
+child parent and teacher. So, essentially, a StudyID could have two rows,
+four rows, or six rows, depending on how many Informants there are.
+Children are in the experimental or control group only, so one would expect
+Informants to be nested and correlated within TreatmentGroup within studies.
+
+Because of the data structure (multiple rows of sample means rather than
+fewer rows of pairwise comparisions) the degree to which control and
+intervention group means are more or less similar in a given StudyID is
+capture in part (maybe even large part) by ~ 1 | StudyID.
+
+What is missing from this random = list (~ 1 | StudyID, ~ Informant |
+TreatmentGroup) is the fact that the inner | outer is saying, for example,
+that parents in the experimental or control group across studies share
+correlated random effects. When, in fact, one would expect parents,
+children, and teachers in the experimental or control group to share
+correlated random effects within a given study.
+
+Perhaps given the data structure, you would advise something else. Or
+perhaps I am still being unclear in my description and understanding.
+
+Regards
+Ross
+
+
+On Fri, 14 Feb 2025 at 13:00, Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Ross,
+>
+> my proc mixed knowledge is a bit rusty, but unless I am confused, your
+> proc mixed statement specifies a random intercept for StudyID and an UN
+> structure for Informant within StudyID allowing for different
+> variances/covariances for the different levels of TreatmentGroup.
+>
+> > random StudyID;
+> > random Informant / subject=StudyID group=TreatmentGroup type=un;
+> > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1 / hold=14;
+>
+> I don't think this quite matches up with your description:
+>
+> > I would like for the different levels of Informant to be correlated
+> within
+> > TreatmentGroup within StudyID, and I would like the different levels of
+> > TreatmentGroup to be correlated within StudyID too.
+>
+> For example, there is nothing in your proc mixed statement that allows for
+> "TreatmentGroup to be correlated within StudyID". Also, the second random
+> statement allows for Informant to be correlated within StudyID, but *not*
+> "within TreatmentGroup within StudyID".
+>
+> So before I attempt to recreate the same structure, it would need to be
+> clear exactly what kind of structure you really want.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Ross Neville <ross.neville at ucd.ie>
+> > Sent: Thursday, February 13, 2025 18:28
+> > To: Viechtbauer, Wolfgang (NP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>;
+> > r-sig-meta-analysis at r-project.org
+> > Subject: nesting an inner | outer formula
+> >
+> > Hi Wolfgang
+> >
+> > I hope this email finds you well
+> >
+> > I was wondering if you could tell me whether the following list of random
+> > effects can be updated to make the the inner | outer formula conditional.
+> >
+> > random = list (~ 1 | StudyID, ~ Informant | TreatmentGroup)
+> >
+> > I would like for the different levels of Informant to be correlated
+> within
+> > TreatmentGroup within StudyID, and I would like the different levels of
+> > TreatmentGroup to be correlated within StudyID too.
+> >
+> > In SAS Proc Mixed, I've managed to run this model and I want to
+> replicate it in
+> > metafor rma.mv.
+> >
+> > random StudyID;
+> > random Informant/subject=StudyID, group=TreatmentGroup type=un;
+> > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1/hold=14;
+> >
+> > Any help you can provide to let me know if this is possible in
+> http://rma.mv
+> > would be much appreciated.
+> >
+> > Regards
+> > Ross
+> >
+> > --
+> > Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+> > Head of Subject - Sport Management
+> > School of Public Health, Physiotherapy and Sport Science
+> > University College Dublin (UCD)
+> > Room G6 - Woodview House
+> > Belfield, Dublin 4
+> > mailto:ross.neville at ucd.ie
+> > +353 (0) 1 716 3419
+>
+
+
+-- 
+Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+Head of Subject - Sport Management
+School of Public Health, Physiotherapy and Sport Science
+University College Dublin (UCD)
+Room G6 - Woodview House
+Belfield, Dublin 4
+ross.neville at ucd.ie
++353 (0) 1 716 3419
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Feb 18 13:34:00 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 18 Feb 2025 12:34:00 +0000
+Subject: [R-meta] nesting an inner | outer formula
+In-Reply-To: <CAERR2oz65mSjfXP7gx8oKjtNbjGaM6VtgWL6-++mvzbjwz=Xtw@mail.gmail.com>
+References: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+ <AS8PR08MB9193FB6B4C982587426BF81C8BFE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oz65mSjfXP7gx8oKjtNbjGaM6VtgWL6-++mvzbjwz=Xtw@mail.gmail.com>
+Message-ID: <AS8PR08MB91930FE8A2C41FA0E2CD4ACF8BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Ross,
+
+Thanks for the clarification. Based on this, I would consider the following structure:
+
+random = ~ 1 | StudyID / TreatmentGroup / Informant
+
+This captures overall differences in the outcomes (across the experimental and control groups and across all informants) between studies. It also allows for heterogeneity in how much experimental and control groups differ from each other across studies (I assume you will add something like mods = ~ TreatmentGroup to the model, since presumably you are interested in the size of the (average) difference between the two groups). And it allows for heterogeneity in outcomes that arises due to some studies using multiple informants. By nesting Informant within TreatmentGroup, this model automatically implies a certain degree of correlation in the true outcomes for different informants within experimental/control groups. This last random effect is also the 'outcome level' random effect, since based on your description, every combination of StudyID, TreatmentGroup, and Informant should yield a unique value for each row.
+
+Strictly speaking, this structure does not capture the correlation in the sampling errors that arises because multiple informants are reporting on the *same children*. If reports, say from parents and teachers, are correlated, then this implies that the sampling errors of the means are also correlated. Such a correlation (or more precisely, the covariance) should go into the V matrix. However, to compute this covariance, you would need to know what the correlation (r) between the parent and teacher reports. This is probably not reported, but maybe can be guestimated from other or your own studies. Say the data for the first two studies looks like this:
+
+Study  Group  Informant   Outcome
+1      Exp    Child       .
+1      Ctrl   Child       .
+2      Exp    Parent      .
+2      Exp    Teacher     .
+2      Ctrl   Parent      .
+2      Ctrl   Teacher     .
+
+Then the corresponding V matrix would be (use a fixed width font to view this so that things are lined up properly):
+
+[s_1E^2/n_1E                                                                            ]
+[            s_1C^2/n_1C                                                                ]
+[                        s_2EP^2/n_2E r*s_2EP*s_2ET/n_2E                                ]
+[                                     s_2ET^2/n_2E                                      ]
+[                                                        s_2CP^2/n_2C r*s_2CP*s_2CT/n_2C]
+[                                                                     s_2CT^2/n_2C      ]
+
+where s stands for standard deviation, n for sample size, and the subscripts are for study, group, and informant in that order (single letter abbreviations). Elements left blank are equal to 0 (zero covariance). I did not put a subscript on r since this is probably a single guestimated value across all studies (and informant pairs). Such a V matrix can be easily generated using the vcalc() function.
+
+Since V is probably just going to be an approximation (especially if you decide not to bother creating the V matrix, which in essence implies assuming r=0), I would then consider using cluster-robust inference methods (robust(model, cluster=StudyID, clubSandwich=TRUE)) at least as a sensitivity check.
+
+I think the above is a good and sensible starting point. A more complex structure might be:
+
+dat$StudyID.TreatmentGroup <- paste0(dat$StudyID, ".", dat$TreatmentGroup)
+random = list(~ TreatmentGroup | StudyID, ~ Informant | StudyID.TreatmentGroup), struct="UN")
+
+This would allow for different variances for experimental and control groups and it would allow for different variances for the different types of informants and allow the correlation in the random effects to differ depending on the type of informant pair (child-parent, child-teacher, parent-teacher, etc.). But I would only attempt to fit this model if there is plenty of data. One could use a LRT to compare the two model structures. There is also a structure with intermediate complexity by using struct=c("UN","HCS"), where we assume different variances for the different informants, but a single correlation irrespective of the pair.
+
+One might also consider TreatmentGroup and Informant to be crossed random effects (within studies), but I think this is overcomplicating things.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Ross Neville <ross.neville at ucd.ie>
+> Sent: Friday, February 14, 2025 14:32
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: r-sig-meta-analysis at r-project.org
+> Subject: Re: nesting an inner | outer formula
+>
+> Dear Wolfgang
+>
+> Thanks for the speedy response, and for seeking clarification and correcting my
+> error.
+>
+> Rather than try to correct my interpretation of the SAS code, perhaps it would
+> make more sense to tell you what structure I really want.
+>
+> The data structure is such that I have studies (StudyID) reporting post-
+> intervention means for children in an experimental and control group
+> (TreatmentGroup). The variable Informant tells us who is reporting on behalf of
+> the child. Some studies have child report only (so two rows for such a StudyID
+> corresponding to the post-intervention means for the experimental and control
+> group). Studies with parent report or teacher report only are the same (two
+> rows). There are also studies where there is data from child and parent, child
+> and teacher, teacher and parent, or even child parent and teacher. So,
+> essentially, a StudyID could have two rows, four rows, or six rows, depending on
+> how many Informants there are. Children are in the experimental or control group
+> only, so one would expect Informants to be nested and correlated within
+> TreatmentGroup within studies.
+>
+> Because of the data structure (multiple rows of sample means rather than fewer
+> rows of pairwise comparisions) the degree to which control and intervention
+> group means are more or less similar in a given StudyID is capture in part
+> (maybe even large part) by ~ 1 | StudyID.
+>
+> What is missing from this random = list (~ 1 | StudyID, ~ Informant |
+> TreatmentGroup) is the fact that the inner | outer is saying, for example, that
+> parents in the experimental or control group across studies share correlated
+> random effects. When, in fact, one would expect parents, children, and teachers
+> in the experimental or control group to share correlated random effects within a
+> given study.
+>
+> Perhaps given the data structure, you would advise something else. Or perhaps I
+> am still being unclear in my description and understanding.
+>
+> Regards
+> Ross
+>
+> On Fri, 14 Feb 2025 at 13:00, Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Dear Ross,
+>
+> my proc mixed knowledge is a bit rusty, but unless I am confused, your proc
+> mixed statement specifies a random intercept for StudyID and an UN structure for
+> Informant within StudyID allowing for different variances/covariances for the
+> different levels of TreatmentGroup.
+>
+> > random StudyID;
+> > random Informant / subject=StudyID group=TreatmentGroup type=un;
+> > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1 / hold=14;
+>
+> I don't think this quite matches up with your description:
+>
+> > I would like for the different levels of Informant to be correlated within
+> > TreatmentGroup within StudyID, and I would like the different levels of
+> > TreatmentGroup to be correlated within StudyID too.
+>
+> For example, there is nothing in your proc mixed statement that allows for
+> "TreatmentGroup to be correlated within StudyID". Also, the second random
+> statement allows for Informant to be correlated within StudyID, but *not*
+> "within TreatmentGroup within StudyID".
+>
+> So before I attempt to recreate the same structure, it would need to be clear
+> exactly what kind of structure you really want.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Ross Neville <mailto:ross.neville at ucd.ie>
+> > Sent: Thursday, February 13, 2025 18:28
+> > To: Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>;
+> > mailto:r-sig-meta-analysis at r-project.org
+> > Subject: nesting an inner | outer formula
+> >
+> > Hi Wolfgang
+> >
+> > I hope this email finds you well
+> >
+> > I was wondering if you could tell me whether the following list of random
+> > effects can be updated to make the the inner | outer formula conditional.
+> >
+> > random = list (~ 1 | StudyID, ~ Informant | TreatmentGroup)
+> >
+> > I would like for the different levels of Informant to be correlated within
+> > TreatmentGroup within StudyID, and I would like the different levels of
+> > TreatmentGroup to be correlated within StudyID too.
+> >
+> > In SAS Proc Mixed, I've managed to run this model and I want to replicate it
+> in
+> > metafor http://rma.mv.
+> >
+> > random StudyID;
+> > random Informant/subject=StudyID, group=TreatmentGroup type=un;
+> > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1/hold=14;
+> >
+> > Any help you can provide to let me know if this is possible in http://rma.mv
+> > would be much appreciated.
+> >
+> > Regards
+> > Ross
+> >
+> > --
+> > Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+> > Head of Subject - Sport Management
+> > School of Public Health, Physiotherapy and Sport Science
+> > University College Dublin (UCD)
+> > Room G6 - Woodview House
+> > Belfield, Dublin 4
+> > mailto:mailto:ross.neville at ucd.ie
+> > +353 (0) 1 716 3419
+
+From ro@@@nev|||e @end|ng |rom ucd@|e  Tue Feb 18 13:40:51 2025
+From: ro@@@nev|||e @end|ng |rom ucd@|e (Ross Neville)
+Date: Tue, 18 Feb 2025 12:40:51 +0000
+Subject: [R-meta] nesting an inner | outer formula
+In-Reply-To: <AS8PR08MB91930FE8A2C41FA0E2CD4ACF8BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+ <AS8PR08MB9193FB6B4C982587426BF81C8BFE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oz65mSjfXP7gx8oKjtNbjGaM6VtgWL6-++mvzbjwz=Xtw@mail.gmail.com>
+ <AS8PR08MB91930FE8A2C41FA0E2CD4ACF8BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <CAERR2oy_bguDVsh=5oj3T6JfnL9c7eGk13VQ-y2dhO_Hw+r4gg@mail.gmail.com>
+
+Thanks Wolfgang
+I will take some time to digest the contents. I appreciate the detail and
+guidance.
+Quickly, the suggested model provides a sigma^2.2 variance of 0, as shown
+below.
+This makes me feel like the random effects random = ~ 1 | StudyID /
+TreatmentGroup / Informant are too complex for the available data.
+Thought on that?
+[image: Screenshot 2025-02-18 at 12.38.17.png]
+
+On Tue, 18 Feb 2025 at 12:34, Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Ross,
+>
+> Thanks for the clarification. Based on this, I would consider the
+> following structure:
+>
+> random = ~ 1 | StudyID / TreatmentGroup / Informant
+>
+> This captures overall differences in the outcomes (across the experimental
+> and control groups and across all informants) between studies. It also
+> allows for heterogeneity in how much experimental and control groups differ
+> from each other across studies (I assume you will add something like mods =
+> ~ TreatmentGroup to the model, since presumably you are interested in the
+> size of the (average) difference between the two groups). And it allows for
+> heterogeneity in outcomes that arises due to some studies using multiple
+> informants. By nesting Informant within TreatmentGroup, this model
+> automatically implies a certain degree of correlation in the true outcomes
+> for different informants within experimental/control groups. This last
+> random effect is also the 'outcome level' random effect, since based on
+> your description, every combination of StudyID, TreatmentGroup, and
+> Informant should yield a unique value for each row.
+>
+> Strictly speaking, this structure does not capture the correlation in the
+> sampling errors that arises because multiple informants are reporting on
+> the *same children*. If reports, say from parents and teachers, are
+> correlated, then this implies that the sampling errors of the means are
+> also correlated. Such a correlation (or more precisely, the covariance)
+> should go into the V matrix. However, to compute this covariance, you would
+> need to know what the correlation (r) between the parent and teacher
+> reports. This is probably not reported, but maybe can be guestimated from
+> other or your own studies. Say the data for the first two studies looks
+> like this:
+>
+> Study  Group  Informant   Outcome
+> 1      Exp    Child       .
+> 1      Ctrl   Child       .
+> 2      Exp    Parent      .
+> 2      Exp    Teacher     .
+> 2      Ctrl   Parent      .
+> 2      Ctrl   Teacher     .
+>
+> Then the corresponding V matrix would be (use a fixed width font to view
+> this so that things are lined up properly):
+>
+> [s_1E^2/n_1E
+>               ]
+> [            s_1C^2/n_1C
+>               ]
+> [                        s_2EP^2/n_2E r*s_2EP*s_2ET/n_2E
+>               ]
+> [                                     s_2ET^2/n_2E
+>               ]
+> [                                                        s_2CP^2/n_2C
+> r*s_2CP*s_2CT/n_2C]
+> [
+>  s_2CT^2/n_2C      ]
+>
+> where s stands for standard deviation, n for sample size, and the
+> subscripts are for study, group, and informant in that order (single letter
+> abbreviations). Elements left blank are equal to 0 (zero covariance). I did
+> not put a subscript on r since this is probably a single guestimated value
+> across all studies (and informant pairs). Such a V matrix can be easily
+> generated using the vcalc() function.
+>
+> Since V is probably just going to be an approximation (especially if you
+> decide not to bother creating the V matrix, which in essence implies
+> assuming r=0), I would then consider using cluster-robust inference methods
+> (robust(model, cluster=StudyID, clubSandwich=TRUE)) at least as a
+> sensitivity check.
+>
+> I think the above is a good and sensible starting point. A more complex
+> structure might be:
+>
+> dat$StudyID.TreatmentGroup <- paste0(dat$StudyID, ".", dat$TreatmentGroup)
+> random = list(~ TreatmentGroup | StudyID, ~ Informant |
+> StudyID.TreatmentGroup), struct="UN")
+>
+> This would allow for different variances for experimental and control
+> groups and it would allow for different variances for the different types
+> of informants and allow the correlation in the random effects to differ
+> depending on the type of informant pair (child-parent, child-teacher,
+> parent-teacher, etc.). But I would only attempt to fit this model if there
+> is plenty of data. One could use a LRT to compare the two model structures.
+> There is also a structure with intermediate complexity by using
+> struct=c("UN","HCS"), where we assume different variances for the different
+> informants, but a single correlation irrespective of the pair.
+>
+> One might also consider TreatmentGroup and Informant to be crossed random
+> effects (within studies), but I think this is overcomplicating things.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Ross Neville <ross.neville at ucd.ie>
+> > Sent: Friday, February 14, 2025 14:32
+> > To: Viechtbauer, Wolfgang (NP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Cc: r-sig-meta-analysis at r-project.org
+> > Subject: Re: nesting an inner | outer formula
+> >
+> > Dear Wolfgang
+> >
+> > Thanks for the speedy response, and for seeking clarification and
+> correcting my
+> > error.
+> >
+> > Rather than try to correct my interpretation of the SAS code, perhaps it
+> would
+> > make more sense to tell you what structure I really want.
+> >
+> > The data structure is such that I have studies (StudyID) reporting post-
+> > intervention means for children in an experimental and control group
+> > (TreatmentGroup). The variable Informant tells us who is reporting on
+> behalf of
+> > the child. Some studies have child report only (so two rows for such a
+> StudyID
+> > corresponding to the post-intervention means for the experimental and
+> control
+> > group). Studies with parent report or teacher report only are the same
+> (two
+> > rows). There are also studies where there is data from child and parent,
+> child
+> > and teacher, teacher and parent, or even child parent and teacher. So,
+> > essentially, a StudyID could have two rows, four rows, or six rows,
+> depending on
+> > how many Informants there are. Children are in the experimental or
+> control group
+> > only, so one would expect Informants to be nested and correlated within
+> > TreatmentGroup within studies.
+> >
+> > Because of the data structure (multiple rows of sample means rather than
+> fewer
+> > rows of pairwise comparisions) the degree to which control and
+> intervention
+> > group means are more or less similar in a given StudyID is capture in
+> part
+> > (maybe even large part) by ~ 1 | StudyID.
+> >
+> > What is missing from this random = list (~ 1 | StudyID, ~ Informant |
+> > TreatmentGroup) is the fact that the inner | outer is saying, for
+> example, that
+> > parents in the experimental or control group across studies share
+> correlated
+> > random effects. When, in fact, one would expect parents, children, and
+> teachers
+> > in the experimental or control group to share correlated random effects
+> within a
+> > given study.
+> >
+> > Perhaps given the data structure, you would advise something else. Or
+> perhaps I
+> > am still being unclear in my description and understanding.
+> >
+> > Regards
+> > Ross
+> >
+> > On Fri, 14 Feb 2025 at 13:00, Viechtbauer, Wolfgang (NP)
+> > <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> > Dear Ross,
+> >
+> > my proc mixed knowledge is a bit rusty, but unless I am confused, your
+> proc
+> > mixed statement specifies a random intercept for StudyID and an UN
+> structure for
+> > Informant within StudyID allowing for different variances/covariances
+> for the
+> > different levels of TreatmentGroup.
+> >
+> > > random StudyID;
+> > > random Informant / subject=StudyID group=TreatmentGroup type=un;
+> > > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1 / hold=14;
+> >
+> > I don't think this quite matches up with your description:
+> >
+> > > I would like for the different levels of Informant to be correlated
+> within
+> > > TreatmentGroup within StudyID, and I would like the different levels of
+> > > TreatmentGroup to be correlated within StudyID too.
+> >
+> > For example, there is nothing in your proc mixed statement that allows
+> for
+> > "TreatmentGroup to be correlated within StudyID". Also, the second random
+> > statement allows for Informant to be correlated within StudyID, but *not*
+> > "within TreatmentGroup within StudyID".
+> >
+> > So before I attempt to recreate the same structure, it would need to be
+> clear
+> > exactly what kind of structure you really want.
+> >
+> > Best,
+> > Wolfgang
+> >
+> > > -----Original Message-----
+> > > From: Ross Neville <mailto:ross.neville at ucd.ie>
+> > > Sent: Thursday, February 13, 2025 18:28
+> > > To: Viechtbauer, Wolfgang (NP)
+> > <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>;
+> > > mailto:r-sig-meta-analysis at r-project.org
+> > > Subject: nesting an inner | outer formula
+> > >
+> > > Hi Wolfgang
+> > >
+> > > I hope this email finds you well
+> > >
+> > > I was wondering if you could tell me whether the following list of
+> random
+> > > effects can be updated to make the the inner | outer formula
+> conditional.
+> > >
+> > > random = list (~ 1 | StudyID, ~ Informant | TreatmentGroup)
+> > >
+> > > I would like for the different levels of Informant to be correlated
+> within
+> > > TreatmentGroup within StudyID, and I would like the different levels of
+> > > TreatmentGroup to be correlated within StudyID too.
+> > >
+> > > In SAS Proc Mixed, I've managed to run this model and I want to
+> replicate it
+> > in
+> > > metafor http://rma.mv.
+> > >
+> > > random StudyID;
+> > > random Informant/subject=StudyID, group=TreatmentGroup type=un;
+> > > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1/hold=14;
+> > >
+> > > Any help you can provide to let me know if this is possible in
+> http://rma.mv
+> > > would be much appreciated.
+> > >
+> > > Regards
+> > > Ross
+> > >
+> > > --
+> > > Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+> > > Head of Subject - Sport Management
+> > > School of Public Health, Physiotherapy and Sport Science
+> > > University College Dublin (UCD)
+> > > Room G6 - Woodview House
+> > > Belfield, Dublin 4
+> > > mailto:mailto:ross.neville at ucd.ie
+> > > +353 (0) 1 716 3419
+>
+
+
+-- 
+Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+Head of Subject - Sport Management
+School of Public Health, Physiotherapy and Sport Science
+University College Dublin (UCD)
+Room G6 - Woodview House
+Belfield, Dublin 4
+ross.neville at ucd.ie
++353 (0) 1 716 3419
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20250218/ce2a8204/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Screenshot 2025-02-18 at 12.38.17.png
+Type: image/png
+Size: 47847 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20250218/ce2a8204/attachment-0001.png>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Feb 18 14:21:24 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 18 Feb 2025 13:21:24 +0000
+Subject: [R-meta] nesting an inner | outer formula
+In-Reply-To: <CAERR2oy_bguDVsh=5oj3T6JfnL9c7eGk13VQ-y2dhO_Hw+r4gg@mail.gmail.com>
+References: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+ <AS8PR08MB9193FB6B4C982587426BF81C8BFE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oz65mSjfXP7gx8oKjtNbjGaM6VtgWL6-++mvzbjwz=Xtw@mail.gmail.com>
+ <AS8PR08MB91930FE8A2C41FA0E2CD4ACF8BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oy_bguDVsh=5oj3T6JfnL9c7eGk13VQ-y2dhO_Hw+r4gg@mail.gmail.com>
+Message-ID: <AS8PR08MB91931D5F75481CD04C5B87668BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Given the 'nlvls' values shown, you appear to have enough data to get fairly accurate estimates (you could check confint(model) to see how tight the CIs are). So I don't think the model is too complex. It could very well be that there isn't much heterogeneity in the Condition effect.
+
+You could also check this by computing the mean difference within studies for Exp versus Control (if there are multiple informats, do this for every type). Strictly speaking again, these mean differences are not independent (since mean_trt_parent - mean_ctrl_parent and mean_trt_teacher - mean_ctrl_teacher involves reports on the same children by parents and teachers), but if you ignored V in the model results you have shown, then we can do the same here). You should find that those mean differences are fairly consistent (at least not more variable than would be expected based on their sampling variances).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Ross Neville <ross.neville at ucd.ie>
+> Sent: Tuesday, February 18, 2025 13:41
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: r-sig-meta-analysis at r-project.org
+> Subject: Re: nesting an inner | outer formula
+>
+> Thanks Wolfgang
+> I will take some time to digest the contents. I appreciate the detail and
+> guidance.
+> Quickly, the suggested model provides a sigma^2.2 variance of 0, as shown
+> below.
+> This makes me feel like the random effects random = ~ 1 | StudyID /
+> TreatmentGroup / Informant are too complex for the available data.
+> Thought on that?
+>
+> On Tue, 18 Feb 2025 at 12:34, Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Dear Ross,
+>
+> Thanks for the clarification. Based on this, I would consider the following
+> structure:
+>
+> random = ~ 1 | StudyID / TreatmentGroup / Informant
+>
+> This captures overall differences in the outcomes (across the experimental and
+> control groups and across all informants) between studies. It also allows for
+> heterogeneity in how much experimental and control groups differ from each other
+> across studies (I assume you will add something like mods = ~ TreatmentGroup to
+> the model, since presumably you are interested in the size of the (average)
+> difference between the two groups). And it allows for heterogeneity in outcomes
+> that arises due to some studies using multiple informants. By nesting Informant
+> within TreatmentGroup, this model automatically implies a certain degree of
+> correlation in the true outcomes for different informants within
+> experimental/control groups. This last random effect is also the 'outcome level'
+> random effect, since based on your description, every combination of StudyID,
+> TreatmentGroup, and Informant should yield a unique value for each row.
+>
+> Strictly speaking, this structure does not capture the correlation in the
+> sampling errors that arises because multiple informants are reporting on the
+> *same children*. If reports, say from parents and teachers, are correlated, then
+> this implies that the sampling errors of the means are also correlated. Such a
+> correlation (or more precisely, the covariance) should go into the V matrix.
+> However, to compute this covariance, you would need to know what the correlation
+> (r) between the parent and teacher reports. This is probably not reported, but
+> maybe can be guestimated from other or your own studies. Say the data for the
+> first two studies looks like this:
+>
+> Study  Group  Informant   Outcome
+> 1      Exp    Child       .
+> 1      Ctrl   Child       .
+> 2      Exp    Parent      .
+> 2      Exp    Teacher     .
+> 2      Ctrl   Parent      .
+> 2      Ctrl   Teacher     .
+>
+> Then the corresponding V matrix would be (use a fixed width font to view this so
+> that things are lined up properly):
+>
+> [s_1E^2/n_1E
+>         ]
+> [            s_1C^2/n_1C
+>         ]
+> [                        s_2EP^2/n_2E
+> r*s_2EP*s_2ET/n_2E                                ]
+> [                                     s_2ET^2/n_2E
+>         ]
+> [                                                        s_2CP^2/n_2C
+> r*s_2CP*s_2CT/n_2C]
+> [                                                                     s_2CT^2/n_
+> 2C      ]
+>
+> where s stands for standard deviation, n for sample size, and the subscripts are
+> for study, group, and informant in that order (single letter abbreviations).
+> Elements left blank are equal to 0 (zero covariance). I did not put a subscript
+> on r since this is probably a single guestimated value across all studies (and
+> informant pairs). Such a V matrix can be easily generated using the vcalc()
+> function.
+>
+> Since V is probably just going to be an approximation (especially if you decide
+> not to bother creating the V matrix, which in essence implies assuming r=0), I
+> would then consider using cluster-robust inference methods (robust(model,
+> cluster=StudyID, clubSandwich=TRUE)) at least as a sensitivity check.
+>
+> I think the above is a good and sensible starting point. A more complex
+> structure might be:
+>
+> dat$StudyID.TreatmentGroup <- paste0(dat$StudyID, ".", dat$TreatmentGroup)
+> random = list(~ TreatmentGroup | StudyID, ~ Informant | StudyID.TreatmentGroup),
+> struct="UN")
+>
+> This would allow for different variances for experimental and control groups and
+> it would allow for different variances for the different types of informants and
+> allow the correlation in the random effects to differ depending on the type of
+> informant pair (child-parent, child-teacher, parent-teacher, etc.). But I would
+> only attempt to fit this model if there is plenty of data. One could use a LRT
+> to compare the two model structures. There is also a structure with intermediate
+> complexity by using struct=c("UN","HCS"), where we assume different variances
+> for the different informants, but a single correlation irrespective of the pair.
+>
+> One might also consider TreatmentGroup and Informant to be crossed random
+> effects (within studies), but I think this is overcomplicating things.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Ross Neville <mailto:ross.neville at ucd.ie>
+> > Sent: Friday, February 14, 2025 14:32
+> > To: Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Cc: mailto:r-sig-meta-analysis at r-project.org
+> > Subject: Re: nesting an inner | outer formula
+> >
+> > Dear Wolfgang
+> >
+> > Thanks for the speedy response, and for seeking clarification and correcting
+> my
+> > error.
+> >
+> > Rather than try to correct my interpretation of the SAS code, perhaps it would
+> > make more sense to tell you what structure I really want.
+> >
+> > The data structure is such that I have studies (StudyID) reporting post-
+> > intervention means for children in an experimental and control group
+> > (TreatmentGroup). The variable Informant tells us who is reporting on behalf
+> of
+> > the child. Some studies have child report only (so two rows for such a StudyID
+> > corresponding to the post-intervention means for the experimental and control
+> > group). Studies with parent report or teacher report only are the same (two
+> > rows). There are also studies where there is data from child and parent, child
+> > and teacher, teacher and parent, or even child parent and teacher. So,
+> > essentially, a StudyID could have two rows, four rows, or six rows, depending
+> on
+> > how many Informants there are. Children are in the experimental or control
+> group
+> > only, so one would expect Informants to be nested and correlated within
+> > TreatmentGroup within studies.
+> >
+> > Because of the data structure (multiple rows of sample means rather than fewer
+> > rows of pairwise comparisions) the degree to which control and intervention
+> > group means are more or less similar in a given StudyID is capture in part
+> > (maybe even large part) by ~ 1 | StudyID.
+> >
+> > What is missing from this random = list (~ 1 | StudyID, ~ Informant |
+> > TreatmentGroup) is the fact that the inner | outer is saying, for example,
+> that
+> > parents in the experimental or control group across studies share correlated
+> > random effects. When, in fact, one would expect parents, children, and
+> teachers
+> > in the experimental or control group to share correlated random effects within
+> a
+> > given study.
+> >
+> > Perhaps given the data structure, you would advise something else. Or perhaps
+> I
+> > am still being unclear in my description and understanding.
+> >
+> > Regards
+> > Ross
+> >
+> > On Fri, 14 Feb 2025 at 13:00, Viechtbauer, Wolfgang (NP)
+> > <mailto:mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> > Dear Ross,
+> >
+> > my proc mixed knowledge is a bit rusty, but unless I am confused, your proc
+> > mixed statement specifies a random intercept for StudyID and an UN structure
+> for
+> > Informant within StudyID allowing for different variances/covariances for the
+> > different levels of TreatmentGroup.
+> >
+> > > random StudyID;
+> > > random Informant / subject=StudyID group=TreatmentGroup type=un;
+> > > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1 / hold=14;
+> >
+> > I don't think this quite matches up with your description:
+> >
+> > > I would like for the different levels of Informant to be correlated within
+> > > TreatmentGroup within StudyID, and I would like the different levels of
+> > > TreatmentGroup to be correlated within StudyID too.
+> >
+> > For example, there is nothing in your proc mixed statement that allows for
+> > "TreatmentGroup to be correlated within StudyID". Also, the second random
+> > statement allows for Informant to be correlated within StudyID, but *not*
+> > "within TreatmentGroup within StudyID".
+> >
+> > So before I attempt to recreate the same structure, it would need to be clear
+> > exactly what kind of structure you really want.
+> >
+> > Best,
+> > Wolfgang
+> >
+> > > -----Original Message-----
+> > > From: Ross Neville <mailto:mailto:ross.neville at ucd.ie>
+> > > Sent: Thursday, February 13, 2025 18:28
+> > > To: Viechtbauer, Wolfgang (NP)
+> > <mailto:mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>;
+> > > mailto:mailto:r-sig-meta-analysis at r-project.org
+> > > Subject: nesting an inner | outer formula
+> > >
+> > > Hi Wolfgang
+> > >
+> > > I hope this email finds you well
+> > >
+> > > I was wondering if you could tell me whether the following list of random
+> > > effects can be updated to make the the inner | outer formula conditional.
+> > >
+> > > random = list (~ 1 | StudyID, ~ Informant | TreatmentGroup)
+> > >
+> > > I would like for the different levels of Informant to be correlated within
+> > > TreatmentGroup within StudyID, and I would like the different levels of
+> > > TreatmentGroup to be correlated within StudyID too.
+> > >
+> > > In SAS Proc Mixed, I've managed to run this model and I want to replicate it
+> > in
+> > > metafor http://rma.mv.
+> > >
+> > > random StudyID;
+> > > random Informant/subject=StudyID, group=TreatmentGroup type=un;
+> > > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1/hold=14;
+> > >
+> > > Any help you can provide to let me know if this is possible in http://rma.mv
+> > > would be much appreciated.
+> > >
+> > > Regards
+> > > Ross
+> > >
+> > > --
+> > > Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+> > > Head of Subject - Sport Management
+> > > School of Public Health, Physiotherapy and Sport Science
+> > > University College Dublin (UCD)
+> > > Room G6 - Woodview House
+> > > Belfield, Dublin 4
+> > > mailto:mailto:mailto:mailto:ross.neville at ucd.ie
+> > > +353 (0) 1 716 3419
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Feb 19 09:33:57 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 19 Feb 2025 08:33:57 +0000
+Subject: [R-meta] nesting an inner | outer formula
+In-Reply-To: <CAERR2oy8K27vY7o2K05Z5XVAotheEB=1+84NPr82AF0bT+rEzA@mail.gmail.com>
+References: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+ <AS8PR08MB9193FB6B4C982587426BF81C8BFE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oz65mSjfXP7gx8oKjtNbjGaM6VtgWL6-++mvzbjwz=Xtw@mail.gmail.com>
+ <AS8PR08MB91930FE8A2C41FA0E2CD4ACF8BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oy_bguDVsh=5oj3T6JfnL9c7eGk13VQ-y2dhO_Hw+r4gg@mail.gmail.com>
+ <AS8PR08MB91931D5F75481CD04C5B87668BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oy8K27vY7o2K05Z5XVAotheEB=1+84NPr82AF0bT+rEzA@mail.gmail.com>
+Message-ID: <AS8PR08MB9193511D08A1149D0525C2508BC52@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Standard errors for variance components are typically not all that useful, since the sampling distribution of a variance component estimate is typically not normal. One can still obtain them with rma.mv() using cvvc=TRUE (this estimates the entire var-cov matrix of the variance/correlation components).
+
+Variance component estimates (and corresponding CIs) are indeed forced to be non-negative by rma.mv(). One can get around this to some extent by using an '~ inner | outer' random effect instead of '~ 1 | outer/inner', since in the former the correlation can be negative, which corresponds to a negative variance for the outer term in '~ 1 | outer/inner'. See:
+
+https://www.metafor-project.org/doku.php/analyses:konstantopoulos2011
+
+But if you really want negative variances (for all variance components), then you will have to use something different than rma.mv(). Allowing for negative variances causes so many coding headaches that I decided not to implementing this (I do allow for negative tau^2 estimates in rma.uni() but this is a much more restricted model space, so handling all the special circumstances around negative variances is much easier there).
+
+And yes, I see no inherent problem when a variance component is estimated to be essentially zero.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Ross Neville <ross.neville at ucd.ie>
+> Sent: Tuesday, February 18, 2025 14:46
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Subject: Re: nesting an inner | outer formula
+>
+> Okay. Thanks for that suggestion for validating the results. My fear was that
+> rma.mv was not estimating a standard error for the sigma^2.2 variance and that
+> was a problem. I also feared that rma.mv was forcing the lower CI to be
+> positive, or exactly zero. And in the presence of the model ?wanting? to
+> estimate a negative variance given the data, rma.mv was resisting that because a
+> variance can?t be negative. And given all this, the sigma^2.2 is not worth
+> having in the analysis at all. Are you saying instead that the sigma^2.2 being 0
+> and having a lower CI of exactly 0 is fine and that model sensible and something
+> that one could move forward with?
+>
+> Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+> Head of Subject - Sport Management
+> School of Public Health, Physiotherapy and Sport Science
+> University College Dublin (UCD)
+> Room G6 - Woodview House
+> Belfield, Dublin 4
+> mailto:ross.neville at ucd.ie
+> +353 (0) 1 716 3419
+>
+> On Tue 18 Feb 2025 at 13:21, Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Given the 'nlvls' values shown, you appear to have enough data to get fairly
+> accurate estimates (you could check confint(model) to see how tight the CIs
+> are). So I don't think the model is too complex. It could very well be that
+> there isn't much heterogeneity in the Condition effect.
+>
+> You could also check this by computing the mean difference within studies for
+> Exp versus Control (if there are multiple informats, do this for every type).
+> Strictly speaking again, these mean differences are not independent (since
+> mean_trt_parent - mean_ctrl_parent and mean_trt_teacher - mean_ctrl_teacher
+> involves reports on the same children by parents and teachers), but if you
+> ignored V in the model results you have shown, then we can do the same here).
+> You should find that those mean differences are fairly consistent (at least not
+> more variable than would be expected based on their sampling variances).
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Ross Neville <mailto:ross.neville at ucd.ie>
+> > Sent: Tuesday, February 18, 2025 13:41
+> > To: Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Cc: mailto:r-sig-meta-analysis at r-project.org
+> > Subject: Re: nesting an inner | outer formula
+> >
+> > Thanks Wolfgang
+> > I will take some time to digest the contents. I appreciate the detail and
+> > guidance.
+> > Quickly, the suggested model provides a sigma^2.2 variance of 0, as shown
+> > below.
+> > This makes me feel like the random effects random = ~ 1 | StudyID /
+> > TreatmentGroup / Informant are too complex for the available data.
+> > Thought on that?
+> >
+> > On Tue, 18 Feb 2025 at 12:34, Viechtbauer, Wolfgang (NP)
+> > <mailto:mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> > Dear Ross,
+> >
+> > Thanks for the clarification. Based on this, I would consider the following
+> > structure:
+> >
+> > random = ~ 1 | StudyID / TreatmentGroup / Informant
+> >
+> > This captures overall differences in the outcomes (across the experimental and
+> > control groups and across all informants) between studies. It also allows for
+> > heterogeneity in how much experimental and control groups differ from each
+> other
+> > across studies (I assume you will add something like mods = ~ TreatmentGroup
+> to
+> > the model, since presumably you are interested in the size of the (average)
+> > difference between the two groups). And it allows for heterogeneity in
+> outcomes
+> > that arises due to some studies using multiple informants. By nesting
+> Informant
+> > within TreatmentGroup, this model automatically implies a certain degree of
+> > correlation in the true outcomes for different informants within
+> > experimental/control groups. This last random effect is also the 'outcome
+> level'
+> > random effect, since based on your description, every combination of StudyID,
+> > TreatmentGroup, and Informant should yield a unique value for each row.
+> >
+> > Strictly speaking, this structure does not capture the correlation in the
+> > sampling errors that arises because multiple informants are reporting on the
+> > *same children*. If reports, say from parents and teachers, are correlated,
+> then
+> > this implies that the sampling errors of the means are also correlated. Such a
+> > correlation (or more precisely, the covariance) should go into the V matrix.
+> > However, to compute this covariance, you would need to know what the
+> correlation
+> > (r) between the parent and teacher reports. This is probably not reported, but
+> > maybe can be guestimated from other or your own studies. Say the data for the
+> > first two studies looks like this:
+> >
+> > Study  Group  Informant   Outcome
+> > 1      Exp    Child       .
+> > 1      Ctrl   Child       .
+> > 2      Exp    Parent      .
+> > 2      Exp    Teacher     .
+> > 2      Ctrl   Parent      .
+> > 2      Ctrl   Teacher     .
+> >
+> > Then the corresponding V matrix would be (use a fixed width font to view this
+> so
+> > that things are lined up properly):
+> >
+> > [s_1E^2/n_1E
+> >         ]
+> > [            s_1C^2/n_1C
+> >         ]
+> > [                        s_2EP^2/n_2E
+> > r*s_2EP*s_2ET/n_2E                                ]
+> > [                                     s_2ET^2/n_2E
+> >         ]
+> > [                                                        s_2CP^2/n_2C
+> > r*s_2CP*s_2CT/n_2C]
+> >
+> [                                                                     s_2CT^2/n_
+> > 2C      ]
+> >
+> > where s stands for standard deviation, n for sample size, and the subscripts
+> are
+> > for study, group, and informant in that order (single letter abbreviations).
+> > Elements left blank are equal to 0 (zero covariance). I did not put a
+> subscript
+> > on r since this is probably a single guestimated value across all studies (and
+> > informant pairs). Such a V matrix can be easily generated using the vcalc()
+> > function.
+> >
+> > Since V is probably just going to be an approximation (especially if you
+> decide
+> > not to bother creating the V matrix, which in essence implies assuming r=0), I
+> > would then consider using cluster-robust inference methods (robust(model,
+> > cluster=StudyID, clubSandwich=TRUE)) at least as a sensitivity check.
+> >
+> > I think the above is a good and sensible starting point. A more complex
+> > structure might be:
+> >
+> > dat$StudyID.TreatmentGroup <- paste0(dat$StudyID, ".", dat$TreatmentGroup)
+> > random = list(~ TreatmentGroup | StudyID, ~ Informant |
+> StudyID.TreatmentGroup),
+> > struct="UN")
+> >
+> > This would allow for different variances for experimental and control groups
+> and
+> > it would allow for different variances for the different types of informants
+> and
+> > allow the correlation in the random effects to differ depending on the type of
+> > informant pair (child-parent, child-teacher, parent-teacher, etc.). But I
+> would
+> > only attempt to fit this model if there is plenty of data. One could use a LRT
+> > to compare the two model structures. There is also a structure with
+> intermediate
+> > complexity by using struct=c("UN","HCS"), where we assume different variances
+> > for the different informants, but a single correlation irrespective of the
+> pair.
+> >
+> > One might also consider TreatmentGroup and Informant to be crossed random
+> > effects (within studies), but I think this is overcomplicating things.
+> >
+> > Best,
+> > Wolfgang
+> >
+> > > -----Original Message-----
+> > > From: Ross Neville <mailto:mailto:ross.neville at ucd.ie>
+> > > Sent: Friday, February 14, 2025 14:32
+> > > To: Viechtbauer, Wolfgang (NP)
+> > <mailto:mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > > Cc: mailto:mailto:r-sig-meta-analysis at r-project.org
+> > > Subject: Re: nesting an inner | outer formula
+> > >
+> > > Dear Wolfgang
+> > >
+> > > Thanks for the speedy response, and for seeking clarification and correcting
+> > my
+> > > error.
+> > >
+> > > Rather than try to correct my interpretation of the SAS code, perhaps it
+> would
+> > > make more sense to tell you what structure I really want.
+> > >
+> > > The data structure is such that I have studies (StudyID) reporting post-
+> > > intervention means for children in an experimental and control group
+> > > (TreatmentGroup). The variable Informant tells us who is reporting on behalf
+> > of
+> > > the child. Some studies have child report only (so two rows for such a
+> StudyID
+> > > corresponding to the post-intervention means for the experimental and
+> control
+> > > group). Studies with parent report or teacher report only are the same (two
+> > > rows). There are also studies where there is data from child and parent,
+> child
+> > > and teacher, teacher and parent, or even child parent and teacher. So,
+> > > essentially, a StudyID could have two rows, four rows, or six rows,
+> depending
+> > on
+> > > how many Informants there are. Children are in the experimental or control
+> > group
+> > > only, so one would expect Informants to be nested and correlated within
+> > > TreatmentGroup within studies.
+> > >
+> > > Because of the data structure (multiple rows of sample means rather than
+> fewer
+> > > rows of pairwise comparisions) the degree to which control and intervention
+> > > group means are more or less similar in a given StudyID is capture in part
+> > > (maybe even large part) by ~ 1 | StudyID.
+> > >
+> > > What is missing from this random = list (~ 1 | StudyID, ~ Informant |
+> > > TreatmentGroup) is the fact that the inner | outer is saying, for example,
+> > that
+> > > parents in the experimental or control group across studies share correlated
+> > > random effects. When, in fact, one would expect parents, children, and
+> > teachers
+> > > in the experimental or control group to share correlated random effects
+> within
+> > a
+> > > given study.
+> > >
+> > > Perhaps given the data structure, you would advise something else. Or
+> perhaps
+> > I
+> > > am still being unclear in my description and understanding.
+> > >
+> > > Regards
+> > > Ross
+> > >
+> > > On Fri, 14 Feb 2025 at 13:00, Viechtbauer, Wolfgang (NP)
+> > > <mailto:mailto:mailto:mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> wrote:
+> > > Dear Ross,
+> > >
+> > > my proc mixed knowledge is a bit rusty, but unless I am confused, your proc
+> > > mixed statement specifies a random intercept for StudyID and an UN structure
+> > for
+> > > Informant within StudyID allowing for different variances/covariances for
+> the
+> > > different levels of TreatmentGroup.
+> > >
+> > > > random StudyID;
+> > > > random Informant / subject=StudyID group=TreatmentGroup type=un;
+> > > > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1 / hold=14;
+> > >
+> > > I don't think this quite matches up with your description:
+> > >
+> > > > I would like for the different levels of Informant to be correlated within
+> > > > TreatmentGroup within StudyID, and I would like the different levels of
+> > > > TreatmentGroup to be correlated within StudyID too.
+> > >
+> > > For example, there is nothing in your proc mixed statement that allows for
+> > > "TreatmentGroup to be correlated within StudyID". Also, the second random
+> > > statement allows for Informant to be correlated within StudyID, but *not*
+> > > "within TreatmentGroup within StudyID".
+> > >
+> > > So before I attempt to recreate the same structure, it would need to be
+> clear
+> > > exactly what kind of structure you really want.
+> > >
+> > > Best,
+> > > Wolfgang
+> > >
+> > > > -----Original Message-----
+> > > > From: Ross Neville <mailto:mailto:mailto:mailto:ross.neville at ucd.ie>
+> > > > Sent: Thursday, February 13, 2025 18:28
+> > > > To: Viechtbauer, Wolfgang (NP)
+> > > <mailto:mailto:mailto:mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>;
+> > > > mailto:mailto:mailto:mailto:r-sig-meta-analysis at r-project.org
+> > > > Subject: nesting an inner | outer formula
+> > > >
+> > > > Hi Wolfgang
+> > > >
+> > > > I hope this email finds you well
+> > > >
+> > > > I was wondering if you could tell me whether the following list of random
+> > > > effects can be updated to make the the inner | outer formula conditional.
+> > > >
+> > > > random = list (~ 1 | StudyID, ~ Informant | TreatmentGroup)
+> > > >
+> > > > I would like for the different levels of Informant to be correlated within
+> > > > TreatmentGroup within StudyID, and I would like the different levels of
+> > > > TreatmentGroup to be correlated within StudyID too.
+> > > >
+> > > > In SAS Proc Mixed, I've managed to run this model and I want to replicate
+> it
+> > > in
+> > > > metafor http://rma.mv.
+> > > >
+> > > > random StudyID;
+> > > > random Informant/subject=StudyID, group=TreatmentGroup type=un;
+> > > > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1/hold=14;
+> > > >
+> > > > Any help you can provide to let me know if this is possible in
+> http://rma.mv
+> > > > would be much appreciated.
+> > > >
+> > > > Regards
+> > > > Ross
+> > > >
+> > > > --
+> > > > Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+> > > > Head of Subject - Sport Management
+> > > > School of Public Health, Physiotherapy and Sport Science
+> > > > University College Dublin (UCD)
+> > > > Room G6 - Woodview House
+> > > > Belfield, Dublin 4
+> > > > mailto:mailto:mailto:mailto:mailto:mailto:mailto:ross.neville at ucd.ie
+> > > > +353 (0) 1 716 3419
+
+From ro@@@nev|||e @end|ng |rom ucd@|e  Mon Feb 24 11:53:59 2025
+From: ro@@@nev|||e @end|ng |rom ucd@|e (Ross Neville)
+Date: Mon, 24 Feb 2025 10:53:59 +0000
+Subject: [R-meta] nesting an inner | outer formula
+In-Reply-To: <CAERR2oyGjMn3b0r2jfFJ=6GVj692a8-3G0G00zRxNqFLKwoKXg@mail.gmail.com>
+References: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+ <AS8PR08MB9193FB6B4C982587426BF81C8BFE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oz65mSjfXP7gx8oKjtNbjGaM6VtgWL6-++mvzbjwz=Xtw@mail.gmail.com>
+ <AS8PR08MB91930FE8A2C41FA0E2CD4ACF8BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oy_bguDVsh=5oj3T6JfnL9c7eGk13VQ-y2dhO_Hw+r4gg@mail.gmail.com>
+ <AS8PR08MB91931D5F75481CD04C5B87668BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oy8K27vY7o2K05Z5XVAotheEB=1+84NPr82AF0bT+rEzA@mail.gmail.com>
+ <AS8PR08MB9193511D08A1149D0525C2508BC52@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oyGjMn3b0r2jfFJ=6GVj692a8-3G0G00zRxNqFLKwoKXg@mail.gmail.com>
+Message-ID: <CAERR2owScSpbWOHvW0Y960G86NEA6c0Ggad9w5wJ5v165mQxVw@mail.gmail.com>
+
+Hi Wolfgang
+Apologies for not linking this email to the mailing list.
+See below.
+Regards,
+Ross
+
+---------- Forwarded message ---------
+From: Ross Neville <ross.neville at ucd.ie>
+Date: Mon, 24 Feb 2025 at 10:03
+Subject: Re: nesting an inner | outer formula
+To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl
+>
+
+
+Hi Wolfgang
+
+Thanks so much for this detailed response, and for clarifying the current
+position of the metafor package as far as negative variances are concerned.
+
+In the meantime, I have settled on the set of random effects highlighted
+yellow in the proc mixed programme below. I would very much like to be able
+to reproduce this set of random effects and model (as far as possible) in
+rma.mv.
+
+Here's the full proc mixed programme:
+
+proc mixed covtest data=dat2 cl;
+class StudyID EstimateID Treatment Informant;
+weight InvErr;
+model PostInterventionMean = TreatmentGroup*Informant/noint s cl ddfm=sat
+residual;
+random Treatment/subject=StudyID type=un group=Informant s;
+parms 1 1 1 1 1 1 1 1 1 1/hold=10;
+
+The resulting variance components output provides a variance for each
+treatment group within each study along with their covariance, grouped by
+informant.
+
+How would such a random effect be programmed in rma.mv?
+
+Appreciate your continued correspondence and support.
+
+Regards
+Ross
+
+On Wed, 19 Feb 2025 at 08:34, Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Standard errors for variance components are typically not all that useful,
+> since the sampling distribution of a variance component estimate is
+> typically not normal. One can still obtain them with rma.mv() using
+> cvvc=TRUE (this estimates the entire var-cov matrix of the
+> variance/correlation components).
+>
+> Variance component estimates (and corresponding CIs) are indeed forced to
+> be non-negative by rma.mv(). One can get around this to some extent by
+> using an '~ inner | outer' random effect instead of '~ 1 | outer/inner',
+> since in the former the correlation can be negative, which corresponds to a
+> negative variance for the outer term in '~ 1 | outer/inner'. See:
+>
+> https://www.metafor-project.org/doku.php/analyses:konstantopoulos2011
+>
+> But if you really want negative variances (for all variance components),
+> then you will have to use something different than rma.mv(). Allowing for
+> negative variances causes so many coding headaches that I decided not to
+> implementing this (I do allow for negative tau^2 estimates in rma.uni() but
+> this is a much more restricted model space, so handling all the special
+> circumstances around negative variances is much easier there).
+>
+> And yes, I see no inherent problem when a variance component is estimated
+> to be essentially zero.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Ross Neville <ross.neville at ucd.ie>
+> > Sent: Tuesday, February 18, 2025 14:46
+> > To: Viechtbauer, Wolfgang (NP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Subject: Re: nesting an inner | outer formula
+> >
+> > Okay. Thanks for that suggestion for validating the results. My fear was
+> that
+> > rma.mv was not estimating a standard error for the sigma^2.2 variance
+> and that
+> > was a problem. I also feared that rma.mv was forcing the lower CI to be
+> > positive, or exactly zero. And in the presence of the model ?wanting? to
+> > estimate a negative variance given the data, rma.mv was resisting that
+> because a
+> > variance can?t be negative. And given all this, the sigma^2.2 is not
+> worth
+> > having in the analysis at all. Are you saying instead that the sigma^2.2
+> being 0
+> > and having a lower CI of exactly 0 is fine and that model sensible and
+> something
+> > that one could move forward with?
+> >
+> > Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+> > Head of Subject - Sport Management
+> > School of Public Health, Physiotherapy and Sport Science
+> > University College Dublin (UCD)
+> > Room G6 - Woodview House
+> > Belfield, Dublin 4
+> > mailto:ross.neville at ucd.ie
+> > +353 (0) 1 716 3419
+> >
+> > On Tue 18 Feb 2025 at 13:21, Viechtbauer, Wolfgang (NP)
+> > <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> > Given the 'nlvls' values shown, you appear to have enough data to get
+> fairly
+> > accurate estimates (you could check confint(model) to see how tight the
+> CIs
+> > are). So I don't think the model is too complex. It could very well be
+> that
+> > there isn't much heterogeneity in the Condition effect.
+> >
+> > You could also check this by computing the mean difference within
+> studies for
+> > Exp versus Control (if there are multiple informats, do this for every
+> type).
+> > Strictly speaking again, these mean differences are not independent
+> (since
+> > mean_trt_parent - mean_ctrl_parent and mean_trt_teacher -
+> mean_ctrl_teacher
+> > involves reports on the same children by parents and teachers), but if
+> you
+> > ignored V in the model results you have shown, then we can do the same
+> here).
+> > You should find that those mean differences are fairly consistent (at
+> least not
+> > more variable than would be expected based on their sampling variances).
+> >
+> > Best,
+> > Wolfgang
+> >
+> > > -----Original Message-----
+> > > From: Ross Neville <mailto:ross.neville at ucd.ie>
+> > > Sent: Tuesday, February 18, 2025 13:41
+> > > To: Viechtbauer, Wolfgang (NP)
+> > <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > > Cc: mailto:r-sig-meta-analysis at r-project.org
+> > > Subject: Re: nesting an inner | outer formula
+> > >
+> > > Thanks Wolfgang
+> > > I will take some time to digest the contents. I appreciate the detail
+> and
+> > > guidance.
+> > > Quickly, the suggested model provides a sigma^2.2 variance of 0, as
+> shown
+> > > below.
+> > > This makes me feel like the random effects random = ~ 1 | StudyID /
+> > > TreatmentGroup / Informant are too complex for the available data.
+> > > Thought on that?
+> > >
+> > > On Tue, 18 Feb 2025 at 12:34, Viechtbauer, Wolfgang (NP)
+> > > <mailto:mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> > > Dear Ross,
+> > >
+> > > Thanks for the clarification. Based on this, I would consider the
+> following
+> > > structure:
+> > >
+> > > random = ~ 1 | StudyID / TreatmentGroup / Informant
+> > >
+> > > This captures overall differences in the outcomes (across the
+> experimental and
+> > > control groups and across all informants) between studies. It also
+> allows for
+> > > heterogeneity in how much experimental and control groups differ from
+> each
+> > other
+> > > across studies (I assume you will add something like mods = ~
+> TreatmentGroup
+> > to
+> > > the model, since presumably you are interested in the size of the
+> (average)
+> > > difference between the two groups). And it allows for heterogeneity in
+> > outcomes
+> > > that arises due to some studies using multiple informants. By nesting
+> > Informant
+> > > within TreatmentGroup, this model automatically implies a certain
+> degree of
+> > > correlation in the true outcomes for different informants within
+> > > experimental/control groups. This last random effect is also the
+> 'outcome
+> > level'
+> > > random effect, since based on your description, every combination of
+> StudyID,
+> > > TreatmentGroup, and Informant should yield a unique value for each row.
+> > >
+> > > Strictly speaking, this structure does not capture the correlation in
+> the
+> > > sampling errors that arises because multiple informants are reporting
+> on the
+> > > *same children*. If reports, say from parents and teachers, are
+> correlated,
+> > then
+> > > this implies that the sampling errors of the means are also
+> correlated. Such a
+> > > correlation (or more precisely, the covariance) should go into the V
+> matrix.
+> > > However, to compute this covariance, you would need to know what the
+> > correlation
+> > > (r) between the parent and teacher reports. This is probably not
+> reported, but
+> > > maybe can be guestimated from other or your own studies. Say the data
+> for the
+> > > first two studies looks like this:
+> > >
+> > > Study  Group  Informant   Outcome
+> > > 1      Exp    Child       .
+> > > 1      Ctrl   Child       .
+> > > 2      Exp    Parent      .
+> > > 2      Exp    Teacher     .
+> > > 2      Ctrl   Parent      .
+> > > 2      Ctrl   Teacher     .
+> > >
+> > > Then the corresponding V matrix would be (use a fixed width font to
+> view this
+> > so
+> > > that things are lined up properly):
+> > >
+> > > [s_1E^2/n_1E
+> > >         ]
+> > > [            s_1C^2/n_1C
+> > >         ]
+> > > [                        s_2EP^2/n_2E
+> > > r*s_2EP*s_2ET/n_2E                                ]
+> > > [                                     s_2ET^2/n_2E
+> > >         ]
+> > > [                                                        s_2CP^2/n_2C
+> > > r*s_2CP*s_2CT/n_2C]
+> > >
+> > [
+>  s_2CT^2/n_
+> > > 2C      ]
+> > >
+> > > where s stands for standard deviation, n for sample size, and the
+> subscripts
+> > are
+> > > for study, group, and informant in that order (single letter
+> abbreviations).
+> > > Elements left blank are equal to 0 (zero covariance). I did not put a
+> > subscript
+> > > on r since this is probably a single guestimated value across all
+> studies (and
+> > > informant pairs). Such a V matrix can be easily generated using the
+> vcalc()
+> > > function.
+> > >
+> > > Since V is probably just going to be an approximation (especially if
+> you
+> > decide
+> > > not to bother creating the V matrix, which in essence implies assuming
+> r=0), I
+> > > would then consider using cluster-robust inference methods
+> (robust(model,
+> > > cluster=StudyID, clubSandwich=TRUE)) at least as a sensitivity check.
+> > >
+> > > I think the above is a good and sensible starting point. A more complex
+> > > structure might be:
+> > >
+> > > dat$StudyID.TreatmentGroup <- paste0(dat$StudyID, ".",
+> dat$TreatmentGroup)
+> > > random = list(~ TreatmentGroup | StudyID, ~ Informant |
+> > StudyID.TreatmentGroup),
+> > > struct="UN")
+> > >
+> > > This would allow for different variances for experimental and control
+> groups
+> > and
+> > > it would allow for different variances for the different types of
+> informants
+> > and
+> > > allow the correlation in the random effects to differ depending on the
+> type of
+> > > informant pair (child-parent, child-teacher, parent-teacher, etc.).
+> But I
+> > would
+> > > only attempt to fit this model if there is plenty of data. One could
+> use a LRT
+> > > to compare the two model structures. There is also a structure with
+> > intermediate
+> > > complexity by using struct=c("UN","HCS"), where we assume different
+> variances
+> > > for the different informants, but a single correlation irrespective of
+> the
+> > pair.
+> > >
+> > > One might also consider TreatmentGroup and Informant to be crossed
+> random
+> > > effects (within studies), but I think this is overcomplicating things.
+> > >
+> > > Best,
+> > > Wolfgang
+> > >
+> > > > -----Original Message-----
+> > > > From: Ross Neville <mailto:mailto:ross.neville at ucd.ie>
+> > > > Sent: Friday, February 14, 2025 14:32
+> > > > To: Viechtbauer, Wolfgang (NP)
+> > > <mailto:mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > > > Cc: mailto:mailto:r-sig-meta-analysis at r-project.org
+> > > > Subject: Re: nesting an inner | outer formula
+> > > >
+> > > > Dear Wolfgang
+> > > >
+> > > > Thanks for the speedy response, and for seeking clarification and
+> correcting
+> > > my
+> > > > error.
+> > > >
+> > > > Rather than try to correct my interpretation of the SAS code,
+> perhaps it
+> > would
+> > > > make more sense to tell you what structure I really want.
+> > > >
+> > > > The data structure is such that I have studies (StudyID) reporting
+> post-
+> > > > intervention means for children in an experimental and control group
+> > > > (TreatmentGroup). The variable Informant tells us who is reporting
+> on behalf
+> > > of
+> > > > the child. Some studies have child report only (so two rows for such
+> a
+> > StudyID
+> > > > corresponding to the post-intervention means for the experimental and
+> > control
+> > > > group). Studies with parent report or teacher report only are the
+> same (two
+> > > > rows). There are also studies where there is data from child and
+> parent,
+> > child
+> > > > and teacher, teacher and parent, or even child parent and teacher.
+> So,
+> > > > essentially, a StudyID could have two rows, four rows, or six rows,
+> > depending
+> > > on
+> > > > how many Informants there are. Children are in the experimental or
+> control
+> > > group
+> > > > only, so one would expect Informants to be nested and correlated
+> within
+> > > > TreatmentGroup within studies.
+> > > >
+> > > > Because of the data structure (multiple rows of sample means rather
+> than
+> > fewer
+> > > > rows of pairwise comparisions) the degree to which control and
+> intervention
+> > > > group means are more or less similar in a given StudyID is capture
+> in part
+> > > > (maybe even large part) by ~ 1 | StudyID.
+> > > >
+> > > > What is missing from this random = list (~ 1 | StudyID, ~ Informant |
+> > > > TreatmentGroup) is the fact that the inner | outer is saying, for
+> example,
+> > > that
+> > > > parents in the experimental or control group across studies share
+> correlated
+> > > > random effects. When, in fact, one would expect parents, children,
+> and
+> > > teachers
+> > > > in the experimental or control group to share correlated random
+> effects
+> > within
+> > > a
+> > > > given study.
+> > > >
+> > > > Perhaps given the data structure, you would advise something else. Or
+> > perhaps
+> > > I
+> > > > am still being unclear in my description and understanding.
+> > > >
+> > > > Regards
+> > > > Ross
+> > > >
+> > > > On Fri, 14 Feb 2025 at 13:00, Viechtbauer, Wolfgang (NP)
+> > > > <mailto:mailto:mailto:mailto:
+> wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > wrote:
+> > > > Dear Ross,
+> > > >
+> > > > my proc mixed knowledge is a bit rusty, but unless I am confused,
+> your proc
+> > > > mixed statement specifies a random intercept for StudyID and an UN
+> structure
+> > > for
+> > > > Informant within StudyID allowing for different
+> variances/covariances for
+> > the
+> > > > different levels of TreatmentGroup.
+> > > >
+> > > > > random StudyID;
+> > > > > random Informant / subject=StudyID group=TreatmentGroup type=un;
+> > > > > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1 / hold=14;
+> > > >
+> > > > I don't think this quite matches up with your description:
+> > > >
+> > > > > I would like for the different levels of Informant to be
+> correlated within
+> > > > > TreatmentGroup within StudyID, and I would like the different
+> levels of
+> > > > > TreatmentGroup to be correlated within StudyID too.
+> > > >
+> > > > For example, there is nothing in your proc mixed statement that
+> allows for
+> > > > "TreatmentGroup to be correlated within StudyID". Also, the second
+> random
+> > > > statement allows for Informant to be correlated within StudyID, but
+> *not*
+> > > > "within TreatmentGroup within StudyID".
+> > > >
+> > > > So before I attempt to recreate the same structure, it would need to
+> be
+> > clear
+> > > > exactly what kind of structure you really want.
+> > > >
+> > > > Best,
+> > > > Wolfgang
+> > > >
+> > > > > -----Original Message-----
+> > > > > From: Ross Neville <mailto:mailto:mailto:mailto:
+> ross.neville at ucd.ie>
+> > > > > Sent: Thursday, February 13, 2025 18:28
+> > > > > To: Viechtbauer, Wolfgang (NP)
+> > > > <mailto:mailto:mailto:mailto:
+> wolfgang.viechtbauer at maastrichtuniversity.nl>;
+> > > > > mailto:mailto:mailto:mailto:r-sig-meta-analysis at r-project.org
+> > > > > Subject: nesting an inner | outer formula
+> > > > >
+> > > > > Hi Wolfgang
+> > > > >
+> > > > > I hope this email finds you well
+> > > > >
+> > > > > I was wondering if you could tell me whether the following list of
+> random
+> > > > > effects can be updated to make the the inner | outer formula
+> conditional.
+> > > > >
+> > > > > random = list (~ 1 | StudyID, ~ Informant | TreatmentGroup)
+> > > > >
+> > > > > I would like for the different levels of Informant to be
+> correlated within
+> > > > > TreatmentGroup within StudyID, and I would like the different
+> levels of
+> > > > > TreatmentGroup to be correlated within StudyID too.
+> > > > >
+> > > > > In SAS Proc Mixed, I've managed to run this model and I want to
+> replicate
+> > it
+> > > > in
+> > > > > metafor http://rma.mv.
+> > > > >
+> > > > > random StudyID;
+> > > > > random Informant/subject=StudyID, group=TreatmentGroup type=un;
+> > > > > parms  1  1 1 1  1 1 1  1 1 1  1 1 1  1/hold=14;
+> > > > >
+> > > > > Any help you can provide to let me know if this is possible in
+> > http://rma.mv
+> > > > > would be much appreciated.
+> > > > >
+> > > > > Regards
+> > > > > Ross
+> > > > >
+> > > > > --
+> > > > > Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+> > > > > Head of Subject - Sport Management
+> > > > > School of Public Health, Physiotherapy and Sport Science
+> > > > > University College Dublin (UCD)
+> > > > > Room G6 - Woodview House
+> > > > > Belfield, Dublin 4
+> > > > > mailto:mailto:mailto:mailto:mailto:mailto:mailto:
+> ross.neville at ucd.ie
+> > > > > +353 (0) 1 716 3419
+>
+
+
+-- 
+Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+Head of Subject - Sport Management
+School of Public Health, Physiotherapy and Sport Science
+University College Dublin (UCD)
+Room G6 - Woodview House
+Belfield, Dublin 4
+ross.neville at ucd.ie
++353 (0) 1 716 3419
+
+
+
+-- 
+Dr Ross D. Neville, PhD, ProfCert University Teaching and Learning
+Head of Subject - Sport Management
+School of Public Health, Physiotherapy and Sport Science
+University College Dublin (UCD)
+Room G6 - Woodview House
+Belfield, Dublin 4
+ross.neville at ucd.ie
++353 (0) 1 716 3419
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Feb 24 15:51:04 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 24 Feb 2025 14:51:04 +0000
+Subject: [R-meta] nesting an inner | outer formula
+In-Reply-To: <CAERR2owScSpbWOHvW0Y960G86NEA6c0Ggad9w5wJ5v165mQxVw@mail.gmail.com>
+References: <CAERR2owg_0QohQ0EsuoQ+Q6KVD=r7_mpEMsFgxVffP=ntb5wPg@mail.gmail.com>
+ <AS8PR08MB9193FB6B4C982587426BF81C8BFE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oz65mSjfXP7gx8oKjtNbjGaM6VtgWL6-++mvzbjwz=Xtw@mail.gmail.com>
+ <AS8PR08MB91930FE8A2C41FA0E2CD4ACF8BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oy_bguDVsh=5oj3T6JfnL9c7eGk13VQ-y2dhO_Hw+r4gg@mail.gmail.com>
+ <AS8PR08MB91931D5F75481CD04C5B87668BFA2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oy8K27vY7o2K05Z5XVAotheEB=1+84NPr82AF0bT+rEzA@mail.gmail.com>
+ <AS8PR08MB9193511D08A1149D0525C2508BC52@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAERR2oyGjMn3b0r2jfFJ=6GVj692a8-3G0G00zRxNqFLKwoKXg@mail.gmail.com>
+ <CAERR2owScSpbWOHvW0Y960G86NEA6c0Ggad9w5wJ5v165mQxVw@mail.gmail.com>
+Message-ID: <AS8PR08MB91934C339FFD145730A3BA0C8BC02@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi Ross,
+
+rma.mv() does not have something like the 'group' option, but one should be able to accomplish the same thing with a bit of trickery. In essence, the two levels of Treatment and the three types of informats can be combined into a single variable with 6 levels:
+
+dat$Treatment.Informant <- paste0(dat$Treatment, ".", dat$Informant)
+
+which we then use in 'random' with an unstructured var-cov matrix:
+
+random = ~ Treatment.Informant | StudyID, struct="UN"
+
+This yields a 6x6 var-cov matrix of the random effects. But the model assumes that any covariances/correlations for non-identical informants are zero. So you need to use 'rho = c()' to set these correlations to zero (and use NA to indicate that a correlation should be estimated). See:
+
+https://wviechtb.github.io/metafor/reference/rma.mv.html#fixing-variance-correlation-components
+
+I *think* this should be 'rho = c(NA,0,0,0,0, 0,0,0,0, NA,0,0, 0,0, NA)' but you should double-check this.
+
+This makes the estimation process more complicated, so it might require some pushing and prodding (via different optimizers, optimizer settings, initial values) to get things to converge.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Ross Neville <ross.neville at ucd.ie>
+> Sent: Monday, February 24, 2025 11:54
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>;
+> r-sig-meta-analysis at r-project.org
+> Subject: nesting an inner | outer formula
+>
+> Hi Wolfgang
+>
+> Thanks so much for this detailed response, and for clarifying the current
+> position of the metafor package as far as negative variances are concerned.
+>
+> In the meantime, I have settled on the set of random effects highlighted yellow
+> in the proc mixed programme below. I would very much like to be able to
+> reproduce this set of random effects and model (as far as possible) in rma.mv.
+>
+> Here's the full proc mixed programme:
+>
+> proc mixed covtest data=dat2 cl;
+> class StudyID EstimateID Treatment Informant;
+> weight InvErr;
+> model PostInterventionMean = TreatmentGroup*Informant/noint s cl ddfm=sat
+> residual;
+> random Treatment/subject=StudyID type=un group=Informant s;
+> parms 1 1 1 1 1 1 1 1 1 1/hold=10;
+>
+> The resulting variance components output provides a variance for each treatment
+> group within each study along with their covariance, grouped by informant.
+>
+> How would such a random effect be programmed in rma.mv?
+>
+> Appreciate your continued correspondence and support.
+>
+> Regards
+> Ross
+>
+> On Wed, 19 Feb 2025 at 08:34, Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Standard errors for variance components are typically not all that useful, since
+> the sampling distribution of a variance component estimate is typically not
+> normal. One can still obtain them with rma.mv() using cvvc=TRUE (this estimates
+> the entire var-cov matrix of the variance/correlation components).
+>
+> Variance component estimates (and corresponding CIs) are indeed forced to be
+> non-negative by rma.mv(). One can get around this to some extent by using an '~
+> inner | outer' random effect instead of '~ 1 | outer/inner', since in the former
+> the correlation can be negative, which corresponds to a negative variance for
+> the outer term in '~ 1 | outer/inner'. See:
+>
+> https://www.metafor-project.org/doku.php/analyses:konstantopoulos2011
+>
+> But if you really want negative variances (for all variance components), then
+> you will have to use something different than rma.mv(). Allowing for negative
+> variances causes so many coding headaches that I decided not to implementing
+> this (I do allow for negative tau^2 estimates in rma.uni() but this is a much
+> more restricted model space, so handling all the special circumstances around
+> negative variances is much easier there).
+>
+> And yes, I see no inherent problem when a variance component is estimated to be
+> essentially zero.
+>
+> Best,
+> Wolfgang
+

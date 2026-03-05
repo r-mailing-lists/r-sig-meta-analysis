@@ -1,0 +1,255 @@
+From i@io m@iii@g oii phys@ii@-courses@org  Mon Jan 12 10:41:45 2026
+From: i@io m@iii@g oii phys@ii@-courses@org (i@io m@iii@g oii phys@ii@-courses@org)
+Date: Mon, 12 Jan 2026 10:41:45 +0100 (CET)
+Subject: [R-meta] =?utf-8?q?online_course=3A_Meta-analysis_in_R_-_11?=
+ =?utf-8?b?4oCTMTQgTWF5?=
+Message-ID: <1768210905.591323241@webmail.jimdo.com>
+
+
+Dear all,
+We are pleased to announce the upcoming online course ?Meta-analysis in R?, taking place from 11?14 May.
+ 
+This hands-on course provides a practical introduction to modern methods for systematic reviews and meta-analyses, with a strong focus on applications in ecology and evolutionary biology. Participants will learn how to design and conduct systematic reviews, choose and calculate effect sizes, perform multilevel meta-analyses and meta-regressions, and interpret results while accounting for heterogeneity and publication bias.
+ 
+The course combines lectures and practical exercises using real datasets and the R packages metafor and orchaRd, following open science and PRISMA EcoEvo guidelines. All analyses will be conducted in R, with scripts and resources provided.
+ 
+Course website: [ https://www.physalia-courses.org/courses-workshops/metain-r/ ]( https://www.physalia-courses.org/courses-workshops/metain-r/ )
+ 
+Best regards,
+Carlo
+ 
+ 
+--------------------
+
+Carlo Pecoraro, Ph.D
+
+
+Physalia-courses DIRECTOR
+
+info at physalia-courses.org
+
+mobile: +49 17645230846
+
+[ Bluesky ]( https://bsky.app/profile/physaliacourses.bsky.social ) [ Linkedin ]( https://www.linkedin.com/in/physalia-courses-a64418127/ )
+
+
+	[[alternative HTML version deleted]]
+
+
+From mtruong @end|ng |rom yorku@c@  Wed Jan 14 21:24:21 2026
+From: mtruong @end|ng |rom yorku@c@ (Michael Truong)
+Date: Wed, 14 Jan 2026 20:24:21 +0000
+Subject: [R-meta] When is it OK to pool between and within-subjects effect
+ sizes in meta-analyses?
+Message-ID: <YT2PR01MB5760B3CF8ABCFB8CEF7C29C1D48FA@YT2PR01MB5760.CANPRD01.PROD.OUTLOOK.COM>
+
+Hi Everyone,
+
+I am trying to run a Bayesian meta-analysis with effect sizes from both between-subjects and within-subjects study designs. I tried to do my due-diligence, but I am confused. I have written up my question as a Quarto,  .bib and .html files that you may access here: https://gist.github.com/emstruong/3d19cb8861befe2161fa4ee2ceab3bde.
+
+Here is my long write-up:
+
+# Problem Statement
+
+I'm concerned about when it is appropriate to pool effect sizes from between-subjects and within-subjects studies together and would appreciate any guidance. I am finding contradicting recommendations and I don't know what to make of it. Perhaps part of the problem is that the recommendations never seem to directly discuss how meta-regression might affect the analyst's pooling of the effect sizes in the same model. And examples of meta-regression that model the differences in between-subjects and within-subjects studies (referred to as 'study type', hereafter) don't seem to touch on issues of 'construct validity' or issues of what to do when you want to include further predictors in the meta-regression. I have summarized key citations in the section below this blurb.
+
+In particular, given the arguments presented in Hamaker [- at hamaker2012], I think that effects on a between-subjects versus within-subjects level might generally correspond to different phenomena. Hence, I will refer to this general issue as a problem of 'construct validity', specifically whether the effects of between-subjects studies validly measure the *same* phenomena as within-subjects studies.
+
+For those not familiar, in Hamaker [- at hamaker2012], the canonical example is that the between-subjects correlation between typing speed and number of typos is negative: A higher score on the latent variable of typing skill should mean both a higher typing speed and a fewer number of typos. However, the within-subjects correlation between typing speed and number of typos is positive: Asking someone to type faster than what they're comfortable with should increase the number of typose they make. Thus, each effect size from between versus within-subjects designs corresponds to completely different phenomena. (Concrete code for simulating this example are provided at the bottom of this post.)
+
+**This problem of construct validity leads to my series of questions. Generalizing to the case of meta-analyses, when is it appropriate to include effect sizes from both between-subjects and within-subjects studies together within the same meta-analysis?**
+
+-   Does meta-regression using the study type (between-subjects/within-subjects) as a moderator completely address the problems with construct validity?
+-   If the effects are truly fundamentally different from one-another, does this mean that further meta-regressions (e.g,. Country of study) should be done using study type in an interaction (i.e., Country x study-type)?
+-   Would we better off running two separate meta-analyses, one for all the within-subjects studies and another for all the between-subjects studies?
+-   Won't it be problematic to use meta-regression to test whether study type is a significant moderator and hence, should be modelled? If you fail to find a statistically significant difference---despite real underlying differences in construct validity---and proceed to pool the studies together, then won't you end up under-estimating the amount of uncertainty in your meta-analysis? You would be inflating the number of studies used in your estimate of the mean effect.
+    -   It is not because the main effect of study type is statistically non-significant that it is guaranteed to not be a highly-significant and important moderator when put in an interaction with some other moderator variable.
+    -   The above strategy that I am questioning is basically put forth here: <https://stats.stackexchange.com/a/393582>
+
+# Citations and Snippets from the Literature and Online Blogs
+
+Cooper [- at cooperHandbookResearchSynthesis2019] emphasizes the importance of whether the different studies are asking the same questions or not. Cooper [- at cooperHandbookResearchSynthesis2019] also does not mention whether meta-regression can be used to model the statistical differences between the two types of effect sizes (between subjects and within subjects).
+
+> "In this discussion, *different study designs* refers to instances in which, for example, one study uses independent groups and another uses a pre-post design or matched groups. It does not refer to indstances when one study was a randomized trial (or quasi-experimental study) and another observational. In general, these two kinds of studies will be addressing fundamentally different questions; it would not be appropriate to include them in the same analysis." Page 240 of Cooper [- at cooperHandbookResearchSynthesis2019]
+
+Another classic resource is Morris and DeShon [- at morrisCombiningEffectSize2002]. They don't explicitly frame their argument in terms of validity. Although they do say:
+
+> "For effect size estimates to be meaningfully compared across studies, it is necessary that (a) all effect sizes estimate the same treatment effect and (b) all effect sizes be scaled in the same metric. \[...\] If the effect sizes from different studies estimate different population mean differences or different population standard deviations, they cannot be meaningfully combined." [@morrisCombiningEffectSize2002, pp. 106]
+
+In a blog-post on using Bayesian meta-analysis using `brms`, Kurz [- at kurzBayesianMetaanalysisBrms2022] models the difference between between-subjects and within-subject designed studies using meta-regression, but there is no discussion of construct validity or what we should do if we wanted to add further predictors in our meta-regression.
+
+In the brms book, Burkner [- at burknerBrmsBookApplied2024, pp. 269-271] performs a 'multivariate meta-analysis' on the effects of intranasal oxytocin sprapys and where three different outcomes (on the same scale) are used within the same meta-regression. In this meta-regression, the type of outcome is included as a predictor. I think this is analogous to the problem of pooling between-subjects and within-subjects design because, clearly, each of the three outcomes corresponds to a completely different phenomena. Albeit, any expected change would be attributed to the intervention of interest.
+
+# Regarding Hamaker (2012)
+
+```{r}
+# With some coding help from Claude to make things faster
+library(ggplot2)
+library(patchwork)
+set.seed(42)
+```
+
+Following the example in Figure 3.1 of Hamaker [- at hamaker2012]:
+
+Let's say that we have two types of data:
+
+-   Between-subjects correlations of number of words per minute and percentage of typos
+
+```{r}
+n_cross <- 100
+
+# Generate typing speed (words per minute)
+wpm_cross <- rnorm(n_cross, mean = 60, sd = 15)
+
+# Generate typo percentage with negative correlation
+# Faster typers (higher skill) make fewer typos and use pmax to ensure non-negativity
+typo_pct_cross <- (15 -
+  0.15 * wpm_cross +
+  rnorm(n_cross, mean = 0, sd = 2)) |>
+    pmax(min = 0)
+
+cross_sectional_data <- data.frame(
+  person_id = 1:n_cross,
+  wpm = wpm_cross,
+  typo_percentage = typo_pct_cross
+)
+```
+
+-   Within-subjects correlations of number of words per minute and percentage of typos
+
+```{r}
+n_persons <- 15
+n_observations_per_person <- 20
+
+within_person_data <- data.frame()
+
+for (i in 1:n_persons) {
+  # Each person has their own baseline skill level
+  person_baseline_wpm <- rnorm(1, mean = 60, sd = 15)
+  person_baseline_typo <- rnorm(1, mean = 8, sd = 2)
+
+  # Within-person variations around their baseline
+  wpm_variation <- rnorm(n_observations_per_person, mean = 0, sd = 8)
+  wpm_person <- person_baseline_wpm + wpm_variation
+
+  # Positive within-person correlation: faster typing = more typos
+  typo_person <- (person_baseline_typo +
+    0.12 * wpm_variation +
+    rnorm(n_observations_per_person, mean = 0, sd = 1)) |>
+    pmax(min = 0)
+
+  person_data <- data.frame(
+    person_id = i,
+    wpm = wpm_person,
+    typo_percentage = typo_person
+  )
+
+  within_person_data <- rbind(within_person_data, person_data)
+}
+```
+
+Then this implies the following set of graphs
+
+```{r}
+# Plot 1: Cross-sectional
+p1 <- ggplot(cross_sectional_data, aes(x = wpm, y = typo_percentage)) +
+  geom_point(alpha = 0.5, size = 2) +
+  stat_ellipse(level = 0.95, color = "black", size = 1) +
+  labs(title = "Between-Subjects",
+       x = "number of words\nper minute",
+       y = "percentage\nof typos") +
+  theme_minimal(base_size = 14) +
+  theme(axis.title.y = element_text(angle = 90, vjust = 0.5),
+        plot.title = element_text(hjust = 0.5))
+
+# Plot 2: Within-person
+p2 <- ggplot(within_person_data, aes(x = wpm, y = typo_percentage, group = person_id)) +
+  stat_ellipse(level = 0.75, alpha = 0.3, color = "gray60", size = 0.8) +
+  labs(title = "Within-Subjects",
+       x = "number of words\nper minute",
+       y = "percentage\nof typos") +
+  theme_minimal(base_size = 14) +
+  theme(axis.title.y = element_text(angle = 90, vjust = 0.5),
+        plot.title = element_text(hjust = 0.5))
+
+p1 | p2
+```
+
+Cheers,
+Michael
+ 
+ 
+--------------------------------------------------------
+Michael S. Truong
+
+Flora Quantitative Lab, PhD4
+York University
+mtruong at yorku.ca | emstruonger at gmail.com
+https://emstruong.github.io/
+ --------------------------------------------------------
+
+I try to answer emails within a week, once a week.
+
+From zj|n65 @end|ng |rom uwo@c@  Mon Jan 26 05:14:54 2026
+From: zj|n65 @end|ng |rom uwo@c@ (Zhouhan Jin)
+Date: Mon, 26 Jan 2026 04:14:54 +0000
+Subject: [R-meta] vcalc() for different rho by design (within=.7 vs
+ between=.5)
+References: <f50b33c9-db76-416c-bb7e-ddb1e65ce81f@Spark>
+Message-ID: <58af5510-a72e-4e7c-acd5-662970249fc4@Spark>
+
+Hi all,
+
+Quick question about metafor::vcalc(): is there a way to specify different within-study correlations for sampling errors depending on study design (e.g., rho = 0.5 for between-subject studies and rho = 0.7 for within-subject studies), rather than using my likely inefficient workaround using clubSandwich::pattern_covariance_matrix() to build V?
+
+I?m currently doing this (toy example below) and would appreciate any guidance on whether vcalc() can handle this directly.
+
+Thanks in advance!
+
+Zhouhan
+
+library(metafor); library(tidyverse); library(clubSandwich)
+
+dat.smc <- read.table(header=T, text="
+study time_interval   group      ni   mpre    mpost  sdpre  sdpost  design    age
+A     pre-post1       treat      28   0.89     5.07   1.40   3.20   between   adult
+A     pre-post2       treat      28   0.89     3.64   1.40   3.15   between   adult
+A     pre-post1       contl      58   1.22     3.52   1.76   2.58   between   young
+A     pre-post2       contl      58   1.22     2.86   1.76   2.80   between   young
+B     pre-post1       treat      38   1.89     4.07   0.40   2.20   within    young
+B     pre-post1       contl      48   2.22     2.52   0.76   1.58   within    young")
+
+datT <- escalc("SMCRP", ni=ni, m1i=mpost, m2i=mpre, sd1i=sdpre, sd2i=sdpost, ri=rep(.7,3), data=subset(dat.smc,group=="treat"))
+
+datC <- escalc("SMCRP", ni=ni, m1i=mpost, m2i=mpre, sd1i=sdpre, sd2i=sdpost, ri=rep(.7,3), data=subset(dat.smc,group=="contl"))
+
+arm <- "group"
+id  <- c("study","time_interval")
+
+dat <- datT %>%
+  select(all_of(c(id, "yi", "vi")), everything()) %>%
+  left_join(datC %>% select(all_of(id), yiC = yi, viC = vi), by = id) %>%
+  mutate(yi = yi - yiC, vi = vi + viC, effect = row_number()) %>%
+  select(-yiC, -viC)
+
+# Define larger correlations among effect sizes from within-subjects (0.7)
+# than those from between-subjects designs (0.5)
+dat2 <- dat %>%
+  group_by(study) %>%
+  mutate(rho_study = if_else(first(design) == "within", 0.7, 0.5)) %>%
+  ungroup()
+
+r_pat <- matrix(c(
+  0.7, 0.5,
+  0.5, 0.5
+), nrow = 2, byrow = TRUE,
+dimnames = list(c("within","between"), c("within","between")))
+
+V <- with(dat2, pattern_covariance_matrix(
+  vi = vi, cluster = study, pattern_level = design, r_pattern = r_pat, check_PD = TRUE))
+
+m <- rma.mv<http://rma.mv>(yi ~ 0 + time_interval, V, random = ~1|study/effect, data=dat2)
+
+	[[alternative HTML version deleted]]
+
+

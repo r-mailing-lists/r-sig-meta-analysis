@@ -1,0 +1,1634 @@
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Thu Feb  1 14:34:14 2024
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 1 Feb 2024 13:34:14 +0000
+Subject: [R-meta] meta-analysis of data summarised as means and SD
+In-Reply-To: <1181793866.5605215.1706730660590@mail.yahoo.com>
+References: <955154555.5323519.1706711114616.ref@mail.yahoo.com>
+ <955154555.5323519.1706711114616@mail.yahoo.com>
+ <636523c1-787b-b54e-be86-33af89d90b2f@dewey.myzen.co.uk>
+ <1181793866.5605215.1706730660590@mail.yahoo.com>
+Message-ID: <895ff6ca-c4bd-22cc-f266-70c6dbaf579b@dewey.myzen.co.uk>
+
+Dear Mark
+
+Please keep the list copied in. Comments in-line
+
+On 31/01/2024 19:51, mark walton wrote:
+> That is correct, metamean is part of the meta package, but as far as I 
+> can work out metamean in the only programme in either the meta or 
+> metafor packages that can deal with data summarised as means, standard 
+> deviations and sample number.
+
+I am afraid your understanding is not correct. If you have an estimate 
+(in your case a mean) and its standard error (which you can calculate 
+from the standard deviation and sample size) then there are several 
+packages capable of doing the analysis including metafor and, as Guido 
+has pointed out in a separate e-mail, meta.
+
+Michael
+
+
+  However, metamean can only handle single
+> factor analysis so it can tell me is microplastics occur in higher 
+> density in Asia than North and South America but not if tropical regions 
+> in Asia and the America have higher densities than temperate regions.
+> 
+> So I am looking for an alternative to metamean that will allow two or 
+> more factors to be analysed at the same time and can handle summarised data.
+> 
+> Thanks
+> Mark
+> 
+> On Wednesday, 31 January 2024 at 18:00:23 CET, Michael Dewey 
+> <lists at dewey.myzen.co.uk> wrote:
+> 
+> 
+> Dear Mark
+> 
+> The two main packages for that sort of thing are meta or metafor.
+> 
+> Michael
+> 
+> On 31/01/2024 14:25, mark walton via R-sig-meta-analysis wrote:
+>  > Hi
+>  > I wonder if anyone can suggest a way of looking at the impacts of various
+>  > factors (eg habitat, climatic zone, analysis method, minimum particle
+>  > detection size) on the sampled microplastic densities? My data is already
+>  > summarised as mean and SD for each study.
+>  > I was using the "metamean" package but this can only look at a single
+>  > factor at a time.
+>  > Thanks
+>  > Mark
+>  >
+>  > ??? [[alternative HTML version deleted]]
+>  >
+>  > _______________________________________________
+>  > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org 
+> <mailto:R-sig-meta-analysis at r-project.org>
+>  > To manage your subscription to this mailing list, go to:
+>  > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis 
+> <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+> 
+>  >
+> 
+> -- 
+> Michael
+> 
+> 
+> <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>	Virus-free.www.avg.com <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>
+> 
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+
+-- 
+Michael
+
+
+From gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de  Thu Feb  1 14:42:11 2024
+From: gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de (Dr. Guido Schwarzer)
+Date: Thu, 1 Feb 2024 13:42:11 +0000
+Subject: [R-meta] meta-analysis of data summarised as means and SD
+In-Reply-To: <955154555.5323519.1706711114616@mail.yahoo.com>
+References: <955154555.5323519.1706711114616.ref@mail.yahoo.com>
+ <955154555.5323519.1706711114616@mail.yahoo.com>
+Message-ID: <452FCF9D-99DD-406E-A2BE-50B4B0F388C1-3440@uniklinik-freiburg.de>
+
+Dear Mark,
+
+As this might be of interest to others, I reply to your DM via r-sig-meta.
+
+In order to consider two instead of one factor in metamean(), you could use interaction() to generate a new variable combining two factors (see also full R code below):
+dat$agecat.sex <- interaction(dat$agecat, dat$sex)
+
+A more general way is to use meta-regression (either using metareg() in R package meta or rma() in R package metafor which is called by metareg()):
+metareg(metamean(...), age + sex + age * sex)
+
+This regression model with two main effects and the interaction produces exactly the same results as a subgroup analysis using the variable agecat.sex if a common heterogeneity variance is assumed within subgroups.
+
+The advantage of the meta-regression is that you can easily add additional factors to the model.
+
+Best wishes,
+Guido
+
+P.S. Full R script:
+
+library("meta")
+
+set.seed(1904)
+#
+dat <- data.frame(n = rep(100, 20), mean = sample(1:6, 20, replace = TRUE),
+                  sd = rep(1, 20),
+                  age = runif(20, 40, 60),
+                  sex = sample(c("male", "female"), 20, replace = TRUE))
+dat$agecat <- factor(dat$age > 50, levels = c(FALSE, TRUE),
+  labels = c("<= 50 years", "> 50 years"))
+#
+dat$agecat.sex <- interaction(dat$agecat, dat$sex)
+
+m <- metamean(n, mean, sd, data = dat, common = FALSE)
+m
+
+# Subgroup analyses (with different between-study variances in subgroups)
+update(m, subgroup = agecat)
+update(m, subgroup = sex)
+#
+update(m, subgroup = agecat.sex)
+
+
+# Subgroup analyses assuming a common between-study variance in subgroups
+update(m, subgroup = agecat, tau.common = TRUE)
+metareg(m, agecat) # same result
+#
+update(m, subgroup = sex, tau.common = TRUE)
+metareg(m, sex) # same result
+#
+update(m, subgroup = agecat.sex, tau.common = TRUE)
+metareg(m, agecat.sex) # same result
+# Meta-regression with two categorical covariates (same result)
+metareg(m, agecat + sex + agecat * sex)
+
+
+
+From mem_w@|ton @end|ng |rom y@hoo@co@uk  Fri Feb  2 11:38:56 2024
+From: mem_w@|ton @end|ng |rom y@hoo@co@uk (mark walton)
+Date: Fri, 2 Feb 2024 10:38:56 +0000 (UTC)
+Subject: [R-meta] meta-analysis of data summarised as means and SD
+In-Reply-To: <895ff6ca-c4bd-22cc-f266-70c6dbaf579b@dewey.myzen.co.uk>
+References: <955154555.5323519.1706711114616.ref@mail.yahoo.com>
+ <955154555.5323519.1706711114616@mail.yahoo.com>
+ <636523c1-787b-b54e-be86-33af89d90b2f@dewey.myzen.co.uk>
+ <1181793866.5605215.1706730660590@mail.yahoo.com>
+ <895ff6ca-c4bd-22cc-f266-70c6dbaf579b@dewey.myzen.co.uk>
+Message-ID: <677795062.6751209.1706870336538@mail.yahoo.com>
+
+ Dear Michael
+Apologies, the list is copied in now.
+Yes I was under the illusion that metamean could only handle a single factor, I have struggled for so long trying to find a way to do it but my knowledge of R was insufficient.
+Best wishesMark
+    On Thursday, 1 February 2024 at 14:34:18 CET, Michael Dewey <lists at dewey.myzen.co.uk> wrote:  
+ 
+ Dear Mark
+
+Please keep the list copied in. Comments in-line
+
+On 31/01/2024 19:51, mark walton wrote:
+> That is correct, metamean is part of the meta package, but as far as I 
+> can work out metamean in the only programme in either the meta or 
+> metafor packages that can deal with data summarised as means, standard 
+> deviations and sample number.
+
+I am afraid your understanding is not correct. If you have an estimate 
+(in your case a mean) and its standard error (which you can calculate 
+from the standard deviation and sample size) then there are several 
+packages capable of doing the analysis including metafor and, as Guido 
+has pointed out in a separate e-mail, meta.
+
+Michael
+
+
+? However, metamean can only handle single
+> factor analysis so it can tell me is microplastics occur in higher 
+> density in Asia than North and South America but not if tropical regions 
+> in Asia and the America have higher densities than temperate regions.
+> 
+> So I am looking for an alternative to metamean that will allow two or 
+> more factors to be analysed at the same time and can handle summarised data.
+> 
+> Thanks
+> Mark
+> 
+> On Wednesday, 31 January 2024 at 18:00:23 CET, Michael Dewey 
+> <lists at dewey.myzen.co.uk> wrote:
+> 
+> 
+> Dear Mark
+> 
+> The two main packages for that sort of thing are meta or metafor.
+> 
+> Michael
+> 
+> On 31/01/2024 14:25, mark walton via R-sig-meta-analysis wrote:
+>? > Hi
+>? > I wonder if anyone can suggest a way of looking at the impacts of various
+>? > factors (eg habitat, climatic zone, analysis method, minimum particle
+>? > detection size) on the sampled microplastic densities? My data is already
+>? > summarised as mean and SD for each study.
+>? > I was using the "metamean" package but this can only look at a single
+>? > factor at a time.
+>? > Thanks
+>? > Mark
+>? >
+>? > ??? [[alternative HTML version deleted]]
+>? >
+>? > _______________________________________________
+>? > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org 
+> <mailto:R-sig-meta-analysis at r-project.org>
+>? > To manage your subscription to this mailing list, go to:
+>? > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis 
+> <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+> 
+>? >
+> 
+> -- 
+> Michael
+> 
+> 
+> <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>??? Virus-free.www.avg.com <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>
+> 
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+
+-- 
+Michael
+  
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Sun Feb  4 21:54:54 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Sun, 4 Feb 2024 14:54:54 -0600
+Subject: [R-meta] BLUPs revisit
+In-Reply-To: <MEAPR01MB5415B4E998FBA805D5425E229D7D2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB5415B9C2AC0EB4A7FF4500B59D792@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <MEAPR01MB5415B4E998FBA805D5425E229D7D2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <CAFUVuJwzwg6JVL2YqSDU69Gv3KYVjTSqSt1tBUby+gg6Zb9wpA@mail.gmail.com>
+
+Hi Yefang,
+
+I think you've posed questions that are quite challenging to answer via a
+listserv discussion. They're essentially methodological research questions,
+and answering them properly would likely require running simulations and
+perhaps doing mathematical derivations. Thus, it's unlikely that people
+would have ready responses to questions like this.
+
+James
+
+On Tue, Jan 30, 2024 at 1:16?AM Yefeng Yang via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> Hi all,
+>
+> Would someone like to provide some comments on my question? I would be
+> grateful, if could help me out, especially the MA experts like Wolfgang and
+> James.
+>
+> Best,
+> Yefeng
+>
+> ________________________________
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on
+> behalf of Yefeng Yang via R-sig-meta-analysis <
+> r-sig-meta-analysis at r-project.org>
+> Sent: 26 January 2024 11:41
+> To: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+> Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> Subject: [R-meta] BLUPs revisit
+>
+> Dear the community,
+>
+> Hope you are all doing well in the new year.
+>
+> I am very interested in BLUPs in meta-analysis. I have asked relevant
+> questions before; something like whether sd of the BLUPs is equal to the
+> tau. I got an excellent answer from the community.
+>
+> Now I have a new one. I am considering whether we can use BLUPs to assess
+> the statistical properties of the studies included in a meta-analysis. Very
+> much appreciated in advance.
+>
+> I would like to use a numerical example to present my question. Let's
+> calculate the BLUPs with:
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg,
+> data=dat.bcg)
+> res <- rma(yi, vi, data=dat)
+> study_es <- blup(res)
+>
+> The value `prep` in ` blup(res)` or object `study_es ` is actually the
+> study-specific effect, which accounts for the sampling errors.
+>
+> If I use `prep` to divide by `se` (another value in ` blup(res)` or object
+> `study_es `), I will get the so-called signal-noise-ratio (SNR), which is
+> different from the test statistic of each effect: yi/sqrt(vi). Next,
+> assuming there is no publication bias, I can use SNR to calculate the power
+> for each study: Phi(-1.96 - SNR) + 1 - Phi(1.96 - SNR). The advantage of
+> this method is that we do not need to assume the meta-analytic effect size
+> estimate (overall mean) is the true effect for each study.  I have two
+> specific questions:
+> (1) ?Does this sound reasonable? I feel something wrong with using the
+> `se` as the standard error of the study-specific true effect - not quite
+> sure we should use `se` or sqrt(vi),
+> (2) Some literature criticizes that empirical BLUPs have large
+> uncertainty. S to properly use them, one needs to account for the
+> uncertainty. If this is the case, how to account for it?
+>
+> Best,
+> Yefeng
+>
+>
+>
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Mon Feb  5 06:49:36 2024
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Mon, 5 Feb 2024 05:49:36 +0000
+Subject: [R-meta] BLUPs revisit
+In-Reply-To: <CAFUVuJwzwg6JVL2YqSDU69Gv3KYVjTSqSt1tBUby+gg6Zb9wpA@mail.gmail.com>
+References: <MEAPR01MB5415B9C2AC0EB4A7FF4500B59D792@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <MEAPR01MB5415B4E998FBA805D5425E229D7D2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJwzwg6JVL2YqSDU69Gv3KYVjTSqSt1tBUby+gg6Zb9wpA@mail.gmail.com>
+Message-ID: <MEAPR01MB541543B9FD6BAC2ECA4C25A99D472@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Hi James,
+
+That's true. Thanks for your kindly reply.
+
+Best,
+Yefeng
+________________________________
+From: James Pustejovsky <jepusto at gmail.com>
+Sent: 05 February 2024 7:54
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+Subject: Re: [R-meta] BLUPs revisit
+
+Hi Yefang,
+
+I think you've posed questions that are quite challenging to answer via a listserv discussion. They're essentially methodological research questions, and answering them properly would likely require running simulations and perhaps doing mathematical derivations. Thus, it's unlikely that people would have ready responses to questions like this.
+
+James
+
+On Tue, Jan 30, 2024 at 1:16?AM Yefeng Yang via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>> wrote:
+Hi all,
+
+Would someone like to provide some comments on my question? I would be grateful, if could help me out, especially the MA experts like Wolfgang and James.
+
+Best,
+Yefeng
+
+________________________________
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org<mailto:r-sig-meta-analysis-bounces at r-project.org>> on behalf of Yefeng Yang via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>>
+Sent: 26 January 2024 11:41
+To: r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org> <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>>
+Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au<mailto:yefeng.yang1 at unsw.edu.au>>
+Subject: [R-meta] BLUPs revisit
+
+Dear the community,
+
+Hope you are all doing well in the new year.
+
+I am very interested in BLUPs in meta-analysis. I have asked relevant questions before; something like whether sd of the BLUPs is equal to the tau. I got an excellent answer from the community.
+
+Now I have a new one. I am considering whether we can use BLUPs to assess the statistical properties of the studies included in a meta-analysis. Very much appreciated in advance.
+
+I would like to use a numerical example to present my question. Let's calculate the BLUPs with:
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+res <- rma(yi, vi, data=dat)
+study_es <- blup(res)
+
+The value `prep` in ` blup(res)` or object `study_es ` is actually the study-specific effect, which accounts for the sampling errors.
+
+If I use `prep` to divide by `se` (another value in ` blup(res)` or object `study_es `), I will get the so-called signal-noise-ratio (SNR), which is different from the test statistic of each effect: yi/sqrt(vi). Next, assuming there is no publication bias, I can use SNR to calculate the power for each study: Phi(-1.96 - SNR) + 1 - Phi(1.96 - SNR). The advantage of this method is that we do not need to assume the meta-analytic effect size estimate (overall mean) is the true effect for each study.  I have two specific questions:
+(1) ?Does this sound reasonable? I feel something wrong with using the `se` as the standard error of the study-specific true effect - not quite sure we should use `se` or sqrt(vi),
+(2) Some literature criticizes that empirical BLUPs have large uncertainty. S to properly use them, one needs to account for the uncertainty. If this is the case, how to account for it?
+
+Best,
+Yefeng
+
+
+
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From em||yru@@e||99 @end|ng |rom out|ook@com  Thu Feb 15 09:35:15 2024
+From: em||yru@@e||99 @end|ng |rom out|ook@com (Emily Russell)
+Date: Thu, 15 Feb 2024 08:35:15 +0000
+Subject: [R-meta] Intuitive explanation of BLUPs
+Message-ID: <DB9P251MB0156F9AE284E6BBDABF44D7DCA4D2@DB9P251MB0156.EURP251.PROD.OUTLOOK.COM>
+
+Dear All
+
+Sorry if this question is too simple, but could anyone give me an intuitive explanation of best linear unbiased prediction (BLUP) applied to meta-analysis?  Everything I can find seems to refer to genes, and I can't quite make the connection to meta-analysis.
+
+Thanks
+
+Emily
+
+	[[alternative HTML version deleted]]
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Thu Feb 15 11:19:57 2024
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?iso-8859-1?Q?Dr=2E_Gerta_R=FCcker?=)
+Date: Thu, 15 Feb 2024 10:19:57 +0000
+Subject: [R-meta] Intuitive explanation of BLUPs
+In-Reply-To: <DB9P251MB0156F9AE284E6BBDABF44D7DCA4D2@DB9P251MB0156.EURP251.PROD.OUTLOOK.COM>
+References: <DB9P251MB0156F9AE284E6BBDABF44D7DCA4D2@DB9P251MB0156.EURP251.PROD.OUTLOOK.COM>
+Message-ID: <c54059a761e149f1aec5d21763d46912@uniklinik-freiburg.de>
+
+Hi Emily,
+
+What you observe in a meta-analysis are the random means (or whatever effect measure is used) of the chosen endpoint in each study. If your model is the random effects model, this means that these observations randomly deviate in one or the other direction from the true means in each study. The random effects model provides an estimate of tau^2, the variance of the means between the studies. Moreover, using the tau estimate, it allows estimating the true expectations for each study. These are called BLUPs.
+
+Best,
+Gerta
+
+
+-----Urspr?ngliche Nachricht-----
+Von: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> Im Auftrag von Emily Russell via R-sig-meta-analysis
+Gesendet: Donnerstag, 15. Februar 2024 09:35
+An: r-sig-meta-analysis at r-project.org
+Cc: Emily Russell <emilyrussell99 at outlook.com>
+Betreff: [R-meta] Intuitive explanation of BLUPs
+
+Dear All
+
+Sorry if this question is too simple, but could anyone give me an intuitive explanation of best linear unbiased prediction (BLUP) applied to meta-analysis?  Everything I can find seems to refer to genes, and I can't quite make the connection to meta-analysis.
+
+Thanks
+
+Emily
+
+	[[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Thu Feb 15 14:39:17 2024
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 15 Feb 2024 13:39:17 +0000
+Subject: [R-meta] Intuitive explanation of BLUPs
+In-Reply-To: <DB9P251MB0156F9AE284E6BBDABF44D7DCA4D2@DB9P251MB0156.EURP251.PROD.OUTLOOK.COM>
+References: <DB9P251MB0156F9AE284E6BBDABF44D7DCA4D2@DB9P251MB0156.EURP251.PROD.OUTLOOK.COM>
+Message-ID: <90570a05-be65-a18b-232b-14cc5e730062@dewey.myzen.co.uk>
+
+Dear Emily
+
+It is always hard to give intuitive explanations as our intuitions 
+differ so much. That seems pusilanimous though, so here goes.
+
+Suppose you are interested in getting the best estimate for one of the 
+studies in your meta-analysis. If there is no heterogeneity then the 
+best estimate is the overall mean, the summary estimate. Suppose there 
+is substantial heterogeneity then you need an estimate somewhere between 
+the overall mean and the actual observed value in that study because you 
+know there is much between study variation. That estimate is the BLUP.
+
+Michael
+
+On 15/02/2024 08:35, Emily Russell via R-sig-meta-analysis wrote:
+> Dear All
+> 
+> Sorry if this question is too simple, but could anyone give me an intuitive explanation of best linear unbiased prediction (BLUP) applied to meta-analysis?  Everything I can find seems to refer to genes, and I can't quite make the connection to meta-analysis.
+> 
+> Thanks
+> 
+> Emily
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Thu Feb 15 16:25:05 2024
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?iso-8859-1?Q?Dr=2E_Gerta_R=FCcker?=)
+Date: Thu, 15 Feb 2024 15:25:05 +0000
+Subject: [R-meta] Intuitive explanation of BLUPs
+In-Reply-To: <90570a05-be65-a18b-232b-14cc5e730062@dewey.myzen.co.uk>
+References: <DB9P251MB0156F9AE284E6BBDABF44D7DCA4D2@DB9P251MB0156.EURP251.PROD.OUTLOOK.COM>
+ <90570a05-be65-a18b-232b-14cc5e730062@dewey.myzen.co.uk>
+Message-ID: <64961f94674641568d7440cfa5c5a97b@uniklinik-freiburg.de>
+
+pusillanimous - a great word to know, thank you, Michael :-)
+
+
+
+-----Urspr?ngliche Nachricht-----
+Von: Michael Dewey via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> 
+Gesendet: Donnerstag, 15. Februar 2024 14:39
+An: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Michael Dewey <lists at dewey.myzen.co.uk>; Emily Russell <emilyrussell99 at outlook.com>
+Betreff: Re: [R-meta] Intuitive explanation of BLUPs
+
+Dear Emily
+
+It is always hard to give intuitive explanations as our intuitions 
+differ so much. That seems pusilanimous though, so here goes.
+
+Suppose you are interested in getting the best estimate for one of the 
+studies in your meta-analysis. If there is no heterogeneity then the 
+best estimate is the overall mean, the summary estimate. Suppose there 
+is substantial heterogeneity then you need an estimate somewhere between 
+the overall mean and the actual observed value in that study because you 
+know there is much between study variation. That estimate is the BLUP.
+
+Michael
+
+On 15/02/2024 08:35, Emily Russell via R-sig-meta-analysis wrote:
+> Dear All
+> 
+> Sorry if this question is too simple, but could anyone give me an intuitive explanation of best linear unbiased prediction (BLUP) applied to meta-analysis?  Everything I can find seems to refer to genes, and I can't quite make the connection to meta-analysis.
+> 
+> Thanks
+> 
+> Emily
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Fri Feb 16 02:36:55 2024
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Fri, 16 Feb 2024 01:36:55 +0000
+Subject: [R-meta] robust error is smaller than model-based error
+Message-ID: <MEAPR01MB5415B79E49F4AC6C14CD3B459D4C2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear community,
+
+I (or, more precisely, my collaborator) am helping with one meta-analysis with dependent effect sizes. We used a multilevel model with effect size ID, study ID, and species ID as random effects.  We also used the RVE to calculate the robust error. I have two questions.
+
+
+  1.
+The test of model coefficient based on RVE indicates a significant effect (p < 0.05), while the test based on model-based error (we call it naive/original error) shows a non-significant effect (p < 0.05). I used `robust` in `metafor`, with `CR1` correction (`clubsandwich` is not working in my case; see below?) . Sorry, I do not have the raw data so there is no reproducible example.
+  2.
+How to calculate the robust error for models with non-nested random-effects structure? This issue has troubled me for a long time. Precisely, in my case, because effect size ID is nested within the study ID, so it is easy to calculate robust error (either using ? ?`robust` or ?`clubsandwich` ?). However, I still have species ID as the random effect (it is a kind of crossed random effect). In such a case `clubsandwich` is not working. `robust` is still working, but we only can use `CR1` correction.
+
+Regards,
+Yefeng
+
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Fri Feb 16 05:18:05 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 15 Feb 2024 22:18:05 -0600
+Subject: [R-meta] robust error is smaller than model-based error
+In-Reply-To: <MEAPR01MB5415B79E49F4AC6C14CD3B459D4C2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB5415B79E49F4AC6C14CD3B459D4C2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <CAFUVuJxM1Ty3+HgkB+Ye0n5rodVYCbErstYx2Y3bCH3bSfUcpA@mail.gmail.com>
+
+Hi Yefeng,
+
+On point 1, I am not sure what your question is. From inspecting the source
+code of metafor::robust(), the function is not set up to handle models with
+crossed random effects. I'm not at all sure what it does if you feed it a
+model with crossed random effects, but I would be very cautious about
+interpreting the output. Perhaps Wolfgang can comment on whether robust()
+is meant to accommodate models with crossed random effects.
+
+On point 2, I can verify that clubSandwich does not support CRVE for models
+with crossed random effects. Cameron, Gelbach, and Miller (2011) describe
+multi-way clustered standard errors, but only for ordinary least squares
+models. As far as I am aware, the statistical theory for multi-way
+clustered standard errors has not been developed for models that have
+crossed random effects and the extension from Cameron, Gelbach and Miller
+is not obvious. So if you want to stay on solid ground in terms of
+statistical theory, I think your best approach might be just to do a good
+job of developing and checking the model, and then rely on the model-based
+SEs for inference.
+
+James
+
+On Thu, Feb 15, 2024 at 7:37?PM Yefeng Yang via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> Dear community,
+>
+> I (or, more precisely, my collaborator) am helping with one meta-analysis
+> with dependent effect sizes. We used a multilevel model with effect size
+> ID, study ID, and species ID as random effects.  We also used the RVE to
+> calculate the robust error. I have two questions.
+>
+>
+>   1.
+> The test of model coefficient based on RVE indicates a significant effect
+> (p < 0.05), while the test based on model-based error (we call it
+> naive/original error) shows a non-significant effect (p < 0.05). I used
+> `robust` in `metafor`, with `CR1` correction (`clubsandwich` is not working
+> in my case; see below?) . Sorry, I do not have the raw data so there is no
+> reproducible example.
+>   2.
+> How to calculate the robust error for models with non-nested
+> random-effects structure? This issue has troubled me for a long time.
+> Precisely, in my case, because effect size ID is nested within the study
+> ID, so it is easy to calculate robust error (either using ? ?`robust` or
+> ?`clubsandwich` ?). However, I still have species ID as the random effect
+> (it is a kind of crossed random effect). In such a case `clubsandwich` is
+> not working. `robust` is still working, but we only can use `CR1`
+> correction.
+>
+> Regards,
+> Yefeng
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Fri Feb 16 06:02:28 2024
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Fri, 16 Feb 2024 05:02:28 +0000
+Subject: [R-meta] robust error is smaller than model-based error
+In-Reply-To: <CAFUVuJxM1Ty3+HgkB+Ye0n5rodVYCbErstYx2Y3bCH3bSfUcpA@mail.gmail.com>
+References: <MEAPR01MB5415B79E49F4AC6C14CD3B459D4C2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxM1Ty3+HgkB+Ye0n5rodVYCbErstYx2Y3bCH3bSfUcpA@mail.gmail.com>
+Message-ID: <MEAPR01MB5415ED386162624FBC46F4059D4C2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Hi James,
+
+Thanks for your reply.
+
+On point 1, what I mean is that if we use the model-based SE to test null-hypothesis of the average effect, we get a null-effect (p > 0.05). But, if we use robust error (which is returned by robust()?), we get a non-zero effect. The result itself is a bit weird.
+
+Regarding your comment on `robust()`, let me use the reproducible example to explain what I mean (`metafor` is amazing - you can find all sorts of data structure you have interest).
+
+# load package and data
+library(metafor)
+library(clubSandwich)
+dat <- dat.lim2014$o_o_unadj
+
+# calculate zr and sampling variances
+dat <- escalc(measure="ZCOR", ri=ri, ni=ni, data=dat)
+
+# create effect size id variable
+dat$esid <- 1:nrow(dat)
+
+# fit a multilevel model with a non-nested random-effects structure
+res <- rma.mv(yi, vi,  random = list(~ 1 | article, ~ 1 | esid, ~ 1 | species), data=dat)
+
+But, we still can use `robust()` to calculate the cluster-robust error with CR1 adjustment as:
+# robust error with CR1 adjustment
+robust(res, cluster = article, adjust = T)
+
+As expected, the clubsandwich? cannot be used to calculate robust error for such a model
+coef_test(res, vcov = "CR1", cluster = dat$article)
+
+Also, if we use CR2 adjustment, `robust()` is also not working
+# robust error with CR2 adjustment
+robust(res, cluster = article, clubSandwich = T)
+
+ I might misunderstand something or made mistakes. But I would be grateful if you would you like to explain a bit.
+
+Best,
+Yefeng
+________________________________
+From: James Pustejovsky <jepusto at gmail.com>
+Sent: 16 February 2024 15:18
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+Subject: Re: [R-meta] robust error is smaller than model-based error
+
+Hi Yefeng,
+
+On point 1, I am not sure what your question is. From inspecting the source code of metafor::robust(), the function is not set up to handle models with crossed random effects. I'm not at all sure what it does if you feed it a model with crossed random effects, but I would be very cautious about interpreting the output. Perhaps Wolfgang can comment on whether robust() is meant to accommodate models with crossed random effects.
+
+On point 2, I can verify that clubSandwich does not support CRVE for models with crossed random effects. Cameron, Gelbach, and Miller (2011) describe multi-way clustered standard errors, but only for ordinary least squares models. As far as I am aware, the statistical theory for multi-way clustered standard errors has not been developed for models that have crossed random effects and the extension from Cameron, Gelbach and Miller is not obvious. So if you want to stay on solid ground in terms of statistical theory, I think your best approach might be just to do a good job of developing and checking the model, and then rely on the model-based SEs for inference.
+
+James
+
+On Thu, Feb 15, 2024 at 7:37?PM Yefeng Yang via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>> wrote:
+Dear community,
+
+I (or, more precisely, my collaborator) am helping with one meta-analysis with dependent effect sizes. We used a multilevel model with effect size ID, study ID, and species ID as random effects.  We also used the RVE to calculate the robust error. I have two questions.
+
+
+  1.
+The test of model coefficient based on RVE indicates a significant effect (p < 0.05), while the test based on model-based error (we call it naive/original error) shows a non-significant effect (p < 0.05). I used `robust` in `metafor`, with `CR1` correction (`clubsandwich` is not working in my case; see below?) . Sorry, I do not have the raw data so there is no reproducible example.
+  2.
+How to calculate the robust error for models with non-nested random-effects structure? This issue has troubled me for a long time. Precisely, in my case, because effect size ID is nested within the study ID, so it is easy to calculate robust error (either using ? ?`robust` or ?`clubsandwich` ?). However, I still have species ID as the random effect (it is a kind of crossed random effect). In such a case `clubsandwich` is not working. `robust` is still working, but we only can use `CR1` correction.
+
+Regards,
+Yefeng
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Feb 16 13:42:46 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 16 Feb 2024 12:42:46 +0000
+Subject: [R-meta] robust error is smaller than model-based error
+In-Reply-To: <MEAPR01MB5415ED386162624FBC46F4059D4C2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB5415B79E49F4AC6C14CD3B459D4C2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxM1Ty3+HgkB+Ye0n5rodVYCbErstYx2Y3bCH3bSfUcpA@mail.gmail.com>
+ <MEAPR01MB5415ED386162624FBC46F4059D4C2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <AS8PR08MB9193DD667F49A0000A6ACAD58B4C2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi all,
+
+Chiming in here. Sure, it can happen that the model-based test is not significant and the robust one is. There is no guarantee that robust variance estimation is going to lead to a more conservative estimate of the standard error(s). I don't think that this is immediately weird. In fact, the example below illustrates that this can happen (the model-based test is not significant, while robust(res, cluster=article) yields a significant test).
+
+And yes, robust(res, cluster=article) runs just fine in the case below, but here the robust variance estimation doesn't capture all of the dependencies that are assumed to be present according to the working model. By using 'article' as the cluster variable, RVE will assume that estimates from different articles are independent, while the working model allows for dependency across different articles due to the crossed species random effects. That is apparently an important source of dependency, since if we ignore this, the model-based SE also changes quite dramatically:
+
+res0 <- rma.mv(yi, vi, random = list(~ 1 | article, ~ 1 | esid), data=dat)
+res0
+
+And now the model-based SE is quite similar to robust(res, cluster=article) or robust(res0, cluster=article). But according to an LRT comparing res0 with res, one should prefer the latter:
+
+anova(res, res0)
+
+As James mentioned, one would need to use cluster-robust methods that allow for multi-way clustered standard errors, but such methodology has not been developed in the context of such models.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Yefeng Yang via R-sig-meta-analysis
+> Sent: Friday, February 16, 2024 06:02
+> To: James Pustejovsky <jepusto at gmail.com>; R Special Interest Group for Meta-
+> Analysis <r-sig-meta-analysis at r-project.org>
+> Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> Subject: Re: [R-meta] robust error is smaller than model-based error
+>
+> Hi James,
+>
+> Thanks for your reply.
+>
+> On point 1, what I mean is that if we use the model-based SE to test null-
+> hypothesis of the average effect, we get a null-effect (p > 0.05). But, if we
+> use robust error (which is returned by robust()?), we get a non-zero effect. The
+> result itself is a bit weird.
+>
+> Regarding your comment on `robust()`, let me use the reproducible example to
+> explain what I mean (`metafor` is amazing - you can find all sorts of data
+> structure you have interest).
+>
+> # load package and data
+> library(metafor)
+> library(clubSandwich)
+> dat <- dat.lim2014$o_o_unadj
+>
+> # calculate zr and sampling variances
+> dat <- escalc(measure="ZCOR", ri=ri, ni=ni, data=dat)
+>
+> # create effect size id variable
+> dat$esid <- 1:nrow(dat)
+>
+> # fit a multilevel model with a non-nested random-effects structure
+> res <- rma.mv(yi, vi,  random = list(~ 1 | article, ~ 1 | esid, ~ 1 | species),
+> data=dat)
+>
+> But, we still can use `robust()` to calculate the cluster-robust error with CR1
+> adjustment as:
+> # robust error with CR1 adjustment
+> robust(res, cluster = article, adjust = T)
+>
+> As expected, the clubsandwich? cannot be used to calculate robust error for such
+> a model
+> coef_test(res, vcov = "CR1", cluster = dat$article)
+>
+> Also, if we use CR2 adjustment, `robust()` is also not working
+> # robust error with CR2 adjustment
+> robust(res, cluster = article, clubSandwich = T)
+>
+>  I might misunderstand something or made mistakes. But I would be grateful if
+> you would you like to explain a bit.
+>
+> Best,
+> Yefeng
+> ________________________________
+> From: James Pustejovsky <jepusto at gmail.com>
+> Sent: 16 February 2024 15:18
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> Subject: Re: [R-meta] robust error is smaller than model-based error
+>
+> Hi Yefeng,
+>
+> On point 1, I am not sure what your question is. From inspecting the source code
+> of metafor::robust(), the function is not set up to handle models with crossed
+> random effects. I'm not at all sure what it does if you feed it a model with
+> crossed random effects, but I would be very cautious about interpreting the
+> output. Perhaps Wolfgang can comment on whether robust() is meant to accommodate
+> models with crossed random effects.
+>
+> On point 2, I can verify that clubSandwich does not support CRVE for models with
+> crossed random effects. Cameron, Gelbach, and Miller (2011) describe multi-way
+> clustered standard errors, but only for ordinary least squares models. As far as
+> I am aware, the statistical theory for multi-way clustered standard errors has
+> not been developed for models that have crossed random effects and the extension
+> from Cameron, Gelbach and Miller is not obvious. So if you want to stay on solid
+> ground in terms of statistical theory, I think your best approach might be just
+> to do a good job of developing and checking the model, and then rely on the
+> model-based SEs for inference.
+>
+> James
+>
+> On Thu, Feb 15, 2024 at 7:37?PM Yefeng Yang via R-sig-meta-analysis <r-sig-meta-
+> analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>> wrote:
+> Dear community,
+>
+> I (or, more precisely, my collaborator) am helping with one meta-analysis with
+> dependent effect sizes. We used a multilevel model with effect size ID, study
+> ID, and species ID as random effects.  We also used the RVE to calculate the
+> robust error. I have two questions.
+>
+>   1.
+> The test of model coefficient based on RVE indicates a significant effect (p <
+> 0.05), while the test based on model-based error (we call it naive/original
+> error) shows a non-significant effect (p < 0.05). I used `robust` in `metafor`,
+> with `CR1` correction (`clubsandwich` is not working in my case; see below?) .
+> Sorry, I do not have the raw data so there is no reproducible example.
+>   2.
+> How to calculate the robust error for models with non-nested random-effects
+> structure? This issue has troubled me for a long time. Precisely, in my case,
+> because effect size ID is nested within the study ID, so it is easy to calculate
+> robust error (either using ? ?`robust` or ?`clubsandwich` ?). However, I still have
+> species ID as the random effect (it is a kind of crossed random effect). In such
+> a case `clubsandwich` is not working. `robust` is still working, but we only can
+> use `CR1` correction.
+>
+> Regards,
+> Yefeng
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Feb 19 10:35:27 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 19 Feb 2024 09:35:27 +0000
+Subject: [R-meta] Estimating partial correlation coefficients from
+ multi-level regression models
+In-Reply-To: <PAVPR08MB8895FFB698753C4850F4EBB6A27A2@PAVPR08MB8895.eurprd08.prod.outlook.com>
+References: <PAVPR08MB8895FFB698753C4850F4EBB6A27A2@PAVPR08MB8895.eurprd08.prod.outlook.com>
+Message-ID: <AS8PR08MB919306AB13A6DE5E5A2927428B512@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Vainius,
+
+I suspect you are not getting any responses to your post (and neither on CV: https://stats.stackexchange.com/questions/637996/meta-analysis-estimating-partial-correlation-coefficients-using-estimates-from) because as far as I know, nobody has ever looked into this issue.
+
+So I would say you have two options:
+
+1) Exclude the PCCs from multilevel analyses.
+2) Include them and transparently explain how you set the dfs.
+
+Note that ni is probably relatively large compared to the number of predictors however you count them, so this probably has little influence on the results in the first place.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Vainius Bartasevicius via R-sig-meta-analysis
+> Sent: Thursday, January 25, 2024 16:31
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Vainius Bartasevi?ius <vainius.bartasevicius at tspmi.vu.lt>
+> Subject: [R-meta] Estimating partial correlation coefficients from multi-level
+> regression models
+>
+> Dear All,
+>
+> I am writing to you with an inquiry on the estimation of partial correlation
+> coefficients (PCCs) using escalc function of the metafor package.
+>
+> Currently we are conducting a meta-analysis which draws on data from multiple
+> regression models and uses partial correlation coefficient as an effect size.
+> Some of the models included in our meta-analysis come from multi-level analyses.
+> Our predictors of interest are at level 1, so is the outcome measure.
+>
+> We are a bit unsure about the correct way to estimate PCCs using estimates from
+> multi-level models, given that the calculation of degrees of freedom in multi-
+> level models is different from that applied in single-level regression. In
+> particular, we are wondering what figure we should provide for mi argument
+> (total number of predictors) when estimating PCCs from multi-level models.
+> Should we take the sum of level 1 and level 2 predictors? Should we take into
+> account the number of level 2 units when specifying this argument?
+>
+> Any help would be greatly appreciated - thank you very much for your time.
+>
+> Kind regards
+> Vainius Bartasevi?ius
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Feb 19 11:08:23 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 19 Feb 2024 10:08:23 +0000
+Subject: [R-meta] 
+ Interpreting the overall effect adjusted for publication
+ bias, in the absence of publication bias
+In-Reply-To: <YT1PR01MB4012C516E414FC3B2AF8A293EC722@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+References: <YT1PR01MB4012C516E414FC3B2AF8A293EC722@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+Message-ID: <AS8PR08MB91934A7C71FC02ED2C02CD048B512@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi Daniel,
+
+The intercept in PET is an extrapolation to a study with an infinite sample size (i.e., where the standard error / sampling variance is equal to 0). Given that the studies are typically far away from having an infinitely large sample size, such an extrapolation leads to a large SE for the intercept term and hence a very wide CI / low power for the test of H0: intercept = 0.
+
+Here is an illustration of this issue:
+
+library(metafor)
+
+k <- 20
+
+iters <- 10000
+
+pval1 <- rep(NA, iters)
+pval2 <- rep(NA, iters)
+
+for (i in 1:iters) {
+
+   # simulate data (without any publication bias)
+   vi <- runif(k, .01, .1)
+   yi <- rnorm(k, 0.2, sqrt(vi))
+
+   # fit the standard equal-effects model and save the p-value
+   res1 <- rma(yi, vi, method="EE")
+   pval1[i] <- res1$pval
+
+   # fit a meta-regression model with the standard errors as predictor and
+   # save the p-value for the intercept term
+   res2 <- rma(yi, vi, mods = ~ sqrt(vi), method="FE")
+   pval2[i] <- res2$pval[1]
+
+}
+
+# power of the tests
+mean(pval1 <= .05)
+mean(pval2 <= .05)
+
+I kept things simple by not simulating any heterogeneity. Roughly, the data were simulated as if we are dealing with standardized mean differences where studies have sample sizes between 40 and 400 participants and the true standardized mean difference is 0.2. The standard equal-effects model has almost 100% power, while the test of the intercept in the meta-regression model has only around 28% power. Quite a dramatic difference.
+
+So, unless there is evidence of publication bias, I would caution to use the significance of the intercept term (or some other 'corrected' estimate) for decision making.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Daniel Foster via R-sig-meta-analysis
+> Sent: Wednesday, January 17, 2024 18:47
+> To: Daniel Foster via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+> Cc: Daniel Foster <daniel.foster at utoronto.ca>
+> Subject: [R-meta] Interpreting the overall effect adjusted for publication bias,
+> in the absence of publication bias
+>
+> Hi all,
+>
+> I am carrying out a multi-level meta-analysis in which I have conducted a FAT-
+> PET to ascertain whether or not there is evidence of publication bias, as well
+> as the overall effect accounting for publication bias.
+>
+> The results, uncorrected for publication bias, indicate that that there is a
+> significant association between the two variables I am looking at. The FAT was
+> not significant, suggesting the absence of publication bias. However, the
+> results from PET indicate that after accounting for publication bias, the
+> relationship is no longer significant.
+>
+> Given that I did not find evidence of publication bias, can I conclude that
+> there was a significant effect (i.e., using the findings from the model
+> uncorrected for publication bias)? Or should I emphasize the PET findings in my
+> discussion? How is this commonly dealt with?
+>
+> Thank you!
+>
+> Daniel
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Feb 19 12:20:07 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 19 Feb 2024 11:20:07 +0000
+Subject: [R-meta] 
+ rma.mv metafor models for genome-wide meta-analyses are
+ (too) conservative
+In-Reply-To: <1e3f0f79716743a1a68a88e61cf3a360@mpi.nl>
+References: <1e3f0f79716743a1a68a88e61cf3a360@mpi.nl>
+Message-ID: <AS8PR08MB919368E8EF5E2F005EEFC1788B512@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Beate,
+
+Just so I understand this correctly:
+
+1) You have 130 estimates (of something) within each of 23 cohorts, so the input to yi in the model below is of length 130*23=2990, correct?
+
+2) And Vsampoverlap is therefore a 2990x2990 variance-covariance matrix, which is block-diagonal with 23 130*130 blocks, correct?
+
+3) Then you use the results from this model to compute 8 million predicted values (for various combinations of COV1, COV2, and COV3) and compute 'z = pred / se', correct?
+
+4) Then you examine the distribution of these 8 million z-values and find that they are too conservative (i.e., they are not quite standard normal, but have an SD that is somewhat larger than 1 / more than 5% of the z-values are >= +-1.96), correct?
+
+I hope I got all of this correct. I am not familiar with the specifics of this application, but here are some thoughts.
+
+First of all, it is not entirely clear to me why you would expect the predicted values to be standard normal in the first place. Maybe this is similar to GWAS (in a single sample) where one would expect the vast majority of SNPs not to be associated with some phenotype of interest so the p-values should form a roughly uniform distribution, but this may not be true when there is population stratification (or other things) going on and one can use the distribution of p-values to check for this.
+
+You also wrote that the correlation matrix is 'scaled to the SE of each BETA'. So does the diagonal of Vsampoverlap correspond to the standard errors of the estimates or their sampling variances (squared standard errors)? It should be the latter.
+
+The random effects structure of the model is quite simple, assuming a constant correlation for every pair of estimates and a constant amount of heterogeneity for the various estimates. These may be fairly sensible or rather strict assumptions, depending on the application. Relaxing these assumptions is tricky though, because with 130 different estimates, even allowing the amount of heterogeneity to differ would introduce 129 additional parameters into the model and let's not even think about a fully unstructured var-cov matrix for the random effects.
+
+An interesting attempt might be to try:
+
+res <- robust(model_cov, cluster=COHORT)
+
+(or possibly also adding clubSandwich=TRUE) and then using 'res' for obtaining the predicted values, but I am not sure how well cluster-robust inferences methods will handle 130 estimates with 'only' 23 cohorts. The idea is that even if Vsampoverlap and/or the random effects structure is misspecified, cluster-robust inferences methods should give you asymptotically correct standard errors / tests. But I somewhat doubt that this works with so many estimates relative to the number of cohorts. Still worth a try though.
+
+Maybe some of these comments will be helpful or at least spark a bit more discussion.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of St Pourcain, Beate via R-sig-meta-analysis
+> Sent: Friday, January 26, 2024 19:14
+> To: r-sig-meta-analysis at r-project.org
+> Cc: St Pourcain, Beate <Beate.StPourcain at mpi.nl>
+> Subject: [R-meta] rma.mv metafor models for genome-wide meta-analyses are (too)
+> conservative
+>
+> Hi,
+>
+> We are a group of geneticists using meta-regression for genome-wide meta-
+> analysis and encountered a hidden thorny issue.
+> We use metafor rma.mv models to meta-analyse:
+>
+> * 130 correlated input statistics
+> * each statistics has BETAs for 8 million variants (reflecting genetic
+> association effects)
+>
+> capturing:
+> * 70000 individuals
+> * 400000 repeat observations
+>
+> from
+> 23 cohorts.
+>
+> Across the 8 million variants, the following model fits quite well for each
+> variant, based on a (fairly) well-known phenotypic correlation matrix for sample
+> overlap (Vsampoverlap) scaled to the SE of each BETA.
+>
+> model_cov <- rma.mv(yi = BETA, V = Vsampoverlap, mods = COV1+ COV2+COV3, random=
+> list(~ 1|COHORT/VAR), data = df)}, silent = F)
+>
+> where VAR specifies the input statistics, COHORT represents cohorts, and COV
+> represents fixed effects.
+>
+> However, when predicting BETAs for each of the 8 million variants across a grid
+> of fixed effect predictors (COV1, COV2, COV3) we note that, on average, derived
+> genome-wide Z-scores based on predicted BETAs and SEs are too conservative and
+> deviate from the expected null distribution in a quantile-quantile plot,
+> affecting all predictions. We can also quantify this deviation from a null
+> distribution across all 8 million variants using the LDSC intercept (i.e. the
+> Linkage disequilibrium Score regression intercept for a variant-based
+> heritability estimation; Bullik-Sullivan 2015:
+> https://pubmed.ncbi.nlm.nih.gov/25642630/), which should be one if unbiased, but
+> we observe ~0.9(SE=0.005). Note that the intercept would be above one, if test
+> statistics were inflated.
+>
+> Thus, we think we subtly over-correct for relatedness and quench the power of
+> our analysis. Would there be any thoughts within the group as to how to relax
+> the adjustment for relatedness in metafor?
+>
+> Thanks so much for any input,
+> Beate
+>
+> PS: Note to random geneticists in the group: If we could, we would replace the
+> phenotypic correlation matrix with the non-genetic part of the phenotypic
+> correlation matrix, but such an estimation is unreliable given the small sample
+> size of most cohorts.
+>
+> R version 4.1.3 (2022-03-10)
+> Platform: x86_64-w64-mingw32/x64 (64-bit)
+> Running under: Windows 10 x64 (build 19045)
+>
+> Matrix products: default
+>
+> locale:
+> [1]
+> LC_COLLATE=English_Europe.1252  LC_CTYPE=English_Europe.1252    LC_MONETARY=Engl
+> ish_Europe.1252 LC_NUMERIC=C
+> [5] LC_TIME=English_Europe.1252
+>
+> attached base packages:
+> [1] parallel  stats     graphics  grDevices
+> utils     datasets  methods   base
+>
+> other attached packages:
+> [1] data.table_1.14.2   metafor_4.4-0       numDeriv_2016.8-1.1 metadat_1.2-
+> 0       Matrix_1.4-0
+>
+> Beate St Pourcain, PhD
+> Senior Investigator & Group Leader
+> Room A207
+> Max Planck Institute for Psycholinguistics | Wundtlaan 1 | 6525 XD Nijmegen |
+> The Netherlands
+>
+> @bstpourcain
+> Tel: tel:+31%2024%20352%201964
+> Fax: tel:+31%2024%20352%201213
+> ORCID: https://orcid.org/0000-0002-4680-3517
+> Web: https://www.mpi.nl/departments/language-and-genetics/projects/population-
+> variation-and-human-communication/
+> Further affiliations with:
+> MRC Integrative Epidemiology Unit | University of Bristol | UK
+> Donders Institute for Brain, Cognition and Behaviour | Radboud University | The
+> Netherlands
+
+
+From Be@te@StPourc@|n @end|ng |rom mp|@n|  Mon Feb 19 12:51:53 2024
+From: Be@te@StPourc@|n @end|ng |rom mp|@n| (St Pourcain, Beate)
+Date: Mon, 19 Feb 2024 11:51:53 +0000
+Subject: [R-meta] 
+ rma.mv metafor models for genome-wide meta-analyses are
+ (too) conservative
+In-Reply-To: <AS8PR08MB919368E8EF5E2F005EEFC1788B512@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <1e3f0f79716743a1a68a88e61cf3a360@mpi.nl>
+ <AS8PR08MB919368E8EF5E2F005EEFC1788B512@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <807c9532486948258f257f1f69856aa0@mpi.nl>
+
+Dear Wolfgang,
+
+Thanks so much for getting back about this. 
+
+*1) You have 130 estimates (of something) within each of 23 cohorts, so the
+input to yi in the model below is of length 130*23=2990, correct?*
+No, we have 130 estimates from 23 cohorts in total, i.e. 130 summary
+statistics. Not all cohorts have all combinations of observations.
+
+*2) And Vsampoverlap is therefore a 2990x2990 variance-covariance matrix,
+which is block-diagonal with 23 130*130 blocks, correct?*
+No, we have a 130 x 130 variance-covariance matrix with 23 blocks (i.e.
+cohorts with repeated measures).
+
+*3) Then you use the results from this model to compute 8 million predicted
+values (for various combinations of COV1, COV2, and COV3) and compute 'z =
+pred / se', correct?*
+Correct. 
+
+*4) Then you examine the distribution of these 8 million z-values and find
+that they are too conservative (i.e., they are not quite standard normal,
+but have an SD that is somewhat larger than 1 / more than 5% of the z-values
+are >= +-1.96), correct?*
+
+I guess so, we used other statistics to check this genome-wide: We checked
+QQ plots, median Chi square and another measure for population
+stratification (i.e. the LDSC h2 intercept).
+The first remedy we have applied now is that we corrected for the actual
+sample overlap within each block and this improved the p-value distribution
+a lot, based on QQ plots and median Chi square distribution.
+
+*6) I hope I got all of this correct. I am not familiar with the specifics
+of this application, but here are some thoughts.*
+Thank you!
+
+*First of all, it is not entirely clear to me why you would expect the
+predicted values to be standard normal in the first place. Maybe this is
+similar to GWAS (in a single sample) where one would expect the vast
+majority of SNPs not to be associated with some phenotype of interest so the
+p-values should form a roughly uniform distribution, but this may not be
+true when there is population stratification (or other things) going on and
+one can use the distribution of p-values to check for this.*
+
+Yes, this is what we did. We checked QQ plots, median Chi square and another
+measure for population stratification (i.e. the LDSC h2 intercept). We have
+an absence of population stratification. Thus, there is no inflation of
+p-values but an over-correction of p-values. However, we are getting closer
+to one now.
+
+*You also wrote that the correlation matrix is 'scaled to the SE of each
+BETA'. So does the diagonal of Vsampoverlap correspond to the standard
+errors of the estimates or their sampling variances (squared standard
+errors)? It should be the latter.*
+
+This is correct, the diagonal of Vsampoverlap corresponds to the sampling
+variances:
+diag(SE) %*% as.matrix(corr) %*% diag(SE)
+
+
+*The random effects structure of the model is quite simple, assuming a
+constant correlation for every pair of estimates and a constant amount of
+heterogeneity for the various estimates. These may be fairly sensible or
+rather strict assumptions, depending on the application. Relaxing these
+assumptions is tricky though, because with 130 different estimates, even
+allowing the amount of heterogeneity to differ would introduce 129
+additional parameters into the model and let's not even think about a fully
+unstructured var-cov matrix for the random effects.
+
+An interesting attempt might be to try:
+
+res <- robust(model_cov, cluster=COHORT)
+
+(or possibly also adding clubSandwich=TRUE) and then using 'res' for
+obtaining the predicted values, but I am not sure how well cluster-robust
+inferences methods will handle 130 estimates with 'only' 23 cohorts. The
+idea is that even if Vsampoverlap and/or the random effects structure is
+misspecified, cluster-robust inferences methods should give you
+asymptotically correct standard errors / tests. But I somewhat doubt that
+this works with so many estimates relative to the number of cohorts. Still
+worth a try though.*
+
+Thanks for the idea about the robust model. We will have a look!
+
+Best wishes,
+Beate
+ 
+
+
+
+
+
+
+Beate St Pourcain, PhD
+Senior Investigator & Group Leader
+Room A207
+Max Planck Institute for Psycholinguistics | Wundtlaan 1 | 6525 XD Nijmegen
+| The Netherlands
+
+
+@bstpourcain
+Tel:?+31 24 3521964
+Fax:?+31 24 3521213
+ORCID: https://orcid.org/0000-0002-4680-3517
+Web:
+https://www.mpi.nl/departments/language-and-genetics/projects/population-var
+iation-and-human-communication/
+Further affiliations with:
+MRC Integrative Epidemiology Unit | University of Bristol | UK
+Donders Institute for Brain, Cognition and Behaviour | Radboud University |
+The Netherlands
+
+My working hours may not be your working hours. Please do not feel obligated
+to reply outside of your normal working schedule.
+
+-----Original Message-----
+From: Viechtbauer, Wolfgang (NP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> 
+Sent: Monday, 19 February 2024 12:20
+To: R Special Interest Group for Meta-Analysis
+<r-sig-meta-analysis at r-project.org>
+Cc: St Pourcain, Beate <Beate.StPourcain at mpi.nl>
+Subject: RE: rma.mv metafor models for genome-wide meta-analyses are (too)
+conservative
+
+Dear Beate,
+
+Just so I understand this correctly:
+
+1) You have 130 estimates (of something) within each of 23 cohorts, so the
+input to yi in the model below is of length 130*23=2990, correct?
+
+2) And Vsampoverlap is therefore a 2990x2990 variance-covariance matrix,
+which is block-diagonal with 23 130*130 blocks, correct?
+
+3) Then you use the results from this model to compute 8 million predicted
+values (for various combinations of COV1, COV2, and COV3) and compute 'z =
+pred / se', correct?
+
+4) Then you examine the distribution of these 8 million z-values and find
+that they are too conservative (i.e., they are not quite standard normal,
+but have an SD that is somewhat larger than 1 / more than 5% of the z-values
+are >= +-1.96), correct?
+
+I hope I got all of this correct. I am not familiar with the specifics of
+this application, but here are some thoughts.
+
+First of all, it is not entirely clear to me why you would expect the
+predicted values to be standard normal in the first place. Maybe this is
+similar to GWAS (in a single sample) where one would expect the vast
+majority of SNPs not to be associated with some phenotype of interest so the
+p-values should form a roughly uniform distribution, but this may not be
+true when there is population stratification (or other things) going on and
+one can use the distribution of p-values to check for this.
+
+You also wrote that the correlation matrix is 'scaled to the SE of each
+BETA'. So does the diagonal of Vsampoverlap correspond to the standard
+errors of the estimates or their sampling variances (squared standard
+errors)? It should be the latter.
+
+The random effects structure of the model is quite simple, assuming a
+constant correlation for every pair of estimates and a constant amount of
+heterogeneity for the various estimates. These may be fairly sensible or
+rather strict assumptions, depending on the application. Relaxing these
+assumptions is tricky though, because with 130 different estimates, even
+allowing the amount of heterogeneity to differ would introduce 129
+additional parameters into the model and let's not even think about a fully
+unstructured var-cov matrix for the random effects.
+
+An interesting attempt might be to try:
+
+res <- robust(model_cov, cluster=COHORT)
+
+(or possibly also adding clubSandwich=TRUE) and then using 'res' for
+obtaining the predicted values, but I am not sure how well cluster-robust
+inferences methods will handle 130 estimates with 'only' 23 cohorts. The
+idea is that even if Vsampoverlap and/or the random effects structure is
+misspecified, cluster-robust inferences methods should give you
+asymptotically correct standard errors / tests. But I somewhat doubt that
+this works with so many estimates relative to the number of cohorts. Still
+worth a try though.
+
+Maybe some of these comments will be helpful or at least spark a bit more
+discussion.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> 
+> On Behalf Of St Pourcain, Beate via R-sig-meta-analysis
+> Sent: Friday, January 26, 2024 19:14
+> To: r-sig-meta-analysis at r-project.org
+> Cc: St Pourcain, Beate <Beate.StPourcain at mpi.nl>
+> Subject: [R-meta] rma.mv metafor models for genome-wide meta-analyses 
+> are (too) conservative
+>
+> Hi,
+>
+> We are a group of geneticists using meta-regression for genome-wide 
+> meta- analysis and encountered a hidden thorny issue.
+> We use metafor rma.mv models to meta-analyse:
+>
+> * 130 correlated input statistics
+> * each statistics has BETAs for 8 million variants (reflecting genetic 
+> association effects)
+>
+> capturing:
+> * 70000 individuals
+> * 400000 repeat observations
+>
+> from
+> 23 cohorts.
+>
+> Across the 8 million variants, the following model fits quite well for 
+> each variant, based on a (fairly) well-known phenotypic correlation 
+> matrix for sample overlap (Vsampoverlap) scaled to the SE of each BETA.
+>
+> model_cov <- rma.mv(yi = BETA, V = Vsampoverlap, mods = COV1+ 
+> COV2+COV3, random= list(~ 1|COHORT/VAR), data = df)}, silent = F)
+>
+> where VAR specifies the input statistics, COHORT represents cohorts, 
+> and COV represents fixed effects.
+>
+> However, when predicting BETAs for each of the 8 million variants 
+> across a grid of fixed effect predictors (COV1, COV2, COV3) we note 
+> that, on average, derived genome-wide Z-scores based on predicted 
+> BETAs and SEs are too conservative and deviate from the expected null 
+> distribution in a quantile-quantile plot, affecting all predictions. 
+> We can also quantify this deviation from a null distribution across 
+> all 8 million variants using the LDSC intercept (i.e. the Linkage 
+> disequilibrium Score regression intercept for a variant-based heritability
+estimation; Bullik-Sullivan 2015:
+> https://pubmed.ncbi.nlm.nih.gov/25642630/), which should be one if 
+> unbiased, but we observe ~0.9(SE=0.005). Note that the intercept would 
+> be above one, if test statistics were inflated.
+>
+> Thus, we think we subtly over-correct for relatedness and quench the 
+> power of our analysis. Would there be any thoughts within the group as 
+> to how to relax the adjustment for relatedness in metafor?
+>
+> Thanks so much for any input,
+> Beate
+>
+> PS: Note to random geneticists in the group: If we could, we would 
+> replace the phenotypic correlation matrix with the non-genetic part of 
+> the phenotypic correlation matrix, but such an estimation is 
+> unreliable given the small sample size of most cohorts.
+>
+> R version 4.1.3 (2022-03-10)
+> Platform: x86_64-w64-mingw32/x64 (64-bit) Running under: Windows 10 
+> x64 (build 19045)
+>
+> Matrix products: default
+>
+> locale:
+> [1]
+> LC_COLLATE=English_Europe.1252  LC_CTYPE=English_Europe.1252
+LC_MONETARY=Engl
+> ish_Europe.1252 LC_NUMERIC=C
+> [5] LC_TIME=English_Europe.1252
+>
+> attached base packages:
+> [1] parallel  stats     graphics  grDevices
+> utils     datasets  methods   base
+>
+> other attached packages:
+> [1] data.table_1.14.2   metafor_4.4-0       numDeriv_2016.8-1.1
+metadat_1.2-
+> 0       Matrix_1.4-0
+>
+> Beate St Pourcain, PhD
+> Senior Investigator & Group Leader
+> Room A207
+> Max Planck Institute for Psycholinguistics | Wundtlaan 1 | 6525 XD 
+> Nijmegen | The Netherlands
+>
+> @bstpourcain
+> Tel: tel:+31%2024%20352%201964
+> Fax: tel:+31%2024%20352%201213
+> ORCID: https://orcid.org/0000-0002-4680-3517
+> Web: 
+> https://www.mpi.nl/departments/language-and-genetics/projects/populati
+> on-
+> variation-and-human-communication/
+> Further affiliations with:
+> MRC Integrative Epidemiology Unit | University of Bristol | UK Donders 
+> Institute for Brain, Cognition and Behaviour | Radboud University | 
+> The Netherlands
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: smime.p7s
+Type: application/pkcs7-signature
+Size: 7322 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240219/a70f4174/attachment-0001.p7s>
+
+From v@|n|u@@b@rt@@ev|c|u@ @end|ng |rom t@pm|@vu@|t  Mon Feb 19 14:55:03 2024
+From: v@|n|u@@b@rt@@ev|c|u@ @end|ng |rom t@pm|@vu@|t (=?iso-8859-2?Q?Vainius_Bartasevi=E8ius?=)
+Date: Mon, 19 Feb 2024 13:55:03 +0000
+Subject: [R-meta] Estimating partial correlation coefficients from
+ multi-level regression models
+In-Reply-To: <AS8PR08MB919306AB13A6DE5E5A2927428B512@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <PAVPR08MB8895FFB698753C4850F4EBB6A27A2@PAVPR08MB8895.eurprd08.prod.outlook.com>
+ <AS8PR08MB919306AB13A6DE5E5A2927428B512@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <PAVPR08MB8895A8C6B009A1A39B672CC2A2512@PAVPR08MB8895.eurprd08.prod.outlook.com>
+
+Dear Wolfgang,
+
+Many thanks for your response. Yes, this issue does seem to have little influence on our summary effect sizes and meta-regression models anyway. We therefore largely follow the 2) option, although we might also try running identical analyses excluding PCCs that come from multi-level models as a kind of sensitivity analysis.
+
+Best regards
+Vainius
+________________________________
+From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: 19 February 2024 11:35
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Vainius Bartasevi?ius <vainius.bartasevicius at tspmi.vu.lt>
+Subject: RE: Estimating partial correlation coefficients from multi-level regression models
+
+[You don't often get email from wolfgang.viechtbauer at maastrichtuniversity.nl. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+
+Dear Vainius,
+
+I suspect you are not getting any responses to your post (and neither on CV: https://stats.stackexchange.com/questions/637996/meta-analysis-estimating-partial-correlation-coefficients-using-estimates-from) because as far as I know, nobody has ever looked into this issue.
+
+So I would say you have two options:
+
+1) Exclude the PCCs from multilevel analyses.
+2) Include them and transparently explain how you set the dfs.
+
+Note that ni is probably relatively large compared to the number of predictors however you count them, so this probably has little influence on the results in the first place.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Vainius Bartasevicius via R-sig-meta-analysis
+> Sent: Thursday, January 25, 2024 16:31
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Vainius Bartasevi?ius <vainius.bartasevicius at tspmi.vu.lt>
+> Subject: [R-meta] Estimating partial correlation coefficients from multi-level
+> regression models
+>
+> Dear All,
+>
+> I am writing to you with an inquiry on the estimation of partial correlation
+> coefficients (PCCs) using escalc function of the metafor package.
+>
+> Currently we are conducting a meta-analysis which draws on data from multiple
+> regression models and uses partial correlation coefficient as an effect size.
+> Some of the models included in our meta-analysis come from multi-level analyses.
+> Our predictors of interest are at level 1, so is the outcome measure.
+>
+> We are a bit unsure about the correct way to estimate PCCs using estimates from
+> multi-level models, given that the calculation of degrees of freedom in multi-
+> level models is different from that applied in single-level regression. In
+> particular, we are wondering what figure we should provide for mi argument
+> (total number of predictors) when estimating PCCs from multi-level models.
+> Should we take the sum of level 1 and level 2 predictors? Should we take into
+> account the number of level 2 units when specifying this argument?
+>
+> Any help would be greatly appreciated - thank you very much for your time.
+>
+> Kind regards
+> Vainius Bartasevi?ius
+
+	[[alternative HTML version deleted]]
+
+
+From em||yru@@e||99 @end|ng |rom out|ook@com  Tue Feb 27 17:07:00 2024
+From: em||yru@@e||99 @end|ng |rom out|ook@com (Emily Russell)
+Date: Tue, 27 Feb 2024 16:07:00 +0000
+Subject: [R-meta] Book suggestion to understand the technical stuff
+Message-ID: <DB9P251MB0156439E8241698A1717F9E7CA592@DB9P251MB0156.EURP251.PROD.OUTLOOK.COM>
+
+Dear All
+
+I am really enjoying the book Meta-analysis with R (really!) and I am grateful for the bits that suggest that it is OK to skip the technical stuff in favour of the examples, BUT if I did want to understand the technical bits can someone suggest a good book or similar?
+
+I would really like to understand what I am doing as well as just being able to do it.
+
+Thanks
+
+Emily
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Tue Feb 27 17:56:56 2024
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 27 Feb 2024 16:56:56 +0000
+Subject: [R-meta] Book suggestion to understand the technical stuff
+In-Reply-To: <DB9P251MB0156439E8241698A1717F9E7CA592@DB9P251MB0156.EURP251.PROD.OUTLOOK.COM>
+References: <DB9P251MB0156439E8241698A1717F9E7CA592@DB9P251MB0156.EURP251.PROD.OUTLOOK.COM>
+Message-ID: <2f422a77-2fed-b24c-e026-39ed08972cb7@dewey.myzen.co.uk>
+
+Dear Emily
+
+You might get more helpful replies if you said what level of 
+mathematical training you have had. Are you familiar with basic algebra 
+features like the summation notation and the use of subscripts? Do you 
+know about logarithms and exponentiation? Have you learned about matrix 
+notation? I do not think you need to know about differential calculus to 
+get quite a long way.
+
+Michael
+
+On 27/02/2024 16:07, Emily Russell via R-sig-meta-analysis wrote:
+> Dear All
+> 
+> I am really enjoying the book Meta-analysis with R (really!) and I am grateful for the bits that suggest that it is OK to skip the technical stuff in favour of the examples, BUT if I did want to understand the technical bits can someone suggest a good book or similar?
+> 
+> I would really like to understand what I am doing as well as just being able to do it.
+> 
+> Thanks
+> 
+> Emily
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+

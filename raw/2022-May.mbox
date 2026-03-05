@@ -1,0 +1,3362 @@
+From towh|d| @end|ng |rom ut@@c@|r  Tue May  3 01:37:04 2022
+From: towh|d| @end|ng |rom ut@@c@|r (towhidi)
+Date: Tue, 03 May 2022 04:07:04 +0430
+Subject: [R-meta] Does trim and fill method correct for data falsification
+ or lower quality of small studies?
+Message-ID: <062993ffb0b9f4828ca60dc30a4a9fcb@ut.ac.ir>
+
+Dear all,
+
+The asymmetry in a funnel plot can be caused by factors other than 
+publication bias, such as data falsification or poorer quality in 
+smaller trials. However, the Cochrane Handbook mentions that "the trim 
+and fill method does not take into account reasons for funnel plot 
+asymmetry other than publication bias".
+
+I do not understand why it cannot account for data falsification or poor 
+quality of small trials, assuming that these characteristics are 
+associated with study size. For data falsification, the true observed 
+effect size (before the fraudulent change in the data) for these studies 
+converges on the true underlying effect size. But the falsified data 
+move these data points to the right side, and, using the trim and fill 
+method, this bias is neutralized by imputing their counterparts on the 
+other side. Of course, the confidence intervals will be biased, because 
+we are imputing data points that do not exist (which narrows the CI) and 
+that the bias arose from data falsification or low quality has added to 
+the estimated sampling variance (which widens the CI). Also, it changes 
+the weights, especially in the random-effects model.
+
+But, isn't the point estimate a corrected estimate, assuming that data 
+falsification has caused the asymmetry?
+
+The same argument may apply to the bias that arises from low-quality 
+studies. However, if this is correct, I think that acknowledging this 
+and interpreting the CIs with even more caution is more logical than 
+assuming that the asymmetry is caused solely by publication bias and 
+that misconduct and low quality of small studies have nothing to do with 
+it.
+
+Is this correct? Or I am missing something?
+
+Thank you.
+
+
+-- 
+Ali Zia-Tohidi MSc
+Clinical Psychology
+University of Tehran
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue May  3 09:15:00 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 3 May 2022 07:15:00 +0000
+Subject: [R-meta] 
+ Does trim and fill method correct for data falsification
+ or lower quality of small studies?
+In-Reply-To: <062993ffb0b9f4828ca60dc30a4a9fcb@ut.ac.ir>
+References: <062993ffb0b9f4828ca60dc30a4a9fcb@ut.ac.ir>
+Message-ID: <b5dd8f8611084336b059d50b7ae66f00@UM-MAIL3214.unimaas.nl>
+
+Dear Ali,
+
+Please see my responses below.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of towhidi
+>Sent: Tuesday, 03 May, 2022 1:37
+>To: r sig meta-analysis list
+>Subject: [R-meta] Does trim and fill method correct for data falsification or
+>lower quality of small studies?
+>
+>Dear all,
+>
+>The asymmetry in a funnel plot can be caused by factors other than
+>publication bias, such as data falsification or poorer quality in
+>smaller trials. 
+
+... or unaccounted for moderators (that are correlated with study size) or more generally heterogeneity.
+
+>However, the Cochrane Handbook mentions that "the trim
+>and fill method does not take into account reasons for funnel plot
+>asymmetry other than publication bias".
+
+I searched through the handbook (https://training.cochrane.org/handbook/current) and couldn't find this quote. Where did you find this?
+
+>I do not understand why it cannot account for data falsification or poor
+>quality of small trials, assuming that these characteristics are
+>associated with study size. For data falsification, the true observed
+>effect size (before the fraudulent change in the data) for these studies
+>converges on the true underlying effect size. But the falsified data
+>move these data points to the right side, and, using the trim and fill
+>method, this bias is neutralized by imputing their counterparts on the
+>other side. 
+
+'Neutralized' sounds a bit too optimistic. If a study is imputed corresponding to the fraudulent study (which isn't guaranteed depending on how the funnel looks in general), it is going to be placed at 'est - delta', where 'est' is the pooled estimate at the end of the trim and fill procedure and 'delta' is the distance between est and the fraudulent study. If 'est' is larger than 0, then this would still leads to some bias, but it should indeed be reduced.
+
+>Of course, the confidence intervals will be biased, because
+>we are imputing data points that do not exist (which narrows the CI) and
+>that the bias arose from data falsification or low quality has added to
+>the estimated sampling variance (which widens the CI). Also, it changes
+>the weights, especially in the random-effects model.
+>
+>But, isn't the point estimate a corrected estimate, assuming that data
+>falsification has caused the asymmetry?
+
+I would say yes. A simulation study that has examined the properties of various methods not only when there is publication bias but also under the use of 'questionable research practices' is:
+
+Carter, E. C., Sch?nbrodt, F. D., Gervais, W. M. & Hilgard, J. (2019). Correcting for bias in psychology: A comparison of meta-analytic methods. Advances in Methods and Practices in Psychological Science, 2(2), 115-144. https://doi.org/10.1177/2515245919847196 
+
+>The same argument may apply to the bias that arises from low-quality
+>studies. However, if this is correct, I think that acknowledging this
+>and interpreting the CIs with even more caution is more logical than
+>assuming that the asymmetry is caused solely by publication bias and
+>that misconduct and low quality of small studies have nothing to do with
+>it.
+>
+>Is this correct? Or I am missing something?
+>
+>Thank you.
+>
+>--
+>Ali Zia-Tohidi MSc
+>Clinical Psychology
+>University of Tehran
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Tue May  3 16:02:19 2022
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Tue, 3 May 2022 14:02:19 +0000
+Subject: [R-meta] =?gb2312?b?Y29uZnVzaW9uIHBvaW50OiB0aGUgdmFyaW91cyAnY29y?=
+ =?gb2312?b?cmVsYXRpb24nIChyaG8sIKbRKSBpbiBtdWx0aXZhcmlhdGUgbWV0YS1hbmFs?=
+ =?gb2312?b?eXRpYyBtb2RlbA==?=
+In-Reply-To: <MEAPR01MB5415710EF2CFEFC96E8630419DC09@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB5415710EF2CFEFC96E8630419DC09@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <MEAPR01MB541500B70ACEE8BA58DA6EB99DC09@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Hi subscribers
+
+I am writing to ask one question regarding the various 'correlation' (rho) in multivariate models (implemented in rma.mv() function).  I would be grateful if would like to clarify my confusion.  I am hoping someone who is familiar with meta-analytic models can address my questions. Wolfgang definitely knows the answers, but I guess he is so busy that he has no time to answer my questions. Anyway, I briefly describe my question below.
+
+Assume I am conducting a bivariate meta-analysis to estimate (1) the overall effects of two outcomes (cognition and anxiety), and (2) the correlation between the two outcomes. I am confused with the two types of correlations (probably three types) involved in this bivariate meta-analysis.
+
+(i) rho in the variance-covariance matrix of dependent effect size's sampling errors:
+
+when constructing (or approximately imputing) variance-covariance matrix of dependent effect size's sampling errors (via vcalc() function), we can use the argument rho (??) to specify the correlation of observed effect sizes or outcomes measured concurrently:
+
+### construct the variance-covariance matrix assuming rho = 0.66 for effect sizes corresponding to the 'verbal' and 'math' outcome types
+
+ V <- vcalc(vi, cluster=studyID, type=outcome, data=dat, rho=0.66)
+
+ (ii) rho in the variance-covariance matrix of random effects structure:
+
+say I am using ~ inner | outer to define the random effects structure ~ outcome | studyID. For any of the variance structures (e.g., compound symmetric structure [CS], heteroscedastic compound symmetric structure [HCS], UN [unstructured]), there is a correlation coefficient rho (??) denoting the correlation between the different levels of inner variable (in the our case, outcome). Then we can fit the bivariate random-effects model using rma.mv(), for example:
+
+rma.mv(yi, vi, mods = ~ outcome, random = ~ group | studyID, struct="UN", data=mydata)
+
+(iii) correlation between true effects size/outcomes
+
+
+My question is,
+
+  1.   what are the differences and relationships between ?? (sampling correlation; scenario i) in V matrix and ?? in the random effects structure (scenario ii) in the context of my example and a more general condition?
+  2.  whether the second ?? (correlation in the random effects structure; scenario ii) is exactly the third ?? (correlation between the underlying true effects size/outcomes; scenario iii).
+  3.  Is ?? (sampling correlation; scenario i) meaning the correlation between the observed effects/outcomes and ?? in the random effects structure (scenario ii) is the correlation between the true effects/outcomes.
+  4.  Is there any other ?? in multivariate or multilevel meta-analytic models?
+
+Best,
+
+Yefeng Yang PhD
+https://scholar.google.com/citations?user=V1WGHHIAAAAJ
+UNSW, Sydney
+City University of Hong Kong, China
+
+
+	[[alternative HTML version deleted]]
+
+
+From towh|d| @end|ng |rom ut@@c@|r  Wed May  4 00:11:44 2022
+From: towh|d| @end|ng |rom ut@@c@|r (towhidi)
+Date: Wed, 04 May 2022 02:41:44 +0430
+Subject: [R-meta] 
+ Does trim and fill method correct for data falsification
+ or lower quality of small studies?
+In-Reply-To: <b5dd8f8611084336b059d50b7ae66f00@UM-MAIL3214.unimaas.nl>
+References: <062993ffb0b9f4828ca60dc30a4a9fcb@ut.ac.ir>
+ <b5dd8f8611084336b059d50b7ae66f00@UM-MAIL3214.unimaas.nl>
+Message-ID: <e7e0c79f0709ed7cfbbb4691f76acd0a@ut.ac.ir>
+
+On 2022-05-03 11:45, Viechtbauer, Wolfgang (NP) wrote:
+
+> Dear Ali,
+> 
+> Please see my responses below.
+> 
+> Best,
+> Wolfgang
+> 
+>> -----Original Message-----
+>> From: R-sig-meta-analysis 
+>> [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>> Behalf Of towhidi
+>> Sent: Tuesday, 03 May, 2022 1:37
+>> To: r sig meta-analysis list
+>> Subject: [R-meta] Does trim and fill method correct for data 
+>> falsification or
+>> lower quality of small studies?
+>> 
+>> Dear all,
+>> 
+>> The asymmetry in a funnel plot can be caused by factors other than
+>> publication bias, such as data falsification or poorer quality in
+>> smaller trials.
+> 
+> ... or unaccounted for moderators (that are correlated with study size) 
+> or more generally heterogeneity.
+> 
+>> However, the Cochrane Handbook mentions that "the trim
+>> and fill method does not take into account reasons for funnel plot
+>> asymmetry other than publication bias".
+> 
+> I searched through the handbook 
+> (https://training.cochrane.org/handbook/current) and couldn't find this 
+> quote. Where did you find this?
+> 
+>> I do not understand why it cannot account for data falsification or 
+>> poor
+>> quality of small trials, assuming that these characteristics are
+>> associated with study size. For data falsification, the true observed
+>> effect size (before the fraudulent change in the data) for these 
+>> studies
+>> converges on the true underlying effect size. But the falsified data
+>> move these data points to the right side, and, using the trim and fill
+>> method, this bias is neutralized by imputing their counterparts on the
+>> other side.
+> 
+> 'Neutralized' sounds a bit too optimistic. If a study is imputed 
+> corresponding to the fraudulent study (which isn't guaranteed depending 
+> on how the funnel looks in general), it is going to be placed at 'est - 
+> delta', where 'est' is the pooled estimate at the end of the trim and 
+> fill procedure and 'delta' is the distance between est and the 
+> fraudulent study. If 'est' is larger than 0, then this would still 
+> leads to some bias, but it should indeed be reduced.
+> 
+>> Of course, the confidence intervals will be biased, because
+>> we are imputing data points that do not exist (which narrows the CI) 
+>> and
+>> that the bias arose from data falsification or low quality has added 
+>> to
+>> the estimated sampling variance (which widens the CI). Also, it 
+>> changes
+>> the weights, especially in the random-effects model.
+>> 
+>> But, isn't the point estimate a corrected estimate, assuming that data
+>> falsification has caused the asymmetry?
+> 
+> I would say yes. A simulation study that has examined the properties of 
+> various methods not only when there is publication bias but also under 
+> the use of 'questionable research practices' is:
+> 
+> Carter, E. C., Sch?nbrodt, F. D., Gervais, W. M. & Hilgard, J. (2019). 
+> Correcting for bias in psychology: A comparison of meta-analytic 
+> methods. Advances in Methods and Practices in Psychological Science, 
+> 2(2), 115-144. https://doi.org/10.1177/2515245919847196
+> 
+>> The same argument may apply to the bias that arises from low-quality
+>> studies. However, if this is correct, I think that acknowledging this
+>> and interpreting the CIs with even more caution is more logical than
+>> assuming that the asymmetry is caused solely by publication bias and
+>> that misconduct and low quality of small studies have nothing to do 
+>> with
+>> it.
+>> 
+>> Is this correct? Or I am missing something?
+>> 
+>> Thank you.
+>> 
+>> --
+>> Ali Zia-Tohidi MSc
+>> Clinical Psychology
+>> University of Tehran
+
+
+Dear Wolfgang,
+Thank you for your response, and thank you for the article you 
+mentioned.
+
+The quoted text, "the trim and fill method does not take into account 
+reasons for funnel plot asymmetry other than publication bias", was from 
+the previous version of the Cochrane Handbook 
+(https://handbook-5-1.cochrane.org/chapter_10/10_4_4_2_trim_and_fill.htm). 
+The trim and fill subsection is removed from the current version.
+
+Best,
+Ali
+
+-- 
+Ali Zia-Tohidi MSc
+Clinical Psychology
+University of Tehran
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed May  4 12:07:54 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 4 May 2022 10:07:54 +0000
+Subject: [R-meta] 
+ Does trim and fill method correct for data falsification
+ or lower quality of small studies?
+In-Reply-To: <e7e0c79f0709ed7cfbbb4691f76acd0a@ut.ac.ir>
+References: <062993ffb0b9f4828ca60dc30a4a9fcb@ut.ac.ir>
+ <b5dd8f8611084336b059d50b7ae66f00@UM-MAIL3214.unimaas.nl>
+ <e7e0c79f0709ed7cfbbb4691f76acd0a@ut.ac.ir>
+Message-ID: <2da0a187b25f424bba304be0d3e7bd4d@UM-MAIL3214.unimaas.nl>
+
+Thanks for providing the source of this quote. 
+
+Having read the entire text now, my interpretation of the statement ("Equally importantly, the trim and fill method does not take into account reasons for funnel plot asymmetry other than publication bias") is that this is not meant to exclude other forms of biases that could behave like publication bias (such as the use of questionable research practices), but in essence the method assumes that funnel plot asymmetry is automatically due to publication bias (or other forms of biases that behave like it), so if the asymmetry is due to something else (like an unknown moderator that is correlated with study size), it will falsely attribute that asymmetry to publication bias and falsely correct for it.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: towhidi [mailto:towhidi at ut.ac.ir]
+>Sent: Wednesday, 04 May, 2022 0:12
+>To: Viechtbauer, Wolfgang (NP)
+>Cc: r sig meta-analysis list
+>Subject: Re: [R-meta] Does trim and fill method correct for data falsification or
+>lower quality of small studies?
+>
+>On 2022-05-03 11:45, Viechtbauer, Wolfgang (NP) wrote:
+>
+>> Dear Ali,
+>>
+>> Please see my responses below.
+>>
+>> Best,
+>> Wolfgang
+>>
+>>> -----Original Message-----
+>>> From: R-sig-meta-analysis
+>>> [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>> Behalf Of towhidi
+>>> Sent: Tuesday, 03 May, 2022 1:37
+>>> To: r sig meta-analysis list
+>>> Subject: [R-meta] Does trim and fill method correct for data
+>>> falsification or
+>>> lower quality of small studies?
+>>>
+>>> Dear all,
+>>>
+>>> The asymmetry in a funnel plot can be caused by factors other than
+>>> publication bias, such as data falsification or poorer quality in
+>>> smaller trials.
+>>
+>> ... or unaccounted for moderators (that are correlated with study size)
+>> or more generally heterogeneity.
+>>
+>>> However, the Cochrane Handbook mentions that "the trim
+>>> and fill method does not take into account reasons for funnel plot
+>>> asymmetry other than publication bias".
+>>
+>> I searched through the handbook
+>> (https://training.cochrane.org/handbook/current) and couldn't find this
+>> quote. Where did you find this?
+>>
+>>> I do not understand why it cannot account for data falsification or
+>>> poor
+>>> quality of small trials, assuming that these characteristics are
+>>> associated with study size. For data falsification, the true observed
+>>> effect size (before the fraudulent change in the data) for these
+>>> studies
+>>> converges on the true underlying effect size. But the falsified data
+>>> move these data points to the right side, and, using the trim and fill
+>>> method, this bias is neutralized by imputing their counterparts on the
+>>> other side.
+>>
+>> 'Neutralized' sounds a bit too optimistic. If a study is imputed
+>> corresponding to the fraudulent study (which isn't guaranteed depending
+>> on how the funnel looks in general), it is going to be placed at 'est -
+>> delta', where 'est' is the pooled estimate at the end of the trim and
+>> fill procedure and 'delta' is the distance between est and the
+>> fraudulent study. If 'est' is larger than 0, then this would still
+>> leads to some bias, but it should indeed be reduced.
+>>
+>>> Of course, the confidence intervals will be biased, because
+>>> we are imputing data points that do not exist (which narrows the CI)
+>>> and
+>>> that the bias arose from data falsification or low quality has added
+>>> to
+>>> the estimated sampling variance (which widens the CI). Also, it
+>>> changes
+>>> the weights, especially in the random-effects model.
+>>>
+>>> But, isn't the point estimate a corrected estimate, assuming that data
+>>> falsification has caused the asymmetry?
+>>
+>> I would say yes. A simulation study that has examined the properties of
+>> various methods not only when there is publication bias but also under
+>> the use of 'questionable research practices' is:
+>>
+>> Carter, E. C., Sch?nbrodt, F. D., Gervais, W. M. & Hilgard, J. (2019).
+>> Correcting for bias in psychology: A comparison of meta-analytic
+>> methods. Advances in Methods and Practices in Psychological Science,
+>> 2(2), 115-144. https://doi.org/10.1177/2515245919847196
+>>
+>>> The same argument may apply to the bias that arises from low-quality
+>>> studies. However, if this is correct, I think that acknowledging this
+>>> and interpreting the CIs with even more caution is more logical than
+>>> assuming that the asymmetry is caused solely by publication bias and
+>>> that misconduct and low quality of small studies have nothing to do
+>>> with
+>>> it.
+>>>
+>>> Is this correct? Or I am missing something?
+>>>
+>>> Thank you.
+>>>
+>>> --
+>>> Ali Zia-Tohidi MSc
+>>> Clinical Psychology
+>>> University of Tehran
+>
+>Dear Wolfgang,
+>Thank you for your response, and thank you for the article you
+>mentioned.
+>
+>The quoted text, "the trim and fill method does not take into account
+>reasons for funnel plot asymmetry other than publication bias", was from
+>the previous version of the Cochrane Handbook
+>(https://handbook-5-1.cochrane.org/chapter_10/10_4_4_2_trim_and_fill.htm).
+>The trim and fill subsection is removed from the current version.
+>
+>Best,
+>Ali
+>
+>--
+>Ali Zia-Tohidi MSc
+>Clinical Psychology
+>University of Tehran
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed May  4 12:52:00 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 4 May 2022 10:52:00 +0000
+Subject: [R-meta] 
+ =?utf-8?q?confusion_point=3A_the_various_=27correlation?=
+ =?utf-8?q?=27_=28rho=2C_=CF=81=29_in_multivariate_meta-analytic_model?=
+In-Reply-To: <MEAPR01MB541500B70ACEE8BA58DA6EB99DC09@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB5415710EF2CFEFC96E8630419DC09@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <MEAPR01MB541500B70ACEE8BA58DA6EB99DC09@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <822244c2055043cd81bfda448f4c5bb7@UM-MAIL3214.unimaas.nl>
+
+Dear Yefang,
+
+Please be careful with using specialized symbols/formatting in your text, since this is a plain-text mailing list and such symbols/formatting might not display correctly for the recipients (note the ? mark symbols below and in how this ends up looking in the archives: https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-May/004026.html). 
+
+Also, when I get questions via email, I typically redirect them here or places like StackOverflow (https://stackoverflow.com) or CrossValidated (https://stats.stackexchange.com) because the answer I or others provide might be beneficial to more people, not just the person asking. And yes, sometimes I do not have the time to answer.
+
+So, to your question(s):
+
+The V matrix (which we can construct/approximate with vcalc()) is the variance-covariance matrix of the sampling errors of the effect size estimates within each study. To keep things simple, say our 'effect size measure' is simply a raw mean. And we have measured two different things (like cognition and anxiety) in a single group of subjects. So, the raw data in a study would simply be two columns, one for each variable, for the n subjects. Now imagine we would repeat this study over and over, each time computing the means of the two variables based on new samples of subjects drawn from the same population and then we would correlate these pairs of means -- that is the within-study correlation. But we just have run the study once. So we cannot correlate the pairs of means, since you cannot compute the correlation when you just have two numbers. However, it turns out that the correlation between the raw data (say, r) is an estimate of the correlation between the two means!
+
+This is essentially the same principle as what is used in computing (or rather: estimating) the sampling variance of an effect size measure. In theory, the sampling variance is the variance in the effect size estimates we would obtain if we theoretically would repeat the same study over and over under identical circumstances. But we don't do that, since the study was run once. We have our effect size estimate from that study and now we want to know what its variance would have been if we had repeated the study over and over. For a mean, we can estimate its sampling variance by dividing the variance of the raw data by n. So, we can do this for the cognition mean (variance of the raw cognition values divided by n) and the anxiety mean (variance of the raw anxiety values divided by n). Those are the sampling variances. And the covariance between the two means is estimated by taking the correlation between the raw data and multiplying that by the square root of the product of the two sampling variances (i.e., cov = r * sqrt(sampling_var_1 * sampling_var_2)).
+
+This will give me the 2x2 matrix that goes into the V matrix for this particular study, which reflects the dependency in the two estimates within this study. So, the 'rho' for vcalc() is about this within-study correlation ('r' above).
+
+Sidenote: For other effect size measures that are more commonly used in meta-analyses (instead of simply means) like standardized mean differences, (log) odds/risk ratios, and so on, the equations that need to be used to compute/estimate their sampling variances and the correlation between two estimates computed based on the same sample of subjects are of course different than those used for means.
+
+But in a meta-analaysis, we have multiple studies. And for each study, there is a pair of means (or whatever the effect size measure is). Another type of correlation we can ask about is the correlation in the underlying *true* means (assuming that the true means of the two variables are not constant across studies). This is what we can estimate by fitting a model like:
+
+rma.mv(yi, V, mods = ~ outcome, random = ~ outcome | study, struct="UN", data=mydata)
+
+So, yi is the vector with the means for the two outcomes for all of the studies, V is the var-cov matrix we constructed above (block-diagonal with 2x2 blocks), outcome distinguishes if a value in yi is a mean for the first or the second outcome, and 'study' is a study identifier.
+
+Sidenote: If a study did not measure both outcomes, then this is no problem -- it just provides one value to 'yi' and its part in the V matrix is just a 1x1 block.
+
+By adding a random effect for 'outcome within study' (random = ~ outcome | study) with an 'unstructured variance-covariance matrix' (struct="UN"), we estimate the variance in the *true* means for the first and second outcome (and we allow those two variances to be different) and we estimate the covariance/correlation between the true means. This is the 'rho' for the correlation of the true means.
+
+Note that it is important above that we use rma.mv(yi, V, ...) and not just rma.mv(yi, vi, ...), since the latter would assume that the within-study correlations are 0. The effect of this is (typically) that we would overestimate the correlation of the true means.
+
+And finally, yes, there can be other 'rho' types (or more generally, correlations, because what we call these correlations is completely arbitrary). For example, there can be autocorrelations when the same effect size is repeatedly measured over time in a group of subjects (then we can have within-study autocorrelation and also the autocorrelation in the true means).
+
+I hope this clarifies things a bit.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Yefeng Yang
+>Sent: Tuesday, 03 May, 2022 16:02
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] confusion point: the various 'correlation' (rho, ?) in
+>multivariate meta-analytic model
+>
+>Hi subscribers
+>
+>I am writing to ask one question regarding the various 'correlation' (rho) in
+>multivariate models (implemented in rma.mv() function).  I would be grateful if
+>would like to clarify my confusion.  I am hoping someone who is familiar with
+>meta-analytic models can address my questions. Wolfgang definitely knows the
+>answers, but I guess he is so busy that he has no time to answer my questions.
+>Anyway, I briefly describe my question below.
+>
+>Assume I am conducting a bivariate meta-analysis to estimate (1) the overall
+>effects of two outcomes (cognition and anxiety), and (2) the correlation between
+>the two outcomes. I am confused with the two types of correlations (probably
+>three types) involved in this bivariate meta-analysis.
+>
+>(i) rho in the variance-covariance matrix of dependent effect size's sampling
+>errors:
+>
+>when constructing (or approximately imputing) variance-covariance matrix of
+>dependent effect size's sampling errors (via vcalc() function), we can use the
+>argument rho (??) to specify the correlation of observed effect sizes or outcomes
+>measured concurrently:
+>
+>### construct the variance-covariance matrix assuming rho = 0.66 for effect sizes
+>corresponding to the 'verbal' and 'math' outcome types
+>
+> V <- vcalc(vi, cluster=studyID, type=outcome, data=dat, rho=0.66)
+>
+> (ii) rho in the variance-covariance matrix of random effects structure:
+>
+>say I am using ~ inner | outer to define the random effects structure ~ outcome |
+>studyID. For any of the variance structures (e.g., compound symmetric structure
+>[CS], heteroscedastic compound symmetric structure [HCS], UN [unstructured]),
+>there is a correlation coefficient rho (??) denoting the correlation between the
+>different levels of inner variable (in the our case, outcome). Then we can fit
+>the bivariate random-effects model using rma.mv(), for example:
+>
+>rma.mv(yi, vi, mods = ~ outcome, random = ~ group | studyID, struct="UN",
+>data=mydata)
+>
+>(iii) correlation between true effects size/outcomes
+>
+>My question is,
+>
+>  1.   what are the differences and relationships between ?? (sampling
+>correlation; scenario i) in V matrix and ?? in the random effects structure
+>(scenario ii) in the context of my example and a more general condition?
+>  2.  whether the second ?? (correlation in the random effects structure;
+>scenario ii) is exactly the third ?? (correlation between the underlying true
+>effects size/outcomes; scenario iii).
+>  3.  Is ?? (sampling correlation; scenario i) meaning the correlation between
+>the observed effects/outcomes and ?? in the random effects structure (scenario
+>ii) is the correlation between the true effects/outcomes.
+>  4.  Is there any other ?? in multivariate or multilevel meta-analytic models?
+>
+>Best,
+>
+>Yefeng Yang PhD
+>https://scholar.google.com/citations?user=V1WGHHIAAAAJ
+>UNSW, Sydney
+>City University of Hong Kong, China
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed May  4 14:17:16 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 4 May 2022 13:17:16 +0100
+Subject: [R-meta] 
+ Does trim and fill method correct for data falsification
+ or lower quality of small studies?
+In-Reply-To: <e7e0c79f0709ed7cfbbb4691f76acd0a@ut.ac.ir>
+References: <062993ffb0b9f4828ca60dc30a4a9fcb@ut.ac.ir>
+ <b5dd8f8611084336b059d50b7ae66f00@UM-MAIL3214.unimaas.nl>
+ <e7e0c79f0709ed7cfbbb4691f76acd0a@ut.ac.ir>
+Message-ID: <3f0a158e-061f-57c9-2cae-edf5c0a9bc04@dewey.myzen.co.uk>
+
+One might also point out that the methods has been criticised for 
+detecting publicaiton bias
+
+@article{schwarzer10,
+    author = {Schwarzer, G and Carpenter, J R and R\"ucker, G},
+    title = {Empirical evaluation suggests {Copas} selection model
+       preferable to trim--and--fill method for publication
+       bias in meta--analysis},
+    journal = {Journal of Clinical Epidemiology},
+    year = {2010},
+    volume = {63},
+    pages = {282--288}
+}
+
+Michael
+
+On 03/05/2022 23:11, towhidi wrote:
+> On 2022-05-03 11:45, Viechtbauer, Wolfgang (NP) wrote:
+> 
+>> Dear Ali,
+>>
+>> Please see my responses below.
+>>
+>> Best,
+>> Wolfgang
+>>
+>>> -----Original Message-----
+>>> From: R-sig-meta-analysis 
+>>> [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>> Behalf Of towhidi
+>>> Sent: Tuesday, 03 May, 2022 1:37
+>>> To: r sig meta-analysis list
+>>> Subject: [R-meta] Does trim and fill method correct for data 
+>>> falsification or
+>>> lower quality of small studies?
+>>>
+>>> Dear all,
+>>>
+>>> The asymmetry in a funnel plot can be caused by factors other than
+>>> publication bias, such as data falsification or poorer quality in
+>>> smaller trials.
+>>
+>> ... or unaccounted for moderators (that are correlated with study 
+>> size) or more generally heterogeneity.
+>>
+>>> However, the Cochrane Handbook mentions that "the trim
+>>> and fill method does not take into account reasons for funnel plot
+>>> asymmetry other than publication bias".
+>>
+>> I searched through the handbook 
+>> (https://training.cochrane.org/handbook/current) and couldn't find 
+>> this quote. Where did you find this?
+>>
+>>> I do not understand why it cannot account for data falsification or poor
+>>> quality of small trials, assuming that these characteristics are
+>>> associated with study size. For data falsification, the true observed
+>>> effect size (before the fraudulent change in the data) for these studies
+>>> converges on the true underlying effect size. But the falsified data
+>>> move these data points to the right side, and, using the trim and fill
+>>> method, this bias is neutralized by imputing their counterparts on the
+>>> other side.
+>>
+>> 'Neutralized' sounds a bit too optimistic. If a study is imputed 
+>> corresponding to the fraudulent study (which isn't guaranteed 
+>> depending on how the funnel looks in general), it is going to be 
+>> placed at 'est - delta', where 'est' is the pooled estimate at the end 
+>> of the trim and fill procedure and 'delta' is the distance between est 
+>> and the fraudulent study. If 'est' is larger than 0, then this would 
+>> still leads to some bias, but it should indeed be reduced.
+>>
+>>> Of course, the confidence intervals will be biased, because
+>>> we are imputing data points that do not exist (which narrows the CI) and
+>>> that the bias arose from data falsification or low quality has added to
+>>> the estimated sampling variance (which widens the CI). Also, it changes
+>>> the weights, especially in the random-effects model.
+>>>
+>>> But, isn't the point estimate a corrected estimate, assuming that data
+>>> falsification has caused the asymmetry?
+>>
+>> I would say yes. A simulation study that has examined the properties 
+>> of various methods not only when there is publication bias but also 
+>> under the use of 'questionable research practices' is:
+>>
+>> Carter, E. C., Sch?nbrodt, F. D., Gervais, W. M. & Hilgard, J. (2019). 
+>> Correcting for bias in psychology: A comparison of meta-analytic 
+>> methods. Advances in Methods and Practices in Psychological Science, 
+>> 2(2), 115-144. https://doi.org/10.1177/2515245919847196
+>>
+>>> The same argument may apply to the bias that arises from low-quality
+>>> studies. However, if this is correct, I think that acknowledging this
+>>> and interpreting the CIs with even more caution is more logical than
+>>> assuming that the asymmetry is caused solely by publication bias and
+>>> that misconduct and low quality of small studies have nothing to do with
+>>> it.
+>>>
+>>> Is this correct? Or I am missing something?
+>>>
+>>> Thank you.
+>>>
+>>> -- 
+>>> Ali Zia-Tohidi MSc
+>>> Clinical Psychology
+>>> University of Tehran
+> 
+> 
+> Dear Wolfgang,
+> Thank you for your response, and thank you for the article you mentioned.
+> 
+> The quoted text, "the trim and fill method does not take into account 
+> reasons for funnel plot asymmetry other than publication bias", was from 
+> the previous version of the Cochrane Handbook 
+> (https://handbook-5-1.cochrane.org/chapter_10/10_4_4_2_trim_and_fill.htm). 
+> The trim and fill subsection is removed from the current version.
+> 
+> Best,
+> Ali
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Thu May  5 09:56:36 2022
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Thu, 5 May 2022 07:56:36 +0000
+Subject: [R-meta] A further question about 'correlations' in multivariate
+ model: correlation in observed effects vs. correlation in true effects
+Message-ID: <MEAPR01MB5415A405429C17A2F55BE1FC9DC29@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Hi subscribers,
+
+Excited to be here again. Last time, I asked one question regarding the within-study correlation (used for the variance-covariance matrix of sampling errors of effect size estimates) and the correlation in *true* effects (estimated from the variance-covariance matrix of random effect). Please refer to my question here: https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-May/004026.html.
+
+Regarding my question, Wolfgang gave me a fairly clear answer, which resolved my long-standing confusion. I appreciated this very much. See his answer here: https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-May/004029.html.
+
+Now, I have further, albeit small, questions about the relationship between correlation in observed effects and that in true effects (these questions were inspired by "variance in the observed effect and that in the true effect"):
+
+
+  1.   is there a concept of correlation in observed effects? I mean whether correlation in observed effects is meaningful?  If yes, what is its general meaning or implication? You can use an example of one study containing two outcomes (cognition and anxiety) to explain it to me.
+  2.  what is the relationship between correlation in observed effects and that in true effects? I am expecting a quantitative relationship between the two (just like the variance of the observed effect =  variance of true effect + sampling variance)
+  3.  any parameters in the meta-analytic model (see below for an example) can reflect or denote the correlation in the observed effect (if the corresponding concept exists; see question 1): rma.mv(yi, V, mods = ~ outcome, random = ~ outcome | study, struct="UN", data=mydata)
+  4.  correlation in variance-covariance matrix of sampling variance can be formally called within-study correlation. This is fairly clear. I wonder what is the formal name or general name of correlation (rho) in the variance-covariance of a random effect (for example rho in the structure like "UN")
+  5.  in contrast to the within-study correlation, there is also another correlation, named the between-study correlation involved in the multivariate meta-analytic model (see Riley R D, Abrams K R, Sutton A J, et al. Bivariate random-effects meta-analysis and the estimation of between-study correlation[J]. BMC Medical Research Methodology, 2007, 7(1): 1-15.). So what is the meaning of between-study correlation? Is between-study correlation exactly the correlation in true effects (as you explained in the meta-analytic context, we have multiple studies, not only one study for the within-study correlation)?
+
+I would be grateful if would like to take the time to clarify my confusion.
+
+Best,
+
+Yefeng Yang PhD
+
+	[[alternative HTML version deleted]]
+
+
+From towh|d| @end|ng |rom ut@@c@|r  Thu May  5 10:30:00 2022
+From: towh|d| @end|ng |rom ut@@c@|r (towhidi)
+Date: Thu, 05 May 2022 13:00:00 +0430
+Subject: [R-meta] 
+ Does trim and fill method correct for data falsification
+ or lower quality of small studies?
+In-Reply-To: <3f0a158e-061f-57c9-2cae-edf5c0a9bc04@dewey.myzen.co.uk>
+References: <062993ffb0b9f4828ca60dc30a4a9fcb@ut.ac.ir>
+ <b5dd8f8611084336b059d50b7ae66f00@UM-MAIL3214.unimaas.nl>
+ <e7e0c79f0709ed7cfbbb4691f76acd0a@ut.ac.ir>
+ <3f0a158e-061f-57c9-2cae-edf5c0a9bc04@dewey.myzen.co.uk>
+Message-ID: <6e13e5c1027b3bd667eb9df08dee032c@ut.ac.ir>
+
+On 2022-05-04 16:47, Michael Dewey wrote:
+
+> One might also point out that the methods has been criticised for 
+> detecting publicaiton bias
+> 
+> @article{schwarzer10,
+> author = {Schwarzer, G and Carpenter, J R and R\"ucker, G},
+> title = {Empirical evaluation suggests {Copas} selection model
+> preferable to trim--and--fill method for publication
+> bias in meta--analysis},
+> journal = {Journal of Clinical Epidemiology},
+> year = {2010},
+> volume = {63},
+> pages = {282--288}
+> }
+> 
+> Michael
+> 
+> On 03/05/2022 23:11, towhidi wrote: On 2022-05-03 11:45, Viechtbauer, 
+> Wolfgang (NP) wrote:
+> 
+> Dear Ali,
+> 
+> Please see my responses below.
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis 
+> [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+> Behalf Of towhidi
+> Sent: Tuesday, 03 May, 2022 1:37
+> To: r sig meta-analysis list
+> Subject: [R-meta] Does trim and fill method correct for data 
+> falsification or
+> lower quality of small studies?
+> 
+> Dear all,
+> 
+> The asymmetry in a funnel plot can be caused by factors other than
+> publication bias, such as data falsification or poorer quality in
+> smaller trials.
+> ... or unaccounted for moderators (that are correlated with study size) 
+> or more generally heterogeneity.
+> 
+> However, the Cochrane Handbook mentions that "the trim
+> and fill method does not take into account reasons for funnel plot
+> asymmetry other than publication bias".
+> I searched through the handbook 
+> (https://training.cochrane.org/handbook/current) and couldn't find this 
+> quote. Where did you find this?
+> 
+> I do not understand why it cannot account for data falsification or 
+> poor
+> quality of small trials, assuming that these characteristics are
+> associated with study size. For data falsification, the true observed
+> effect size (before the fraudulent change in the data) for these 
+> studies
+> converges on the true underlying effect size. But the falsified data
+> move these data points to the right side, and, using the trim and fill
+> method, this bias is neutralized by imputing their counterparts on the
+> other side.
+> 'Neutralized' sounds a bit too optimistic. If a study is imputed 
+> corresponding to the fraudulent study (which isn't guaranteed depending 
+> on how the funnel looks in general), it is going to be placed at 'est - 
+> delta', where 'est' is the pooled estimate at the end of the trim and 
+> fill procedure and 'delta' is the distance between est and the 
+> fraudulent study. If 'est' is larger than 0, then this would still 
+> leads to some bias, but it should indeed be reduced.
+> 
+> Of course, the confidence intervals will be biased, because
+> we are imputing data points that do not exist (which narrows the CI) 
+> and
+> that the bias arose from data falsification or low quality has added to
+> the estimated sampling variance (which widens the CI). Also, it changes
+> the weights, especially in the random-effects model.
+> 
+> But, isn't the point estimate a corrected estimate, assuming that data
+> falsification has caused the asymmetry?
+> I would say yes. A simulation study that has examined the properties of 
+> various methods not only when there is publication bias but also under 
+> the use of 'questionable research practices' is:
+> 
+> Carter, E. C., Sch?nbrodt, F. D., Gervais, W. M. & Hilgard, J. (2019). 
+> Correcting for bias in psychology: A comparison of meta-analytic 
+> methods. Advances in Methods and Practices in Psychological Science, 
+> 2(2), 115-144. https://doi.org/10.1177/2515245919847196
+> 
+> The same argument may apply to the bias that arises from low-quality
+> studies. However, if this is correct, I think that acknowledging this
+> and interpreting the CIs with even more caution is more logical than
+> assuming that the asymmetry is caused solely by publication bias and
+> that misconduct and low quality of small studies have nothing to do 
+> with
+> it.
+> 
+> Is this correct? Or I am missing something?
+> 
+> Thank you.
+> 
+> -- Ali Zia-Tohidi MSc
+> Clinical Psychology
+> University of Tehran
+
+> Dear Wolfgang,
+> Thank you for your response, and thank you for the article you 
+> mentioned.
+
+> The quoted text, "the trim and fill method does not take into account 
+> reasons for funnel plot asymmetry other than publication bias", was 
+> from the previous version of the Cochrane Handbook 
+> (https://handbook-5-1.cochrane.org/chapter_10/10_4_4_2_trim_and_fill.htm). 
+> The trim and fill subsection is removed from the current version.
+
+> Best,
+> Ali
+
+
+
+Dear Wolfgang
+Thank you for elaborating on the text.
+
+And Dear Micheal,
+Thank you for your note. I intend to use different methods in my 
+sensitivity analyses.
+
+Best,
+Ali
+
+
+-- 
+Ali Zia-Tohidi MSc
+Clinical Psychology
+University of Tehran
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu May  5 11:51:15 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 5 May 2022 09:51:15 +0000
+Subject: [R-meta] 
+ A further question about 'correlations' in multivariate
+ model: correlation in observed effects vs. correlation in true effects
+In-Reply-To: <MEAPR01MB5415A405429C17A2F55BE1FC9DC29@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB5415A405429C17A2F55BE1FC9DC29@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <539df810bed44338986c94075ffa1950@UM-MAIL3214.unimaas.nl>
+
+Dear Yefeng,
+
+Please see below for my responses.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Yefeng Yang
+>Sent: Thursday, 05 May, 2022 9:57
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] A further question about 'correlations' in multivariate model:
+>correlation in observed effects vs. correlation in true effects
+>
+>Hi subscribers,
+>
+>Excited to be here again. Last time, I asked one question regarding the within-
+>study correlation (used for the variance-covariance matrix of sampling errors of
+>effect size estimates) and the correlation in *true* effects (estimated from the
+>variance-covariance matrix of random effect). Please refer to my question here:
+>https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-May/004026.html.
+>
+>Regarding my question, Wolfgang gave me a fairly clear answer, which resolved my
+>long-standing confusion. I appreciated this very much. See his answer here:
+>https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-May/004029.html.
+>
+>Now, I have further, albeit small, questions about the relationship between
+>correlation in observed effects and that in true effects (these questions were
+>inspired by "variance in the observed effect and that in the true effect"):
+>
+>  1.   is there a concept of correlation in observed effects? I mean whether
+>correlation in observed effects is meaningful?  If yes, what is its general
+>meaning or implication? You can use an example of one study containing two
+>outcomes (cognition and anxiety) to explain it to me.
+
+This is the within-study correlation I talked about.
+
+>  2.  what is the relationship between correlation in observed effects and that
+>in true effects? I am expecting a quantitative relationship between the two (just
+>like the variance of the observed effect =  variance of true effect + sampling
+>variance)
+
+There is no inherent relationship between the two. It could be that the within-study correlations are positive but that the correlation in the underlying true effects are negative or vice-versa, or that the true effects are not correlated at all, and so on.
+
+>  3.  any parameters in the meta-analytic model (see below for an example) can
+>reflect or denote the correlation in the observed effect (if the corresponding
+>concept exists; see question 1): rma.mv(yi, V, mods = ~ outcome, random = ~
+>outcome | study, struct="UN", data=mydata)
+
+I don't understand the question.
+
+>  4.  correlation in variance-covariance matrix of sampling variance can be
+>formally called within-study correlation. This is fairly clear. I wonder what is
+>the formal name or general name of correlation (rho) in the variance-covariance
+>of a random effect (for example rho in the structure like "UN")
+
+Some might call it the between-study correlation, but to me this phrasing is a bit odd, because it sounds a bit like the correlation denotes how something in study A correlates with something in study B, but that is not what it denotes (it denotes how the true effects correlate within a study, so in that sense, it is also a within-study correlation, but let's not call it that to avoid confusion).
+
+>  5.  in contrast to the within-study correlation, there is also another
+>correlation, named the between-study correlation involved in the multivariate
+>meta-analytic model (see Riley R D, Abrams K R, Sutton A J, et al. Bivariate
+>random-effects meta-analysis and the estimation of between-study correlation[J].
+>BMC Medical Research Methodology, 2007, 7(1): 1-15.). So what is the meaning of
+>between-study correlation? Is between-study correlation exactly the correlation
+>in true effects (as you explained in the meta-analytic context, we have multiple
+>studies, not only one study for the within-study correlation)?
+
+Yes - see 4.
+
+>I would be grateful if would like to take the time to clarify my confusion.
+>
+>Best,
+>
+>Yefeng Yang PhD
+
+
+From Tor|@Pen@ @end|ng |rom @tonybrook@edu  Thu May  5 16:12:28 2022
+From: Tor|@Pen@ @end|ng |rom @tonybrook@edu (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+Date: Thu, 5 May 2022 10:12:28 -0400
+Subject: [R-meta] Multilevel Meta-Analysis Pet-Peese and Power
+Message-ID: <CAEmuQj92EXpYyRogT2cBk6f61F0cn-t7MqSC86QWNfPtBMN4fw@mail.gmail.com>
+
+I was asked by reviewers to conduct a Pet-Peese analysis for publication
+bias, but I'm not sure how to conduct a Pet-Peese analysis on a rma.mv
+object in metafor. (1) Does anyone know if it is possible to run a
+Pet-Peese analysis of publication bias on a rma.mv object? They also asked
+for power analyses which I could not find out how to do for rma.mv objects
+with moderators. (2) Does anyone know how to conduct a power analysis on a
+rma.mv moderator analysis?
+
+I appreciate any guidance you can provide!
+
+Thanks,
+Tori
+
+-- 
+*Tori Pe?a <https://www.linkedin.com/in/toripena/> *(she/her/ella)
+Doctoral Candidate, Cognitive Psychology
+Dept. of Psychology
+Stony Brook University
+Stony Brook, NY 11790-2500
+[image: Stony Brook University logo]
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Thu May  5 16:24:11 2022
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 5 May 2022 09:24:11 -0500
+Subject: [R-meta] Multilevel Meta-Analysis Pet-Peese and Power
+In-Reply-To: <CAEmuQj92EXpYyRogT2cBk6f61F0cn-t7MqSC86QWNfPtBMN4fw@mail.gmail.com>
+References: <CAEmuQj92EXpYyRogT2cBk6f61F0cn-t7MqSC86QWNfPtBMN4fw@mail.gmail.com>
+Message-ID: <CAFUVuJwDfpThrL2ta9TuWb-D_2g3T17q74G-U84dV=2uh6=cNA@mail.gmail.com>
+
+Hi Tori,
+
+Here are two papers on PET-PEESE for multi-level/multi-variate
+meta-analysis:
+- Fern?ndez-Castilla, B., Declercq, L., Jamshidi, L., Beretvas, S. N.,
+Onghena, P., & Van den Noortgate, W. (2021). Detecting selection bias in
+meta-analyses with multiple outcomes: a simulation study. The Journal of
+Experimental Education, 89(1), 125-144. ttps://
+doi.org/10.1080/00220973.2019.1582470
+- Rodgers, M. A., & Pustejovsky, J. E. (2021). Evaluating meta-analytic
+methods to detect selective reporting in the presence of dependent effect
+sizes. Psychological Methods, 26(2), 141. https://doi.org/10.1037/met0000300
+pre-print: https://osf.io/preprints/metaarxiv/vqp8u/ supplementary
+materials: https://osf.io/5f732/
+The supplementary materials for our paper includes example code.
+
+The short answer on PET-PEESE is that you can do this by running a
+meta-regression (using rma.mv) that includes a measure of precision as a
+predictor. For PET, the predictor would be the standard error (or something
+closely related to the SE). For PEESE, the predictor would be the squared
+standard error. Depending on what effect size metric you're using, you may
+need to make a few tweaks to the predictor, as we explain in our paper.
+
+Regarding power analysis, my colleagues and I have a working paper that
+describes power approximations for rma.mv() models, but only for the
+overall average effect size:
+https://osf.io/preprints/metaarxiv/6tp9y/
+As far as I know, there has not yet been work on power analysis for
+moderators. One could evaluate power through simulation, though I don't
+think there are any readily available tools for doing this.
+
+Kind Regards,
+James
+
+
+On Thu, May 5, 2022 at 9:12 AM Tori Pe?a <Tori.Pena at stonybrook.edu> wrote:
+
+> I was asked by reviewers to conduct a Pet-Peese analysis for publication
+> bias, but I'm not sure how to conduct a Pet-Peese analysis on a rma.mv
+> object in metafor. (1) Does anyone know if it is possible to run a
+> Pet-Peese analysis of publication bias on a rma.mv object? They also asked
+> for power analyses which I could not find out how to do for rma.mv objects
+> with moderators. (2) Does anyone know how to conduct a power analysis on a
+> rma.mv moderator analysis?
+>
+> I appreciate any guidance you can provide!
+>
+> Thanks,
+> Tori
+>
+> --
+> *Tori Pe?a <https://www.linkedin.com/in/toripena/> *(she/her/ella)
+> Doctoral Candidate, Cognitive Psychology
+> Dept. of Psychology
+> Stony Brook University
+> Stony Brook, NY 11790-2500
+> [image: Stony Brook University logo]
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Thu May  5 16:27:54 2022
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (=?UTF-8?Q?Dr=2e_Gerta_R=c3=bccker?=)
+Date: Thu, 5 May 2022 16:27:54 +0200
+Subject: [R-meta] Multilevel Meta-Analysis Pet-Peese and Power
+In-Reply-To: <CAEmuQj92EXpYyRogT2cBk6f61F0cn-t7MqSC86QWNfPtBMN4fw@mail.gmail.com>
+References: <CAEmuQj92EXpYyRogT2cBk6f61F0cn-t7MqSC86QWNfPtBMN4fw@mail.gmail.com>
+Message-ID: <2fccb97c-4129-8491-4235-38e49f3c6c00@imbi.uni-freiburg.de>
+
+Dear Tori,
+
+I am not sure whether they would accept this as a PET-PEESE analysis, 
+but the limit meta-analysis, implemented with function limitmeta() in 
+the metasens package https://cran.r-project.org/web/packages/metasens/ 
+does a similar job.
+
+For the theory, see 
+https://academic.oup.com/biostatistics/article/12/1/122/391113?login=false 
+or https://onlinelibrary.wiley.com/doi/10.1002/bimj.201000151.
+
+Best,
+
+Gerta
+
+Am 05.05.2022 um 16:12 schrieb Tori Pe?a:
+> I was asked by reviewers to conduct a Pet-Peese analysis for publication
+> bias, but I'm not sure how to conduct a Pet-Peese analysis on a rma.mv
+> object in metafor. (1) Does anyone know if it is possible to run a
+> Pet-Peese analysis of publication bias on a rma.mv object? They also asked
+> for power analyses which I could not find out how to do for rma.mv objects
+> with moderators. (2) Does anyone know how to conduct a power analysis on a
+> rma.mv moderator analysis?
+>
+> I appreciate any guidance you can provide!
+>
+> Thanks,
+> Tori
+>
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Guest Scientist
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Zinkmattenstr. 6a, D-79108 Freiburg, Germany
+
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+
+From jepu@to @end|ng |rom gm@||@com  Thu May  5 17:33:57 2022
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 5 May 2022 10:33:57 -0500
+Subject: [R-meta] 
+ A further question about 'correlations' in multivariate
+ model: correlation in observed effects vs. correlation in true effects
+In-Reply-To: <539df810bed44338986c94075ffa1950@UM-MAIL3214.unimaas.nl>
+References: <MEAPR01MB5415A405429C17A2F55BE1FC9DC29@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <539df810bed44338986c94075ffa1950@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAFUVuJyO09vTVopar_uMeeqWG0J04kd34SmDJ+GQvV5RbS7tOQ@mail.gmail.com>
+
+Hi Yefeng, I'll add a couple of observations to Wolfgang's response.
+
+First let me address your question about whether there is a concept of
+correlation in observed effect size estimates, and whether this is
+meaningful. I think the term is ambiguous--it most likely means the
+sampling correlation between estimates, conditional on the true effects for
+a given study. This is as Wolfgang noted. But it might also refer to an
+_overall_ correlation between the effect size estimates in a study. This
+correlation is what you would observe if you just created a scatterplot of
+the effect size estimates for the first outcome versus the effect size
+estimates for the second outcome.
+
+Say that for each study:
+T_1j is the observed effect size estimate for the cognition outcome in
+study j
+V_1j is the sampling variance of T_1j
+T_2j is the observed effect size estimate for the anxiety outcome in study j
+V_2j is the sampling variance of T_2j
+r is the sampling correlation (the "within-study" correlation) between T_1j
+and T_2j
+Then if you plotted T_1j versus T_2j, the correlation between the points is
+an _overall_ correlation, which _combines_ the within-study correlation in
+the sampling errors and the "between-study" correlation in true effect
+sizes.
+
+If you are willing to work under a particular set of modeling assumptions,
+such as the bivariate meta-analysis model that you've described, then you
+can derive this overall correlation between observed effect size estimates
+from the same study. Say that the true effect sizes for study j are
+theta_1j and theta_2j, and we assume an unstructured covariance matrix
+where Var(theta_1j) = tau_1, Var(theta_2j) = tau_2, and Cor(theta_1j,
+theta_2j) = rho. Then
+Cov(T_1j, T_2j) = r * sqrt(V_1j V_2j) + rho * sqrt(tau_1 * tau_2)
+Var(T_1j) = V_1j + tau_1
+Var(T_2j) = V_2j + tau_2
+and so
+Cor(T_1j, T_2j) = [r * sqrt(V_1j V_2j) + rho * sqrt(tau_1 * tau_2)] /
+sqrt[(V_1j + tau_1) * (V_2j + tau_2)]
+As you can see, this is a rather complicated expression that depends on
+several parameters and also varies from study to study. This suggests it's
+hard to interpret in substantive terms.
+
+If we make some further simplifying assumptions that the sampling variances
+are equal, V_1j = V_2j = V_j, and the between-study variances are equal,
+tau_1 = tau_2 = tau, then things simplify a bit:
+Cor(T_1j, T_2j) = (r * V_j + rho * tau) / (V_j + tau) = r * (1 - phi_j) +
+rho * phi_j,
+where phi_j = tau / (V_j + tau), a sort of study-specific version of
+I-squared. So with this expression, we can see that the overall correlation
+is an average of the correlation between sampling errors and the
+correlation between the random effects.
+
+Richard Riley and colleagues have some work from a while back looking at
+how one could estimate the bivariate meta-analytic model by assuming that
+the correlation between sampling errors and the correlation between random
+effects is the same (i.e., r = rho):
+Riley, R. D., Thompson, J. R., & Abrams, K. R. (2008). An alternative model
+for bivariate random-effects meta-analysis when the within-study
+correlations are unknown. *Biostatistics*, *9*(1), 172-186.
+Generally though, there's not any reason why this would need to be the case.
+
+James
+https://jepusto.com
+
+On Thu, May 5, 2022 at 4:51 AM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Yefeng,
+>
+> Please see below for my responses.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On
+> >Behalf Of Yefeng Yang
+> >Sent: Thursday, 05 May, 2022 9:57
+> >To: r-sig-meta-analysis at r-project.org
+> >Subject: [R-meta] A further question about 'correlations' in multivariate
+> model:
+> >correlation in observed effects vs. correlation in true effects
+> >
+> >Hi subscribers,
+> >
+> >Excited to be here again. Last time, I asked one question regarding the
+> within-
+> >study correlation (used for the variance-covariance matrix of sampling
+> errors of
+> >effect size estimates) and the correlation in *true* effects (estimated
+> from the
+> >variance-covariance matrix of random effect). Please refer to my question
+> here:
+> >https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-May/004026.html.
+> >
+> >Regarding my question, Wolfgang gave me a fairly clear answer, which
+> resolved my
+> >long-standing confusion. I appreciated this very much. See his answer
+> here:
+> >https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-May/004029.html.
+> >
+> >Now, I have further, albeit small, questions about the relationship
+> between
+> >correlation in observed effects and that in true effects (these questions
+> were
+> >inspired by "variance in the observed effect and that in the true
+> effect"):
+> >
+> >  1.   is there a concept of correlation in observed effects? I mean
+> whether
+> >correlation in observed effects is meaningful?  If yes, what is its
+> general
+> >meaning or implication? You can use an example of one study containing two
+> >outcomes (cognition and anxiety) to explain it to me.
+>
+> This is the within-study correlation I talked about.
+>
+> >  2.  what is the relationship between correlation in observed effects
+> and that
+> >in true effects? I am expecting a quantitative relationship between the
+> two (just
+> >like the variance of the observed effect =  variance of true effect +
+> sampling
+> >variance)
+>
+> There is no inherent relationship between the two. It could be that the
+> within-study correlations are positive but that the correlation in the
+> underlying true effects are negative or vice-versa, or that the true
+> effects are not correlated at all, and so on.
+>
+> >  3.  any parameters in the meta-analytic model (see below for an
+> example) can
+> >reflect or denote the correlation in the observed effect (if the
+> corresponding
+> >concept exists; see question 1): rma.mv(yi, V, mods = ~ outcome, random
+> = ~
+> >outcome | study, struct="UN", data=mydata)
+>
+> I don't understand the question.
+>
+> >  4.  correlation in variance-covariance matrix of sampling variance can
+> be
+> >formally called within-study correlation. This is fairly clear. I wonder
+> what is
+> >the formal name or general name of correlation (rho) in the
+> variance-covariance
+> >of a random effect (for example rho in the structure like "UN")
+>
+> Some might call it the between-study correlation, but to me this phrasing
+> is a bit odd, because it sounds a bit like the correlation denotes how
+> something in study A correlates with something in study B, but that is not
+> what it denotes (it denotes how the true effects correlate within a study,
+> so in that sense, it is also a within-study correlation, but let's not call
+> it that to avoid confusion).
+>
+> >  5.  in contrast to the within-study correlation, there is also another
+> >correlation, named the between-study correlation involved in the
+> multivariate
+> >meta-analytic model (see Riley R D, Abrams K R, Sutton A J, et al.
+> Bivariate
+> >random-effects meta-analysis and the estimation of between-study
+> correlation[J].
+> >BMC Medical Research Methodology, 2007, 7(1): 1-15.). So what is the
+> meaning of
+> >between-study correlation? Is between-study correlation exactly the
+> correlation
+> >in true effects (as you explained in the meta-analytic context, we have
+> multiple
+> >studies, not only one study for the within-study correlation)?
+>
+> Yes - see 4.
+>
+> >I would be grateful if would like to take the time to clarify my
+> confusion.
+> >
+> >Best,
+> >
+> >Yefeng Yang PhD
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @de||n@@@rten|e @end|ng |rom br|@to|@@c@uk  Fri May 13 11:38:05 2022
+From: @de||n@@@rten|e @end|ng |rom br|@to|@@c@uk (Adelina Artenie)
+Date: Fri, 13 May 2022 09:38:05 +0000
+Subject: [R-meta] Queries re: rma.mv
+In-Reply-To: <a873a002ba9c4f1db34fc10e711a0a12@UM-MAIL3214.unimaas.nl>
+References: <VI1PR0602MB3437B067B8C7DA5BD7CEFA51BFF59@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+ <a873a002ba9c4f1db34fc10e711a0a12@UM-MAIL3214.unimaas.nl>
+Message-ID: <VI1PR0602MB3437704C2541474984FBB3A2BFCA9@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+
+Hi Wolfgang,
+
+Thank you for your detailed response. It has been very helpful. I am still pondering one thing though about the weights, if I could have your advice please:
+
+I have re-calculated the weights as you suggested (shown in my code below) and if I run a bubble plot using regplot and use these weights as the size of the bubbles, it would appear that, indeed, the correlated data are down-weighted.
+
+The issue is the following (note: my moderator is a measure of time): looking at the bubble plot, one can tell visually that the trend is clearly increasing over time. However, the coefficient from rma.mv and the best fit line in regplot show a decreasing trend. The only way this would occur is if the weights of the correlated data used in the model are not, in fact, down-weighted but up-weighted (the correlated data have a decreasing trend over time). In other words, it seems as if rma.mv is not using the row-sum weights but the weights that are based on the diagonal of the matrix (or some other weights..).
+
+Relatedly, I also wonder why, if the default weights shown in the forest plot or the bubble/regplot, are not the ones used by the rma.mv model, why are they the default weights plotted? This too makes me think that these are the ones used internally in the model estimation by rma.mv
+
+Apologies for the long e-mail. This package has been incredibly useful so far.
+I?ve just hit a point where I do not fully understand how rma.mv works and how to make sense of my results.
+
+Many thanks for your help
+Adelina
+
+
+My code:
+
+Inci_trends$prs_yrs_100 = Inci_trends$prs_yrs/100
+trend_dat_Inci <- escalc(measure="IRLN", xi=cases, ti=prs_yrs_100, data=Inci_trends)
+summary.escalc(trend_dat_Inci)
+
+multi_level_m_Inci <- rma.mv(yi = yi,
+                            V = vi,
+                            slab = author,
+                            data = trend_dat_Inci,
+                            random = ~ 1 |slab/ID,
+                            test = "z",
+                            method = "REML",
+                            mods = ~ midpoint )
+summary(multi_level_m_Inci)
+round(exp(coef(summary(multi_level_m_Inci))[-1,c("estimate", "ci.lb", "ci.ub")]), 2)
+
+w_reg_Inci <- weights(multi_level_m_Inci)
+w_m_Inci <- weights(multi_level_m_Inci, type = "matrix")
+
+w_m_Inci_adjw <- rowSums(w_m_Inci) / sum(w_m_Inci) * 100
+
+regplot(multi_level_m_Inci, label = F, transf=exp,
+        ylab = "Rate",
+        xlab = "midpoint",
+        col="grey",
+        bg="red",
+        labsize = 0.5,
+        legend = F,
+        psize=c(w_m_Inci_adjw)
+)
+
+
+
+
+From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Date: Wednesday, 20 April 2022 at 19:42
+To: Adelina Artenie <adelina.artenie at bristol.ac.uk>, r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Subject: RE: Queries re: rma.mv
+Dear Adelina,
+
+See below for my responses.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Adelina Artenie
+>Sent: Wednesday, 20 April, 2022 19:15
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Queries re: rma.mv
+>
+>Hello
+>
+>I am trying to do a meta-regression to explore whether incidence rates are
+>changing over time. Some of the estimates are correlated so I am using the rma.mv
+>function. The moderator is a measure of time.
+>
+>I have two questions please:
+>
+>  1.  I am trying to understand why is it that the correlated estimates are
+>systematically up-weighted. I would have thought that any correlated data would
+>be down-weighted or, at the very least, have a similar weight as the uncorrelated
+>data. I appreciate that the weight calculation in this case is complex
+>(https://www.metafor-project.org/doku.php/tips:weights_in_rma.mv_models ). I
+>wonder if, conceptually, this would be expected? In my mock example, the
+>correlated estimates have weights of 7-10% whereas the uncorrelated ones have
+>weights of 4%. I see a similar trend in my own data, and I find the difference in
+>the weights to be quite considerable.
+
+I assume you are referring to the weights shown in the forest plot. These are just based on the diagonal of the weight matrix. As you note, the weighting in such models is more complex, so looking at these weights doesn't really allow you to draw such a conclusion. In fact, generally, the effect will be as you expect, namely that correlated estimates will be downweighted. Consider the dat.konstantopoulos2011 dataset and let's make all sampling variances equal to each other to see this more clearly. Also, we will compute the row-sum weights, since these reflect more directly the weight each estimate is getting in this model.
+
+dat <- dat.konstantopoulos2011
+
+dat$vi <- median(dat$vi)
+res <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat)
+res
+
+wi <- weights(res, type="rowsum")
+
+data.frame(k = c(table(dat$district)),
+           weight = tapply(wi, dat$district, mean))
+
+So, as you can see, in clusters with more estimates, each individual estimate gets less weight.
+
+Things will be more complicated when sampling variances differ and also when including moderators in the model.
+
+>  2.  Could I confirm with you that my interpretation of the coefficient for the
+>moderator is correct? In this case, the estimate is 0.0846, which represents the
+>mean/median log IRR (incidence rate ratio) for a one-unit increase in the
+>moderator. Therefore, the IRR is 1.088: for each unit increase in time, the
+>incidence rate increases on average by 8.8% (ignoring the confidence intervals
+>for now).
+
+Correct.
+
+>Many thanks in advance,
+>Adelina
+>
+>Adelina Artenie, MSc, PhD
+>CIHR Postdoctoral Research Fellow
+>Population Health Sciences
+>Bristol Medical School
+>University of Bristol
+>
+>Code
+>***
+>
+>ID <- c(1:18)
+>author <- c("AA", "AA", "BB", "CC", "DD", "EE", "EE", "EE", "FF", "GG", "HH",
+>"II", "JJ",
+>            "KK", "LL", "MM", "NN", "OO")
+>cases <- c(8:25)
+>prs_yrs <-
+>c(200,150,3000,400,500,100,400,300,1200,456,177,296,664,123,123,432,67,3045)
+>moderator<-c(1:18)
+>
+>mydata<-data.frame(ID,author,cases,prs_yrs,moderator)
+>print(mydata)
+>
+>my_example <- escalc(measure="IRLN", xi=cases, ti=prs_yrs, data=mydata)
+>my_example
+>my_meta_reg <- rma.mv(yi = yi,
+>                            V = vi,
+>                            slab = author,
+>                            data = my_example,
+>                            random = ~ 1 | author/ID,
+>                            test = "z",
+>                            method = "REML",
+>                            mods = ~ moderator)
+>
+>summary(my_meta_reg)
+>regplot(my_meta_reg, label = T, transf=exp,
+>        ylab = "Incidence rate",
+>        xlab = "Moderator",
+>        col="black",
+>        plim = c(1,NA),
+>        labsize = 0.5,
+>        legend = F)
+>forest(my_meta_reg, showweights=TRUE)
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri May 13 12:32:55 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 13 May 2022 10:32:55 +0000
+Subject: [R-meta] Queries re: rma.mv
+In-Reply-To: <VI1PR0602MB3437704C2541474984FBB3A2BFCA9@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+References: <VI1PR0602MB3437B067B8C7DA5BD7CEFA51BFF59@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+ <a873a002ba9c4f1db34fc10e711a0a12@UM-MAIL3214.unimaas.nl>
+ <VI1PR0602MB3437704C2541474984FBB3A2BFCA9@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+Message-ID: <72431848289a4d2e92a9b1f2f6078a7b@UM-MAIL3214.unimaas.nl>
+
+Hi Adelina,
+
+In multilevel models, one has to distinguish the between- and the within-study relationship between some predictor and the outcome. I don't have access to your data, but possibly those trends differ in your data. So, it might appear visually that the trend is increasing, but not when analyzed using a multilevel model.
+
+The weight structure is more complex in models with moderators, so it's not just a matter of computing row-sum weights to get the same results. In general, there is an entire weight matrix. On the page that I linked to, I only discuss the special case of an "intercept-only model". James Pustejovsky has a blog entry where he goes further into discussing weights also in models with moderators:
+
+https://www.jepusto.com/weighting-in-multivariate-meta-analysis/
+
+I am not aware of a general way of reducing the weight matrix down to a vector of weights, such that a standard meta-analysis model will give the same results as the more complex multilevel/multivariate model from which the weight matrix is derived. So, since it is not generally possible (as far as I know) to compute 'estimate-specific weights', forest and bubble plots just use the diagonal of the weight matrix as a rough indication of how much weight is assigned to individual points (but you are of course free to specify other point sizes).
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Adelina Artenie [mailto:adelina.artenie at bristol.ac.uk]
+>Sent: Friday, 13 May, 2022 11:38
+>To: Viechtbauer, Wolfgang (NP); r-sig-meta-analysis at r-project.org
+>Subject: Re: Queries re: rma.mv
+>
+>Hi Wolfgang,
+>
+>Thank you for your detailed response. It has been very helpful. I am still
+>pondering one thing though about the weights, if I could have your advice please:
+>
+>I have re-calculated the weights as you suggested (shown in my code below) and if
+>I run a bubble plot using regplot and use these weights as the size of the
+>bubbles, it would appear that, indeed, the correlated data are down-weighted.
+>
+>The issue is the following (note: my moderator is a measure of time): looking at
+>the bubble plot, one can tell visually that the trend is clearly increasing over
+>time. However, the coefficient from rma.mv and the best fit line in regplot show
+>a decreasing trend. The only way this would occur is if the weights of the
+>correlated data used in the model are not, in fact, down-weighted but up-weighted
+>(the correlated data have a decreasing trend over time). In other words, it seems
+>as if rma.mv is not using the row-sum weights but the weights that are based on
+>the diagonal of the matrix (or some other weights..).
+>
+>Relatedly, I also wonder why, if the default weights shown in the forest plot or
+>the bubble/regplot, are not the ones used by the rma.mv model, why are they the
+>default weights plotted? This too makes me think that these are the ones used
+>internally in the model estimation by rma.mv
+>
+>Apologies for the long e-mail. This package has been incredibly useful so far.
+>I've just hit a point where I do not fully understand how rma.mv works and how to
+>make sense of my results.
+>
+>Many thanks for your help
+>Adelina
+>
+>My code:
+>
+>Inci_trends$prs_yrs_100 = Inci_trends$prs_yrs/100
+>trend_dat_Inci <- escalc(measure="IRLN", xi=cases, ti=prs_yrs_100,
+>data=Inci_trends)
+>summary.escalc(trend_dat_Inci)
+>
+>multi_level_m_Inci <- rma.mv(yi = yi,
+>????????????????????????????V = vi,
+>????????????????????????????slab = author,
+>??????????????????????????? data = trend_dat_Inci,
+>??????????????????????????? random = ~ 1 |slab/ID,
+>????????????????????????????test = "z",
+>????????????????????????????method = "REML",
+>??????????????????????????? mods = ~ midpoint )
+>summary(multi_level_m_Inci)
+>round(exp(coef(summary(multi_level_m_Inci))[-1,c("estimate", "ci.lb", "ci.ub")]),
+>2)
+>
+>w_reg_Inci <- weights(multi_level_m_Inci)
+>w_m_Inci <- weights(multi_level_m_Inci, type = "matrix")
+>
+>w_m_Inci_adjw <- rowSums(w_m_Inci) / sum(w_m_Inci) * 100
+>
+>regplot(multi_level_m_Inci, label = F, transf=exp,
+>??????? ylab = "Rate",
+>??????? xlab = "midpoint",
+>??????? col="grey",
+>??????? bg="red",
+>??????? labsize = 0.5,
+>??????? legend = F,
+>??????? psize=c(w_m_Inci_adjw)
+>)
+>
+>From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+>Date: Wednesday, 20 April 2022 at 19:42
+>To: Adelina Artenie <adelina.artenie at bristol.ac.uk>, r-sig-meta-analysis at r-
+>project.org <r-sig-meta-analysis at r-project.org>
+>Subject: RE: Queries re: rma.mv
+>Dear Adelina,
+>
+>See below for my responses.
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>Behalf Of Adelina Artenie
+>>Sent: Wednesday, 20 April, 2022 19:15
+>>To: r-sig-meta-analysis at r-project.org
+>>Subject: [R-meta] Queries re: rma.mv
+>>
+>>Hello
+>>
+>>I am trying to do a meta-regression to explore whether incidence rates are
+>>changing over time. Some of the estimates are correlated so I am using the
+>rma.mv
+>>function. The moderator is a measure of time.
+>>
+>>I have two questions please:
+>>
+>>? 1.? I am trying to understand why is it that the correlated estimates are
+>>systematically up-weighted. I would have thought that any correlated data would
+>>be down-weighted or, at the very least, have a similar weight as the
+>uncorrelated
+>>data. I appreciate that the weight calculation in this case is complex
+>>(https://www.metafor-project.org/doku.php/tips:weights_in_rma.mv_models ). I
+>>wonder if, conceptually, this would be expected? In my mock example, the
+>>correlated estimates have weights of 7-10% whereas the uncorrelated ones have
+>>weights of 4%. I see a similar trend in my own data, and I find the difference
+>in
+>>the weights to be quite considerable.
+>
+>I assume you are referring to the weights shown in the forest plot. These are
+>just based on the diagonal of the weight matrix. As you note, the weighting in
+>such models is more complex, so looking at these weights doesn't really allow you
+>to draw such a conclusion. In fact, generally, the effect will be as you expect,
+>namely that correlated estimates will be downweighted. Consider the
+>dat.konstantopoulos2011 dataset and let's make all sampling variances equal to
+>each other to see this more clearly. Also, we will compute the row-sum weights,
+>since these reflect more directly the weight each estimate is getting in this
+>model.
+>
+>dat <- dat.konstantopoulos2011
+>
+>dat$vi <- median(dat$vi)
+>res <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat)
+>res
+>
+>wi <- weights(res, type="rowsum")
+>
+>data.frame(k = c(table(dat$district)),
+>?????????? weight = tapply(wi, dat$district, mean))
+>
+>So, as you can see, in clusters with more estimates, each individual estimate
+>gets less weight.
+>
+>Things will be more complicated when sampling variances differ and also when
+>including moderators in the model.
+>
+>>? 2.? Could I confirm with you that my interpretation of the coefficient for the
+>>moderator is correct? In this case, the estimate is 0.0846, which represents the
+>>mean/median log IRR (incidence rate ratio) for a one-unit increase in the
+>>moderator. Therefore, the IRR is 1.088: for each unit increase in time, the
+>>incidence rate increases on average by 8.8% (ignoring the confidence intervals
+>>for now).
+>
+>Correct.
+>
+>>Many thanks in advance,
+>>Adelina
+>>
+>>Adelina Artenie, MSc, PhD
+>>CIHR Postdoctoral Research Fellow
+>>Population Health Sciences
+>>Bristol Medical School
+>>University of Bristol
+>>
+>>Code
+>>***
+>>
+>>ID <- c(1:18)
+>>author <- c("AA", "AA", "BB", "CC", "DD", "EE", "EE", "EE", "FF", "GG", "HH",
+>>"II", "JJ",
+>>??????????? "KK", "LL", "MM", "NN", "OO")
+>>cases <- c(8:25)
+>>prs_yrs <-
+>>c(200,150,3000,400,500,100,400,300,1200,456,177,296,664,123,123,432,67,3045)
+>>moderator<-c(1:18)
+>>
+>>mydata<-data.frame(ID,author,cases,prs_yrs,moderator)
+>>print(mydata)
+>>
+>>my_example <- escalc(measure="IRLN", xi=cases, ti=prs_yrs, data=mydata)
+>>my_example
+>>my_meta_reg <- rma.mv(yi = yi,
+>>??????????????????????????? V = vi,
+>>??????????????????????????? slab = author,
+>>??????????????????????????? data = my_example,
+>>??????????????????????????? random = ~ 1 | author/ID,
+>>??????????????????????????? test = "z",
+>>??????????????????????????? method = "REML",
+>>??????????????????????????? mods = ~ moderator)
+>>
+>>summary(my_meta_reg)
+>>regplot(my_meta_reg, label = T, transf=exp,
+>>??????? ylab = "Incidence rate",
+>>??????? xlab = "Moderator",
+>>??????? col="black",
+>>??????? plim = c(1,NA),
+>>??????? labsize = 0.5,
+>>??????? legend = F)
+>>forest(my_meta_reg, showweights=TRUE)
+
+
+From jepu@to @end|ng |rom gm@||@com  Fri May 13 16:57:37 2022
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Fri, 13 May 2022 09:57:37 -0500
+Subject: [R-meta] Queries re: rma.mv
+In-Reply-To: <72431848289a4d2e92a9b1f2f6078a7b@UM-MAIL3214.unimaas.nl>
+References: <VI1PR0602MB3437B067B8C7DA5BD7CEFA51BFF59@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+ <a873a002ba9c4f1db34fc10e711a0a12@UM-MAIL3214.unimaas.nl>
+ <VI1PR0602MB3437704C2541474984FBB3A2BFCA9@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+ <72431848289a4d2e92a9b1f2f6078a7b@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAFUVuJwXumZtkq3gd7cibz6An3YUF+Xzv57dC22Gk+hEdJMifw@mail.gmail.com>
+
+Hi Adelina,
+
+I agree with Wolfgang that looking at the between-study and within-study
+variation in the predictor would probably be a helpful step for diagnosing
+what's going on here. To do so, try calculating group means of the
+predictor and a group-centered version of the predictor, for instance as
+follows:
+
+trend_dat_Inci <- escalc(measure="IRLN", xi=cases, ti=prs_yrs_100,
+data=Inci_trends)
+trend_dat_Inci_centered <-
+  trend_dat_Inci %>%
+  group_by(slab) %>%
+  mutate(
+    midpoint_b = mean(midpoint),
+    midpoint_w = midpoint - midpoint_b
+  )
+
+Then include both predictors in the meta-regression model:
+
+rma.mv(yi = yi,
+             V = vi,
+             slab = author,
+             data = trend_dat_Inci,
+             random = ~ 1 |slab/ID,
+             test = "z",
+             method = "REML",
+             mods = ~ midpoint_b + midpoint_w)
+
+In your original meta-regression model, the coefficient on midpoint is
+actually a weighted average of the coefficients on midpoint_b and
+midpoint_w. So, if there is a big difference (especially a sign difference)
+in the coefficients on midpoint_b and midpoint_w, then that would help to
+explain why the visual appearance of the bubble plot doesn't match up with
+the meta-regression result.
+
+James
+
+
+
+
+On Fri, May 13, 2022 at 5:33 AM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Hi Adelina,
+>
+> In multilevel models, one has to distinguish the between- and the
+> within-study relationship between some predictor and the outcome. I don't
+> have access to your data, but possibly those trends differ in your data.
+> So, it might appear visually that the trend is increasing, but not when
+> analyzed using a multilevel model.
+>
+> The weight structure is more complex in models with moderators, so it's
+> not just a matter of computing row-sum weights to get the same results. In
+> general, there is an entire weight matrix. On the page that I linked to, I
+> only discuss the special case of an "intercept-only model". James
+> Pustejovsky has a blog entry where he goes further into discussing weights
+> also in models with moderators:
+>
+> https://www.jepusto.com/weighting-in-multivariate-meta-analysis/
+>
+> I am not aware of a general way of reducing the weight matrix down to a
+> vector of weights, such that a standard meta-analysis model will give the
+> same results as the more complex multilevel/multivariate model from which
+> the weight matrix is derived. So, since it is not generally possible (as
+> far as I know) to compute 'estimate-specific weights', forest and bubble
+> plots just use the diagonal of the weight matrix as a rough indication of
+> how much weight is assigned to individual points (but you are of course
+> free to specify other point sizes).
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Adelina Artenie [mailto:adelina.artenie at bristol.ac.uk]
+> >Sent: Friday, 13 May, 2022 11:38
+> >To: Viechtbauer, Wolfgang (NP); r-sig-meta-analysis at r-project.org
+> >Subject: Re: Queries re: rma.mv
+> >
+> >Hi Wolfgang,
+> >
+> >Thank you for your detailed response. It has been very helpful. I am still
+> >pondering one thing though about the weights, if I could have your advice
+> please:
+> >
+> >I have re-calculated the weights as you suggested (shown in my code
+> below) and if
+> >I run a bubble plot using regplot and use these weights as the size of the
+> >bubbles, it would appear that, indeed, the correlated data are
+> down-weighted.
+> >
+> >The issue is the following (note: my moderator is a measure of time):
+> looking at
+> >the bubble plot, one can tell visually that the trend is clearly
+> increasing over
+> >time. However, the coefficient from rma.mv and the best fit line in
+> regplot show
+> >a decreasing trend. The only way this would occur is if the weights of the
+> >correlated data used in the model are not, in fact, down-weighted but
+> up-weighted
+> >(the correlated data have a decreasing trend over time). In other words,
+> it seems
+> >as if rma.mv is not using the row-sum weights but the weights that are
+> based on
+> >the diagonal of the matrix (or some other weights..).
+> >
+> >Relatedly, I also wonder why, if the default weights shown in the forest
+> plot or
+> >the bubble/regplot, are not the ones used by the rma.mv model, why are
+> they the
+> >default weights plotted? This too makes me think that these are the ones
+> used
+> >internally in the model estimation by rma.mv
+> >
+> >Apologies for the long e-mail. This package has been incredibly useful so
+> far.
+> >I've just hit a point where I do not fully understand how rma.mv works
+> and how to
+> >make sense of my results.
+> >
+> >Many thanks for your help
+> >Adelina
+> >
+> >My code:
+> >
+> >Inci_trends$prs_yrs_100 = Inci_trends$prs_yrs/100
+> >trend_dat_Inci <- escalc(measure="IRLN", xi=cases, ti=prs_yrs_100,
+> >data=Inci_trends)
+> >summary.escalc(trend_dat_Inci)
+> >
+> >multi_level_m_Inci <- rma.mv(yi = yi,
+> >                            V = vi,
+> >                            slab = author,
+> >                            data = trend_dat_Inci,
+> >                            random = ~ 1 |slab/ID,
+> >                            test = "z",
+> >                            method = "REML",
+> >                            mods = ~ midpoint )
+> >summary(multi_level_m_Inci)
+> >round(exp(coef(summary(multi_level_m_Inci))[-1,c("estimate", "ci.lb",
+> "ci.ub")]),
+> >2)
+> >
+> >w_reg_Inci <- weights(multi_level_m_Inci)
+> >w_m_Inci <- weights(multi_level_m_Inci, type = "matrix")
+> >
+> >w_m_Inci_adjw <- rowSums(w_m_Inci) / sum(w_m_Inci) * 100
+> >
+> >regplot(multi_level_m_Inci, label = F, transf=exp,
+> >        ylab = "Rate",
+> >        xlab = "midpoint",
+> >        col="grey",
+> >        bg="red",
+> >        labsize = 0.5,
+> >        legend = F,
+> >        psize=c(w_m_Inci_adjw)
+> >)
+> >
+> >From: Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>
+> >Date: Wednesday, 20 April 2022 at 19:42
+> >To: Adelina Artenie <adelina.artenie at bristol.ac.uk>,
+> r-sig-meta-analysis at r-
+> >project.org <r-sig-meta-analysis at r-project.org>
+> >Subject: RE: Queries re: rma.mv
+> >Dear Adelina,
+> >
+> >See below for my responses.
+> >
+> >Best,
+> >Wolfgang
+> >
+> >>-----Original Message-----
+> >>From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On
+> >>Behalf Of Adelina Artenie
+> >>Sent: Wednesday, 20 April, 2022 19:15
+> >>To: r-sig-meta-analysis at r-project.org
+> >>Subject: [R-meta] Queries re: rma.mv
+> >>
+> >>Hello
+> >>
+> >>I am trying to do a meta-regression to explore whether incidence rates
+> are
+> >>changing over time. Some of the estimates are correlated so I am using
+> the
+> >rma.mv
+> >>function. The moderator is a measure of time.
+> >>
+> >>I have two questions please:
+> >>
+> >>  1.  I am trying to understand why is it that the correlated estimates
+> are
+> >>systematically up-weighted. I would have thought that any correlated
+> data would
+> >>be down-weighted or, at the very least, have a similar weight as the
+> >uncorrelated
+> >>data. I appreciate that the weight calculation in this case is complex
+> >>(https://www.metafor-project.org/doku.php/tips:weights_in_rma.mv_models
+> ). I
+> >>wonder if, conceptually, this would be expected? In my mock example, the
+> >>correlated estimates have weights of 7-10% whereas the uncorrelated ones
+> have
+> >>weights of 4%. I see a similar trend in my own data, and I find the
+> difference
+> >in
+> >>the weights to be quite considerable.
+> >
+> >I assume you are referring to the weights shown in the forest plot. These
+> are
+> >just based on the diagonal of the weight matrix. As you note, the
+> weighting in
+> >such models is more complex, so looking at these weights doesn't really
+> allow you
+> >to draw such a conclusion. In fact, generally, the effect will be as you
+> expect,
+> >namely that correlated estimates will be downweighted. Consider the
+> >dat.konstantopoulos2011 dataset and let's make all sampling variances
+> equal to
+> >each other to see this more clearly. Also, we will compute the row-sum
+> weights,
+> >since these reflect more directly the weight each estimate is getting in
+> this
+> >model.
+> >
+> >dat <- dat.konstantopoulos2011
+> >
+> >dat$vi <- median(dat$vi)
+> >res <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat)
+> >res
+> >
+> >wi <- weights(res, type="rowsum")
+> >
+> >data.frame(k = c(table(dat$district)),
+> >           weight = tapply(wi, dat$district, mean))
+> >
+> >So, as you can see, in clusters with more estimates, each individual
+> estimate
+> >gets less weight.
+> >
+> >Things will be more complicated when sampling variances differ and also
+> when
+> >including moderators in the model.
+> >
+> >>  2.  Could I confirm with you that my interpretation of the coefficient
+> for the
+> >>moderator is correct? In this case, the estimate is 0.0846, which
+> represents the
+> >>mean/median log IRR (incidence rate ratio) for a one-unit increase in the
+> >>moderator. Therefore, the IRR is 1.088: for each unit increase in time,
+> the
+> >>incidence rate increases on average by 8.8% (ignoring the confidence
+> intervals
+> >>for now).
+> >
+> >Correct.
+> >
+> >>Many thanks in advance,
+> >>Adelina
+> >>
+> >>Adelina Artenie, MSc, PhD
+> >>CIHR Postdoctoral Research Fellow
+> >>Population Health Sciences
+> >>Bristol Medical School
+> >>University of Bristol
+> >>
+> >>Code
+> >>***
+> >>
+> >>ID <- c(1:18)
+> >>author <- c("AA", "AA", "BB", "CC", "DD", "EE", "EE", "EE", "FF", "GG",
+> "HH",
+> >>"II", "JJ",
+> >>            "KK", "LL", "MM", "NN", "OO")
+> >>cases <- c(8:25)
+> >>prs_yrs <-
+>
+> >>c(200,150,3000,400,500,100,400,300,1200,456,177,296,664,123,123,432,67,3045)
+> >>moderator<-c(1:18)
+> >>
+> >>mydata<-data.frame(ID,author,cases,prs_yrs,moderator)
+> >>print(mydata)
+> >>
+> >>my_example <- escalc(measure="IRLN", xi=cases, ti=prs_yrs, data=mydata)
+> >>my_example
+> >>my_meta_reg <- rma.mv(yi = yi,
+> >>                            V = vi,
+> >>                            slab = author,
+> >>                            data = my_example,
+> >>                            random = ~ 1 | author/ID,
+> >>                            test = "z",
+> >>                            method = "REML",
+> >>                            mods = ~ moderator)
+> >>
+> >>summary(my_meta_reg)
+> >>regplot(my_meta_reg, label = T, transf=exp,
+> >>        ylab = "Incidence rate",
+> >>        xlab = "Moderator",
+> >>        col="black",
+> >>        plim = c(1,NA),
+> >>        labsize = 0.5,
+> >>        legend = F)
+> >>forest(my_meta_reg, showweights=TRUE)
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From de@@|mone@be||nd@87 @end|ng |rom gm@||@com  Tue May 17 07:23:25 2022
+From: de@@|mone@be||nd@87 @end|ng |rom gm@||@com (De Simone)
+Date: Tue, 17 May 2022 06:23:25 +0100
+Subject: [R-meta] Help for funnel plot
+Message-ID: <CAHGyc-v+2fpX_GFkMYrNid_bJ_mQ3d5rVUYi4WcS2-Sq+vkmCQ@mail.gmail.com>
+
+ Hi,
+Excuse me for these silly questions
+how do I get a colour gradient for the background like the one attached.
+Colours are a bit limited
+Any specific code for the type (solid vs interrupted etc) of the reference
+line and pseudo confidence lines. I use "lty", but this do both at the same
+time
+
+Here is my argument
+
+dat <- escalc("MD", m1i=Mean_TAP, sd1i= SD_TAP, n1i= N_TAP,
+m2i=Mean_caudal, sd2i= SD_caudal, n2i= N_caudal, slab=Study, data=
+Duration_of_analgesia)
+
+
+
+res <- rma(yi, vi, data=dat, measure="MD", method="DL")
+
+
+funnel(res, main="Duration of analegsia", back = 12, xlab="Mean difference
+(hours)", cex = 1.2,  lwd = 2, lty = "solid", mgp = c(2, 1, 0), font.main =
+1, font.lab = 2, font.axis = 2)
+
+Thank you
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20220517/23620589/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Funnel.pdf
+Type: application/pdf
+Size: 57649 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20220517/23620589/attachment-0001.pdf>
+
+From jdkb9701 @end|ng |rom connect@hku@hk  Sun May 22 20:02:02 2022
+From: jdkb9701 @end|ng |rom connect@hku@hk (Joshua Bernal)
+Date: Mon, 23 May 2022 02:02:02 +0800
+Subject: [R-meta] Appending a risk-of-bias traffic-light plot to a
+ 'three-level' forest plot
+In-Reply-To: <1351dad800ec4954a762962ca5894307@UM-MAIL3213.unimaas.nl>
+References: <CAMPpmRcsXcOF2KhXp8ifvEG1XO8VJEH81gnd3omWrBpXpNu5RQ@mail.gmail.com>
+ <1351dad800ec4954a762962ca5894307@UM-MAIL3213.unimaas.nl>
+Message-ID: <CAMPpmRcudJpiBAed65wa21ZpXcyyYOY70H5Q3YtwB1LQN0xxzg@mail.gmail.com>
+
+Dear Dr. Viechtbauer and members,
+
+I was hoping to add numbered references to the forest plot using
+superscripts, as described by the vignette in the metafor website
+(https://www.metafor-project.org/doku.php/plots:forest_plot_with_superscripts).
+However, because of the 'dataframe transformation from rma.mv to
+rma.uni' following the workaround method to aggregate effect sizes as
+described in Source A
+(stat.ethz.ch/pipermail/r-sig-meta-analysis/2019-February/001423.html),
+I simply could not use the vignette's instructions directly. Your help
+on this would be highly appreciated!
+
+Thanks,
+Josh
+
+
+On Fri, Feb 18, 2022 at 5:51 PM Viechtbauer, Wolfgang (SP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+> Dear Josh,
+>
+> See below for my responses.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+> >Behalf Of Joshua Bernal
+> >Sent: Friday, 18 February, 2022 3:07
+> >To: r-sig-meta-analysis at r-project.org
+> >Subject: [R-meta] Appending a risk-of-bias traffic-light plot to a 'three-level'
+> >forest plot
+> >
+> >Greetings Dr. Viechtbauer and members,
+> >
+> >I ran a three-level meta-analysis with rma.mv (due to multiple
+> >measures of a construct within-studies). I seek help on how to append
+> >a risk-of-bias traffic-light plot to an extension of the three-level
+> >forest plot, please find the query details below...
+> >
+> >Goal A (metafor):
+> >Create the three-level forest plot with each study's "aggregated"
+> >effect estimate and CI.
+> >(Source A: stat.ethz.ch/pipermail/r-sig-meta-analysis/2019-February/001423.html)
+> >
+> >Goal A Issues:
+> >1) Source A presents 2 ways to obtain "aggregated" effect sizes, with
+> >the second way getting "exactly the same results as those from the
+> >full model". Because the present rma.mv analysis uses the
+> >t-distribution (test = "t"), the p-values and summary CIs obtained are
+> >slightly different/larger. Is it possible to get the exact same
+> >results as when test = "t" for the rma.mv model? To see what this
+> >looks like, please find the metafor reprex below.
+>
+> I would suggest to do the following:
+>
+> 1) Use the 'contain' method for computing the dfs:
+>
+> res <- rma.mv(yi, vi, random = ~ 1 | author/outcome, data = dat, test = "t", dfs = "contain",
+>               method = "REML", slab = author)
+>
+> 2) Then use test="t" for rma():
+>
+> rma(yi, vi, data=sav, test="t")
+>
+> Then the results match up exactly.
+>
+> >2) After running the reprex, you will see that Study 6 contributes one
+> >effect size only, its CI from the "standard" rma.mv forest plot (where
+> >all effect sizes in each study are shown) vs its CI from the
+> >"aggregated" forest plot are different. If the argument
+> >"tau2=res$sigma2[2]" is omitted from the code of the "aggregated"
+> >forest plot, then the obtained summary CI for Study 6 then matches
+> >with that of the "standard" plot. Which would be considered the
+> >correct approach in this case?
+>
+> The first. If you want to show a forest plot of the aggregated data, then the aggregation involves adding the within-study variance (as you have done) and hence the CI will be wider also for study 6.
+>
+> >metafor reprex:
+> >###
+> >library(metafor)
+> >
+> >dat <- structure(list(author = c("Study 1", "Study 1", "Study 1", "Study 1",
+> >"Study 1", "Study 2", "Study 2", "Study 2", "Study 2", "Study 3",
+> >"Study 3", "Study 4", "Study 4", "Study 5", "Study 5", "Study 6"
+> >), study = c(1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 5, 6),
+> >    outcome = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+> >    15, 16), yi = c(0.52, 0.256, 0.5003, 0.3131, -0.1019, 0.3591,
+> >    0.0341, 0.0357, 0.3942, -0.1503, 0.2671, 0.131, 0.1664, 1.1761,
+> >    0.5799, 0.406), vi = c(0.00926, 0.00199, 0.01171, 0.0171,
+> >    0.00524, 0.0712, 0.0971, 0.0823, 0.0912, 0.1204, 0.3536,
+> >    0.0655, 0.0607, 0.9571, 0.6617, 0.5139)), row.names = c(NA,
+> >16L), class = "data.frame")
+> >
+> >res <- rma.mv(yi, vi, random = ~ 1 | author/outcome, data = dat, test
+> >= "t", method = "REML", slab = author)
+> >res
+> >forest(res)
+> >
+> >sav <- lapply(split(dat, dat$author), function(x) {
+> >    res <- rma(yi, vi, data=x, tau2=res$sigma2[2])
+> >    return(c(coef(res), vcov(res)))
+> >})
+> >
+> >sav <- data.frame(do.call(rbind, sav))
+> >names(sav) <- c("yi", "vi")
+> >
+> >forest(sav$yi, sav$vi, slab=rownames(sav))
+> >
+> >rma(yi, vi, data=sav)
+> >res
+> >###
+> >
+> >Goal B (robvis, development version 0.3.0.900):
+> >Create a risk-of-bias traffic-light plot using the "Generic" (or aka
+> >"ROB1") template.
+> >(Source B: https://github.com/mcguinlu/robvis  ("Generic")  OR
+> >cran.r-project.org/web/packages/robvis/vignettes/Introduction_to_robvis.html#rob1
+> > ("ROB1"))
+> >
+> >Goal B Issues:
+> >After running the robvis reprex below, you will see that an extra
+> >judgment label ("Critical" or dark red circle with exclamation mark)
+> >is automatically added/cannot be removed (although only 5 judgment
+> >labels are relevant in the dataset, I am forced to specify 6 judgement
+> >labels). I am aware there is an argument "judgement_levels" under
+> >development, but do not know if it is relevant and if so how to take
+> >it from here...
+>
+> Can't help with this.
+>
+> >robvis reprex:
+> >###
+> >library(robvis)
+> >
+> >rp <- structure(list(Study = c("Study 1", "Study 2", "Study 3", "Study 4",
+> >"Study 5", "Study 6"), Bias.due.to.confounding. = c("Not applicable",
+> >"Not applicable", "Not applicable", "Some concerns", "Low", "No information"
+> >), Bias.in.selection.of.participants.into.the.study. = c("Not applicable",
+> >"Not applicable", "Not applicable", "Some concerns", "Low", "Low"
+> >), Bias.in.classification.of.interventions. = c("Not applicable",
+> >"Not applicable", "Not applicable", "Some concerns", "Low", "Low"
+> >), Bias.arising.from.the.randomization.process. = c("Some concerns",
+> >"Low", "Low", "Not applicable", "Not applicable", "Not applicable"
+> >), Bias.due.to.deviations.from.intended.intervention. = c("Low",
+> >"Some concerns", "Low", "Low", "Some concerns", "Low"),
+> >Bias.due.to.missing.outcome.data. = c("Some concerns",
+> >"Low", "No information", "Some concerns", "Low", "No information"
+> >), Bias.in.measurement.of.the.outcome. = c("Some concerns", "Low",
+> >"Some concerns", "Some concerns", "Low", "Some concerns"),
+> >Bias.due.to.selection.of.the.reported.result. = c("Some concerns",
+> >"Low", "High", "Some concerns", "Low", "High"), Overall = c("Some concerns",
+> >"Low", "High", "Some concerns", "Low", "High")), row.names = c(NA,
+> >6L), class = "data.frame")
+> >
+> >bor <- rob_traffic_light(rp, tool="Generic", colour="cochrane",
+> >psize=10, overall=TRUE, judgement_labels=c("","High","Some
+> >concerns","Low","No information","Not applicable"))
+> >
+> >bor
+> >###
+> >
+> >Goal C:
+> >Append the risk-of-bias traffic-light plot (from Goal B) to the forest
+> >plot (from Goal A).
+> >(Source C: mcguinlu.github.io/robvis/articles/metafor.html#appending-risk-of-
+> >bias-plots-to-forest-plots-1)
+> >
+> >Goal C Issues:
+> >Because the present analysis considers the bias domains of both
+> >randomized and non-randomized controlled intervention studies and risk
+> >of bias was respectively assessed by ROB2 and ROBINS-I, the "Generic"
+> >template is used because it allows modifying the number of domains so
+> >as to include the relevant domains of both tools in the traffic-light
+> >plot. However, according to "rob_tools(forest = TRUE)", robvis
+> >currently supports only "ROB2" and "ROBINS-I" templates for the
+> >"rob_append_to_forest()" function.
+>
+> Again, can't really help with robvis.
+>
+> As an alternative, you could also consider creating the traffic light part of the plot yourself. Then you have full control over what is shown and how. An example where I did this can be found here:
+>
+> https://www.metafor-project.org/doku.php/plots:forest_plot_revman
+>
+> >Other sub-goals:
+> >- Modify text of header from "Estimate [95% CI]" to "SMD [95% CI]".
+>
+> In forest(), see argument 'header'.
+>
+> >- Modify text of x-axis label from "Observed Outcome" to "Standardized
+> >Mean Difference".
+>
+> In forest(), see argument 'xlab'.
+>
+> >- To the right of "SMD [95% CI]", add a column with the header "No. of
+> >effect sizes" to display the number of effect sizes within each study.
+>
+> In forest(), you can use the 'textpos' argument to create space to the right of the annotations and then add this column either via the 'ilab' argument or with text(). In fact, the link above demonstrates this.
+>
+> >Many thanks in advance for your help...
+> >
+> >Sincerely,
+> >Josh
+
+
+From jdkb9701 @end|ng |rom connect@hku@hk  Mon May 23 04:52:44 2022
+From: jdkb9701 @end|ng |rom connect@hku@hk (Joshua Bernal)
+Date: Mon, 23 May 2022 10:52:44 +0800
+Subject: [R-meta] Appending a risk-of-bias traffic-light plot to a
+ 'three-level' forest plot
+In-Reply-To: <CAMPpmRcudJpiBAed65wa21ZpXcyyYOY70H5Q3YtwB1LQN0xxzg@mail.gmail.com>
+References: <CAMPpmRcsXcOF2KhXp8ifvEG1XO8VJEH81gnd3omWrBpXpNu5RQ@mail.gmail.com>
+ <1351dad800ec4954a762962ca5894307@UM-MAIL3213.unimaas.nl>
+ <CAMPpmRcudJpiBAed65wa21ZpXcyyYOY70H5Q3YtwB1LQN0xxzg@mail.gmail.com>
+Message-ID: <CAMPpmReR3RgtUv_WLuBS8E0z8g3dJsKHrr3woMJZQFi4XWy+OA@mail.gmail.com>
+
+Dear all,
+
+After spending some more time on the issue, I have managed to find a
+solution and indeed the vignette's instructions can be used directly,
+with a little help of cbind(sav, dat$slab.ref)!
+
+Thanks,
+Josh
+
+On Mon, May 23, 2022 at 2:02 AM Joshua Bernal <jdkb9701 at connect.hku.hk> wrote:
+>
+> Dear Dr. Viechtbauer and members,
+>
+> I was hoping to add numbered references to the forest plot using
+> superscripts, as described by the vignette in the metafor website
+> (https://www.metafor-project.org/doku.php/plots:forest_plot_with_superscripts).
+> However, because of the 'dataframe transformation from rma.mv to
+> rma.uni' following the workaround method to aggregate effect sizes as
+> described in Source A
+> (stat.ethz.ch/pipermail/r-sig-meta-analysis/2019-February/001423.html),
+> I simply could not use the vignette's instructions directly. Your help
+> on this would be highly appreciated!
+>
+> Thanks,
+> Josh
+>
+>
+> On Fri, Feb 18, 2022 at 5:51 PM Viechtbauer, Wolfgang (SP)
+> <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >
+> > Dear Josh,
+> >
+> > See below for my responses.
+> >
+> > Best,
+> > Wolfgang
+> >
+> > >-----Original Message-----
+> > >From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+> > >Behalf Of Joshua Bernal
+> > >Sent: Friday, 18 February, 2022 3:07
+> > >To: r-sig-meta-analysis at r-project.org
+> > >Subject: [R-meta] Appending a risk-of-bias traffic-light plot to a 'three-level'
+> > >forest plot
+> > >
+> > >Greetings Dr. Viechtbauer and members,
+> > >
+> > >I ran a three-level meta-analysis with rma.mv (due to multiple
+> > >measures of a construct within-studies). I seek help on how to append
+> > >a risk-of-bias traffic-light plot to an extension of the three-level
+> > >forest plot, please find the query details below...
+> > >
+> > >Goal A (metafor):
+> > >Create the three-level forest plot with each study's "aggregated"
+> > >effect estimate and CI.
+> > >(Source A: stat.ethz.ch/pipermail/r-sig-meta-analysis/2019-February/001423.html)
+> > >
+> > >Goal A Issues:
+> > >1) Source A presents 2 ways to obtain "aggregated" effect sizes, with
+> > >the second way getting "exactly the same results as those from the
+> > >full model". Because the present rma.mv analysis uses the
+> > >t-distribution (test = "t"), the p-values and summary CIs obtained are
+> > >slightly different/larger. Is it possible to get the exact same
+> > >results as when test = "t" for the rma.mv model? To see what this
+> > >looks like, please find the metafor reprex below.
+> >
+> > I would suggest to do the following:
+> >
+> > 1) Use the 'contain' method for computing the dfs:
+> >
+> > res <- rma.mv(yi, vi, random = ~ 1 | author/outcome, data = dat, test = "t", dfs = "contain",
+> >               method = "REML", slab = author)
+> >
+> > 2) Then use test="t" for rma():
+> >
+> > rma(yi, vi, data=sav, test="t")
+> >
+> > Then the results match up exactly.
+> >
+> > >2) After running the reprex, you will see that Study 6 contributes one
+> > >effect size only, its CI from the "standard" rma.mv forest plot (where
+> > >all effect sizes in each study are shown) vs its CI from the
+> > >"aggregated" forest plot are different. If the argument
+> > >"tau2=res$sigma2[2]" is omitted from the code of the "aggregated"
+> > >forest plot, then the obtained summary CI for Study 6 then matches
+> > >with that of the "standard" plot. Which would be considered the
+> > >correct approach in this case?
+> >
+> > The first. If you want to show a forest plot of the aggregated data, then the aggregation involves adding the within-study variance (as you have done) and hence the CI will be wider also for study 6.
+> >
+> > >metafor reprex:
+> > >###
+> > >library(metafor)
+> > >
+> > >dat <- structure(list(author = c("Study 1", "Study 1", "Study 1", "Study 1",
+> > >"Study 1", "Study 2", "Study 2", "Study 2", "Study 2", "Study 3",
+> > >"Study 3", "Study 4", "Study 4", "Study 5", "Study 5", "Study 6"
+> > >), study = c(1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 4, 4, 5, 5, 6),
+> > >    outcome = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+> > >    15, 16), yi = c(0.52, 0.256, 0.5003, 0.3131, -0.1019, 0.3591,
+> > >    0.0341, 0.0357, 0.3942, -0.1503, 0.2671, 0.131, 0.1664, 1.1761,
+> > >    0.5799, 0.406), vi = c(0.00926, 0.00199, 0.01171, 0.0171,
+> > >    0.00524, 0.0712, 0.0971, 0.0823, 0.0912, 0.1204, 0.3536,
+> > >    0.0655, 0.0607, 0.9571, 0.6617, 0.5139)), row.names = c(NA,
+> > >16L), class = "data.frame")
+> > >
+> > >res <- rma.mv(yi, vi, random = ~ 1 | author/outcome, data = dat, test
+> > >= "t", method = "REML", slab = author)
+> > >res
+> > >forest(res)
+> > >
+> > >sav <- lapply(split(dat, dat$author), function(x) {
+> > >    res <- rma(yi, vi, data=x, tau2=res$sigma2[2])
+> > >    return(c(coef(res), vcov(res)))
+> > >})
+> > >
+> > >sav <- data.frame(do.call(rbind, sav))
+> > >names(sav) <- c("yi", "vi")
+> > >
+> > >forest(sav$yi, sav$vi, slab=rownames(sav))
+> > >
+> > >rma(yi, vi, data=sav)
+> > >res
+> > >###
+> > >
+> > >Goal B (robvis, development version 0.3.0.900):
+> > >Create a risk-of-bias traffic-light plot using the "Generic" (or aka
+> > >"ROB1") template.
+> > >(Source B: https://github.com/mcguinlu/robvis  ("Generic")  OR
+> > >cran.r-project.org/web/packages/robvis/vignettes/Introduction_to_robvis.html#rob1
+> > > ("ROB1"))
+> > >
+> > >Goal B Issues:
+> > >After running the robvis reprex below, you will see that an extra
+> > >judgment label ("Critical" or dark red circle with exclamation mark)
+> > >is automatically added/cannot be removed (although only 5 judgment
+> > >labels are relevant in the dataset, I am forced to specify 6 judgement
+> > >labels). I am aware there is an argument "judgement_levels" under
+> > >development, but do not know if it is relevant and if so how to take
+> > >it from here...
+> >
+> > Can't help with this.
+> >
+> > >robvis reprex:
+> > >###
+> > >library(robvis)
+> > >
+> > >rp <- structure(list(Study = c("Study 1", "Study 2", "Study 3", "Study 4",
+> > >"Study 5", "Study 6"), Bias.due.to.confounding. = c("Not applicable",
+> > >"Not applicable", "Not applicable", "Some concerns", "Low", "No information"
+> > >), Bias.in.selection.of.participants.into.the.study. = c("Not applicable",
+> > >"Not applicable", "Not applicable", "Some concerns", "Low", "Low"
+> > >), Bias.in.classification.of.interventions. = c("Not applicable",
+> > >"Not applicable", "Not applicable", "Some concerns", "Low", "Low"
+> > >), Bias.arising.from.the.randomization.process. = c("Some concerns",
+> > >"Low", "Low", "Not applicable", "Not applicable", "Not applicable"
+> > >), Bias.due.to.deviations.from.intended.intervention. = c("Low",
+> > >"Some concerns", "Low", "Low", "Some concerns", "Low"),
+> > >Bias.due.to.missing.outcome.data. = c("Some concerns",
+> > >"Low", "No information", "Some concerns", "Low", "No information"
+> > >), Bias.in.measurement.of.the.outcome. = c("Some concerns", "Low",
+> > >"Some concerns", "Some concerns", "Low", "Some concerns"),
+> > >Bias.due.to.selection.of.the.reported.result. = c("Some concerns",
+> > >"Low", "High", "Some concerns", "Low", "High"), Overall = c("Some concerns",
+> > >"Low", "High", "Some concerns", "Low", "High")), row.names = c(NA,
+> > >6L), class = "data.frame")
+> > >
+> > >bor <- rob_traffic_light(rp, tool="Generic", colour="cochrane",
+> > >psize=10, overall=TRUE, judgement_labels=c("","High","Some
+> > >concerns","Low","No information","Not applicable"))
+> > >
+> > >bor
+> > >###
+> > >
+> > >Goal C:
+> > >Append the risk-of-bias traffic-light plot (from Goal B) to the forest
+> > >plot (from Goal A).
+> > >(Source C: mcguinlu.github.io/robvis/articles/metafor.html#appending-risk-of-
+> > >bias-plots-to-forest-plots-1)
+> > >
+> > >Goal C Issues:
+> > >Because the present analysis considers the bias domains of both
+> > >randomized and non-randomized controlled intervention studies and risk
+> > >of bias was respectively assessed by ROB2 and ROBINS-I, the "Generic"
+> > >template is used because it allows modifying the number of domains so
+> > >as to include the relevant domains of both tools in the traffic-light
+> > >plot. However, according to "rob_tools(forest = TRUE)", robvis
+> > >currently supports only "ROB2" and "ROBINS-I" templates for the
+> > >"rob_append_to_forest()" function.
+> >
+> > Again, can't really help with robvis.
+> >
+> > As an alternative, you could also consider creating the traffic light part of the plot yourself. Then you have full control over what is shown and how. An example where I did this can be found here:
+> >
+> > https://www.metafor-project.org/doku.php/plots:forest_plot_revman
+> >
+> > >Other sub-goals:
+> > >- Modify text of header from "Estimate [95% CI]" to "SMD [95% CI]".
+> >
+> > In forest(), see argument 'header'.
+> >
+> > >- Modify text of x-axis label from "Observed Outcome" to "Standardized
+> > >Mean Difference".
+> >
+> > In forest(), see argument 'xlab'.
+> >
+> > >- To the right of "SMD [95% CI]", add a column with the header "No. of
+> > >effect sizes" to display the number of effect sizes within each study.
+> >
+> > In forest(), you can use the 'textpos' argument to create space to the right of the annotations and then add this column either via the 'ilab' argument or with text(). In fact, the link above demonstrates this.
+> >
+> > >Many thanks in advance for your help...
+> > >
+> > >Sincerely,
+> > >Josh
+
+
+From jdkb9701 @end|ng |rom connect@hku@hk  Mon May 23 14:22:31 2022
+From: jdkb9701 @end|ng |rom connect@hku@hk (Joshua Bernal)
+Date: Mon, 23 May 2022 20:22:31 +0800
+Subject: [R-meta] Superscript between 'author name,' and 'year'
+Message-ID: <CAMPpmRdjHNeHRdCxXh8zDwTrjBxhCwzmYMj8ckNLcK7mFKH8=Q@mail.gmail.com>
+
+Dear Dr. Viecthbauer and members,
+
+I am seeking help on how to modify the code for inserting superscripts
+by the author(s)/year entries
+(https://www.metafor-project.org/doku.php/plots:forest_plot_with_superscripts)
+such that the superscript falls between the author name and year, eg,
+Smith,^10 2022, as opposed to Smith, 2022^10.
+
+Thank you very much in advance for your help!
+
+Josh
+
+
+From jdkb9701 @end|ng |rom connect@hku@hk  Mon May 23 14:26:11 2022
+From: jdkb9701 @end|ng |rom connect@hku@hk (Joshua Bernal)
+Date: Mon, 23 May 2022 20:26:11 +0800
+Subject: [R-meta] Superscript between 'author name,' and 'year'
+Message-ID: <CAMPpmRce8OQ0tG9SMGnH9ENWONTSS4CNKY6TgC44hceFgk0ZMA@mail.gmail.com>
+
+Dear Dr. Viecthbauer and members,
+
+I am seeking help on how to modify the code for inserting superscripts
+by the author(s)/year entries in metafor
+(https://www.metafor-project.org/doku.php/plots:forest_plot_with_superscripts)
+such that the superscript falls between the author name and year, eg,
+Smith,^10 2022, as opposed to Smith, 2022^10.
+
+Thank you very much in advance for your help!
+
+Josh
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon May 23 15:01:16 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 23 May 2022 13:01:16 +0000
+Subject: [R-meta] Superscript between 'author name,' and 'year'
+In-Reply-To: <CAMPpmRce8OQ0tG9SMGnH9ENWONTSS4CNKY6TgC44hceFgk0ZMA@mail.gmail.com>
+References: <CAMPpmRce8OQ0tG9SMGnH9ENWONTSS4CNKY6TgC44hceFgk0ZMA@mail.gmail.com>
+Message-ID: <e5af2e4ac62546f28684b488eb8ac011@UM-MAIL3214.unimaas.nl>
+
+Dear Josh,
+
+In the example, try:
+
+dat$slab.ref <- mapply(function(x,y,z) as.expression(bquote(.(x)*","^.(y)~.(z))), dat$author, dat$trial, dat$year)
+
+In general, read ?plothmath, ?bquote, and ?mapply to understand how all of this works.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Joshua Bernal
+>Sent: Monday, 23 May, 2022 14:26
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Superscript between 'author name,' and 'year'
+>
+>Dear Dr. Viecthbauer and members,
+>
+>I am seeking help on how to modify the code for inserting superscripts
+>by the author(s)/year entries in metafor
+>(https://www.metafor-project.org/doku.php/plots:forest_plot_with_superscripts)
+>such that the superscript falls between the author name and year, eg,
+>Smith,^10 2022, as opposed to Smith, 2022^10.
+>
+>Thank you very much in advance for your help!
+>
+>Josh
+
+
+From jdkb9701 @end|ng |rom connect@hku@hk  Mon May 23 15:16:14 2022
+From: jdkb9701 @end|ng |rom connect@hku@hk (Joshua Bernal)
+Date: Mon, 23 May 2022 21:16:14 +0800
+Subject: [R-meta] Superscript between 'author name,' and 'year'
+In-Reply-To: <e5af2e4ac62546f28684b488eb8ac011@UM-MAIL3214.unimaas.nl>
+References: <CAMPpmRce8OQ0tG9SMGnH9ENWONTSS4CNKY6TgC44hceFgk0ZMA@mail.gmail.com>
+ <e5af2e4ac62546f28684b488eb8ac011@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAMPpmRdeXyFfNXhhf3JPjTQajx=4O+4oACWWZaCzKr=fe6FK7g@mail.gmail.com>
+
+Dear Dr. Viechtbauer,
+
+Indeed, I still have yet to understand how this works, eg, the change
+of code from xy to xyz and the symbols that connect them, so thank you
+for the suggested readings and thank you once again for your timely
+help!
+
+Best wishes,
+Josh
+
+On Mon, May 23, 2022 at 9:01 PM Viechtbauer, Wolfgang (NP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+> Dear Josh,
+>
+> In the example, try:
+>
+> dat$slab.ref <- mapply(function(x,y,z) as.expression(bquote(.(x)*","^.(y)~.(z))), dat$author, dat$trial, dat$year)
+>
+> In general, read ?plothmath, ?bquote, and ?mapply to understand how all of this works.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+> >Behalf Of Joshua Bernal
+> >Sent: Monday, 23 May, 2022 14:26
+> >To: r-sig-meta-analysis at r-project.org
+> >Subject: [R-meta] Superscript between 'author name,' and 'year'
+> >
+> >Dear Dr. Viecthbauer and members,
+> >
+> >I am seeking help on how to modify the code for inserting superscripts
+> >by the author(s)/year entries in metafor
+> >(https://www.metafor-project.org/doku.php/plots:forest_plot_with_superscripts)
+> >such that the superscript falls between the author name and year, eg,
+> >Smith,^10 2022, as opposed to Smith, 2022^10.
+> >
+> >Thank you very much in advance for your help!
+> >
+> >Josh
+
+
+From de@@|mone@be||nd@87 @end|ng |rom gm@||@com  Mon May 23 17:18:26 2022
+From: de@@|mone@be||nd@87 @end|ng |rom gm@||@com (De Simone)
+Date: Mon, 23 May 2022 16:18:26 +0100
+Subject: [R-meta] Help with Funnel plot
+Message-ID: <CAHGyc-u6k5toQ7BiAH18bQM4sX_+KX7cC=NHQ-20dwLPFSUMEw@mail.gmail.com>
+
+Dear Dr. Viechtbauer and Team,
+
+I have this question regarding funnel plot, is how to get gradient colors
+for the background like the one attached
+And again how to get different types of lines (solid vs interrupted) for
+the Reference and confidence separately. The argument "lty" do both. Using
+"shade" and "hlines" didn't help
+
+funnel(res, main="Duration of analegsia", back = 12, xlab="Mean difference
+(hours)", cex = 1.2,  lwd = 2, lty = "solid", mgp = c(2, 1, 0), font.main =
+1, font.lab = 2, font.axis = 2)
+
+Best,
+Belinda
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20220523/cf7e5d7f/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Funnel(1).pdf
+Type: application/pdf
+Size: 57649 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20220523/cf7e5d7f/attachment-0001.pdf>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon May 23 19:24:51 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 23 May 2022 17:24:51 +0000
+Subject: [R-meta] Help with Funnel plot
+In-Reply-To: <CAHGyc-u6k5toQ7BiAH18bQM4sX_+KX7cC=NHQ-20dwLPFSUMEw@mail.gmail.com>
+References: <CAHGyc-u6k5toQ7BiAH18bQM4sX_+KX7cC=NHQ-20dwLPFSUMEw@mail.gmail.com>
+Message-ID: <f5b0ba25ad404c99aa71e1b8beb9a948@UM-MAIL3214.unimaas.nl>
+
+Dear Belinda,
+
+The docs tell you how the 'lty' arguments works:
+
+https://wviechtb.github.io/metafor/reference/funnel.html
+
+The gradient wasn't done with any argument to funnel(). Not sure how it was added.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: De Simone [mailto:de.simone.belinda87 at gmail.com]
+>Sent: Monday, 23 May, 2022 17:18
+>To: Viechtbauer, Wolfgang (NP); r-sig-meta-analysis at r-project.org
+>Subject: Help with Funnel plot
+>
+>Dear Dr. Viechtbauer and Team,
+>
+>I have this question regarding funnel plot, is how to get gradient colors for the
+>background like the one attached
+>And again how to get different types of lines (solid vs interrupted) for the
+>Reference and confidence separately. The argument "lty" do both. Using "shade"
+>and "hlines" didn't help
+>
+>funnel(res, main="Duration of analegsia", back = 12, xlab="Mean difference
+>(hours)", cex = 1.2,? lwd = 2, lty = "solid", mgp = c(2, 1, 0), font.main = 1,
+>font.lab = 2, font.axis = 2)
+>
+>Best,
+>Belinda
+
+From Brend@n@Hutch|n@on @end|ng |rom @nu@edu@@u  Tue May 24 10:46:53 2022
+From: Brend@n@Hutch|n@on @end|ng |rom @nu@edu@@u (Brendan Hutchinson)
+Date: Tue, 24 May 2022 08:46:53 +0000
+Subject: [R-meta] contour enhanced funnel plots when using function of
+ sample size
+Message-ID: <ME3P282MB416248CA0A7FD3B8C63BA756A9D79@ME3P282MB4162.AUSP282.PROD.OUTLOOK.COM>
+
+Dear mailing list,
+
+I have a question regarding funnel plots with the funnel() function in metafor. I've done a brief search of the archive but could not spot whether this has been addressed, but if it has I do apologise!
+
+My question is specifically whether there is a means of generating a contour enhanced funnel plot with pseudo confidence regions when using a function of sample size on the y axis. According to the R documentation, this isn't possible. I wanted to ask if anyone knew of any means to achieve this or perhaps a workaround (unless this is some inherent issue to the use of a function of sample size that I'm not seeing).
+
+Thanks so much!
+Brendan
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Tue May 24 11:59:50 2022
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Tue, 24 May 2022 11:59:50 +0200
+Subject: [R-meta] contour enhanced funnel plots when using function of
+ sample size
+In-Reply-To: <ME3P282MB416248CA0A7FD3B8C63BA756A9D79@ME3P282MB4162.AUSP282.PROD.OUTLOOK.COM>
+References: <ME3P282MB416248CA0A7FD3B8C63BA756A9D79@ME3P282MB4162.AUSP282.PROD.OUTLOOK.COM>
+Message-ID: <d75ca89d-2be8-ffaf-5f36-5273efbc8a4b@imbi.uni-freiburg.de>
+
+Am 24.05.22 um 10:46 schrieb Brendan Hutchinson:
+
+> [...]
+> My question is specifically whether there is a means of generating a contour enhanced funnel plot with pseudo confidence regions when using a function of sample size on the y axis. According to the R documentation, this isn't possible. I wanted to ask if anyone knew of any means to achieve this or perhaps a workaround (unless this is some inherent issue to the use of a function of sample size that I'm not seeing).
+
+The sample size does not contain any information on the statistical 
+significance of a study result. For example, for a binary outcome:
+
+ > meta::metabin(1, 100, 2, 100)$pval
+[1] 0.5688381
+ > meta::metabin(25, 100, 50, 100)$pval
+[1] 0.0005287824
+
+Both studies have a total sample size of 200, however, depending on the 
+number of events, the studies have very different p-values.
+
+The same argument can be made for a continuous outcome, studies with the 
+same sample sizes and mean values can have very different standard 
+deviations leading to different p-values.
+
+Best,
+
+Guido
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Zinkmattenstr. 6a, D-79108 Freiburg
+
+Mail: sc at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+From Tor|@Pen@ @end|ng |rom @tonybrook@edu  Wed May 25 21:40:47 2022
+From: Tor|@Pen@ @end|ng |rom @tonybrook@edu (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+Date: Wed, 25 May 2022 15:40:47 -0400
+Subject: [R-meta] contour enhanced funnel plots when using function of
+ sample size
+In-Reply-To: <d75ca89d-2be8-ffaf-5f36-5273efbc8a4b@imbi.uni-freiburg.de>
+References: <ME3P282MB416248CA0A7FD3B8C63BA756A9D79@ME3P282MB4162.AUSP282.PROD.OUTLOOK.COM>
+ <d75ca89d-2be8-ffaf-5f36-5273efbc8a4b@imbi.uni-freiburg.de>
+Message-ID: <CAEmuQj_MnKWOS8vOrk-q6fJ1rgtib3320yAiLqV1_ko6OfSmEg@mail.gmail.com>
+
+Hi folks,
+
+I wanted to follow-up this question and ask if there is a way (or is it
+recommended) to generate a color-enhanced funnel plot on a rma.mv object?
+Thanks in advance!
+
+On Tue, May 24, 2022 at 6:00 AM Guido Schwarzer <sc at imbi.uni-freiburg.de>
+wrote:
+
+> Am 24.05.22 um 10:46 schrieb Brendan Hutchinson:
+>
+> > [...]
+> > My question is specifically whether there is a means of generating a
+> contour enhanced funnel plot with pseudo confidence regions when using a
+> function of sample size on the y axis. According to the R documentation,
+> this isn't possible. I wanted to ask if anyone knew of any means to achieve
+> this or perhaps a workaround (unless this is some inherent issue to the use
+> of a function of sample size that I'm not seeing).
+>
+> The sample size does not contain any information on the statistical
+> significance of a study result. For example, for a binary outcome:
+>
+>  > meta::metabin(1, 100, 2, 100)$pval
+> [1] 0.5688381
+>  > meta::metabin(25, 100, 50, 100)$pval
+> [1] 0.0005287824
+>
+> Both studies have a total sample size of 200, however, depending on the
+> number of events, the studies have very different p-values.
+>
+> The same argument can be made for a continuous outcome, studies with the
+> same sample sizes and mean values can have very different standard
+> deviations leading to different p-values.
+>
+> Best,
+>
+> Guido
+>
+> --
+> Dr. Guido Schwarzer
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Postal address: Zinkmattenstr. 6a, D-79108 Freiburg
+>
+> Mail: sc at imbi.uni-freiburg.de
+> Homepage: https://www.imbi.uni-freiburg.de/
+>
+> ORCID iD: https://orcid.org/0000-0001-6214-9087
+> R-book: https://www.springer.com/gp/book/9783319214153
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+
+-- 
+*Tori Pe?a <https://www.linkedin.com/in/toripena/> *(she/her/ella)
+Doctoral Candidate, Cognitive Psychology
+Dept. of Psychology
+Stony Brook University
+Stony Brook, NY 11790-2500
+[image: Stony Brook University logo]
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed May 25 22:38:23 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 25 May 2022 20:38:23 +0000
+Subject: [R-meta] contour enhanced funnel plots when using function of
+ sample size
+Message-ID: <56b5e1da478145f6aa6f0d045a4d870a@UM-MAIL3214.unimaas.nl>
+
+Hi Tori,
+
+The funnel() function will work just as well on an rma.mv object, so yes, you can also create a contour-enhanced funnel plot for an rma.mv object. For example:
+
+dat <- dat.konstantopoulos2011
+res <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat)
+funnel(res, level=c(90, 95, 99), shade=c("white", "gray55", "gray75"), refline=0, legend=TRUE)
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Tori Pe?a
+>Sent: Wednesday, 25 May, 2022 21:41
+>To: r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] contour enhanced funnel plots when using function of sample
+>size
+>
+>Hi folks,
+>
+>I wanted to follow-up this question and ask if there is a way (or is it
+>recommended) to generate a color-enhanced funnel plot on a rma.mv object?
+>Thanks in advance!
+>
+>On Tue, May 24, 2022 at 6:00 AM Guido Schwarzer <sc at imbi.uni-freiburg.de>
+>wrote:
+>
+>> Am 24.05.22 um 10:46 schrieb Brendan Hutchinson:
+>>
+>> > [...]
+>> > My question is specifically whether there is a means of generating a
+>> contour enhanced funnel plot with pseudo confidence regions when using a
+>> function of sample size on the y axis. According to the R documentation,
+>> this isn't possible. I wanted to ask if anyone knew of any means to achieve
+>> this or perhaps a workaround (unless this is some inherent issue to the use
+>> of a function of sample size that I'm not seeing).
+>>
+>> The sample size does not contain any information on the statistical
+>> significance of a study result. For example, for a binary outcome:
+>>
+>>  > meta::metabin(1, 100, 2, 100)$pval
+>> [1] 0.5688381
+>>  > meta::metabin(25, 100, 50, 100)$pval
+>> [1] 0.0005287824
+>>
+>> Both studies have a total sample size of 200, however, depending on the
+>> number of events, the studies have very different p-values.
+>>
+>> The same argument can be made for a continuous outcome, studies with the
+>> same sample sizes and mean values can have very different standard
+>> deviations leading to different p-values.
+>>
+>> Best,
+>>
+>> Guido
+>>
+>> --
+>> Dr. Guido Schwarzer
+>> Institute of Medical Biometry and Statistics,
+>> Faculty of Medicine and Medical Center - University of Freiburg
+>>
+>> Postal address: Zinkmattenstr. 6a, D-79108 Freiburg
+>>
+>> Mail: sc at imbi.uni-freiburg.de
+>> Homepage: https://www.imbi.uni-freiburg.de/
+>>
+>> ORCID iD: https://orcid.org/0000-0001-6214-9087
+>> R-book: https://www.springer.com/gp/book/9783319214153
+
+From Brend@n@Hutch|n@on @end|ng |rom @nu@edu@@u  Thu May 26 08:51:51 2022
+From: Brend@n@Hutch|n@on @end|ng |rom @nu@edu@@u (Brendan Hutchinson)
+Date: Thu, 26 May 2022 06:51:51 +0000
+Subject: [R-meta] contour enhanced funnel plots when using function of
+ sample size
+In-Reply-To: <d75ca89d-2be8-ffaf-5f36-5273efbc8a4b@imbi.uni-freiburg.de>
+References: <ME3P282MB416248CA0A7FD3B8C63BA756A9D79@ME3P282MB4162.AUSP282.PROD.OUTLOOK.COM>
+ <d75ca89d-2be8-ffaf-5f36-5273efbc8a4b@imbi.uni-freiburg.de>
+Message-ID: <MEYP282MB41559C1C29F65D1CA8BF6F91A9D99@MEYP282MB4155.AUSP282.PROD.OUTLOOK.COM>
+
+Dear Guido,
+
+Thank you very much for your prompt response and for clarifying!
+
+In case it is of any interest for future mailing list readers, the publication by Peters et al 2008 (DOI: 10.1016/j.jclinepi.2007.11.010) details this nicely.
+
+Brendan
+
+________________________________
+From: Guido Schwarzer <sc at imbi.uni-freiburg.de>
+Sent: Tuesday, 24 May 2022 7:59 PM
+To: Brendan Hutchinson <Brendan.Hutchinson at anu.edu.au>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] contour enhanced funnel plots when using function of sample size
+
+Am 24.05.22 um 10:46 schrieb Brendan Hutchinson:
+
+> [...]
+> My question is specifically whether there is a means of generating a contour enhanced funnel plot with pseudo confidence regions when using a function of sample size on the y axis. According to the R documentation, this isn't possible. I wanted to ask if anyone knew of any means to achieve this or perhaps a workaround (unless this is some inherent issue to the use of a function of sample size that I'm not seeing).
+
+The sample size does not contain any information on the statistical
+significance of a study result. For example, for a binary outcome:
+
+ > meta::metabin(1, 100, 2, 100)$pval
+[1] 0.5688381
+ > meta::metabin(25, 100, 50, 100)$pval
+[1] 0.0005287824
+
+Both studies have a total sample size of 200, however, depending on the
+number of events, the studies have very different p-values.
+
+The same argument can be made for a continuous outcome, studies with the
+same sample sizes and mean values can have very different standard
+deviations leading to different p-values.
+
+Best,
+
+Guido
+
+--
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Zinkmattenstr. 6a, D-79108 Freiburg
+
+Mail: sc at imbi.uni-freiburg.de
+Homepage: https://aus01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.imbi.uni-freiburg.de%2F&amp;data=05%7C01%7CBrendan.Hutchinson%40anu.edu.au%7Ce1c994f3a74b4de43bae08da3d6c26e7%7Ce37d725cab5c46249ae5f0533e486437%7C0%7C0%7C637889832250164910%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=GshPihzPPG0RJsWMGGOsri%2Bs9G7RettBMawSaJ7NSGk%3D&amp;reserved=0
+
+ORCID iD: https://aus01.safelinks.protection.outlook.com/?url=https%3A%2F%2Forcid.org%2F0000-0001-6214-9087&amp;data=05%7C01%7CBrendan.Hutchinson%40anu.edu.au%7Ce1c994f3a74b4de43bae08da3d6c26e7%7Ce37d725cab5c46249ae5f0533e486437%7C0%7C0%7C637889832250164910%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=hMHX2KuAFx4qLfGOD3QHTcXqd7x7l33hU2i0hCeC49w%3D&amp;reserved=0
+R-book: https://aus01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.springer.com%2Fgp%2Fbook%2F9783319214153&amp;data=05%7C01%7CBrendan.Hutchinson%40anu.edu.au%7Ce1c994f3a74b4de43bae08da3d6c26e7%7Ce37d725cab5c46249ae5f0533e486437%7C0%7C0%7C637889832250164910%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=Hq6wE73nZ2Xw%2BAHVKaP1wdcVNCJmerSoFiYpLoycwjM%3D&amp;reserved=0
+
+
+	[[alternative HTML version deleted]]
+
+
+From A|ex@ndr@@Voce @end|ng |rom @|c@gov@@u  Thu May 26 11:30:08 2022
+From: A|ex@ndr@@Voce @end|ng |rom @|c@gov@@u (Alexandra Voce)
+Date: Thu, 26 May 2022 09:30:08 +0000
+Subject: [R-meta] tau^2 for multilevel models
+Message-ID: <a41a5efec4794ac8901e732db45d7108@aic.gov.au>
+
+Dear mailing list,
+
+If I have a multilevel model, say:
+
+dat <- get(data(dat.bcg))
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+
+example <- rma.mv(yi, vi, random = ~ 1 | alloc/trial, data=dat)
+
+Is the sum of the sigma^2 values in this model equivalent to tau^2 that would be calculated in a more general random effects model, e.g..
+
+example2 <- rma(yi, vi, data=dat)
+
+By equivalent, I mean is it correct to state that the sum of sigma^2 values in a multilevel model reflects the estimated amount of total heterogeneity? Is there any reason it could be considered incorrect to detail this value (sigma^2_between + sigma^2_within) as tau2?
+
+Thank you,
+Alexandra
+
+Dr Alexandra Voce
+Research Analyst
+Australian Institute of Criminology
+E: Alexandra.voce at aic.gov.au<mailto:Alexandra.voce at aic.gov.au>
+W: www.aic.gov.au
+
+
+________________________________
+
+Confidential Information
+
+This email message and any attached files may contain information that is confidential and subject of legal privilege intended only for use by the individual or entity to whom they are addressed. If you are not the intended recipient or the person responsible for delivering the message to the intended recipient be advised that you have received this message in error and that any use, copying, circulation, forwarding, printing or publication of this message or attached files is strictly forbidden, as is the disclosure of the information contained therein. If you have received this message in error, please notify the sender immediately and delete it from your Inbox.
+When communicating by email you consent to the monitoring and recording of that correspondence.
+
+AIC Web Site:www.aic.gov.au
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu May 26 11:46:39 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 26 May 2022 09:46:39 +0000
+Subject: [R-meta] tau^2 for multilevel models
+In-Reply-To: <a41a5efec4794ac8901e732db45d7108@aic.gov.au>
+References: <a41a5efec4794ac8901e732db45d7108@aic.gov.au>
+Message-ID: <7ea36b2a741745c8840bdc22f08d8956@UM-MAIL3214.unimaas.nl>
+
+Dear Alexandra,
+
+Yes, sum(example$sigma2) can be considered the total amount of heterogeneity. It won't be exactly equal to example2$tau2, but shouldn't be too dissimilar (0.323 vs. 0.313 in this example).
+
+Sure, you could denote sum(example$sigma2) as tau^2. In fact, you can fit model 'example' using this alternative parameterization (which is equivalent as long as rho is estimated to be > 0):
+
+example3 <- rma.mv(yi, vi, random = ~ trial | alloc, data=dat)
+example3
+
+And here, example3$tau2 is identical to sum(example$sigma2).
+
+See also:
+
+https://www.metafor-project.org/doku.php/analyses:konstantopoulos2011
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Alexandra Voce
+>Sent: Thursday, 26 May, 2022 11:30
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] tau^2 for multilevel models
+>
+>Dear mailing list,
+>
+>If I have a multilevel model, say:
+>
+>dat <- get(data(dat.bcg))
+>dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+>
+>example <- rma.mv(yi, vi, random = ~ 1 | alloc/trial, data=dat)
+>
+>Is the sum of the sigma^2 values in this model equivalent to tau^2 that would be
+>calculated in a more general random effects model, e.g..
+>
+>example2 <- rma(yi, vi, data=dat)
+>
+>By equivalent, I mean is it correct to state that the sum of sigma^2 values in a
+>multilevel model reflects the estimated amount of total heterogeneity? Is there
+>any reason it could be considered incorrect to detail this value (sigma^2_between
+>+ sigma^2_within) as tau2?
+>
+>Thank you,
+>Alexandra
+>
+>Dr Alexandra Voce
+>Research Analyst
+>Australian Institute of Criminology
+>E: Alexandra.voce at aic.gov.au<mailto:Alexandra.voce at aic.gov.au>
+>W: www.aic.gov.au
+
+
+From Dy|@n_John@on @end|ng |rom hotm@||@c@  Mon May 30 19:42:26 2022
+From: Dy|@n_John@on @end|ng |rom hotm@||@c@ (D J)
+Date: Mon, 30 May 2022 17:42:26 +0000
+Subject: [R-meta] Setting Axis in Forest Function
+Message-ID: <DM6PR13MB428314BD8C44F9B200A8F8BCFCDD9@DM6PR13MB4283.namprd13.prod.outlook.com>
+
+Hello,
+
+Is there a way to specify the scale of the x-axis for the effect sizes. I need to make multiple forest plots and I want the range to be consistent.
+
+m.overall <- rma.mv(fishersZ, V_fisher, random = list(~ 1 | effectsizeID, ~ 1 | StudyID), intercept=
+                      TRUE, data=dataset, method = "REML", slab=paste(author))
+forest(m.overall, xlim=c(6,-10),
+       xlab = "",mlab="",
+       cex=0.40, fonts="sans",
+       ilab=cbind(dataset$Refid), ilab.xpos=c(-4),)
+
+Thanks!
+
+Best,
+DJ
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon May 30 20:21:41 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 30 May 2022 18:21:41 +0000
+Subject: [R-meta] Setting Axis in Forest Function
+In-Reply-To: <DM6PR13MB428314BD8C44F9B200A8F8BCFCDD9@DM6PR13MB4283.namprd13.prod.outlook.com>
+References: <DM6PR13MB428314BD8C44F9B200A8F8BCFCDD9@DM6PR13MB4283.namprd13.prod.outlook.com>
+Message-ID: <0f0a71a163e04185a8e68b5ff67ab4f0@UM-MAIL3214.unimaas.nl>
+
+Hi DJ,
+
+Maybe you are looking for the 'alim' (or 'at') argument.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of D J
+>Sent: Monday, 30 May, 2022 19:42
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Setting Axis in Forest Function
+>
+>Hello,
+>
+>Is there a way to specify the scale of the x-axis for the effect sizes. I need to
+>make multiple forest plots and I want the range to be consistent.
+>
+>m.overall <- rma.mv(fishersZ, V_fisher, random = list(~ 1 | effectsizeID, ~ 1 |
+>StudyID), intercept=
+>                      TRUE, data=dataset, method = "REML", slab=paste(author))
+>forest(m.overall, xlim=c(6,-10),
+>       xlab = "",mlab="",
+>       cex=0.40, fonts="sans",
+>       ilab=cbind(dataset$Refid), ilab.xpos=c(-4),)
+>
+>Thanks!
+>
+>Best,
+>DJ
+
+
+From dy|@n_john@on @end|ng |rom hotm@||@c@  Mon May 30 20:26:06 2022
+From: dy|@n_john@on @end|ng |rom hotm@||@c@ (D J)
+Date: Mon, 30 May 2022 18:26:06 +0000
+Subject: [R-meta] Setting Axis in Forest Function
+In-Reply-To: <0f0a71a163e04185a8e68b5ff67ab4f0@UM-MAIL3214.unimaas.nl>
+References: <DM6PR13MB428314BD8C44F9B200A8F8BCFCDD9@DM6PR13MB4283.namprd13.prod.outlook.com>
+ <0f0a71a163e04185a8e68b5ff67ab4f0@UM-MAIL3214.unimaas.nl>
+Message-ID: <DM6PR13MB4283BA656612F6806819BD82FCDD9@DM6PR13MB4283.namprd13.prod.outlook.com>
+
+Don?t know how I missed that one ? thanks so much!
+
+Best,
+DJ
+
+Sent from Mail<https://go.microsoft.com/fwlink/?LinkId=550986> for Windows
+
+From: Viechtbauer, Wolfgang (NP)<mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: May 30, 2022 2:21 PM
+To: D J<mailto:Dylan_Johnson at hotmail.ca>; r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>
+Subject: RE: Setting Axis in Forest Function
+
+Hi DJ,
+
+Maybe you are looking for the 'alim' (or 'at') argument.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of D J
+>Sent: Monday, 30 May, 2022 19:42
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Setting Axis in Forest Function
+>
+>Hello,
+>
+>Is there a way to specify the scale of the x-axis for the effect sizes. I need to
+>make multiple forest plots and I want the range to be consistent.
+>
+>m.overall <- rma.mv(fishersZ, V_fisher, random = list(~ 1 | effectsizeID, ~ 1 |
+>StudyID), intercept=
+>                      TRUE, data=dataset, method = "REML", slab=paste(author))
+>forest(m.overall, xlim=c(6,-10),
+>       xlab = "",mlab="",
+>       cex=0.40, fonts="sans",
+>       ilab=cbind(dataset$Refid), ilab.xpos=c(-4),)
+>
+>Thanks!
+>
+>Best,
+>DJ
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon May 30 20:34:27 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 30 May 2022 18:34:27 +0000
+Subject: [R-meta] 
+ Question regarding metarate calling the Poisson model for
+ meta-analysis
+In-Reply-To: <AM9P193MB13621A1182D351E20A4B8A20E0DD9@AM9P193MB1362.EURP193.PROD.OUTLOOK.COM>
+References: <AM9P193MB1362799825DAADA1AC8B4196E0139@AM9P193MB1362.EURP193.PROD.OUTLOOK.COM>
+ <aee34707a795410786696e925d5fe15c@UM-MAIL3214.unimaas.nl>
+ <AM9P193MB1362018096808A27168926F7E0169@AM9P193MB1362.EURP193.PROD.OUTLOOK.COM>
+ <3f541187bd24426fba2537be157ebde3@UM-MAIL3214.unimaas.nl>
+ <AM9P193MB136263F5DF634BC89BD348D4E01D9@AM9P193MB1362.EURP193.PROD.OUTLOOK.COM>
+ <AM9P193MB13621A1182D351E20A4B8A20E0DD9@AM9P193MB1362.EURP193.PROD.OUTLOOK.COM>
+Message-ID: <1545725444174cdea2d1d0ef06b11d7d@UM-MAIL3214.unimaas.nl>
+
+Dear Roel,
+
+Since you addressed this post to me directly -- just to let you know, I am unlikely to provide an answer to these questions. I would have to spend a few hours thinking about those (these are good but tricky questions), which is not something I can do at this moment. Maybe somebody else is willing to take a stab at answering them.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Willems, R.P.J. (Roel) [mailto:r.willems at amsterdamumc.nl]
+>Sent: Monday, 30 May, 2022 18:14
+>To: 'r-sig-meta-analysis at r-project.org'; Viechtbauer, Wolfgang (NP)
+>Subject: RE: Question regarding metarate calling the Poisson model for meta-
+>analysis
+>
+>Dear Prof. Viechtbauer,
+>
+>We have made excellent progress with the statistical analyses using the mixed-
+>effects meta-regression model. Again, many thanks for your advice! We would very
+>much appreciate if you could share your perspective on the interpretation of the
+>pooled cumulative incidences using this approach.
+>
+>The studies analyzed provide cumulative incidence proportions from very different
+>time points; for instance, at 30 days, while another provides the incidence at 90
+>days or 12 months, etc. Given the definition of cumulative incidence: 'the
+>proportion of a fixed population that becomes diseased in a stated period of
+>time' specifying the time dimension is key for correct interpretation. How should
+>we interpret the overall estimate of the model, which itself already accounts for
+>the study differences in terms of follow-up time. To which time period do the
+>overall incidence estimates relate?
+>
+>Do we need to transform the overall estimates of the different study subgroups
+>that we calculated using these meta-regression models? For example, in order to
+>create some sort of 'standardized' 'at 30-day' overall estimates that would
+>facilitate comparison of the estimates from the different subgroup analyses? Or
+>would it be better to refrain from using cumulative incidences and calculate the
+>'approximate' no. of patient-days for all studies, and then meta-analyze the
+>studies by setting them all to the same denominator - in terms of incidence rate
+>per no. of patient days.
+>
+>Best,
+>Roel
+>
+>R.P.J. Willems MD
+>Medical Microbiology and Infection Prevention AII | Location AMC |
+>L1-247 | Meibergdreef 9, 1105 HZ Amsterdam
+>E: r.willems at amsterdamumc.nl
+>www.amsterdamumc.nl | www.vumc.nl | www.amc.nl
+>
+>-----Oorspronkelijk bericht-----
+>Van: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+>Verzonden: donderdag 24 maart 2022 12:49
+>Aan: Willems, R.P.J. (Roel) <r.willems at amsterdamumc.nl>; 'r-sig-meta-analysis at r-
+>project.org' <r-sig-meta-analysis at r-project.org>
+>Onderwerp: RE: Question regarding metarate calling the Poisson model for meta-
+>analysis
+>
+>Dear Roel,
+>
+>If you are looking at cumulative proportions, then I would personally just use a
+>binomial/logistic model. If studies differ in terms of the time periods (e.g.,
+>one study provides the cumulative proportion at 30 days while another at 90
+>days), then this could be accounted for via a moderator in a logistic mixed-
+>effects meta-regression model. rma.glmm() with measure="PLO" can do this.
+>
+>If you have multiple proportions for the same group of individuals at various
+>follow-up timepoints, then things get more tricky. First of all, when you say
+>"cumulative proportion at 30 days, at 90 days", do you mean that the first
+>proportion is for number of cases between 0-30 days and the second proportion is
+>for the number of cases (among the non-cases left over after 30 days) between 30-
+>90 days? Or do you mean that the first proportion is for the number of cases
+>between 0-30 days and the second proportion is for the number of cases between 0-
+>90 days?
+>
+>In any case (pun intended), these proportions are not independent of each other.
+>Some relevant articles:
+>
+>Trikalinos, T. A. & Olkin, I. (2012). Meta-analysis of effect sizes reported at
+>multiple time points: A multivariate approach. Clinical Trials, 9(5), 610-620.
+>https://eur04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdoi.org%2F10.11
+>77%2F1740774512453218&amp;data=04%7C01%7Cr.willems%40amsterdamumc.nl%7C70ce522404
+>b34722d25308da0d8c60a3%7C68dfab1a11bb4cc6beb528d756984fb6%7C0%7C0%7C6378371938073
+>07577%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWw
+>iLCJXVCI6Mn0%3D%7C3000&amp;sdata=kFUD4%2BdxJW5IaTf0LpKyMrif0oLM4PWY7kWzWw7fplw%3D
+>&amp;reserved=0
+>
+>Trikalinos, T. A. & Olkin, I. (2008). A method for the meta-analysis of mutually
+>exclusive binary outcomes. Statistics in Medicine, 27(21), 4279-4300.
+>https://eur04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdoi.org%2F10.10
+>02%2Fsim.3299&amp;data=04%7C01%7Cr.willems%40amsterdamumc.nl%7C70ce522404b34722d2
+>5308da0d8c60a3%7C68dfab1a11bb4cc6beb528d756984fb6%7C0%7C0%7C637837193807307577%7C
+>Unknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI
+>6Mn0%3D%7C3000&amp;sdata=D3zDqjjn9FvQw0ZX3Ka8RLM22Y1XJZvbL3GxdsNbDHA%3D&amp;reser
+>ved=0
+>
+>You will find this dataset and the corresponding analysis here:
+>
+>https://eur04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwviechtb.github
+>.io%2Fmetadat%2Freference%2Fdat.fine1993.html&amp;data=04%7C01%7Cr.willems%40amst
+>erdamumc.nl%7C70ce522404b34722d25308da0d8c60a3%7C68dfab1a11bb4cc6beb528d756984fb6
+>%7C0%7C0%7C637837193807307577%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjo
+>iV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=vH4a1mYcRUMfxnYyA9VMGQ7Y
+>Vr4QjLrSIppMxfeOlbs%3D&amp;reserved=0
+>
+>This is actually a slightly more complex case where the outcome is the (log) odds
+>ratio contrasting two conditions. The same principle applies for single groups,
+>except that the outcome would then just me the log odds for individual groups.
+>Note that a 'normal' model is used in this analysis, not a logistic mixed-effects
+>model (for the latter, you would need the raw data).
+>
+>Best,
+>Wolfgang
+
+

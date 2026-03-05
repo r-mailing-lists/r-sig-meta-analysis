@@ -1,0 +1,3665 @@
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Mar  2 13:44:36 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 2 Mar 2020 12:44:36 +0000
+Subject: [R-meta] Co-variances of the random structure
+In-Reply-To: <BB1342B7-BA2D-4D13-A156-5035A4A7C672@cgiar.org>
+References: <937E2BEB-19B2-435D-90BD-3DCE0350D76C@cgiar.org>
+ <4392767E-4D6B-43DE-93FD-CC64CD7D00BF@cgiar.org>
+ <bb23ab58bf1e4c28ba08a6454b407742@UM-MAIL3213.unimaas.nl>
+ <BB1342B7-BA2D-4D13-A156-5035A4A7C672@cgiar.org>
+Message-ID: <f30ea07f2dea499cbdef0628eda25a3e@UM-MAIL3214.unimaas.nl>
+
+Dear Gil,
+
+I don't know what 'yi' represents in your case, but let's say you are simply analyzing means. And let's say 'vi' is the vector with the sampling variances of these means. You cannot simply analyze sqrt(yi) while keeping vi unchanged. The sampling variance of a square-root transformed mean is different from the sampling variance of a mean, so the variances need to be adjusted appropriately. For the square-root transformation, the adjusted (estimate of the) sampling variance is vi / (4 * yi) (where yi = mean) based on the delta method.
+
+Similarly, you cannot simply reverse-transform the variance-covariance matrix of the random effects or some linear combination thereof. And no, 'G' and 'H' are still variance-covariance matrices, regardless of what kind of transformation you apply to 'yi' - they are just variance-covariance matrices for outcomes that are in some kind of transformed units.
+
+I haven't thought this all the way through, but I think one could get an estimate of the variance in the back-transformed units again by applying the delta method, so if varTREATMENTresponse is the variance for your sqrt-transformed outcome, then varTREATMENTresponse * 4 * meanTREATMENTresponse would be the variance for the untransformed outcome, but to compute this, you need an estimate of 'meanTREATMENTresponse' (based on the sqrt-transformed outcome), so this isn't invariant to the mean level.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Gram, Gil (IITA)
+Sent: Friday, 28 February, 2020 17:00
+To: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Co-variances of the random structure
+
+Dear Wolfgang,
+
+Thanks for your response. Yes that is what I meant. This brings me to my second question:
+
+As you can see in my model design, I sqrt transformed my data so I am modeling sqrt(yi). I should therefore back-transform yield estimates with ^2. But at what point do I back-transform the variances when I?m interested in computing variance responses with:
+varTREATMENTresponse = varTREATMENT + varControl - 2*covar(TREATMENT, Control)
+
+The matrices MOD$G and MOD$H are thus the var-cov matrices of a sqrt transformed data, and are in fact standard deviations, right? So 
+- do I first back-transform the SDs into VAR by (MOD$G)^2 and (MOD$H)^2, and then use the above formula?
+or
+- do I first use the above formula and then back-transform the resulting VAR response by (varTREATMENTresponse)^2?
+or
+- is there a way to adapt the above formula for SDs?
+
+Thanks for your help,
+Gil
+
+> On 18 Feb 2020, at 13:00, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> Hi Gil,
+> 
+> Not sure if I understand.
+> 
+> MOD$G and MOD$H contain the var-cov matrices for the ~ treatment|idSite and ~ treatment|idSite.time random effects.
+> 
+> Or are you looking for var-cov matrices of the variance components (and covariances) themselves?
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Gram, Gil (IITA)
+> Sent: Tuesday, 18 February, 2020 12:13
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Co-variances of the random structure
+> 
+> Dear all,
+> 
+> I have the following question: is it possible to extract the covariances from random variance components of a rma.mv model? For example, from my model below this email.
+> 
+> Thanks in advance you for your help,
+> 
+> Gil
+> 
+> ---
+> 
+> My model design:
+> 
+> MOD = rma.mv(sqrt(yi), vi, method = 'REML', struct="HCS", sparse=TRUE, data=dat,
+>                              mods = ~ rateORone + rateORtwo + rateORthree + rateORManure + kgMN
+>                              + I(rateORone^2) + I(rateORtwo^2) + I(rateORthree^2) + I(rateORManure^2) + I(kgMN^2)
+>                              + rateORone:kgMN + rateORtwo:kgMN + rateORthree:kgMN + rateORManure:kgMN
+>                              + I(rateORone^2):I(kgMN^2) + I(rateORtwo^2):I(kgMN^2) + I(rateORthree^2):I(kgMN^2) + I(rateORManure^2):I(kgMN^2)
+>                              + cropSys + idF,
+>                              random = list(~1|ref, ~1|idRow, ~ treatment|idSite, ~ treatment|idSite.time))
+> 
+> Where ?treatment? in the random structure has 4 levels, Control, OR, MR and ORMR. 
+> I wish to evaluate the variances of the responses of the 3 last levels with the first. For instance with OR: Var_response = Var_OR + Var_control ? 2 * Cov_OR:control.
+> 
+> My model output yields the following:
+> 
+> Multivariate Meta-Analysis Model (k = 2695; method: REML)
+> 
+> Variance Components:
+> 
+>           estim    sqrt  nlvls  fixed  factor 
+> sigma^2.1  0.0513  0.2264     34     no     ref 
+> sigma^2.2  0.0139  0.1178   2625     no   idRow 
+> 
+> outer factor: idSite    (nlvls = 62)
+> inner factor: treatment (nlvls = 4)
+> 
+>           estim    sqrt  k.lvl  fixed    level 
+> tau^2.1    0.1683  0.4103    255     no  Control 
+> tau^2.2    0.1403  0.3745    324     no       MR 
+> tau^2.3    0.1305  0.3612    993     no       OR 
+> tau^2.4    0.1094  0.3308   1123     no     ORMR 
+> rho        0.8343                    no          
+> 
+> outer factor: idSite.time (nlvls = 230)
+> inner factor: treatment   (nlvls = 4)
+> 
+>             estim    sqrt  k.lvl  fixed    level 
+> gamma^2.1    0.1061  0.3258    255     no  Control 
+> gamma^2.2    0.1272  0.3566    324     no       MR 
+> gamma^2.3    0.1052  0.3243    993     no       OR 
+> gamma^2.4    0.1344  0.3666   1123     no     ORMR 
+> phi          0.9229                    no          
+> 
+> Test for Residual Heterogeneity:
+> QE(df = 2673) = 115058.0204, p-val < .0001
+> 
+> Test of Moderators (coefficients 2:22):
+> QM(df = 21) = 754.8078, p-val < .0001
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Mon Mar  2 20:07:19 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Mon, 2 Mar 2020 20:07:19 +0100
+Subject: [R-meta] Quick question on metaprop output
+In-Reply-To: <CAF8zgfZ5vJmYqip9Ufom9sQMPP8kyc9yd4G7JRvexbi2fJJYLQ@mail.gmail.com>
+References: <CAF8zgfZ5vJmYqip9Ufom9sQMPP8kyc9yd4G7JRvexbi2fJJYLQ@mail.gmail.com>
+Message-ID: <ea769022-604e-c5d2-874a-69878c5c1cc4@imbi.uni-freiburg.de>
+
+Am 19.02.20 um 11:58 schrieb Joao Afonso:
+> [...]
+> Previously I would get the amount of heterogeneity explain by the
+> moderator with r^2. However I can't find this parameter in the output
+> above. Am I missing something in my code to generate this parameter?
+
+In a subgroup meta-analysis one typically does not report R^2.
+
+However, you can run a meta-regression using metareg() which will call 
+internally rma.uni() or rma.glmm() from metafor.
+
+E.g.,
+
+m = metaprop(nlameanimal, ssizeanimal, author, data=prevalence_2020_noout,
+ ?? ? ?? ???? method="inverse", sm="PLOGIT", method.tau="DL", 
+method.ci="NAsm",
+ ??? ?? ? ? ? byvar=lcmbi, tau.common=TRUE,prediction = TRUE)
+
+metareg(m)
+
+Best wishes, Guido
+
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Mon Mar  2 20:16:25 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Mon, 2 Mar 2020 20:16:25 +0100
+Subject: [R-meta] 
+ Outlier and influential case diagnostics using generalized
+ linear mixed models approach
+In-Reply-To: <CAF8zgfbJL385Zs1VG3QDtQ4p-+szufe4qw-yDR-qk0i+VL2NKQ@mail.gmail.com>
+References: <CAF8zgfbJL385Zs1VG3QDtQ4p-+szufe4qw-yDR-qk0i+VL2NKQ@mail.gmail.com>
+Message-ID: <400236a4-6d89-ee6d-126c-8548e313cf40@imbi.uni-freiburg.de>
+
+Am 17.02.20 um 16:14 schrieb Joao Afonso:
+
+> Dear all,
+>
+> I am developing a generalized linear mixed model for my meta-analysis
+> on lameness prevalence in British Dairy Cattle. Everything seems to be
+> working fine however when I try to identify outlier using functions
+> rstudent, leave1out and influence R informs that "no applicable method
+> ... applied to an object of class "c('metaprop', 'meta')". Is there a
+> way to do the diagnostic of influential cases with a rma.glmm object?
+
+The leave-one-out method is available in metainf() of *meta*.
+
+For regression diagnostics provided by *metafor*, you have to conduct a 
+meta-regression of your subgroup meta-analysis first.
+
+E.g.,
+
+m = metaprop(nlameanimal, ssizeanimal, author, data=prevalence_2020_noout,
+ ???????????? method="inverse", sm="PLOGIT", method.tau="DL", 
+method.ci="NAsm",
+ ???????????? byvar=lcmbi, tau.common=TRUE,prediction = TRUE)
+
+mr = metareg(m)
+
+rstudent(mr)
+
+Best wishes, Guido
+
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Tue Mar  3 12:51:15 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Tue, 3 Mar 2020 12:51:15 +0100
+Subject: [R-meta] Meta vs Metafor - trapped in a loop
+In-Reply-To: <CAF8zgfbVDtrtMcVYD615zu46_R-1YsY3h=x2KAhJE7EULFwTTA@mail.gmail.com>
+References: <CAF8zgfbVDtrtMcVYD615zu46_R-1YsY3h=x2KAhJE7EULFwTTA@mail.gmail.com>
+Message-ID: <b0dc8952-62a4-89ac-32c7-f65468a51134@imbi.uni-freiburg.de>
+
+Am 18.02.20 um 16:25 schrieb Joao Afonso:
+> [...]
+> Is there a way to convert a metaprop object into an object that can be
+> used in a influential analysis? Any other routes I should consider for
+> solving this problem?
+
+AFAIS, this question has been answered in 
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2020-March/001956.html .
+
+Best wishes, Guido
+
+
+From @@@udk@emper @end|ng |rom gm@||@com  Wed Mar  4 15:37:18 2020
+From: @@@udk@emper @end|ng |rom gm@||@com (Antonia Sudkaemper)
+Date: Wed, 4 Mar 2020 14:37:18 +0000
+Subject: [R-meta] logarithmic scale in forest plot
+Message-ID: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+
+Dear Metafor Community,
+
+I hope this email finds you well.
+
+I have a question regarding the metafor package. I made a forest plot using
+the code below. I have received feedback that, as the forest plot shows
+odds ratios I should use a log scale for the x axis rather than a linear
+scale, so that the CIs are symmetric around the natural log OR. I am not
+sure how I would achieve that? Could you help me out, please? I would much
+appreciate it.
+
+All the best, Antonia
+
+#race/ethnicity
+oddsratio = c(2.07, 0.90, 1.00, 0.82, 2.25, 0.92)
+sei <- c(.43, .32, .66, .50, .70, .44)
+ci.lb <- oddsratio - 1.96*sei
+ci.ub <- oddsratio + 1.96*sei
+study<-c("Aelenei et al., 2019", "Kulich et al., 2019a", "Kulich et al.,
+2006a", "Kulich et al., 2006b", "Ryan & Haslam, 2004a", "Ryan & Haslam,
+2004b")
+labels<-c(-2, 0, 2, 4, 6, 8)
+
+forest(oddsratio, ci.lb=ci.lb, ci.ub=ci.ub, showweights=TRUE, refline=1,
+xlab
+       = "Odds Ratio", slab=study, alim = c(-2,8), xlim=c(-14,15),
+at=labels, cex =
+         0.9, ylim=c(-2,27))
+addpoly(x = 1.16, ci.lb=0.69, ci.ub=1.95)
+
+
+-- 
+Dr Antonia Sudk?mper
+Researcher, OCR, Cambridge Assessment
+
+www.antoniasudkaemper.com
+a.sudkaemper at gmail.com
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Mar  4 16:46:47 2020
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 4 Mar 2020 15:46:47 +0000
+Subject: [R-meta] logarithmic scale in forest plot
+In-Reply-To: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+References: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+Message-ID: <6f7810bb-a12a-cbc4-307a-9b05dc342c3e@dewey.myzen.co.uk>
+
+Dear Antonia
+
+You are forming the confidence interval for the odds ratio as plus and 
+minus a multiple of its standard error. It would be much, much, much 
+better to use the log odds ratio scale assuming you either have or can 
+obtain the corresponding standard errors (which are not the log of the 
+standard errors you have). Then you can make the plot using the 
+transformation parameters outlined in the documentation.
+
+As it stands I am afraid your confidence intervals range below zero 
+which is impossible for an odds ratio so your plot is quite off-target.
+
+Michael
+
+On 04/03/2020 14:37, Antonia Sudkaemper wrote:
+> Dear Metafor Community,
+> 
+> I hope this email finds you well.
+> 
+> I have a question regarding the metafor package. I made a forest plot using
+> the code below. I have received feedback that, as the forest plot shows
+> odds ratios I should use a log scale for the x axis rather than a linear
+> scale, so that the CIs are symmetric around the natural log OR. I am not
+> sure how I would achieve that? Could you help me out, please? I would much
+> appreciate it.
+> 
+> All the best, Antonia
+> 
+> #race/ethnicity
+> oddsratio = c(2.07, 0.90, 1.00, 0.82, 2.25, 0.92)
+> sei <- c(.43, .32, .66, .50, .70, .44)
+> ci.lb <- oddsratio - 1.96*sei
+> ci.ub <- oddsratio + 1.96*sei
+> study<-c("Aelenei et al., 2019", "Kulich et al., 2019a", "Kulich et al.,
+> 2006a", "Kulich et al., 2006b", "Ryan & Haslam, 2004a", "Ryan & Haslam,
+> 2004b")
+> labels<-c(-2, 0, 2, 4, 6, 8)
+> 
+> forest(oddsratio, ci.lb=ci.lb, ci.ub=ci.ub, showweights=TRUE, refline=1,
+> xlab
+>         = "Odds Ratio", slab=study, alim = c(-2,8), xlim=c(-14,15),
+> at=labels, cex =
+>           0.9, ylim=c(-2,27))
+> addpoly(x = 1.16, ci.lb=0.69, ci.ub=1.95)
+> 
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Mar  4 16:56:45 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 4 Mar 2020 15:56:45 +0000
+Subject: [R-meta] logarithmic scale in forest plot
+In-Reply-To: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+References: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+Message-ID: <5a26344146cc43d989f042bb9ede0828@UM-MAIL3214.unimaas.nl>
+
+Dear Antonia,
+
+You should use log odds ratios as input. In fact, we never meta-analyze the odds ratios directly, because they are not 'symmetric' around 1. For example, an OR of 2 in favor of the treatment group corresponds to an OR of 1/2 = 0.5 in favor of the control group, so if one were to combine these two ORs (assuming equal weights), one would end up with a combined OR of 1.25 in favor of the treatment group, but this is not logical if the two ORs are exact opposites of each other. On the other hand, after log transformation, we get log(2) = 0.6931472 and log(0.5) = -0.6931472, which are now symmetric around 0. Hence, the combined log OR is 0 and, after back-transforming (i.e., exponentiation), we get exp(0) = 1, which makes sense.
+
+Also, how were those standard errors (sei) computed? Are they really SEs of the ORs? In most cases, the SEs we can extract from papers are for the log odds ratios.
+
+But to answer your question, here is how it's done. Plot the log odds ratios and then use atransf=exp, which in essence puts the the x-axis on a log scale. An example:
+
+yi  <- log(c(2, 0.5))
+sei <- c(.20, .20)
+forest(yi, sei=sei, atransf=exp, ylim=c(-0.5,5))
+res <- rma(yi, sei=sei, method="FE")
+addpoly(res, row=0)
+
+(And I just saw that Michael has also answered with the same concern about the use of the ORs.)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Antonia Sudkaemper
+Sent: Wednesday, 04 March, 2020 15:37
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] logarithmic scale in forest plot
+
+Dear Metafor Community,
+
+I hope this email finds you well.
+
+I have a question regarding the metafor package. I made a forest plot using
+the code below. I have received feedback that, as the forest plot shows
+odds ratios I should use a log scale for the x axis rather than a linear
+scale, so that the CIs are symmetric around the natural log OR. I am not
+sure how I would achieve that? Could you help me out, please? I would much
+appreciate it.
+
+All the best, Antonia
+
+#race/ethnicity
+oddsratio = c(2.07, 0.90, 1.00, 0.82, 2.25, 0.92)
+sei <- c(.43, .32, .66, .50, .70, .44)
+ci.lb <- oddsratio - 1.96*sei
+ci.ub <- oddsratio + 1.96*sei
+study<-c("Aelenei et al., 2019", "Kulich et al., 2019a", "Kulich et al.,
+2006a", "Kulich et al., 2006b", "Ryan & Haslam, 2004a", "Ryan & Haslam,
+2004b")
+labels<-c(-2, 0, 2, 4, 6, 8)
+
+forest(oddsratio, ci.lb=ci.lb, ci.ub=ci.ub, showweights=TRUE, refline=1,
+xlab
+       = "Odds Ratio", slab=study, alim = c(-2,8), xlim=c(-14,15),
+at=labels, cex =
+         0.9, ylim=c(-2,27))
+addpoly(x = 1.16, ci.lb=0.69, ci.ub=1.95)
+
+-- 
+Dr Antonia Sudk?mper
+Researcher, OCR, Cambridge Assessment
+
+www.antoniasudkaemper.com
+a.sudkaemper at gmail.com
+
+From dm@h@b@n @end|ng |rom gm@||@com  Fri Mar  6 09:48:44 2020
+From: dm@h@b@n @end|ng |rom gm@||@com (=?UTF-8?Q?Daniel_M=C3=B8nsted_Shabanzadeh?=)
+Date: Fri, 6 Mar 2020 09:48:44 +0100
+Subject: [R-meta] Output in rma
+Message-ID: <CABgeOtOj8DFZ+CkAHrQWXbbHJ_44ir-h1e6oqkqjuQ3HyNKOqA@mail.gmail.com>
+
+Dear Wolfgang and network
+
+I am doing a meta-regression in metafor on transformed proportions with two
+categorical variables and once again having some problems in getting the
+outcome right. Hope some of you may know your way through.
+In the print output I see that 449 entries are included. How do I obtain
+number of entries for each level in the variables in the model?
+
+Regards,
+Daniel
+
+
+b<-rma(xi=compl_treat, ni=total, mods = ~indication_cor+age_cor,
+measure = "PAS", data=a, slab=study)> print(b)
+Mixed-Effects Model (k = 449; tau^2 estimator: REML)
+
+tau^2 (estimated amount of residual heterogeneity):     0.0160 (SE = 0.0012)
+tau (square root of estimated tau^2 value):             0.1263
+I^2 (residual heterogeneity / unaccounted variability): 99.57%
+H^2 (unaccounted variability / sampling variability):   231.76
+R^2 (amount of heterogeneity accounted for):            8.04%
+
+Test for Residual Heterogeneity:
+QE(df = 441) = 42409.0416, p-val < .0001
+
+Test of Moderators (coefficients 2:8):
+QM(df = 7) = 43.4202, p-val < .0001
+
+Model Results:
+
+                           estimate      se     zval    pval    ci.lb   ci.ub
+intrcpt                      0.1641  0.0122  13.4372  <.0001   0.1402
+0.1880  ***
+indication_cormissing       -0.0142  0.0244  -0.5839  0.5593  -0.0620
+0.0335
+indication_cortherapeutic    0.0803  0.0195   4.1207  <.0001   0.0421
+0.1185  ***
+age_cor1                     0.0088  0.0166   0.5280  0.5975  -0.0238
+0.0414
+age_cor2                     0.0170  0.0262   0.6468  0.5177  -0.0344
+0.0683
+age_cor3                     0.0466  0.0193   2.4158  0.0157   0.0088
+0.0843    *
+age_cor4                    -0.0408  0.0328  -1.2433  0.2138  -0.1052
+0.0235
+age_cormissing              -0.0446  0.0530  -0.8419  0.3998  -0.1484
+0.0592
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+
+
+Daniel M?nsted Shabanzadeh
+MD, PhD
+Department of Gastroenterology, Surgical Unit
+Hvidovre Hospital
+Mobile +45 2546 5251
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Mar  6 10:02:55 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Fri, 6 Mar 2020 09:02:55 +0000
+Subject: [R-meta] Output in rma
+In-Reply-To: <CABgeOtOj8DFZ+CkAHrQWXbbHJ_44ir-h1e6oqkqjuQ3HyNKOqA@mail.gmail.com>
+References: <CABgeOtOj8DFZ+CkAHrQWXbbHJ_44ir-h1e6oqkqjuQ3HyNKOqA@mail.gmail.com>
+Message-ID: <a04dfb487cda41068dbe55456db44210@UM-MAIL3214.unimaas.nl>
+
+Dear Daniel,
+
+Just create frequency tables of your variables:
+
+table(a$indication_cor)
+table(a$age_cor)
+
+If studies were removed from the model fitting (because of missing data), then the actual frequencies used in the analyses might be smaller. You could then apply the same subsetting as was done in the analysis with:
+
+table(a$indication_cor[b$not.na])
+table(a$age_cor[b$not.na])
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Daniel M?nsted Shabanzadeh [mailto:dmshaban at gmail.com] 
+Sent: Friday, 06 March, 2020 9:49
+To: r-sig-meta-analysis at r-project.org; Viechtbauer, Wolfgang (SP)
+Subject: Output in rma
+
+Dear Wolfgang and network
+
+I am doing a meta-regression in metafor?on transformed proportions with two categorical variables and once again having some problems in?getting the outcome right. Hope?some of you may know your?way through.?
+In the print output?I see that 449 entries are included. How do I?obtain number of entries for each level in the variables?in the model? 
+
+Regards,
+Daniel?
+
+b<-rma(xi=compl_treat, ni=total, mods = ~indication_cor+age_cor, measure = "PAS", data=a, slab=study)
+> print(b)
+
+Mixed-Effects Model (k = 449; tau^2 estimator: REML)
+
+tau^2 (estimated amount of residual heterogeneity):     0.0160 (SE = 0.0012)
+tau (square root of estimated tau^2 value):             0.1263
+I^2 (residual heterogeneity / unaccounted variability): 99.57%
+H^2 (unaccounted variability / sampling variability):   231.76
+R^2 (amount of heterogeneity accounted for):            8.04%
+
+Test for Residual Heterogeneity:
+QE(df = 441) = 42409.0416, p-val < .0001
+
+Test of Moderators (coefficients 2:8):
+QM(df = 7) = 43.4202, p-val < .0001
+
+Model Results:
+
+                           estimate      se     zval    pval    ci.lb   ci.ub 
+intrcpt                      0.1641  0.0122  13.4372  <.0001   0.1402  0.1880  *** 
+indication_cormissing       -0.0142  0.0244  -0.5839  0.5593  -0.0620  0.0335      
+indication_cortherapeutic    0.0803  0.0195   4.1207  <.0001   0.0421  0.1185  *** 
+age_cor1                     0.0088  0.0166   0.5280  0.5975  -0.0238  0.0414      
+age_cor2                     0.0170  0.0262   0.6468  0.5177  -0.0344  0.0683      
+age_cor3                     0.0466  0.0193   2.4158  0.0157   0.0088  0.0843    * 
+age_cor4                    -0.0408  0.0328  -1.2433  0.2138  -0.1052  0.0235      
+age_cormissing              -0.0446  0.0530  -0.8419  0.3998  -0.1484  0.0592      
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+Daniel M?nsted Shabanzadeh
+MD, PhD
+Department of Gastroenterology, Surgical Unit
+Hvidovre Hospital
+Mobile?+45 2546 5251?
+
+From m|@d@ucourt @end|ng |rom gm@||@com  Fri Mar  6 16:36:35 2020
+From: m|@d@ucourt @end|ng |rom gm@||@com (Mia Daucourt)
+Date: Fri, 6 Mar 2020 10:36:35 -0500
+Subject: [R-meta] Model selection using glmulti & MuMln with multilevel
+ (rma.mv) models
+Message-ID: <A7D80B4D-DF6F-449C-8ACE-E68C2FF5A48A@gmail.com>
+
+Good morning,
+
+I am interested in using the glmulti or MuMln package to choose the best combination of moderators for a multi-level model with random effects for study and effect size included. I am also interested in examining interactions between moderators. I need your help, please! Do you have any advice on how to code this or any resources you can point me to?
+
+Please let me know!
+
+My best,
+
+Mia
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sat Mar  7 12:53:08 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sat, 7 Mar 2020 11:53:08 +0000
+Subject: [R-meta] Model selection using glmulti & MuMln with multilevel
+ (rma.mv) models
+In-Reply-To: <A7D80B4D-DF6F-449C-8ACE-E68C2FF5A48A@gmail.com>
+References: <A7D80B4D-DF6F-449C-8ACE-E68C2FF5A48A@gmail.com>
+Message-ID: <f38a4bc2e73d4f45a1d94aee7fc18e5a@UM-MAIL3214.unimaas.nl>
+
+Hi Mia,
+
+Since you mentioned multilevel, I take it you want to use rma.mv() then?
+
+The example here would be easy to adapt:
+
+http://www.metafor-project.org/doku.php/tips:model_selection_with_glmulti_and_mumin
+
+Basically, it would just require something like:
+
+rma.glmulti <- function(formula, data, ...)
+   rma.mv(formula, vi, random = ~ 1 | study / effect, data=data, method="ML", ...)
+
+If you are also interested in interactions, you should read the "Models with Interactions" section. The number of models quickly explodes once one also wants to consider interactions.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Mia Daucourt
+Sent: Friday, 06 March, 2020 16:37
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Model selection using glmulti & MuMln with multilevel (rma.mv) models
+
+Good morning,
+
+I am interested in using the glmulti or MuMln package to choose the best combination of moderators for a multi-level model with random effects for study and effect size included. I am also interested in examining interactions between moderators. I need your help, please! Do you have any advice on how to code this or any resources you can point me to?
+
+Please let me know!
+
+My best,
+
+Mia
+
+
+From m|@d@ucourt @end|ng |rom gm@||@com  Sat Mar  7 23:37:31 2020
+From: m|@d@ucourt @end|ng |rom gm@||@com (Mia Daucourt)
+Date: Sat, 7 Mar 2020 17:37:31 -0500
+Subject: [R-meta] Model selection using glmulti & MuMln with multilevel
+ (rma.mv) models
+In-Reply-To: <f38a4bc2e73d4f45a1d94aee7fc18e5a@UM-MAIL3214.unimaas.nl>
+References: <A7D80B4D-DF6F-449C-8ACE-E68C2FF5A48A@gmail.com>
+ <f38a4bc2e73d4f45a1d94aee7fc18e5a@UM-MAIL3214.unimaas.nl>
+Message-ID: <C60C7FCF-B7AB-4F8A-A086-E52DB4E5C1C6@gmail.com>
+
+Thank you so much for your help!
+
+Mia Daucourt, M.S.
+Florida State University
+Developmental Psychology PhD student
+IDCD Hart lab
+daucourt at psy.fsu.edu
+
+
+> On Mar 7, 2020, at 6:53 AM, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> rma.glmulti <- function(formula, data, ...)
+>   rma.mv(formula, vi, random = ~ 1 | study / effect, data=data, method="ML", ...)
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Mar  9 16:31:32 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 9 Mar 2020 15:31:32 +0000
+Subject: [R-meta] logarithmic scale in forest plot
+In-Reply-To: <CAPQcPujqEZZOVa4qddurgr+gNZDONLwF_Hju8OPLadeNzf_eGA@mail.gmail.com>
+References: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+ <5a26344146cc43d989f042bb9ede0828@UM-MAIL3214.unimaas.nl>
+ <CAPQcPujqEZZOVa4qddurgr+gNZDONLwF_Hju8OPLadeNzf_eGA@mail.gmail.com>
+Message-ID: <c498bceac89744c29411f62bbf66125a@UM-MAIL3214.unimaas.nl>
+
+Please always cc the mailing list.
+
+For log odds ratios, the CI can be negative. After back-transformation (i.e., exponentiation), the CI will be >= 0.
+
+Similarly, the estimated average log odds ratio is 0 in the example. Hence, after back-transformation, the estimate will be 1 (exp(0) = 1).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com] 
+Sent: Monday, 09 March, 2020 15:05
+To: Viechtbauer, Wolfgang (SP)
+Subject: Re: [R-meta] logarithmic scale in forest plot
+
+Hello Wolfgang,?
+
+I just ran this with our data and it seems to work - thank you so much!?
+
+I just noticed that both in your example as well as with our data the mean weighted effect size lower CI is below 0 - does that make sense?
+
+Also, in your example and similar with our data, it says 0.00 as mean weighted effect size, but shows up in the graph at 1. Is that correct?
+
+Thanks again?for your help.?
+
+All the best, Antonia
+
+On Wed, 4 Mar 2020 at 15:56, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Dear Antonia,
+
+You should use log odds ratios as input. In fact, we never meta-analyze the odds ratios directly, because they are not 'symmetric' around 1. For example, an OR of 2 in favor of the treatment group corresponds to an OR of 1/2 = 0.5 in favor of the control group, so if one were to combine these two ORs (assuming equal weights), one would end up with a combined OR of 1.25 in favor of the treatment group, but this is not logical if the two ORs are exact opposites of each other. On the other hand, after log transformation, we get log(2) = 0.6931472 and log(0.5) = -0.6931472, which are now symmetric around 0. Hence, the combined log OR is 0 and, after back-transforming (i.e., exponentiation), we get exp(0) = 1, which makes sense.
+
+Also, how were those standard errors (sei) computed? Are they really SEs of the ORs? In most cases, the SEs we can extract from papers are for the log odds ratios.
+
+But to answer your question, here is how it's done. Plot the log odds ratios and then use atransf=exp, which in essence puts the the x-axis on a log scale. An example:
+
+yi? <- log(c(2, 0.5))
+sei <- c(.20, .20)
+forest(yi, sei=sei, atransf=exp, ylim=c(-0.5,5))
+res <- rma(yi, sei=sei, method="FE")
+addpoly(res, row=0)
+
+(And I just saw that Michael has also answered with the same concern about the use of the ORs.)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Antonia Sudkaemper
+Sent: Wednesday, 04 March, 2020 15:37
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] logarithmic scale in forest plot
+
+Dear Metafor Community,
+
+I hope this email finds you well.
+
+I have a question regarding the metafor package. I made a forest plot using
+the code below. I have received feedback that, as the forest plot shows
+odds ratios I should use a log scale for the x axis rather than a linear
+scale, so that the CIs are symmetric around the natural log OR. I am not
+sure how I would achieve that? Could you help me out, please? I would much
+appreciate it.
+
+All the best, Antonia
+
+#race/ethnicity
+oddsratio = c(2.07, 0.90, 1.00, 0.82, 2.25, 0.92)
+sei <- c(.43, .32, .66, .50, .70, .44)
+ci.lb <- oddsratio - 1.96*sei
+ci.ub <- oddsratio + 1.96*sei
+study<-c("Aelenei et al., 2019", "Kulich et al., 2019a", "Kulich et al.,
+2006a", "Kulich et al., 2006b", "Ryan & Haslam, 2004a", "Ryan & Haslam,
+2004b")
+labels<-c(-2, 0, 2, 4, 6, 8)
+
+forest(oddsratio, ci.lb=ci.lb, ci.ub=ci.ub, showweights=TRUE, refline=1,
+xlab
+? ? ? ?= "Odds Ratio", slab=study, alim = c(-2,8), xlim=c(-14,15),
+at=labels, cex =
+? ? ? ? ?0.9, ylim=c(-2,27))
+addpoly(x = 1.16, ci.lb=0.69, ci.ub=1.95)
+
+-- 
+Dr Antonia Sudk?mper
+Researcher, OCR, Cambridge Assessment
+
+www.antoniasudkaemper.com
+a.sudkaemper at gmail.com
+
+From @@@udk@emper @end|ng |rom gm@||@com  Mon Mar  9 17:10:45 2020
+From: @@@udk@emper @end|ng |rom gm@||@com (Antonia Sudkaemper)
+Date: Mon, 9 Mar 2020 16:10:45 +0000
+Subject: [R-meta] logarithmic scale in forest plot
+In-Reply-To: <c498bceac89744c29411f62bbf66125a@UM-MAIL3214.unimaas.nl>
+References: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+ <5a26344146cc43d989f042bb9ede0828@UM-MAIL3214.unimaas.nl>
+ <CAPQcPujqEZZOVa4qddurgr+gNZDONLwF_Hju8OPLadeNzf_eGA@mail.gmail.com>
+ <c498bceac89744c29411f62bbf66125a@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAPQcPuhGSw_8rbOFSAfh+Q8BretNf91EfG3RizXfewdQvpWETg@mail.gmail.com>
+
+Hello Wolfgang,
+
+thank you, and apologies - mailing list is now cc'ed in.
+
+What confuses me, however, it that for the average the numbers on the right
+seem to indicate the log odds ratio (i.e. 0), but the poly in the graph
+seems to show the odds ratio (i.e. 1) - I would have expected these to be
+congruent?
+
+Also, for "Study 1" and "Study 2",  do the numbers and the graph display
+the odds ratio or log odds ratio? Based on the numbers and the back
+transformation I am assuming the odds ratio?
+
+Thank you very much!
+
+All the best, Antonia
+
+
+
+On Mon, 9 Mar 2020 at 15:31, Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Please always cc the mailing list.
+>
+> For log odds ratios, the CI can be negative. After back-transformation
+> (i.e., exponentiation), the CI will be >= 0.
+>
+> Similarly, the estimated average log odds ratio is 0 in the example.
+> Hence, after back-transformation, the estimate will be 1 (exp(0) = 1).
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com]
+> Sent: Monday, 09 March, 2020 15:05
+> To: Viechtbauer, Wolfgang (SP)
+> Subject: Re: [R-meta] logarithmic scale in forest plot
+>
+> Hello Wolfgang,
+>
+> I just ran this with our data and it seems to work - thank you so much!
+>
+> I just noticed that both in your example as well as with our data the mean
+> weighted effect size lower CI is below 0 - does that make sense?
+>
+> Also, in your example and similar with our data, it says 0.00 as mean
+> weighted effect size, but shows up in the graph at 1. Is that correct?
+>
+> Thanks again for your help.
+>
+> All the best, Antonia
+>
+> On Wed, 4 Mar 2020 at 15:56, Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Dear Antonia,
+>
+> You should use log odds ratios as input. In fact, we never meta-analyze
+> the odds ratios directly, because they are not 'symmetric' around 1. For
+> example, an OR of 2 in favor of the treatment group corresponds to an OR of
+> 1/2 = 0.5 in favor of the control group, so if one were to combine these
+> two ORs (assuming equal weights), one would end up with a combined OR of
+> 1.25 in favor of the treatment group, but this is not logical if the two
+> ORs are exact opposites of each other. On the other hand, after log
+> transformation, we get log(2) = 0.6931472 and log(0.5) = -0.6931472, which
+> are now symmetric around 0. Hence, the combined log OR is 0 and, after
+> back-transforming (i.e., exponentiation), we get exp(0) = 1, which makes
+> sense.
+>
+> Also, how were those standard errors (sei) computed? Are they really SEs
+> of the ORs? In most cases, the SEs we can extract from papers are for the
+> log odds ratios.
+>
+> But to answer your question, here is how it's done. Plot the log odds
+> ratios and then use atransf=exp, which in essence puts the the x-axis on a
+> log scale. An example:
+>
+> yi  <- log(c(2, 0.5))
+> sei <- c(.20, .20)
+> forest(yi, sei=sei, atransf=exp, ylim=c(-0.5,5))
+> res <- rma(yi, sei=sei, method="FE")
+> addpoly(res, row=0)
+>
+> (And I just saw that Michael has also answered with the same concern about
+> the use of the ORs.)
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Antonia Sudkaemper
+> Sent: Wednesday, 04 March, 2020 15:37
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] logarithmic scale in forest plot
+>
+> Dear Metafor Community,
+>
+> I hope this email finds you well.
+>
+> I have a question regarding the metafor package. I made a forest plot using
+> the code below. I have received feedback that, as the forest plot shows
+> odds ratios I should use a log scale for the x axis rather than a linear
+> scale, so that the CIs are symmetric around the natural log OR. I am not
+> sure how I would achieve that? Could you help me out, please? I would much
+> appreciate it.
+>
+> All the best, Antonia
+>
+> #race/ethnicity
+> oddsratio = c(2.07, 0.90, 1.00, 0.82, 2.25, 0.92)
+> sei <- c(.43, .32, .66, .50, .70, .44)
+> ci.lb <- oddsratio - 1.96*sei
+> ci.ub <- oddsratio + 1.96*sei
+> study<-c("Aelenei et al., 2019", "Kulich et al., 2019a", "Kulich et al.,
+> 2006a", "Kulich et al., 2006b", "Ryan & Haslam, 2004a", "Ryan & Haslam,
+> 2004b")
+> labels<-c(-2, 0, 2, 4, 6, 8)
+>
+> forest(oddsratio, ci.lb=ci.lb, ci.ub=ci.ub, showweights=TRUE, refline=1,
+> xlab
+>        = "Odds Ratio", slab=study, alim = c(-2,8), xlim=c(-14,15),
+> at=labels, cex =
+>          0.9, ylim=c(-2,27))
+> addpoly(x = 1.16, ci.lb=0.69, ci.ub=1.95)
+>
+> --
+> Dr Antonia Sudk?mper
+> Researcher, OCR, Cambridge Assessment
+>
+> www.antoniasudkaemper.com
+> a.sudkaemper at gmail.com
+>
+
+
+-- 
+Dr Antonia Sudk?mper
+Researcher, OCR, Cambridge Assessment
+
+www.antoniasudkaemper.com
+a.sudkaemper at gmail.com
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200309/9af5dd16/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: oddsratio_forest_example
+Type: application/octet-stream
+Size: 6624 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200309/9af5dd16/attachment-0001.obj>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Mar  9 17:15:02 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 9 Mar 2020 16:15:02 +0000
+Subject: [R-meta] logarithmic scale in forest plot
+In-Reply-To: <CAPQcPuhGSw_8rbOFSAfh+Q8BretNf91EfG3RizXfewdQvpWETg@mail.gmail.com>
+References: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+ <5a26344146cc43d989f042bb9ede0828@UM-MAIL3214.unimaas.nl>
+ <CAPQcPujqEZZOVa4qddurgr+gNZDONLwF_Hju8OPLadeNzf_eGA@mail.gmail.com>
+ <c498bceac89744c29411f62bbf66125a@UM-MAIL3214.unimaas.nl>
+ <CAPQcPuhGSw_8rbOFSAfh+Q8BretNf91EfG3RizXfewdQvpWETg@mail.gmail.com>
+Message-ID: <f09e413072914b8eb61c45d0f66064be@UM-MAIL3214.unimaas.nl>
+
+Ah, sorry, I meant to write:
+
+addpoly(res, row=0, atransf=exp)
+
+Then it's correct (i.e., everything in the plot is then shown as odds ratios). Apologies for the confusion.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com] 
+Sent: Monday, 09 March, 2020 17:11
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] logarithmic scale in forest plot
+
+Hello Wolfgang,?
+
+thank you, and apologies - mailing list is now cc'ed in.?
+
+What confuses me, however, it that for the average the numbers on the right seem to indicate the log odds ratio (i.e. 0), but the poly in the graph seems to show the odds ratio (i.e. 1) - I would have expected these to be congruent??
+
+Also, for "Study 1" and "Study 2",? do the numbers and the graph display the odds ratio or log odds ratio? Based on the numbers and the back transformation I am assuming the odds ratio??
+
+Thank you very?much!?
+
+All the best, Antonia
+
+On Mon, 9 Mar 2020 at 15:31, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Please always cc the mailing list.
+
+For log odds ratios, the CI can be negative. After back-transformation (i.e., exponentiation), the CI will be >= 0.
+
+Similarly, the estimated average log odds ratio is 0 in the example. Hence, after back-transformation, the estimate will be 1 (exp(0) = 1).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com] 
+Sent: Monday, 09 March, 2020 15:05
+To: Viechtbauer, Wolfgang (SP)
+Subject: Re: [R-meta] logarithmic scale in forest plot
+
+Hello Wolfgang,?
+
+I just ran this with our data and it seems to work - thank you so much!?
+
+I just noticed that both in your example as well as with our data the mean weighted effect size lower CI is below 0 - does that make sense?
+
+Also, in your example and similar with our data, it says 0.00 as mean weighted effect size, but shows up in the graph at 1. Is that correct?
+
+Thanks again?for your help.?
+
+All the best, Antonia
+
+On Wed, 4 Mar 2020 at 15:56, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Dear Antonia,
+
+You should use log odds ratios as input. In fact, we never meta-analyze the odds ratios directly, because they are not 'symmetric' around 1. For example, an OR of 2 in favor of the treatment group corresponds to an OR of 1/2 = 0.5 in favor of the control group, so if one were to combine these two ORs (assuming equal weights), one would end up with a combined OR of 1.25 in favor of the treatment group, but this is not logical if the two ORs are exact opposites of each other. On the other hand, after log transformation, we get log(2) = 0.6931472 and log(0.5) = -0.6931472, which are now symmetric around 0. Hence, the combined log OR is 0 and, after back-transforming (i.e., exponentiation), we get exp(0) = 1, which makes sense.
+
+Also, how were those standard errors (sei) computed? Are they really SEs of the ORs? In most cases, the SEs we can extract from papers are for the log odds ratios.
+
+But to answer your question, here is how it's done. Plot the log odds ratios and then use atransf=exp, which in essence puts the the x-axis on a log scale. An example:
+
+yi? <- log(c(2, 0.5))
+sei <- c(.20, .20)
+forest(yi, sei=sei, atransf=exp, ylim=c(-0.5,5))
+res <- rma(yi, sei=sei, method="FE")
+addpoly(res, row=0)
+
+(And I just saw that Michael has also answered with the same concern about the use of the ORs.)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Antonia Sudkaemper
+Sent: Wednesday, 04 March, 2020 15:37
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] logarithmic scale in forest plot
+
+Dear Metafor Community,
+
+I hope this email finds you well.
+
+I have a question regarding the metafor package. I made a forest plot using
+the code below. I have received feedback that, as the forest plot shows
+odds ratios I should use a log scale for the x axis rather than a linear
+scale, so that the CIs are symmetric around the natural log OR. I am not
+sure how I would achieve that? Could you help me out, please? I would much
+appreciate it.
+
+All the best, Antonia
+
+#race/ethnicity
+oddsratio = c(2.07, 0.90, 1.00, 0.82, 2.25, 0.92)
+sei <- c(.43, .32, .66, .50, .70, .44)
+ci.lb <- oddsratio - 1.96*sei
+ci.ub <- oddsratio + 1.96*sei
+study<-c("Aelenei et al., 2019", "Kulich et al., 2019a", "Kulich et al.,
+2006a", "Kulich et al., 2006b", "Ryan & Haslam, 2004a", "Ryan & Haslam,
+2004b")
+labels<-c(-2, 0, 2, 4, 6, 8)
+
+forest(oddsratio, ci.lb=ci.lb, ci.ub=ci.ub, showweights=TRUE, refline=1,
+xlab
+? ? ? ?= "Odds Ratio", slab=study, alim = c(-2,8), xlim=c(-14,15),
+at=labels, cex =
+? ? ? ? ?0.9, ylim=c(-2,27))
+addpoly(x = 1.16, ci.lb=0.69, ci.ub=1.95)
+
+-- 
+Dr Antonia Sudk?mper
+Researcher, OCR, Cambridge Assessment
+
+www.antoniasudkaemper.com
+a.sudkaemper at gmail.com
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Wed Mar 11 10:29:12 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Wed, 11 Mar 2020 10:29:12 +0100
+Subject: [R-meta] Free download (until Mar 12) of book chapter on DTA
+ meta-analysis
+Message-ID: <b07ab5b8-a182-6fff-1006-94a2b4b52a43@imbi.uni-freiburg.de>
+
+Hi all,
+
+Apologies for self-promoting our work and the close deadline (I simply 
+forgot to send this email earlier).
+
+Springer made Chapter 9 "Meta-Analysis of Diagnostic Test Accuracy 
+Studies" of our book "Meta-Analysis with R" freely available until 
+tomorrow, March 12th:
+
+https://link.springer.com/chapter/10.1007/978-3-319-21416-0_9
+
+In the chapter we describe how you can conduct DTA meta-analysis using R 
+package mada.
+
+Best wishes, Guido
+
+
+From @@@udk@emper @end|ng |rom gm@||@com  Wed Mar 11 11:28:50 2020
+From: @@@udk@emper @end|ng |rom gm@||@com (Antonia Sudkaemper)
+Date: Wed, 11 Mar 2020 10:28:50 +0000
+Subject: [R-meta] logarithmic scale in forest plot
+In-Reply-To: <f09e413072914b8eb61c45d0f66064be@UM-MAIL3214.unimaas.nl>
+References: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+ <5a26344146cc43d989f042bb9ede0828@UM-MAIL3214.unimaas.nl>
+ <CAPQcPujqEZZOVa4qddurgr+gNZDONLwF_Hju8OPLadeNzf_eGA@mail.gmail.com>
+ <c498bceac89744c29411f62bbf66125a@UM-MAIL3214.unimaas.nl>
+ <CAPQcPuhGSw_8rbOFSAfh+Q8BretNf91EfG3RizXfewdQvpWETg@mail.gmail.com>
+ <f09e413072914b8eb61c45d0f66064be@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAPQcPuijmX8Vnhn6A-wp9vev_4iYq+=EH1baQ9WE54rz=XXZNw@mail.gmail.com>
+
+Thank you - now it loos right! :)
+
+Just to double check - if I wanted to run the analysis with a random
+effects model, rather than a fixed effects model, would I just delete the
+"method="FE""? This is what I understand from the metafor package CRAN, but
+I might have misunderstood.
+
+Thank you for clarifying.
+
+All the best, Antonia
+
+On Mon, 9 Mar 2020 at 16:15, Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Ah, sorry, I meant to write:
+>
+> addpoly(res, row=0, atransf=exp)
+>
+> Then it's correct (i.e., everything in the plot is then shown as odds
+> ratios). Apologies for the confusion.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com]
+> Sent: Monday, 09 March, 2020 17:11
+> To: Viechtbauer, Wolfgang (SP)
+> Cc: r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] logarithmic scale in forest plot
+>
+> Hello Wolfgang,
+>
+> thank you, and apologies - mailing list is now cc'ed in.
+>
+> What confuses me, however, it that for the average the numbers on the
+> right seem to indicate the log odds ratio (i.e. 0), but the poly in the
+> graph seems to show the odds ratio (i.e. 1) - I would have expected these
+> to be congruent?
+>
+> Also, for "Study 1" and "Study 2",  do the numbers and the graph display
+> the odds ratio or log odds ratio? Based on the numbers and the back
+> transformation I am assuming the odds ratio?
+>
+> Thank you very much!
+>
+> All the best, Antonia
+>
+> On Mon, 9 Mar 2020 at 15:31, Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Please always cc the mailing list.
+>
+> For log odds ratios, the CI can be negative. After back-transformation
+> (i.e., exponentiation), the CI will be >= 0.
+>
+> Similarly, the estimated average log odds ratio is 0 in the example.
+> Hence, after back-transformation, the estimate will be 1 (exp(0) = 1).
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com]
+> Sent: Monday, 09 March, 2020 15:05
+> To: Viechtbauer, Wolfgang (SP)
+> Subject: Re: [R-meta] logarithmic scale in forest plot
+>
+> Hello Wolfgang,
+>
+> I just ran this with our data and it seems to work - thank you so much!
+>
+> I just noticed that both in your example as well as with our data the mean
+> weighted effect size lower CI is below 0 - does that make sense?
+>
+> Also, in your example and similar with our data, it says 0.00 as mean
+> weighted effect size, but shows up in the graph at 1. Is that correct?
+>
+> Thanks again for your help.
+>
+> All the best, Antonia
+>
+> On Wed, 4 Mar 2020 at 15:56, Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Dear Antonia,
+>
+> You should use log odds ratios as input. In fact, we never meta-analyze
+> the odds ratios directly, because they are not 'symmetric' around 1. For
+> example, an OR of 2 in favor of the treatment group corresponds to an OR of
+> 1/2 = 0.5 in favor of the control group, so if one were to combine these
+> two ORs (assuming equal weights), one would end up with a combined OR of
+> 1.25 in favor of the treatment group, but this is not logical if the two
+> ORs are exact opposites of each other. On the other hand, after log
+> transformation, we get log(2) = 0.6931472 and log(0.5) = -0.6931472, which
+> are now symmetric around 0. Hence, the combined log OR is 0 and, after
+> back-transforming (i.e., exponentiation), we get exp(0) = 1, which makes
+> sense.
+>
+> Also, how were those standard errors (sei) computed? Are they really SEs
+> of the ORs? In most cases, the SEs we can extract from papers are for the
+> log odds ratios.
+>
+> But to answer your question, here is how it's done. Plot the log odds
+> ratios and then use atransf=exp, which in essence puts the the x-axis on a
+> log scale. An example:
+>
+> yi  <- log(c(2, 0.5))
+> sei <- c(.20, .20)
+> forest(yi, sei=sei, atransf=exp, ylim=c(-0.5,5))
+> res <- rma(yi, sei=sei, method="FE")
+> addpoly(res, row=0)
+>
+> (And I just saw that Michael has also answered with the same concern about
+> the use of the ORs.)
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Antonia Sudkaemper
+> Sent: Wednesday, 04 March, 2020 15:37
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] logarithmic scale in forest plot
+>
+> Dear Metafor Community,
+>
+> I hope this email finds you well.
+>
+> I have a question regarding the metafor package. I made a forest plot using
+> the code below. I have received feedback that, as the forest plot shows
+> odds ratios I should use a log scale for the x axis rather than a linear
+> scale, so that the CIs are symmetric around the natural log OR. I am not
+> sure how I would achieve that? Could you help me out, please? I would much
+> appreciate it.
+>
+> All the best, Antonia
+>
+> #race/ethnicity
+> oddsratio = c(2.07, 0.90, 1.00, 0.82, 2.25, 0.92)
+> sei <- c(.43, .32, .66, .50, .70, .44)
+> ci.lb <- oddsratio - 1.96*sei
+> ci.ub <- oddsratio + 1.96*sei
+> study<-c("Aelenei et al., 2019", "Kulich et al., 2019a", "Kulich et al.,
+> 2006a", "Kulich et al., 2006b", "Ryan & Haslam, 2004a", "Ryan & Haslam,
+> 2004b")
+> labels<-c(-2, 0, 2, 4, 6, 8)
+>
+> forest(oddsratio, ci.lb=ci.lb, ci.ub=ci.ub, showweights=TRUE, refline=1,
+> xlab
+>        = "Odds Ratio", slab=study, alim = c(-2,8), xlim=c(-14,15),
+> at=labels, cex =
+>          0.9, ylim=c(-2,27))
+> addpoly(x = 1.16, ci.lb=0.69, ci.ub=1.95)
+>
+> --
+> Dr Antonia Sudk?mper
+> Researcher, OCR, Cambridge Assessment
+>
+> www.antoniasudkaemper.com
+> a.sudkaemper at gmail.com
+>
+
+
+-- 
+Dr Antonia Sudk?mper
+Researcher, OCR, Cambridge Assessment
+
+www.antoniasudkaemper.com
+a.sudkaemper at gmail.com
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Mar 11 12:06:22 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 11 Mar 2020 11:06:22 +0000
+Subject: [R-meta] logarithmic scale in forest plot
+In-Reply-To: <CAPQcPuijmX8Vnhn6A-wp9vev_4iYq+=EH1baQ9WE54rz=XXZNw@mail.gmail.com>
+References: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+ <5a26344146cc43d989f042bb9ede0828@UM-MAIL3214.unimaas.nl>
+ <CAPQcPujqEZZOVa4qddurgr+gNZDONLwF_Hju8OPLadeNzf_eGA@mail.gmail.com>
+ <c498bceac89744c29411f62bbf66125a@UM-MAIL3214.unimaas.nl>
+ <CAPQcPuhGSw_8rbOFSAfh+Q8BretNf91EfG3RizXfewdQvpWETg@mail.gmail.com>
+ <f09e413072914b8eb61c45d0f66064be@UM-MAIL3214.unimaas.nl>
+ <CAPQcPuijmX8Vnhn6A-wp9vev_4iYq+=EH1baQ9WE54rz=XXZNw@mail.gmail.com>
+Message-ID: <afb0261c05c4411698325f74a5d4c7b5@UM-MAIL3214.unimaas.nl>
+
+Yes. (I used method="FE" because there were only 2 studies in the toy example, so it would be asking a bit much to fit a random-effects model IMHO.)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com] 
+Sent: Wednesday, 11 March, 2020 11:29
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] logarithmic scale in forest plot
+
+Thank you - now it loos right! :)?
+
+Just to double check - if I wanted to run the analysis with a random effects model, rather than a fixed effects model, would I just delete the "method="FE""? This is what I understand from the metafor package CRAN, but I might have misunderstood.?
+
+Thank you for clarifying.?
+
+All the best, Antonia
+
+On Mon, 9 Mar 2020 at 16:15, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Ah, sorry, I meant to write:
+
+addpoly(res, row=0, atransf=exp)
+
+Then it's correct (i.e., everything in the plot is then shown as odds ratios). Apologies for the confusion.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com] 
+Sent: Monday, 09 March, 2020 17:11
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] logarithmic scale in forest plot
+
+Hello Wolfgang,?
+
+thank you, and apologies - mailing list is now cc'ed in.?
+
+What confuses me, however, it that for the average the numbers on the right seem to indicate the log odds ratio (i.e. 0), but the poly in the graph seems to show the odds ratio (i.e. 1) - I would have expected these to be congruent??
+
+Also, for "Study 1" and "Study 2",? do the numbers and the graph display the odds ratio or log odds ratio? Based on the numbers and the back transformation I am assuming the odds ratio??
+
+Thank you very?much!?
+
+All the best, Antonia
+
+On Mon, 9 Mar 2020 at 15:31, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Please always cc the mailing list.
+
+For log odds ratios, the CI can be negative. After back-transformation (i.e., exponentiation), the CI will be >= 0.
+
+Similarly, the estimated average log odds ratio is 0 in the example. Hence, after back-transformation, the estimate will be 1 (exp(0) = 1).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com] 
+Sent: Monday, 09 March, 2020 15:05
+To: Viechtbauer, Wolfgang (SP)
+Subject: Re: [R-meta] logarithmic scale in forest plot
+
+Hello Wolfgang,?
+
+I just ran this with our data and it seems to work - thank you so much!?
+
+I just noticed that both in your example as well as with our data the mean weighted effect size lower CI is below 0 - does that make sense?
+
+Also, in your example and similar with our data, it says 0.00 as mean weighted effect size, but shows up in the graph at 1. Is that correct?
+
+Thanks again?for your help.?
+
+All the best, Antonia
+
+On Wed, 4 Mar 2020 at 15:56, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Dear Antonia,
+
+You should use log odds ratios as input. In fact, we never meta-analyze the odds ratios directly, because they are not 'symmetric' around 1. For example, an OR of 2 in favor of the treatment group corresponds to an OR of 1/2 = 0.5 in favor of the control group, so if one were to combine these two ORs (assuming equal weights), one would end up with a combined OR of 1.25 in favor of the treatment group, but this is not logical if the two ORs are exact opposites of each other. On the other hand, after log transformation, we get log(2) = 0.6931472 and log(0.5) = -0.6931472, which are now symmetric around 0. Hence, the combined log OR is 0 and, after back-transforming (i.e., exponentiation), we get exp(0) = 1, which makes sense.
+
+Also, how were those standard errors (sei) computed? Are they really SEs of the ORs? In most cases, the SEs we can extract from papers are for the log odds ratios.
+
+But to answer your question, here is how it's done. Plot the log odds ratios and then use atransf=exp, which in essence puts the the x-axis on a log scale. An example:
+
+yi? <- log(c(2, 0.5))
+sei <- c(.20, .20)
+forest(yi, sei=sei, atransf=exp, ylim=c(-0.5,5))
+res <- rma(yi, sei=sei, method="FE")
+addpoly(res, row=0)
+
+(And I just saw that Michael has also answered with the same concern about the use of the ORs.)
+
+Best,
+Wolfgang
+
+From meyer@j@me@ @end|ng |rom u@@@net  Wed Mar 11 12:07:21 2020
+From: meyer@j@me@ @end|ng |rom u@@@net (james meyer)
+Date: Wed, 11 Mar 2020 07:07:21 -0400
+Subject: [R-meta] Deeks plot
+Message-ID: <296yckLgV2640Set.1583924841@web12.cms.usa.net>
+
+I am trying to produce a Deeks plot in ggplot with lnDOR on the x axis and
+1/root(EstimatedSampleSize) on a reversed y axis. This is simple enough. 
+However Ive noted in stata (midas) the regression line runs from x to y axis.
+I am not sure how to produce the line.  eg from stata below
+
+James Meyer
+
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: deeksexample.jpg
+Type: image/jpeg
+Size: 58702 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200311/5ccd4f14/attachment-0001.jpg>
+
+From @@@udk@emper @end|ng |rom gm@||@com  Wed Mar 11 17:04:39 2020
+From: @@@udk@emper @end|ng |rom gm@||@com (Antonia Sudkaemper)
+Date: Wed, 11 Mar 2020 16:04:39 +0000
+Subject: [R-meta] logarithmic scale in forest plot
+In-Reply-To: <afb0261c05c4411698325f74a5d4c7b5@UM-MAIL3214.unimaas.nl>
+References: <CAPQcPugbOOD5b8RGW6DL=wXnMngxFubK97Y4T4X1+Eoso9XdcQ@mail.gmail.com>
+ <5a26344146cc43d989f042bb9ede0828@UM-MAIL3214.unimaas.nl>
+ <CAPQcPujqEZZOVa4qddurgr+gNZDONLwF_Hju8OPLadeNzf_eGA@mail.gmail.com>
+ <c498bceac89744c29411f62bbf66125a@UM-MAIL3214.unimaas.nl>
+ <CAPQcPuhGSw_8rbOFSAfh+Q8BretNf91EfG3RizXfewdQvpWETg@mail.gmail.com>
+ <f09e413072914b8eb61c45d0f66064be@UM-MAIL3214.unimaas.nl>
+ <CAPQcPuijmX8Vnhn6A-wp9vev_4iYq+=EH1baQ9WE54rz=XXZNw@mail.gmail.com>
+ <afb0261c05c4411698325f74a5d4c7b5@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAPQcPujSLDZGRhGTxEY1MLhoaDiX0aZ3pquZGOERrUEU48Jnkg@mail.gmail.com>
+
+Thanks a lot, Wolfgang! That makes sense, but we have a lot more studies in
+our meta-analysis and used the random effects model.
+
+All the best, Antonia
+
+On Wed, 11 Mar 2020 at 11:06, Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Yes. (I used method="FE" because there were only 2 studies in the toy
+> example, so it would be asking a bit much to fit a random-effects model
+> IMHO.)
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com]
+> Sent: Wednesday, 11 March, 2020 11:29
+> To: Viechtbauer, Wolfgang (SP)
+> Cc: r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] logarithmic scale in forest plot
+>
+> Thank you - now it loos right! :)
+>
+> Just to double check - if I wanted to run the analysis with a random
+> effects model, rather than a fixed effects model, would I just delete the
+> "method="FE""? This is what I understand from the metafor package CRAN, but
+> I might have misunderstood.
+>
+> Thank you for clarifying.
+>
+> All the best, Antonia
+>
+> On Mon, 9 Mar 2020 at 16:15, Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Ah, sorry, I meant to write:
+>
+> addpoly(res, row=0, atransf=exp)
+>
+> Then it's correct (i.e., everything in the plot is then shown as odds
+> ratios). Apologies for the confusion.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com]
+> Sent: Monday, 09 March, 2020 17:11
+> To: Viechtbauer, Wolfgang (SP)
+> Cc: r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] logarithmic scale in forest plot
+>
+> Hello Wolfgang,
+>
+> thank you, and apologies - mailing list is now cc'ed in.
+>
+> What confuses me, however, it that for the average the numbers on the
+> right seem to indicate the log odds ratio (i.e. 0), but the poly in the
+> graph seems to show the odds ratio (i.e. 1) - I would have expected these
+> to be congruent?
+>
+> Also, for "Study 1" and "Study 2",  do the numbers and the graph display
+> the odds ratio or log odds ratio? Based on the numbers and the back
+> transformation I am assuming the odds ratio?
+>
+> Thank you very much!
+>
+> All the best, Antonia
+>
+> On Mon, 9 Mar 2020 at 15:31, Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Please always cc the mailing list.
+>
+> For log odds ratios, the CI can be negative. After back-transformation
+> (i.e., exponentiation), the CI will be >= 0.
+>
+> Similarly, the estimated average log odds ratio is 0 in the example.
+> Hence, after back-transformation, the estimate will be 1 (exp(0) = 1).
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Antonia Sudkaemper [mailto:a.sudkaemper at gmail.com]
+> Sent: Monday, 09 March, 2020 15:05
+> To: Viechtbauer, Wolfgang (SP)
+> Subject: Re: [R-meta] logarithmic scale in forest plot
+>
+> Hello Wolfgang,
+>
+> I just ran this with our data and it seems to work - thank you so much!
+>
+> I just noticed that both in your example as well as with our data the mean
+> weighted effect size lower CI is below 0 - does that make sense?
+>
+> Also, in your example and similar with our data, it says 0.00 as mean
+> weighted effect size, but shows up in the graph at 1. Is that correct?
+>
+> Thanks again for your help.
+>
+> All the best, Antonia
+>
+> On Wed, 4 Mar 2020 at 15:56, Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Dear Antonia,
+>
+> You should use log odds ratios as input. In fact, we never meta-analyze
+> the odds ratios directly, because they are not 'symmetric' around 1. For
+> example, an OR of 2 in favor of the treatment group corresponds to an OR of
+> 1/2 = 0.5 in favor of the control group, so if one were to combine these
+> two ORs (assuming equal weights), one would end up with a combined OR of
+> 1.25 in favor of the treatment group, but this is not logical if the two
+> ORs are exact opposites of each other. On the other hand, after log
+> transformation, we get log(2) = 0.6931472 and log(0.5) = -0.6931472, which
+> are now symmetric around 0. Hence, the combined log OR is 0 and, after
+> back-transforming (i.e., exponentiation), we get exp(0) = 1, which makes
+> sense.
+>
+> Also, how were those standard errors (sei) computed? Are they really SEs
+> of the ORs? In most cases, the SEs we can extract from papers are for the
+> log odds ratios.
+>
+> But to answer your question, here is how it's done. Plot the log odds
+> ratios and then use atransf=exp, which in essence puts the the x-axis on a
+> log scale. An example:
+>
+> yi  <- log(c(2, 0.5))
+> sei <- c(.20, .20)
+> forest(yi, sei=sei, atransf=exp, ylim=c(-0.5,5))
+> res <- rma(yi, sei=sei, method="FE")
+> addpoly(res, row=0)
+>
+> (And I just saw that Michael has also answered with the same concern about
+> the use of the ORs.)
+>
+> Best,
+> Wolfgang
+>
+
+
+-- 
+Dr Antonia Sudk?mper
+Researcher, OCR, Cambridge Assessment
+
+www.antoniasudkaemper.com
+a.sudkaemper at gmail.com
+
+	[[alternative HTML version deleted]]
+
+
+From gdu@rte @end|ng |rom edu@u||@bo@@pt  Thu Mar 12 12:07:09 2020
+From: gdu@rte @end|ng |rom edu@u||@bo@@pt (=?UTF-8?Q?Gon=C3=A7alo_Nuno_Da_Silva_Duarte?=)
+Date: Thu, 12 Mar 2020 11:07:09 +0000
+Subject: [R-meta] Turning square brackets into curved brackets
+Message-ID: <CAHJa3UhtBiS9rEz_fPN=3+L6_8EjLdQ89xfjg-XqGCZO5-6Dug@mail.gmail.com>
+
+Dear All,
+
+I was wondering if there is any way to turn the graphical output from
+square into curved brackets?
+
+This is of course a minor point but I believe to be of general interest.
+
+Thanks in advance and best wishes,
+
+*Gon?alo Silva Duarte*
+
+Medical Doctor, Hospital de Santa Maria, Centro Hospitalar Universit?rio
+Lisboa Norte
+Clinical Researcher, IMM, Laboratory of Clinical Pharmacology and
+Therapeutics, Faculdade de Medicina, Universidade de Lisboa
+Scientific Consultant, Centro de Estudos em Medicina Baseada na Evid?ncia
+
+Telephone: +351914662729
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Thu Mar 12 12:27:21 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Thu, 12 Mar 2020 12:27:21 +0100
+Subject: [R-meta] Turning square brackets into curved brackets
+In-Reply-To: <CAHJa3UhtBiS9rEz_fPN=3+L6_8EjLdQ89xfjg-XqGCZO5-6Dug@mail.gmail.com>
+References: <CAHJa3UhtBiS9rEz_fPN=3+L6_8EjLdQ89xfjg-XqGCZO5-6Dug@mail.gmail.com>
+Message-ID: <ed08cec6-a962-b831-1ac0-ee8b53982e4b@imbi.uni-freiburg.de>
+
+Am 12.03.20 um 12:07 schrieb Gon?alo Nuno Da Silva Duarte:
+
+> Dear All,
+>
+> I was wondering if there is any way to turn the graphical output from
+> square into curved brackets?
+
+You did not state which R package / graphical output you are asking about.
+
+In R package *meta* you can use the following command to change the 
+types of brackets and separator in confidence intervals:
+
+library(meta)
+settings.meta(CIbracket = "(", CIseparator = " - ")
+
+These settings are considered in printouts and forest plots.
+
+Best wishes, Guido
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sat Mar 21 12:17:40 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sat, 21 Mar 2020 11:17:40 +0000
+Subject: [R-meta] New Version of metafor (2.4-0)
+Message-ID: <4bd63fd01ecf43bf91dc549b976716a2@UM-MAIL3213.unimaas.nl>
+
+Hi All,
+
+Just a little note that a new version of metafor (2.4-0) has been pushed to CRAN. This update was prompted by the upcoming change in R where the new default will be 'stringsAsFactors=FALSE' (at long last!). As a result, some tests were failing on R-devel, so these needed fixing. Along the way, I made various minor internal updates and added some convenience functionality to several functions. The full changelog can be found here:
+
+https://wviechtb.github.io/metafor/news/index.html#metafor-2-4-0-2020-03-19
+
+I also added two functions that are especially useful for those conducting network meta-analyses with the metafor package. With the to.wide() function, one can rearrange a dataset that is in an arm-based 'long' format to a contrast-based 'wide' format. Two examples illustrating the use of this function can be found here:
+
+https://wviechtb.github.io/metafor/reference/to.wide.html
+
+Once the dataset is in such a wide format, an important next step is the construction of variables that reflect which two groups are being compared with each other in each row (through +1, 0, -1 coding). Such a contrast matrix can be easily created with the contrmat() function. See:
+
+https://wviechtb.github.io/metafor/reference/contrmat.html
+
+for the help file and two examples illustrating its use. The analysis of these two datasets (using arm- and contrast-based models) are illustrated here:
+
+https://wviechtb.github.io/metafor/reference/dat.hasselblad1998.html
+
+and here:
+
+https://wviechtb.github.io/metafor/reference/dat.hasselblad1998.html
+
+Hope you are all staying safe and healthy in these trying times!
+
+Best,
+Wolfgang
+
+
+From dm@h@b@n @end|ng |rom gm@||@com  Tue Mar 24 10:11:21 2020
+From: dm@h@b@n @end|ng |rom gm@||@com (=?UTF-8?Q?Daniel_M=C3=B8nsted_Shabanzadeh?=)
+Date: Tue, 24 Mar 2020 10:11:21 +0100
+Subject: [R-meta] residual heterogeneity in meta-regression
+In-Reply-To: <5fe1a4eb6c3a496ea03ed44f15c82591@UM-MAIL3213.unimaas.nl>
+References: <CABgeOtNVQ70us5vWdcof4G-YcrqJDMq_kq=eB-Rts0vCsk8XbQ@mail.gmail.com>
+ <5fe1a4eb6c3a496ea03ed44f15c82591@UM-MAIL3213.unimaas.nl>
+Message-ID: <CABgeOtOV=ic_MXWLtgjQKeCJJDHXnKkx-ZdBRkG5WCcV-yuPqw@mail.gmail.com>
+
+Dear Wolfgang
+
+Picking up the thread once more...Regarding the many studies included in
+the meta-regression model (up to 450 studies) I do expect very large Q
+statistics and cannot aim to explain all heterogeneity through
+meta-regression. Is there a better way to express heterogeneity in this
+case? I have read that the tau is a better way, however I am not sure of
+the interpretation and what I may conclude regarding the model and
+heterogeneity using tau.
+
+Regards,
+Daniel
+
+
+On Mon, Nov 18, 2019 at 4:27 PM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Daniel,
+>
+> Roughly, the QE-test statistic should tend to decrease when R^2 is large.
+> Whether this is strictly true depends on how tau^2 is being estimated.
+> However, the QE-test could very well be significant even if R^2 is large.
+> It simply means that there is still a significant amount of residual
+> heterogeneity left.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Daniel M?nsted Shabanzadeh [mailto:dmshaban at gmail.com]
+> Sent: Thursday, 14 November, 2019 11:09
+> To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+> Subject: residual heterogeneity in meta-regression
+>
+> Dear Wolfgang
+>
+> I am performing a meta-regression on multiple one-arm non-randomised
+> studies in order to explore the impact of moderators on complications
+> following a surgical intervention. Adding moderators (age catrgory of the
+> patient, surgical technique etc.) increases the R2:
+>
+> Mixed-Effects Model (k = 183; tau^2 estimator: REML)
+>
+> tau^2 (estimated amount of residual heterogeneity):     0.0074 (SE =
+> 0.0010)
+> tau (square root of estimated tau^2 value):             0.0860
+> I^2 (residual heterogeneity / unaccounted variability): 99.20%
+> H^2 (unaccounted variability / sampling variability):   125.63
+> R^2 (amount of heterogeneity accounted for):            36.78%
+>
+> Test for Residual Heterogeneity:
+> QE(df = 156) = 4730.2255, p-val < .0001
+>
+> Test of Moderators (coefficient(s) 2:27):
+> QM(df = 26) = 115.5671, p-val < .0001
+>
+> However, I am unaware of how to interpretate the rising R2 when QE
+> tests keep on beeing significant. So far I understand that the rising R2
+> indicates that the heterogeneity is beeing partly explained by moderators,
+> however does QE change in case most heterogeneity is explained by
+> moderators?
+>
+> Regards,
+> Daniel
+>
+> Daniel M?nsted Shabanzadeh
+> MD, PhD
+> Department of Gastroenterology, Surgical Unit
+> Hvidovre Hospital
+> Mobile +45 2546 5251
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Mar 24 10:41:23 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 24 Mar 2020 09:41:23 +0000
+Subject: [R-meta] residual heterogeneity in meta-regression
+In-Reply-To: <CABgeOtOV=ic_MXWLtgjQKeCJJDHXnKkx-ZdBRkG5WCcV-yuPqw@mail.gmail.com>
+References: <CABgeOtNVQ70us5vWdcof4G-YcrqJDMq_kq=eB-Rts0vCsk8XbQ@mail.gmail.com>
+ <5fe1a4eb6c3a496ea03ed44f15c82591@UM-MAIL3213.unimaas.nl>
+ <CABgeOtOV=ic_MXWLtgjQKeCJJDHXnKkx-ZdBRkG5WCcV-yuPqw@mail.gmail.com>
+Message-ID: <3dd349ac1a954b4fa80033f08b4c385a@UM-MAIL3213.unimaas.nl>
+
+Dear Daniel,
+
+In my opinion, the best way to express how much heterogeneity there is is to compute a prediction interval for the true effects/outcomes. In its most basic form, this is computed for a random-effects model with:
+
+mu_hat +- 1.96 * sqrt(tau^2_hat),
+
+where mu_hat and tau^2_hat are just the estimates of mu (the average true effect/outcome) and tau^2 (the variance in the true effects/outcomes) and 1.96 is the 97.5% percentile of a standard normal distribution (rounded).
+
+A slightly improved version takes the uncertainty of mu_hat into consideration:
+
+mu_hat +- 1.96 * sqrt(SE[mu_hat]^2 + tau^2_hat),
+
+where SE[mu] is the standard error of mu_hat. This is in fact how predict() computes this interval. See:
+
+http://www.metafor-project.org/doku.php/faq#for_random-effects_models_fitt
+
+If the 'Knapp and Hartung method' was used when fitting the model, instead of 1.96, the corresponding percentile of a t-distribution with df=k-1 is used.
+
+This interval can be interpreted in various ways. It can be thought of as an interval that is meant to capture 95% of the true effects/outcomes (in the population of studies). It can also be thought of as an interval that is meant to capture the true effect/outcome of a new study (from the same population of studies) with 95% probability. This is very useful information, because it directly tells us how much true effects/outcomes can vary (in the actual units of the outcome/effect size measure). For example, it might be the case that mu_hat is positive and significantly different from 0 (i.e., true effects/outcomes are *on average* positive), but the prediction interval is so wide such that negative true effects/outcomes *in particular studies* are quite plausible.
+
+I emphasize 'meant to' because, strictly speaking, the interval (computed in the forms above and also when using df=k-2) is not wide enough to really have a 95% capture probability. But for its intended purpose -- to provide a range that reflects how large/small the true effects/outcomes in particular studies might be -- it should be good enough.
+
+For meta-regression models, one can compute such prediction intervals conditional on a particular combination of moderator values (e.g., for studies where mod1 = <something>, mod2 = <something>, ...).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Daniel M?nsted Shabanzadeh [mailto:dmshaban at gmail.com] 
+Sent: Tuesday, 24 March, 2020 10:11
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: residual heterogeneity in meta-regression
+
+Dear Wolfgang
+
+Picking?up the thread once more...Regarding the many studies included in the meta-regression model (up to 450 studies)?I do expect very large Q statistics and cannot aim to explain all heterogeneity through meta-regression. Is there a better way to express heterogeneity in this case? I have read that the tau is a better way, however I am not sure of the interpretation and?what I may conclude regarding the model and heterogeneity using tau. 
+
+Regards,
+Daniel??
+
+On Mon, Nov 18, 2019 at 4:27 PM Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Dear Daniel,
+
+Roughly, the QE-test statistic should tend to decrease when R^2 is large. Whether this is strictly true depends on how tau^2 is being estimated. However, the QE-test could very well be significant even if R^2 is large. It simply means that there is still a significant amount of residual heterogeneity left.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Daniel M?nsted Shabanzadeh [mailto:dmshaban at gmail.com] 
+Sent: Thursday, 14 November, 2019 11:09
+To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+Subject: residual heterogeneity in meta-regression
+
+Dear Wolfgang
+
+I am performing a meta-regression on multiple one-arm non-randomised studies in order to explore the impact of moderators on?complications following a surgical intervention. Adding moderators (age catrgory?of the patient, surgical technique etc.) increases the R2:
+
+Mixed-Effects Model (k = 183; tau^2 estimator: REML)
+
+tau^2 (estimated amount of residual heterogeneity):? ? ?0.0074 (SE = 0.0010)
+tau (square root of estimated tau^2 value):? ? ? ? ? ? ?0.0860
+I^2 (residual heterogeneity / unaccounted variability): 99.20%
+H^2 (unaccounted variability / sampling variability):? ?125.63
+R^2 (amount of heterogeneity accounted for):? ? ? ? ? ? 36.78%
+
+Test for Residual Heterogeneity: 
+QE(df = 156) = 4730.2255, p-val < .0001
+
+Test of Moderators (coefficient(s) 2:27): 
+QM(df = 26) = 115.5671, p-val < .0001
+
+However, I am unaware of how to interpretate the rising R2 when?QE tests?keep on beeing significant. So far?I understand that the rising R2 indicates that the heterogeneity is beeing partly explained by moderators, however does QE change in case most heterogeneity is explained by moderators?
+
+Regards,
+Daniel
+
+Daniel M?nsted Shabanzadeh
+MD, PhD
+Department of Gastroenterology, Surgical Unit
+Hvidovre Hospital
+Mobile?+45 2546 5251?
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Tue Mar 24 17:54:28 2020
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 24 Mar 2020 16:54:28 +0000
+Subject: [R-meta] Cran Task View updated again
+Message-ID: <f7cbe6d8-0e5a-51d7-5724-528f9a07ac74@dewey.myzen.co.uk>
+
+A few new packages and we have now passed 2^7
+
+One interesting novelty is metagam which allows for IPD (using GAMs) 
+even when the individual data sets cannot be shared for confidentiality 
+reasons.
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From ce@@r@terrer @end|ng |rom me@com  Wed Mar 25 15:33:48 2020
+From: ce@@r@terrer @end|ng |rom me@com (=?utf-8?B?Q8Opc2FyIFRlcnJlcg==?=)
+Date: Wed, 25 Mar 2020 14:33:48 -0000
+Subject: [R-meta] Random effects structure
+Message-ID: <3f6a0476-8449-4268-989a-d9f7c61fb800@me.com>
+
+Dear community,
+
+I am conducting a meta-analysis to study the growth rate of bacterial predators as compared to their prey, using the log response ratio. Furthermore, I want to study if this effect varies across different predators. The dataset has the following structure, here showing a subset:
+
+Site	CommonControl	exp	obs	Predator	lnR	var
+A	Alaska? 155	1	1	Bdello	-0.6713152	0.03785708
+A	Alaska? 155	1	2	Cytoph	-0.0702467	0.05763364
+A	Alaska? 155	1	3	Myxo	-0.148982	0.00748768
+A	Alaska? 1510	2	4	Bdello	-0.4926361	0.01691187
+A	Alaska? 1510	2	5	Cytoph	-0.213787	0.01045785
+B	Andesite1controlWeek1	9	6	Bdello	0.27873598	0.14129722
+B	Andesite1controlWeek1	9	7	Cytoph	-0.3243682	0.01466085
+B	Andesite1controlWeek1	9	8	Lyso	1.18302506	0.11663149
+B	Andesite1controlWeek6	11	9	Bdello	-0.8465128	0.03701618
+B	Andesite1controlWeek6	11	10	Cytoph	-0.1559056	0.0283173
+B	Andesite1controlWeek6	11	11	Lyso	-0.8039415	0.04926915
+
+1. There are different sites, thus a potential source of non-independency
+2. Within each site,?we use the value for preys in?the denominator multiple times. I guess rows of data using the same denominator (CommonControl) are also potentially correlated and should be also added as a random-effect.
+
+Based on 1., 2., and what I have understood from the?Konstantopoulos (2011) tutorial, I think I should use the following model:
+
+res <-rma.mv(yi=lnR, V=var, random=~1|Site/exp/obs, mods=~Predator, data=data)
+
+Could you please let me know if the structure of random effects seems appropriate, and help me understand why I need to include "obs"?
+Thank you.
+Cesar
+
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200325/fb8cae0c/attachment-0001.html>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Mar 25 15:43:58 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 25 Mar 2020 14:43:58 +0000
+Subject: [R-meta] Random effects structure
+In-Reply-To: <3f6a0476-8449-4268-989a-d9f7c61fb800@me.com>
+References: <3f6a0476-8449-4268-989a-d9f7c61fb800@me.com>
+Message-ID: <0d0200004b224e6eb053d06428d69d79@UM-MAIL3214.unimaas.nl>
+
+Hi Cesar,
+
+When the same group is used to compute multiple estimates (i.e., a common control), then this also induces dependency on the sampling errors. For the log response ratio, the covariance is then:
+
+SD_C^2 / (n_C*M_C^2)
+
+where M_C and SD_C are the mean and SD of the common control group and n_C the control group size.
+
+So, you ideally should construct a proper V matrix that includes these covariances and that you can then pass to rma.mv().
+
+But yes, random=~1|Site/exp/obs would be sensible.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of C?sar Terrer
+Sent: Wednesday, 25 March, 2020 15:34
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Random effects structure
+
+Dear community,
+
+I am conducting a meta-analysis to study the growth rate of bacterial predators as compared to their prey, using the log response ratio. Furthermore, I want to study if this effect varies across different predators. The dataset has the following structure, here showing a subset:
+
+Site  CommonControl  exp   obs   Predator lnR   var
+A  Alaska  155 1  1  Bdello   -0.6713152  0.03785708
+A  Alaska  155 1  2  Cytoph   -0.0702467  0.05763364
+A  Alaska  155 1  3  Myxo  -0.148982   0.00748768
+A  Alaska  1510   2  4  Bdello   -0.4926361  0.01691187
+A  Alaska  1510   2  5  Cytoph   -0.213787   0.01045785
+B  Andesite1controlWeek1   9  6  Bdello   0.27873598  0.14129722
+B  Andesite1controlWeek1   9  7  Cytoph   -0.3243682  0.01466085
+B  Andesite1controlWeek1   9  8  Lyso  1.18302506  0.11663149
+B  Andesite1controlWeek6   11 9  Bdello   -0.8465128  0.03701618
+B  Andesite1controlWeek6   11 10 Cytoph   -0.1559056  0.0283173
+B  Andesite1controlWeek6   11 11 Lyso  -0.8039415  0.04926915
+
+1. There are different sites, thus a potential source of non-independency
+2. Within each site,?we use the value for preys in?the denominator multiple times. I guess rows of data using the same denominator (CommonControl) are also potentially correlated and should be also added as a random-effect.
+
+Based on 1., 2., and what I have understood from the?Konstantopoulos (2011) tutorial, I think I should use the following model:
+
+res <-rma.mv(yi=lnR, V=var, random=~1|Site/exp/obs, mods=~Predator, data=data)
+
+Could you please let me know if the structure of random effects seems appropriate, and help me understand why I need to include "obs"?
+Thank you.
+Cesar
+
+From jepu@to @end|ng |rom gm@||@com  Wed Mar 25 15:51:25 2020
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 25 Mar 2020 09:51:25 -0500
+Subject: [R-meta] Random effects structure
+In-Reply-To: <0d0200004b224e6eb053d06428d69d79@UM-MAIL3214.unimaas.nl>
+References: <3f6a0476-8449-4268-989a-d9f7c61fb800@me.com>
+ <0d0200004b224e6eb053d06428d69d79@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAFUVuJzC0n=z8xu2HuhLWgoB09kPP=TRztZdS+ee7051wtUp2w@mail.gmail.com>
+
+Hi Cesar,
+
+Just to follow up on Wolfgang's comments (which I concur with, surprising
+nobody). Based on the example data structure that you sent, it looks like
+there might be a further source of dependence in your effect sizes. In site
+B, you have experiments 9 and 11 labelled as "Andesite1controlWeek1" and "
+Andesite1controlWeek6." Are these truly independent samples, or are these
+the same organisms measured over time? If it is the latter, then there will
+again be dependence in the sampling errors due to repeated measurement of
+the same units.
+
+Regardless, a good reference for Wolfgang's suggestion and on the more
+complicated case with dependence do to repeated measurements is Lajeunesse
+(2011): https://doi.org/10.1890/11-0423.1
+
+James
+
+On Wed, Mar 25, 2020 at 9:44 AM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Hi Cesar,
+>
+> When the same group is used to compute multiple estimates (i.e., a common
+> control), then this also induces dependency on the sampling errors. For the
+> log response ratio, the covariance is then:
+>
+> SD_C^2 / (n_C*M_C^2)
+>
+> where M_C and SD_C are the mean and SD of the common control group and n_C
+> the control group size.
+>
+> So, you ideally should construct a proper V matrix that includes these
+> covariances and that you can then pass to rma.mv().
+>
+> But yes, random=~1|Site/exp/obs would be sensible.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of C?sar Terrer
+> Sent: Wednesday, 25 March, 2020 15:34
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Random effects structure
+>
+> Dear community,
+>
+> I am conducting a meta-analysis to study the growth rate of bacterial
+> predators as compared to their prey, using the log response ratio.
+> Furthermore, I want to study if this effect varies across different
+> predators. The dataset has the following structure, here showing a subset:
+>
+> Site  CommonControl  exp   obs   Predator lnR   var
+> A  Alaska  155 1  1  Bdello   -0.6713152  0.03785708
+> A  Alaska  155 1  2  Cytoph   -0.0702467  0.05763364
+> A  Alaska  155 1  3  Myxo  -0.148982   0.00748768
+> A  Alaska  1510   2  4  Bdello   -0.4926361  0.01691187
+> A  Alaska  1510   2  5  Cytoph   -0.213787   0.01045785
+> B  Andesite1controlWeek1   9  6  Bdello   0.27873598  0.14129722
+> B  Andesite1controlWeek1   9  7  Cytoph   -0.3243682  0.01466085
+> B  Andesite1controlWeek1   9  8  Lyso  1.18302506  0.11663149
+> B  Andesite1controlWeek6   11 9  Bdello   -0.8465128  0.03701618
+> B  Andesite1controlWeek6   11 10 Cytoph   -0.1559056  0.0283173
+> B  Andesite1controlWeek6   11 11 Lyso  -0.8039415  0.04926915
+>
+> 1. There are different sites, thus a potential source of non-independency
+> 2. Within each site, we use the value for preys in the denominator
+> multiple times. I guess rows of data using the same denominator
+> (CommonControl) are also potentially correlated and should be also added as
+> a random-effect.
+>
+> Based on 1., 2., and what I have understood from the Konstantopoulos
+> (2011) tutorial, I think I should use the following model:
+>
+> res <-rma.mv(yi=lnR, V=var, random=~1|Site/exp/obs, mods=~Predator,
+> data=data)
+>
+> Could you please let me know if the structure of random effects seems
+> appropriate, and help me understand why I need to include "obs"?
+> Thank you.
+> Cesar
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ce@@r@terrer @end|ng |rom me@com  Wed Mar 25 16:21:16 2020
+From: ce@@r@terrer @end|ng |rom me@com (=?utf-8?B?Q8Opc2FyIFRlcnJlcg==?=)
+Date: Wed, 25 Mar 2020 15:21:16 -0000
+Subject: [R-meta] Random effects structure
+Message-ID: <00f5f730-a3d5-4cb2-ab75-c5557b8a05e6@me.com>
+
+Hi Wolfgang,
+
+Thank you for your quick response.
+
+I have never constructed a V matrix. Based on the Berkey tutorial, I have tried to apply the following
+
+dat$v2i <- dat$NPSD^2 / (dat$NPN*dat$NP^2)
+V <- bldiag(lapply(split(dat[,c("var", "v2i")], dat$exp), as.matrix))
+res <-rma.mv(yi=lnR, V=V, random=~1|Site/exp/obs, mods=~Predator, data=dat)
+
+But it gives me an error that? 'V' must be a square matrix. Is this because the split in V has to be done at the "obs" level? I used "exp" because that indicates the level at which all effect sizes use the same control.
+
+Thank you
+Cesar
+
+
+On March 25, 2020 at 7:44 AM, "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+Hi Cesar,
+
+When the same group is used to compute multiple estimates (i.e., a common control), then this also induces dependency on the sampling errors. For the log response ratio, the covariance is then:
+
+SD_C^2 / (n_C*M_C^2)
+
+where M_C and SD_C are the mean and SD of the common control group and n_C the control group size.
+
+So, you ideally should construct a proper V matrix that includes these covariances and that you can then pass to rma.mv().
+
+But yes, random=~1|Site/exp/obs would be sensible.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of C?sar Terrer
+Sent: Wednesday, 25 March, 2020 15:34
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Random effects structure
+
+Dear community,
+
+I am conducting a meta-analysis to study the growth rate of bacterial predators as compared to their prey, using the log response ratio. Furthermore, I want to study if this effect varies across different predators. The dataset has the following structure, here showing a subset:
+
+Site CommonControl exp obs Predator lnR var
+A Alaska 155 1 1 Bdello -0.6713152 0.03785708
+A Alaska 155 1 2 Cytoph -0.0702467 0.05763364
+A Alaska 155 1 3 Myxo -0.148982 0.00748768
+A Alaska 1510 2 4 Bdello -0.4926361 0.01691187
+A Alaska 1510 2 5 Cytoph -0.213787 0.01045785
+B Andesite1controlWeek1 9 6 Bdello 0.27873598 0.14129722
+B Andesite1controlWeek1 9 7 Cytoph -0.3243682 0.01466085
+B Andesite1controlWeek1 9 8 Lyso 1.18302506 0.11663149
+B Andesite1controlWeek6 11 9 Bdello -0.8465128 0.03701618
+B Andesite1controlWeek6 11 10 Cytoph -0.1559056 0.0283173
+B Andesite1controlWeek6 11 11 Lyso -0.8039415 0.04926915
+
+1. There are different sites, thus a potential source of non-independency
+2. Within each site,?we use the value for preys in?the denominator multiple times. I guess rows of data using the same denominator (CommonControl) are also potentially correlated and should be also added as a random-effect.
+
+Based on 1., 2., and what I have understood from the?Konstantopoulos (2011) tutorial, I think I should use the following model:
+
+res <-rma.mv(yi=lnR, V=var, random=~1|Site/exp/obs, mods=~Predator, data=data)
+
+Could you please let me know if the structure of random effects seems appropriate, and help me understand why I need to include "obs"?
+Thank you.
+Cesar
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200325/e9abc3e7/attachment-0001.html>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Mar 25 18:25:18 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 25 Mar 2020 17:25:18 +0000
+Subject: [R-meta] Random effects structure
+In-Reply-To: <00f5f730-a3d5-4cb2-ab75-c5557b8a05e6@me.com>
+References: <00f5f730-a3d5-4cb2-ab75-c5557b8a05e6@me.com>
+Message-ID: <f2bb831c4b5c48e9af9b77f94715edfa@UM-MAIL3214.unimaas.nl>
+
+The Berkey code doesn't quite apply here. This is more relevant:
+
+http://www.metafor-project.org/doku.php/analyses:gleser2009#multiple-treatment_studies
+
+But your splitting variable is 'exp' within 'Site', so you need to first create a variable that is the combination of the two. This should do it:
+
+dat$Site.exp <- paste0(dat$Site, ".", dat$exp)
+
+Also make sure that the data are sorted accordingly:
+
+dat <- dat[order(dat$Site, dat$exp),]
+
+Then:
+
+calc.v <- function(x) {
+   v <- matrix(x$NPSD^2[1] / (x$NPN[1] * dat$NP[1]^2), nrow=nrow(x), ncol=nrow(x))
+   diag(v) <- x$var
+   v
+}
+V <- bldiag(lapply(split(dat, dat$Site.exp), calc.v))
+
+You should double-check that the blocks in V are correct (with 'var' along the diagonal and the correct covariances along the off-diagonal) before trying to fit the model.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: C?sar Terrer [mailto:cesar.terrer at me.com] 
+Sent: Wednesday, 25 March, 2020 16:21
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Random effects structure
+
+Hi Wolfgang,
+
+Thank you for your quick response.
+
+I have never constructed a V matrix. Based on the Berkey tutorial, I have tried to apply the following
+
+dat$v2i <- dat$NPSD^2 / (dat$NPN*dat$NP^2)
+V <- bldiag(lapply(split(dat[,c("var", "v2i")], dat$exp), as.matrix))
+res <-rma.mv(yi=lnR, V=V, random=~1|Site/exp/obs, mods=~Predator, data=dat)
+
+But it gives me an error that? 'V' must be a square matrix. Is this because the split in V has to be done at the "obs" level? I used "exp" because that indicates the level at which all effect sizes use the same control.
+
+Thank you
+Cesar
+
+On March 25, 2020 at 7:44 AM, "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Hi Cesar,
+
+When the same group is used to compute multiple estimates (i.e., a common control), then this also induces dependency on the sampling errors. For the log response ratio, the covariance is then:
+
+SD_C^2 / (n_C*M_C^2)
+
+where M_C and SD_C are the mean and SD of the common control group and n_C the control group size.
+
+So, you ideally should construct a proper V matrix that includes these covariances and that you can then pass to rma.mv().
+
+But yes, random=~1|Site/exp/obs would be sensible.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of C?sar Terrer
+Sent: Wednesday, 25 March, 2020 15:34
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Random effects structure
+
+Dear community,
+
+I am conducting a meta-analysis to study the growth rate of bacterial predators as compared to their prey, using the log response ratio. Furthermore, I want to study if this effect varies across different predators. The dataset has the following structure, here showing a subset:
+
+Site CommonControl exp obs Predator lnR var
+A Alaska 155 1 1 Bdello -0.6713152 0.03785708
+A Alaska 155 1 2 Cytoph -0.0702467 0.05763364
+A Alaska 155 1 3 Myxo -0.148982 0.00748768
+A Alaska 1510 2 4 Bdello -0.4926361 0.01691187
+A Alaska 1510 2 5 Cytoph -0.213787 0.01045785
+B Andesite1controlWeek1 9 6 Bdello 0.27873598 0.14129722
+B Andesite1controlWeek1 9 7 Cytoph -0.3243682 0.01466085
+B Andesite1controlWeek1 9 8 Lyso 1.18302506 0.11663149
+B Andesite1controlWeek6 11 9 Bdello -0.8465128 0.03701618
+B Andesite1controlWeek6 11 10 Cytoph -0.1559056 0.0283173
+B Andesite1controlWeek6 11 11 Lyso -0.8039415 0.04926915
+
+1. There are different sites, thus a potential source of non-independency
+2. Within each site,?we use the value for preys in?the denominator multiple times. I guess rows of data using the same denominator (CommonControl) are also potentially correlated and should be also added as a random-effect.
+
+Based on 1., 2., and what I have understood from the?Konstantopoulos (2011) tutorial, I think I should use the following model:
+
+res <-rma.mv(yi=lnR, V=var, random=~1|Site/exp/obs, mods=~Predator, data=data)
+
+Could you please let me know if the structure of random effects seems appropriate, and help me understand why I need to include "obs"?
+Thank you.
+Cesar
+
+From ce@@r@terrer @end|ng |rom me@com  Wed Mar 25 19:41:34 2020
+From: ce@@r@terrer @end|ng |rom me@com (=?utf-8?B?Q8Opc2FyIFRlcnJlcg==?=)
+Date: Wed, 25 Mar 2020 18:41:34 -0000
+Subject: [R-meta] Random effects structure
+Message-ID: <5bdfea44-413a-4e0e-b513-a216480ded79@me.com>
+
+Thanks Wolfgang,
+
+I have tried your code:
+
+dat$Site.exp <- as.factor(paste0(dat$Site,".",dat$exp))
+dat <- dat[order(dat$Site, dat$exp),]
+calc.v <- function(x) {
+v <- matrix(x$NPSD^2[1] / (x$NPN[1] * x$NP[1]^2), nrow=nrow(x), ncol=nrow(x))
+diag(v) <- x$var
+v
+}
+V <- bldiag(lapply(split(dat, dat$Site.exp), calc.v))
+res <-rma.mv(yi=lnR, V, random=~1|Site/exp/obs, mods=~Predator, data=dat)
+
+But I get an error: "'V' must be a symmetric matrix."
+
+The dataset has 297 rows, so V is "num [1:297, 1:297]", which seems symmetric to me. The blocks in V seem to be correct. What do you think is the source of the error?
+Cheers,
+Cesar
+
+
+On March 25, 2020 at 10:25 AM, "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+The Berkey code doesn't quite apply here. This is more relevant:
+
+http://www.metafor-project.org/doku.php/analyses:gleser2009#multiple-treatment_studies
+
+But your splitting variable is 'exp' within 'Site', so you need to first create a variable that is the combination of the two. This should do it:
+
+dat$Site.exp <- paste0(dat$Site, ".", dat$exp)
+
+Also make sure that the data are sorted accordingly:
+
+dat <- dat[order(dat$Site, dat$exp),]
+
+Then:
+
+calc.v <- function(x) {
+v <- matrix(x$NPSD^2[1] / (x$NPN[1] * dat$NP[1]^2), nrow=nrow(x), ncol=nrow(x))
+diag(v) <- x$var
+v
+}
+V <- bldiag(lapply(split(dat, dat$Site.exp), calc.v))
+
+You should double-check that the blocks in V are correct (with 'var' along the diagonal and the correct covariances along the off-diagonal) before trying to fit the model.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: C?sar Terrer [mailto:cesar.terrer at me.com] 
+Sent: Wednesday, 25 March, 2020 16:21
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Random effects structure
+
+Hi Wolfgang,
+
+Thank you for your quick response.
+
+I have never constructed a V matrix. Based on the Berkey tutorial, I have tried to apply the following
+
+dat$v2i <- dat$NPSD^2 / (dat$NPN*dat$NP^2)
+V <- bldiag(lapply(split(dat[,c("var", "v2i")], dat$exp), as.matrix))
+res <-rma.mv(yi=lnR, V=V, random=~1|Site/exp/obs, mods=~Predator, data=dat)
+
+But it gives me an error that? 'V' must be a square matrix. Is this because the split in V has to be done at the "obs" level? I used "exp" because that indicates the level at which all effect sizes use the same control.
+
+Thank you
+Cesar
+
+On March 25, 2020 at 7:44 AM, "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Hi Cesar,
+
+When the same group is used to compute multiple estimates (i.e., a common control), then this also induces dependency on the sampling errors. For the log response ratio, the covariance is then:
+
+SD_C^2 / (n_C*M_C^2)
+
+where M_C and SD_C are the mean and SD of the common control group and n_C the control group size.
+
+So, you ideally should construct a proper V matrix that includes these covariances and that you can then pass to rma.mv().
+
+But yes, random=~1|Site/exp/obs would be sensible.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of C?sar Terrer
+Sent: Wednesday, 25 March, 2020 15:34
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Random effects structure
+
+Dear community,
+
+I am conducting a meta-analysis to study the growth rate of bacterial predators as compared to their prey, using the log response ratio. Furthermore, I want to study if this effect varies across different predators. The dataset has the following structure, here showing a subset:
+
+Site CommonControl exp obs Predator lnR var
+A Alaska 155 1 1 Bdello -0.6713152 0.03785708
+A Alaska 155 1 2 Cytoph -0.0702467 0.05763364
+A Alaska 155 1 3 Myxo -0.148982 0.00748768
+A Alaska 1510 2 4 Bdello -0.4926361 0.01691187
+A Alaska 1510 2 5 Cytoph -0.213787 0.01045785
+B Andesite1controlWeek1 9 6 Bdello 0.27873598 0.14129722
+B Andesite1controlWeek1 9 7 Cytoph -0.3243682 0.01466085
+B Andesite1controlWeek1 9 8 Lyso 1.18302506 0.11663149
+B Andesite1controlWeek6 11 9 Bdello -0.8465128 0.03701618
+B Andesite1controlWeek6 11 10 Cytoph -0.1559056 0.0283173
+B Andesite1controlWeek6 11 11 Lyso -0.8039415 0.04926915
+
+1. There are different sites, thus a potential source of non-independency
+2. Within each site,?we use the value for preys in?the denominator multiple times. I guess rows of data using the same denominator (CommonControl) are also potentially correlated and should be also added as a random-effect.
+
+Based on 1., 2., and what I have understood from the?Konstantopoulos (2011) tutorial, I think I should use the following model:
+
+res <-rma.mv(yi=lnR, V=var, random=~1|Site/exp/obs, mods=~Predator, data=data)
+
+Could you please let me know if the structure of random effects seems appropriate, and help me understand why I need to include "obs"?
+Thank you.
+Cesar
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200325/03b9970d/attachment.html>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Mar 25 20:14:57 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 25 Mar 2020 19:14:57 +0000
+Subject: [R-meta] Random effects structure
+In-Reply-To: <5bdfea44-413a-4e0e-b513-a216480ded79@me.com>
+References: <5bdfea44-413a-4e0e-b513-a216480ded79@me.com>
+Message-ID: <8f30a2214a984582bbf8a23b77595fde@UM-MAIL3214.unimaas.nl>
+
+Symmtric doesn't just mean that nrow(V) == ncol(V). It means that V == t(V) (within some numerical tolerance -- see help(isSymmetric) from the Matrix package). For some reason, that's not the case, which is surprising (calc.v() must generate a symmetric matrix by construction). You might want to examine where there is a mismatch:
+
+V != t(V)
+
+What are the values corresponding to cases where this is TRUE?
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: C?sar Terrer [mailto:cesar.terrer at me.com] 
+Sent: Wednesday, 25 March, 2020 19:42
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Random effects structure
+
+Thanks Wolfgang,
+
+I have tried your code:
+
+dat$Site.exp <- as.factor(paste0(dat$Site,".",dat$exp))
+dat <- dat[order(dat$Site, dat$exp),]
+calc.v <- function(x) {
+v <- matrix(x$NPSD^2[1] / (x$NPN[1] * x$NP[1]^2), nrow=nrow(x), ncol=nrow(x))
+diag(v) <- x$var
+v
+}
+V <- bldiag(lapply(split(dat, dat$Site.exp), calc.v))
+res <-rma.mv(yi=lnR, V, random=~1|Site/exp/obs, mods=~Predator, data=dat)
+
+But I get an error: "'V' must be a symmetric matrix."
+
+The dataset has 297 rows, so V is "num [1:297, 1:297]", which seems symmetric to me. The blocks in V seem to be correct. What do you think is the source of the error?
+Cheers,
+Cesar
+
+On March 25, 2020 at 10:25 AM, "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+The Berkey code doesn't quite apply here. This is more relevant:
+
+http://www.metafor-project.org/doku.php/analyses:gleser2009#multiple-treatment_studies
+
+But your splitting variable is 'exp' within 'Site', so you need to first create a variable that is the combination of the two. This should do it:
+
+dat$Site.exp <- paste0(dat$Site, ".", dat$exp)
+
+Also make sure that the data are sorted accordingly:
+
+dat <- dat[order(dat$Site, dat$exp),]
+
+Then:
+
+calc.v <- function(x) {
+v <- matrix(x$NPSD^2[1] / (x$NPN[1] * dat$NP[1]^2), nrow=nrow(x), ncol=nrow(x))
+diag(v) <- x$var
+v
+}
+V <- bldiag(lapply(split(dat, dat$Site.exp), calc.v))
+
+You should double-check that the blocks in V are correct (with 'var' along the diagonal and the correct covariances along the off-diagonal) before trying to fit the model.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: C?sar Terrer [mailto:cesar.terrer at me.com] 
+Sent: Wednesday, 25 March, 2020 16:21
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Random effects structure
+
+Hi Wolfgang,
+
+Thank you for your quick response.
+
+I have never constructed a V matrix. Based on the Berkey tutorial, I have tried to apply the following
+
+dat$v2i <- dat$NPSD^2 / (dat$NPN*dat$NP^2)
+V <- bldiag(lapply(split(dat[,c("var", "v2i")], dat$exp), as.matrix))
+res <-rma.mv(yi=lnR, V=V, random=~1|Site/exp/obs, mods=~Predator, data=dat)
+
+But it gives me an error that? 'V' must be a square matrix. Is this because the split in V has to be done at the "obs" level? I used "exp" because that indicates the level at which all effect sizes use the same control.
+
+Thank you
+Cesar
+
+On March 25, 2020 at 7:44 AM, "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Hi Cesar,
+
+When the same group is used to compute multiple estimates (i.e., a common control), then this also induces dependency on the sampling errors. For the log response ratio, the covariance is then:
+
+SD_C^2 / (n_C*M_C^2)
+
+where M_C and SD_C are the mean and SD of the common control group and n_C the control group size.
+
+So, you ideally should construct a proper V matrix that includes these covariances and that you can then pass to rma.mv().
+
+But yes, random=~1|Site/exp/obs would be sensible.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of C?sar Terrer
+Sent: Wednesday, 25 March, 2020 15:34
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Random effects structure
+
+Dear community,
+
+I am conducting a meta-analysis to study the growth rate of bacterial predators as compared to their prey, using the log response ratio. Furthermore, I want to study if this effect varies across different predators. The dataset has the following structure, here showing a subset:
+
+Site CommonControl exp obs Predator lnR var
+A Alaska 155 1 1 Bdello -0.6713152 0.03785708
+A Alaska 155 1 2 Cytoph -0.0702467 0.05763364
+A Alaska 155 1 3 Myxo -0.148982 0.00748768
+A Alaska 1510 2 4 Bdello -0.4926361 0.01691187
+A Alaska 1510 2 5 Cytoph -0.213787 0.01045785
+B Andesite1controlWeek1 9 6 Bdello 0.27873598 0.14129722
+B Andesite1controlWeek1 9 7 Cytoph -0.3243682 0.01466085
+B Andesite1controlWeek1 9 8 Lyso 1.18302506 0.11663149
+B Andesite1controlWeek6 11 9 Bdello -0.8465128 0.03701618
+B Andesite1controlWeek6 11 10 Cytoph -0.1559056 0.0283173
+B Andesite1controlWeek6 11 11 Lyso -0.8039415 0.04926915
+
+1. There are different sites, thus a potential source of non-independency
+2. Within each site,?we use the value for preys in?the denominator multiple times. I guess rows of data using the same denominator (CommonControl) are also potentially correlated and should be also added as a random-effect.
+
+Based on 1., 2., and what I have understood from the?Konstantopoulos (2011) tutorial, I think I should use the following model:
+
+res <-rma.mv(yi=lnR, V=var, random=~1|Site/exp/obs, mods=~Predator, data=data)
+
+Could you please let me know if the structure of random effects seems appropriate, and help me understand why I need to include "obs"?
+Thank you.
+Cesar
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Mar 25 21:55:12 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 25 Mar 2020 20:55:12 +0000
+Subject: [R-meta] Random effects structure
+In-Reply-To: <8f30a2214a984582bbf8a23b77595fde@UM-MAIL3214.unimaas.nl>
+References: <5bdfea44-413a-4e0e-b513-a216480ded79@me.com>
+ <8f30a2214a984582bbf8a23b77595fde@UM-MAIL3214.unimaas.nl>
+Message-ID: <29de874506be4c9699f3aa4427518c3b@UM-MAIL3214.unimaas.nl>
+
+Made a mistake in calc.v(). It should be:
+
+calc.v <- function(x) {
+   v <- matrix(x$NPSD[1]^2 / (x$NPN[1] * x$NP[1]^2), nrow=nrow(x), ncol=nrow(x))
+   diag(v) <- x$var
+   v
+}
+
+Now it should work.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Viechtbauer, Wolfgang (SP)
+Sent: Wednesday, 25 March, 2020 20:15
+To: C?sar Terrer
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Random effects structure
+
+Symmtric doesn't just mean that nrow(V) == ncol(V). It means that V == t(V) (within some numerical tolerance -- see help(isSymmetric) from the Matrix package). For some reason, that's not the case, which is surprising (calc.v() must generate a symmetric matrix by construction). You might want to examine where there is a mismatch:
+
+V != t(V)
+
+What are the values corresponding to cases where this is TRUE?
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: C?sar Terrer [mailto:cesar.terrer at me.com] 
+Sent: Wednesday, 25 March, 2020 19:42
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Random effects structure
+
+Thanks Wolfgang,
+
+I have tried your code:
+
+dat$Site.exp <- as.factor(paste0(dat$Site,".",dat$exp))
+dat <- dat[order(dat$Site, dat$exp),]
+calc.v <- function(x) {
+v <- matrix(x$NPSD^2[1] / (x$NPN[1] * x$NP[1]^2), nrow=nrow(x), ncol=nrow(x))
+diag(v) <- x$var
+v
+}
+V <- bldiag(lapply(split(dat, dat$Site.exp), calc.v))
+res <-rma.mv(yi=lnR, V, random=~1|Site/exp/obs, mods=~Predator, data=dat)
+
+But I get an error: "'V' must be a symmetric matrix."
+
+The dataset has 297 rows, so V is "num [1:297, 1:297]", which seems symmetric to me. The blocks in V seem to be correct. What do you think is the source of the error?
+Cheers,
+Cesar
+
+On March 25, 2020 at 10:25 AM, "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+The Berkey code doesn't quite apply here. This is more relevant:
+
+http://www.metafor-project.org/doku.php/analyses:gleser2009#multiple-treatment_studies
+
+But your splitting variable is 'exp' within 'Site', so you need to first create a variable that is the combination of the two. This should do it:
+
+dat$Site.exp <- paste0(dat$Site, ".", dat$exp)
+
+Also make sure that the data are sorted accordingly:
+
+dat <- dat[order(dat$Site, dat$exp),]
+
+Then:
+
+calc.v <- function(x) {
+v <- matrix(x$NPSD^2[1] / (x$NPN[1] * dat$NP[1]^2), nrow=nrow(x), ncol=nrow(x))
+diag(v) <- x$var
+v
+}
+V <- bldiag(lapply(split(dat, dat$Site.exp), calc.v))
+
+You should double-check that the blocks in V are correct (with 'var' along the diagonal and the correct covariances along the off-diagonal) before trying to fit the model.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: C?sar Terrer [mailto:cesar.terrer at me.com] 
+Sent: Wednesday, 25 March, 2020 16:21
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Random effects structure
+
+Hi Wolfgang,
+
+Thank you for your quick response.
+
+I have never constructed a V matrix. Based on the Berkey tutorial, I have tried to apply the following
+
+dat$v2i <- dat$NPSD^2 / (dat$NPN*dat$NP^2)
+V <- bldiag(lapply(split(dat[,c("var", "v2i")], dat$exp), as.matrix))
+res <-rma.mv(yi=lnR, V=V, random=~1|Site/exp/obs, mods=~Predator, data=dat)
+
+But it gives me an error that? 'V' must be a square matrix. Is this because the split in V has to be done at the "obs" level? I used "exp" because that indicates the level at which all effect sizes use the same control.
+
+Thank you
+Cesar
+
+On March 25, 2020 at 7:44 AM, "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Hi Cesar,
+
+When the same group is used to compute multiple estimates (i.e., a common control), then this also induces dependency on the sampling errors. For the log response ratio, the covariance is then:
+
+SD_C^2 / (n_C*M_C^2)
+
+where M_C and SD_C are the mean and SD of the common control group and n_C the control group size.
+
+So, you ideally should construct a proper V matrix that includes these covariances and that you can then pass to rma.mv().
+
+But yes, random=~1|Site/exp/obs would be sensible.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of C?sar Terrer
+Sent: Wednesday, 25 March, 2020 15:34
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Random effects structure
+
+Dear community,
+
+I am conducting a meta-analysis to study the growth rate of bacterial predators as compared to their prey, using the log response ratio. Furthermore, I want to study if this effect varies across different predators. The dataset has the following structure, here showing a subset:
+
+Site CommonControl exp obs Predator lnR var
+A Alaska 155 1 1 Bdello -0.6713152 0.03785708
+A Alaska 155 1 2 Cytoph -0.0702467 0.05763364
+A Alaska 155 1 3 Myxo -0.148982 0.00748768
+A Alaska 1510 2 4 Bdello -0.4926361 0.01691187
+A Alaska 1510 2 5 Cytoph -0.213787 0.01045785
+B Andesite1controlWeek1 9 6 Bdello 0.27873598 0.14129722
+B Andesite1controlWeek1 9 7 Cytoph -0.3243682 0.01466085
+B Andesite1controlWeek1 9 8 Lyso 1.18302506 0.11663149
+B Andesite1controlWeek6 11 9 Bdello -0.8465128 0.03701618
+B Andesite1controlWeek6 11 10 Cytoph -0.1559056 0.0283173
+B Andesite1controlWeek6 11 11 Lyso -0.8039415 0.04926915
+
+1. There are different sites, thus a potential source of non-independency
+2. Within each site,?we use the value for preys in?the denominator multiple times. I guess rows of data using the same denominator (CommonControl) are also potentially correlated and should be also added as a random-effect.
+
+Based on 1., 2., and what I have understood from the?Konstantopoulos (2011) tutorial, I think I should use the following model:
+
+res <-rma.mv(yi=lnR, V=var, random=~1|Site/exp/obs, mods=~Predator, data=data)
+
+Could you please let me know if the structure of random effects seems appropriate, and help me understand why I need to include "obs"?
+Thank you.
+Cesar
+_______________________________________________
+R-sig-meta-analysis mailing list
+R-sig-meta-analysis at r-project.org
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+From juhyung2 @end|ng |rom @t@n|ord@edu  Sun Mar 29 20:16:09 2020
+From: juhyung2 @end|ng |rom @t@n|ord@edu (Ju Lee)
+Date: Sun, 29 Mar 2020 18:16:09 +0000
+Subject: [R-meta] Dear Wolfgang
+Message-ID: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+
+Dear Wolfgang,
+
+I sincerely hope you are well and healthy.
+I wanted to reach out regarding ways to incorporate studies with repeated-measures to overall mixed effect models.
+
+My data is almost entirely composed of studies measuring responses at a single time point, but there are few studies that have been measuring responses multiple times throughout study seasons. I was advised that time-averaging these multiple responses makes more sense for these studies.
+
+My understanding was that you could 1) do a fixed effect meta-analysis of these studies to generate a single mean effect sizes and sampling variance from these repeated measurements and then 2) incorporate the single effect size and variance into overall mixed-effect model. Is this a correct approach?
+
+If so, how would I calculate sampling variance from the fixed model in the step 1? Is it based on SE outputs of the fixed effect model?
+
+Thank you very much, and I look forward to hearing from you!
+Best,
+JU
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Mar 30 12:37:59 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 30 Mar 2020 10:37:59 +0000
+Subject: [R-meta] Dear Wolfgang
+In-Reply-To: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+References: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+Message-ID: <3a96292074454fc3bb90d95d88a41032@UM-MAIL3214.unimaas.nl>
+
+Dear Ju,
+
+Before I can try to address your actual questions, please say a bit more about the studies that measure responses at a single time point. Are groups (e.g., treatment versus control) being compared within these studies? Are the 'responses' continuous (such that means and SDs are being reported) or dichotomous (such that counts or proportions are being reported) or something else? And related to this, what effect size measure are you using for quantifying the group difference within studies? Standardized mean differences (which would make sense when means/SDs are being reported), risk differences or (log) risk/odds ratios (based on counts/proportions), or something else?
+
+And the studies that measure responses at multiple time points: Are they just doing the same thing that the 'single time point studies' are doing, but at multiple time points? For example, instead of reporting the means and SDs of the treatment and control group once, there are several follow-ups, such that such the means and SDs of the two groups are reported at each follow-up time point?
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ju Lee
+Sent: Sunday, 29 March, 2020 20:16
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Dear Wolfgang
+
+Dear Wolfgang,
+
+I sincerely hope you are well and healthy.
+I wanted to reach out regarding ways to incorporate studies with repeated-measures to overall mixed effect models.
+
+My data is almost entirely composed of studies measuring responses at a single time point, but there are few studies that have been measuring responses multiple times throughout study seasons. I was advised that time-averaging these multiple responses makes more sense for these studies.
+
+My understanding was that you could 1) do a fixed effect meta-analysis of these studies to generate a single mean effect sizes and sampling variance from these repeated measurements and then 2) incorporate the single effect size and variance into overall mixed-effect model. Is this a correct approach?
+
+If so, how would I calculate sampling variance from the fixed model in the step 1? Is it based on SE outputs of the fixed effect model?
+
+Thank you very much, and I look forward to hearing from you!
+Best,
+JU
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Mon Mar 30 14:32:46 2020
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 30 Mar 2020 13:32:46 +0100
+Subject: [R-meta] Dear Wolfgang
+In-Reply-To: <3a96292074454fc3bb90d95d88a41032@UM-MAIL3214.unimaas.nl>
+References: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <3a96292074454fc3bb90d95d88a41032@UM-MAIL3214.unimaas.nl>
+Message-ID: <685fc21c-9fca-c136-81e6-2eb1a9dd32a2@dewey.myzen.co.uk>
+
+And in addition to Wolfgang's comments it would be helpful to know what 
+scientific question underlies the decision to measure at multiple time 
+points. Presumably the authors of primary studies did not do it for fun.
+
+Michael
+
+On 30/03/2020 11:37, Viechtbauer, Wolfgang (SP) wrote:
+> Dear Ju,
+> 
+> Before I can try to address your actual questions, please say a bit more about the studies that measure responses at a single time point. Are groups (e.g., treatment versus control) being compared within these studies? Are the 'responses' continuous (such that means and SDs are being reported) or dichotomous (such that counts or proportions are being reported) or something else? And related to this, what effect size measure are you using for quantifying the group difference within studies? Standardized mean differences (which would make sense when means/SDs are being reported), risk differences or (log) risk/odds ratios (based on counts/proportions), or something else?
+> 
+> And the studies that measure responses at multiple time points: Are they just doing the same thing that the 'single time point studies' are doing, but at multiple time points? For example, instead of reporting the means and SDs of the treatment and control group once, there are several follow-ups, such that such the means and SDs of the two groups are reported at each follow-up time point?
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ju Lee
+> Sent: Sunday, 29 March, 2020 20:16
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Dear Wolfgang
+> 
+> Dear Wolfgang,
+> 
+> I sincerely hope you are well and healthy.
+> I wanted to reach out regarding ways to incorporate studies with repeated-measures to overall mixed effect models.
+> 
+> My data is almost entirely composed of studies measuring responses at a single time point, but there are few studies that have been measuring responses multiple times throughout study seasons. I was advised that time-averaging these multiple responses makes more sense for these studies.
+> 
+> My understanding was that you could 1) do a fixed effect meta-analysis of these studies to generate a single mean effect sizes and sampling variance from these repeated measurements and then 2) incorporate the single effect size and variance into overall mixed-effect model. Is this a correct approach?
+> 
+> If so, how would I calculate sampling variance from the fixed model in the step 1? Is it based on SE outputs of the fixed effect model?
+> 
+> Thank you very much, and I look forward to hearing from you!
+> Best,
+> JU
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From juhyung2 @end|ng |rom @t@n|ord@edu  Mon Mar 30 18:15:48 2020
+From: juhyung2 @end|ng |rom @t@n|ord@edu (Ju Lee)
+Date: Mon, 30 Mar 2020 16:15:48 +0000
+Subject: [R-meta] Dear Wolfgang
+In-Reply-To: <685fc21c-9fca-c136-81e6-2eb1a9dd32a2@dewey.myzen.co.uk>
+References: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <3a96292074454fc3bb90d95d88a41032@UM-MAIL3214.unimaas.nl>,
+ <685fc21c-9fca-c136-81e6-2eb1a9dd32a2@dewey.myzen.co.uk>
+Message-ID: <BYAPR02MB5559434DA310A9BA2B9EDC1AF7CB0@BYAPR02MB5559.namprd02.prod.outlook.com>
+
+Dear Wolfgang, Michael
+
+
+
+These questions are important, and thank you for pointing them out.
+
+
+
+In answers to your questions:
+
+
+
+  1.  Studies are measuring predation or herbivory rate on experimental prey in control and treatment conditions in the field. Large majority of studies measure this over short term experiment and thus on a single time point (ex. After 24 hr of field exposure).
+  2.  However, some studies will monitor these responses over long-term period over multiple seasons to understand the seasonal dynamics. The issue here is that responses show seasonal fluctuation, which is what they were looking for. But the reviewer of our study has warned against using single representative timepoint within these multiple measures (ex. Peak season) but rather time-average these multiple measurements to reduce time-related bias.
+  3.  So back to the point: In all of studies, in multiple time point, same treatment vs. control group are being compared using the same sampling method. We have mean and SD for all of these data point, separately for control and treatment groups for each time point of multiple measurements.
+  4.  I am using Hedges? d as effect sizes.
+
+
+
+Thank you and I hope this clarifies the question better!
+
+Best,
+
+JU
+
+________________________________
+From: Michael Dewey <lists at dewey.myzen.co.uk>
+Sent: Monday, March 30, 2020 5:32 AM
+To: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>; Ju Lee <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] Dear Wolfgang
+
+And in addition to Wolfgang's comments it would be helpful to know what
+scientific question underlies the decision to measure at multiple time
+points. Presumably the authors of primary studies did not do it for fun.
+
+Michael
+
+On 30/03/2020 11:37, Viechtbauer, Wolfgang (SP) wrote:
+> Dear Ju,
+>
+> Before I can try to address your actual questions, please say a bit more about the studies that measure responses at a single time point. Are groups (e.g., treatment versus control) being compared within these studies? Are the 'responses' continuous (such that means and SDs are being reported) or dichotomous (such that counts or proportions are being reported) or something else? And related to this, what effect size measure are you using for quantifying the group difference within studies? Standardized mean differences (which would make sense when means/SDs are being reported), risk differences or (log) risk/odds ratios (based on counts/proportions), or something else?
+>
+> And the studies that measure responses at multiple time points: Are they just doing the same thing that the 'single time point studies' are doing, but at multiple time points? For example, instead of reporting the means and SDs of the treatment and control group once, there are several follow-ups, such that such the means and SDs of the two groups are reported at each follow-up time point?
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ju Lee
+> Sent: Sunday, 29 March, 2020 20:16
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Dear Wolfgang
+>
+> Dear Wolfgang,
+>
+> I sincerely hope you are well and healthy.
+> I wanted to reach out regarding ways to incorporate studies with repeated-measures to overall mixed effect models.
+>
+> My data is almost entirely composed of studies measuring responses at a single time point, but there are few studies that have been measuring responses multiple times throughout study seasons. I was advised that time-averaging these multiple responses makes more sense for these studies.
+>
+> My understanding was that you could 1) do a fixed effect meta-analysis of these studies to generate a single mean effect sizes and sampling variance from these repeated measurements and then 2) incorporate the single effect size and variance into overall mixed-effect model. Is this a correct approach?
+>
+> If so, how would I calculate sampling variance from the fixed model in the step 1? Is it based on SE outputs of the fixed effect model?
+>
+> Thank you very much, and I look forward to hearing from you!
+> Best,
+> JU
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+--
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Mar 30 20:00:16 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 30 Mar 2020 18:00:16 +0000
+Subject: [R-meta] Dear Wolfgang
+In-Reply-To: <BYAPR02MB5559434DA310A9BA2B9EDC1AF7CB0@BYAPR02MB5559.namprd02.prod.outlook.com>
+References: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <3a96292074454fc3bb90d95d88a41032@UM-MAIL3214.unimaas.nl>,
+ <685fc21c-9fca-c136-81e6-2eb1a9dd32a2@dewey.myzen.co.uk>
+ <BYAPR02MB5559434DA310A9BA2B9EDC1AF7CB0@BYAPR02MB5559.namprd02.prod.outlook.com>
+Message-ID: <4f3b84ec5f5b4ccb8ac1f374d3e4a147@UM-MAIL3214.unimaas.nl>
+
+Thanks for the clarification.
+
+Computing a time-averaged d (or g) value is tricky because the values are not independent. So, if you meta-analyze them, the standard error of the pooled estimate would not be correct unless you take the dependency into consideration. And to answer one of your questions, squaring the standard error from the model would give you the sampling variance, but again, that value would not be correct.
+
+Basically what you have is the 'multiple-endpoint' case described here:
+
+http://www.metafor-project.org/doku.php/analyses:gleser2009#multiple-endpoint_studies
+
+You would need an estimate of the correlation between the repeated measurements (and if you have more than two time points, then an entire correlation matrix) to construct the V matrix for each study before meta-analyzing the values. Then you could use:
+
+res <- rma.mv(yi, V, data=dat)
+
+to pool the estimates into a time-averaged estimate, coef(res), and vcov(res) would give you the sampling variance. But the difficult part is constructing V.
+
+Maybe you can make some reasonable assumptions about the size of correlation (which probably should be lower the further time points are separated, although if there are seasonal effects, then measurements taken during similar seasons - even if they are further apart - may tend to be more correlated again). Based on equations (19.26) and (19.27) from the Gleser and Olkin  (2009) chapter, you can then construct the V matrix.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Ju Lee [mailto:juhyung2 at stanford.edu] 
+Sent: Monday, 30 March, 2020 18:16
+To: Michael Dewey; Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Dear Wolfgang
+
+Dear Wolfgang, Michael
+?
+These questions are important, and thank you for pointing them out.
+?
+In answers to your questions:
+?
+1. Studies are measuring predation or herbivory rate on experimental prey in control and treatment conditions in the field. Large majority of studies measure this over short term experiment and thus on a single time point (ex. After 24 hr of field exposure). 
+
+2. However, some studies will monitor these responses over long-term period over multiple seasons to understand the seasonal dynamics. The issue here is that responses show seasonal fluctuation, which is what they were looking for. But the reviewer of our study has warned against using single representative timepoint within these multiple measures (ex. Peak season) but rather time-average these multiple measurements to reduce time-related bias.
+
+3. So back to the point: In all of studies, in multiple time point, same treatment vs. control group are being compared using the same sampling method. We have mean and SD for all of these data point, separately for control and treatment groups for each time point of multiple measurements.
+
+4. I am using Hedges' d as effect sizes. 
+?
+Thank you and I hope this clarifies the question better!
+Best,
+JU
+
+________________________________________
+From: Michael Dewey <lists at dewey.myzen.co.uk>
+Sent: Monday, March 30, 2020 5:32 AM
+To: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>; Ju Lee <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] Dear Wolfgang 
+?
+And in addition to Wolfgang's comments it would be helpful to know what 
+scientific question underlies the decision to measure at multiple time 
+points. Presumably the authors of primary studies did not do it for fun.
+
+Michael
+
+On 30/03/2020 11:37, Viechtbauer, Wolfgang (SP) wrote:
+> Dear Ju,
+> 
+> Before I can try to address your actual questions, please say a bit more about the studies that measure responses at a single time point. Are groups (e.g., treatment versus control) being compared within these studies? Are the 'responses' continuous (such that means and SDs are being reported) or dichotomous (such that counts or proportions are being reported) or something else? And related to this, what effect size measure are you using for quantifying the group difference within studies? Standardized mean differences (which would make sense when means/SDs are being reported), risk differences or (log) risk/odds ratios (based on counts/proportions), or something else?
+> 
+> And the studies that measure responses at multiple time points: Are they just doing the same thing that the 'single time point studies' are doing, but at multiple time points? For example, instead of reporting the means and SDs of the treatment and control group once, there are several follow-ups, such that such the means and SDs of the two groups are reported at each follow-up time point?
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ju Lee
+> Sent: Sunday, 29 March, 2020 20:16
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Dear Wolfgang
+> 
+> Dear Wolfgang,
+> 
+> I sincerely hope you are well and healthy.
+> I wanted to reach out regarding ways to incorporate studies with repeated-measures to overall mixed effect models.
+> 
+> My data is almost entirely composed of studies measuring responses at a single time point, but there are few studies that have been measuring responses multiple times throughout study seasons. I was advised that time-averaging these multiple responses makes more sense for these studies.
+> 
+> My understanding was that you could 1) do a fixed effect meta-analysis of these studies to generate a single mean effect sizes and sampling variance from these repeated measurements and then 2) incorporate the single effect size and variance into overall mixed-effect model. Is this a correct approach?
+> 
+> If so, how would I calculate sampling variance from the fixed model in the step 1? Is it based on SE outputs of the fixed effect model?
+> 
+> Thank you very much, and I look forward to hearing from you!
+> Best,
+> JU
+
+
+From N|cky@We|ton @end|ng |rom br|@to|@@c@uk  Mon Mar 30 20:36:06 2020
+From: N|cky@We|ton @end|ng |rom br|@to|@@c@uk (Nicky Welton)
+Date: Mon, 30 Mar 2020 18:36:06 +0000
+Subject: [R-meta] Dear Wolfgang
+In-Reply-To: <4f3b84ec5f5b4ccb8ac1f374d3e4a147@UM-MAIL3214.unimaas.nl>
+References: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <3a96292074454fc3bb90d95d88a41032@UM-MAIL3214.unimaas.nl>,
+ <685fc21c-9fca-c136-81e6-2eb1a9dd32a2@dewey.myzen.co.uk>
+ <BYAPR02MB5559434DA310A9BA2B9EDC1AF7CB0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <4f3b84ec5f5b4ccb8ac1f374d3e4a147@UM-MAIL3214.unimaas.nl>
+Message-ID: <VI1PR06MB3055148607F19BA2EC2434D9C8CB0@VI1PR06MB3055.eurprd06.prod.outlook.com>
+
+If you are interested in modelling the time-course relationship then there is a new package in R to do this within a network meta-analysis framework (although it can also be used if there are only 2 interventions):
+https://cran.r-project.org/web/packages/MBNMAtime/index.html
+
+Best wishes,
+
+Nicky
+
+-----Original Message-----
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf Of Viechtbauer, Wolfgang (SP)
+Sent: 30 March 2020 19:00
+To: Ju Lee <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Dear Wolfgang
+
+Thanks for the clarification.
+
+Computing a time-averaged d (or g) value is tricky because the values are not independent. So, if you meta-analyze them, the standard error of the pooled estimate would not be correct unless you take the dependency into consideration. And to answer one of your questions, squaring the standard error from the model would give you the sampling variance, but again, that value would not be correct.
+
+Basically what you have is the 'multiple-endpoint' case described here:
+
+http://www.metafor-project.org/doku.php/analyses:gleser2009#multiple-endpoint_studies
+
+You would need an estimate of the correlation between the repeated measurements (and if you have more than two time points, then an entire correlation matrix) to construct the V matrix for each study before meta-analyzing the values. Then you could use:
+
+res <- rma.mv(yi, V, data=dat)
+
+to pool the estimates into a time-averaged estimate, coef(res), and vcov(res) would give you the sampling variance. But the difficult part is constructing V.
+
+Maybe you can make some reasonable assumptions about the size of correlation (which probably should be lower the further time points are separated, although if there are seasonal effects, then measurements taken during similar seasons - even if they are further apart - may tend to be more correlated again). Based on equations (19.26) and (19.27) from the Gleser and Olkin  (2009) chapter, you can then construct the V matrix.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Ju Lee [mailto:juhyung2 at stanford.edu]
+Sent: Monday, 30 March, 2020 18:16
+To: Michael Dewey; Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Dear Wolfgang
+
+Dear Wolfgang, Michael
+?
+These questions are important, and thank you for pointing them out.
+?
+In answers to your questions:
+?
+1. Studies are measuring predation or herbivory rate on experimental prey in control and treatment conditions in the field. Large majority of studies measure this over short term experiment and thus on a single time point (ex. After 24 hr of field exposure). 
+
+2. However, some studies will monitor these responses over long-term period over multiple seasons to understand the seasonal dynamics. The issue here is that responses show seasonal fluctuation, which is what they were looking for. But the reviewer of our study has warned against using single representative timepoint within these multiple measures (ex. Peak season) but rather time-average these multiple measurements to reduce time-related bias.
+
+3. So back to the point: In all of studies, in multiple time point, same treatment vs. control group are being compared using the same sampling method. We have mean and SD for all of these data point, separately for control and treatment groups for each time point of multiple measurements.
+
+4. I am using Hedges' d as effect sizes. 
+?
+Thank you and I hope this clarifies the question better!
+Best,
+JU
+
+________________________________________
+From: Michael Dewey <lists at dewey.myzen.co.uk>
+Sent: Monday, March 30, 2020 5:32 AM
+To: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>; Ju Lee <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] Dear Wolfgang 
+?
+And in addition to Wolfgang's comments it would be helpful to know what scientific question underlies the decision to measure at multiple time points. Presumably the authors of primary studies did not do it for fun.
+
+Michael
+
+On 30/03/2020 11:37, Viechtbauer, Wolfgang (SP) wrote:
+> Dear Ju,
+> 
+> Before I can try to address your actual questions, please say a bit more about the studies that measure responses at a single time point. Are groups (e.g., treatment versus control) being compared within these studies? Are the 'responses' continuous (such that means and SDs are being reported) or dichotomous (such that counts or proportions are being reported) or something else? And related to this, what effect size measure are you using for quantifying the group difference within studies? Standardized mean differences (which would make sense when means/SDs are being reported), risk differences or (log) risk/odds ratios (based on counts/proportions), or something else?
+> 
+> And the studies that measure responses at multiple time points: Are they just doing the same thing that the 'single time point studies' are doing, but at multiple time points? For example, instead of reporting the means and SDs of the treatment and control group once, there are several follow-ups, such that such the means and SDs of the two groups are reported at each follow-up time point?
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis 
+> [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ju Lee
+> Sent: Sunday, 29 March, 2020 20:16
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Dear Wolfgang
+> 
+> Dear Wolfgang,
+> 
+> I sincerely hope you are well and healthy.
+> I wanted to reach out regarding ways to incorporate studies with repeated-measures to overall mixed effect models.
+> 
+> My data is almost entirely composed of studies measuring responses at a single time point, but there are few studies that have been measuring responses multiple times throughout study seasons. I was advised that time-averaging these multiple responses makes more sense for these studies.
+> 
+> My understanding was that you could 1) do a fixed effect meta-analysis of these studies to generate a single mean effect sizes and sampling variance from these repeated measurements and then 2) incorporate the single effect size and variance into overall mixed-effect model. Is this a correct approach?
+> 
+> If so, how would I calculate sampling variance from the fixed model in the step 1? Is it based on SE outputs of the fixed effect model?
+> 
+> Thank you very much, and I look forward to hearing from you!
+> Best,
+> JU
+
+_______________________________________________
+R-sig-meta-analysis mailing list
+R-sig-meta-analysis at r-project.org
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Mon Mar 30 20:42:59 2020
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (=?UTF-8?Q?Dr=2e_Gerta_R=c3=bccker?=)
+Date: Mon, 30 Mar 2020 20:42:59 +0200
+Subject: [R-meta] Dear Wolfgang
+In-Reply-To: <VI1PR06MB3055148607F19BA2EC2434D9C8CB0@VI1PR06MB3055.eurprd06.prod.outlook.com>
+References: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <3a96292074454fc3bb90d95d88a41032@UM-MAIL3214.unimaas.nl>
+ <685fc21c-9fca-c136-81e6-2eb1a9dd32a2@dewey.myzen.co.uk>
+ <BYAPR02MB5559434DA310A9BA2B9EDC1AF7CB0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <4f3b84ec5f5b4ccb8ac1f374d3e4a147@UM-MAIL3214.unimaas.nl>
+ <VI1PR06MB3055148607F19BA2EC2434D9C8CB0@VI1PR06MB3055.eurprd06.prod.outlook.com>
+Message-ID: <a5b84c5b-429e-8c02-b98d-5daca941c746@imbi.uni-freiburg.de>
+
+Dear Ju,
+
+Another (maybe simplistic) solution could be to use only one (e.g., 
+always the first) time point for those studies that report repeated 
+measurements. This can be justified because you wrote that the "large 
+majority of studies measure this over short term experiment and thus on 
+a single time point" - so, as I understand, you it is only a minority of 
+studies that causes the multiplicity issue.
+
+A similar simplification is often done when including a small number of 
+cross-over trials into a meta-analysis of RCTs with parallel-group design.
+
+Best,
+
+Gerta
+
+Am 30.03.2020 um 20:36 schrieb Nicky Welton:
+> If you are interested in modelling the time-course relationship then there is a new package in R to do this within a network meta-analysis framework (although it can also be used if there are only 2 interventions):
+> https://cran.r-project.org/web/packages/MBNMAtime/index.html
+>
+> Best wishes,
+>
+> Nicky
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf Of Viechtbauer, Wolfgang (SP)
+> Sent: 30 March 2020 19:00
+> To: Ju Lee <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] Dear Wolfgang
+>
+> Thanks for the clarification.
+>
+> Computing a time-averaged d (or g) value is tricky because the values are not independent. So, if you meta-analyze them, the standard error of the pooled estimate would not be correct unless you take the dependency into consideration. And to answer one of your questions, squaring the standard error from the model would give you the sampling variance, but again, that value would not be correct.
+>
+> Basically what you have is the 'multiple-endpoint' case described here:
+>
+> http://www.metafor-project.org/doku.php/analyses:gleser2009#multiple-endpoint_studies
+>
+> You would need an estimate of the correlation between the repeated measurements (and if you have more than two time points, then an entire correlation matrix) to construct the V matrix for each study before meta-analyzing the values. Then you could use:
+>
+> res <- rma.mv(yi, V, data=dat)
+>
+> to pool the estimates into a time-averaged estimate, coef(res), and vcov(res) would give you the sampling variance. But the difficult part is constructing V.
+>
+> Maybe you can make some reasonable assumptions about the size of correlation (which probably should be lower the further time points are separated, although if there are seasonal effects, then measurements taken during similar seasons - even if they are further apart - may tend to be more correlated again). Based on equations (19.26) and (19.27) from the Gleser and Olkin  (2009) chapter, you can then construct the V matrix.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Ju Lee [mailto:juhyung2 at stanford.edu]
+> Sent: Monday, 30 March, 2020 18:16
+> To: Michael Dewey; Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] Dear Wolfgang
+>
+> Dear Wolfgang, Michael
+>   
+> These questions are important, and thank you for pointing them out.
+>   
+> In answers to your questions:
+>   
+> 1. Studies are measuring predation or herbivory rate on experimental prey in control and treatment conditions in the field. Large majority of studies measure this over short term experiment and thus on a single time point (ex. After 24 hr of field exposure).
+>
+> 2. However, some studies will monitor these responses over long-term period over multiple seasons to understand the seasonal dynamics. The issue here is that responses show seasonal fluctuation, which is what they were looking for. But the reviewer of our study has warned against using single representative timepoint within these multiple measures (ex. Peak season) but rather time-average these multiple measurements to reduce time-related bias.
+>
+> 3. So back to the point: In all of studies, in multiple time point, same treatment vs. control group are being compared using the same sampling method. We have mean and SD for all of these data point, separately for control and treatment groups for each time point of multiple measurements.
+>
+> 4. I am using Hedges' d as effect sizes.
+>   
+> Thank you and I hope this clarifies the question better!
+> Best,
+> JU
+>
+> ________________________________________
+> From: Michael Dewey <lists at dewey.myzen.co.uk>
+> Sent: Monday, March 30, 2020 5:32 AM
+> To: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>; Ju Lee <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+> Subject: Re: [R-meta] Dear Wolfgang
+>   
+> And in addition to Wolfgang's comments it would be helpful to know what scientific question underlies the decision to measure at multiple time points. Presumably the authors of primary studies did not do it for fun.
+>
+> Michael
+>
+> On 30/03/2020 11:37, Viechtbauer, Wolfgang (SP) wrote:
+>> Dear Ju,
+>>
+>> Before I can try to address your actual questions, please say a bit more about the studies that measure responses at a single time point. Are groups (e.g., treatment versus control) being compared within these studies? Are the 'responses' continuous (such that means and SDs are being reported) or dichotomous (such that counts or proportions are being reported) or something else? And related to this, what effect size measure are you using for quantifying the group difference within studies? Standardized mean differences (which would make sense when means/SDs are being reported), risk differences or (log) risk/odds ratios (based on counts/proportions), or something else?
+>>
+>> And the studies that measure responses at multiple time points: Are they just doing the same thing that the 'single time point studies' are doing, but at multiple time points? For example, instead of reporting the means and SDs of the treatment and control group once, there are several follow-ups, such that such the means and SDs of the two groups are reported at each follow-up time point?
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis
+>> [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ju Lee
+>> Sent: Sunday, 29 March, 2020 20:16
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Dear Wolfgang
+>>
+>> Dear Wolfgang,
+>>
+>> I sincerely hope you are well and healthy.
+>> I wanted to reach out regarding ways to incorporate studies with repeated-measures to overall mixed effect models.
+>>
+>> My data is almost entirely composed of studies measuring responses at a single time point, but there are few studies that have been measuring responses multiple times throughout study seasons. I was advised that time-averaging these multiple responses makes more sense for these studies.
+>>
+>> My understanding was that you could 1) do a fixed effect meta-analysis of these studies to generate a single mean effect sizes and sampling variance from these repeated measurements and then 2) incorporate the single effect size and variance into overall mixed-effect model. Is this a correct approach?
+>>
+>> If so, how would I calculate sampling variance from the fixed model in the step 1? Is it based on SE outputs of the fixed effect model?
+>>
+>> Thank you very much, and I look forward to hearing from you!
+>> Best,
+>> JU
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Tue Mar 31 13:28:10 2020
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 31 Mar 2020 12:28:10 +0100
+Subject: [R-meta] Dear Wolfgang
+In-Reply-To: <a5b84c5b-429e-8c02-b98d-5daca941c746@imbi.uni-freiburg.de>
+References: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <3a96292074454fc3bb90d95d88a41032@UM-MAIL3214.unimaas.nl>
+ <685fc21c-9fca-c136-81e6-2eb1a9dd32a2@dewey.myzen.co.uk>
+ <BYAPR02MB5559434DA310A9BA2B9EDC1AF7CB0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <4f3b84ec5f5b4ccb8ac1f374d3e4a147@UM-MAIL3214.unimaas.nl>
+ <VI1PR06MB3055148607F19BA2EC2434D9C8CB0@VI1PR06MB3055.eurprd06.prod.outlook.com>
+ <a5b84c5b-429e-8c02-b98d-5daca941c746@imbi.uni-freiburg.de>
+Message-ID: <941e3904-a0f6-527e-e567-d0261fe78321@dewey.myzen.co.uk>
+
+Indeed if the single time point studies have used different times Ju 
+will probably want to do a meta-regression with time as a moderator so 
+it would not matter too much if Ju chose any single value from the 
+multiple time point studies. That would avoid the complexity of 
+estimating the V matrix.
+
+Michael
+
+On 30/03/2020 19:42, Dr. Gerta R?cker wrote:
+> Dear Ju,
+> 
+> Another (maybe simplistic) solution could be to use only one (e.g., 
+> always the first) time point for those studies that report repeated 
+> measurements. This can be justified because you wrote that the "large 
+> majority of studies measure this over short term experiment and thus on 
+> a single time point" - so, as I understand, you it is only a minority of 
+> studies that causes the multiplicity issue.
+> 
+> A similar simplification is often done when including a small number of 
+> cross-over trials into a meta-analysis of RCTs with parallel-group design.
+> 
+> Best,
+> 
+> Gerta
+> 
+> Am 30.03.2020 um 20:36 schrieb Nicky Welton:
+>> If you are interested in modelling the time-course relationship then 
+>> there is a new package in R to do this within a network meta-analysis 
+>> framework (although it can also be used if there are only 2 
+>> interventions):
+>> https://cran.r-project.org/web/packages/MBNMAtime/index.html
+>>
+>> Best wishes,
+>>
+>> Nicky
+>>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> 
+>> On Behalf Of Viechtbauer, Wolfgang (SP)
+>> Sent: 30 March 2020 19:00
+>> To: Ju Lee <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org
+>> Subject: Re: [R-meta] Dear Wolfgang
+>>
+>> Thanks for the clarification.
+>>
+>> Computing a time-averaged d (or g) value is tricky because the values 
+>> are not independent. So, if you meta-analyze them, the standard error 
+>> of the pooled estimate would not be correct unless you take the 
+>> dependency into consideration. And to answer one of your questions, 
+>> squaring the standard error from the model would give you the sampling 
+>> variance, but again, that value would not be correct.
+>>
+>> Basically what you have is the 'multiple-endpoint' case described here:
+>>
+>> http://www.metafor-project.org/doku.php/analyses:gleser2009#multiple-endpoint_studies 
+>>
+>>
+>> You would need an estimate of the correlation between the repeated 
+>> measurements (and if you have more than two time points, then an 
+>> entire correlation matrix) to construct the V matrix for each study 
+>> before meta-analyzing the values. Then you could use:
+>>
+>> res <- rma.mv(yi, V, data=dat)
+>>
+>> to pool the estimates into a time-averaged estimate, coef(res), and 
+>> vcov(res) would give you the sampling variance. But the difficult part 
+>> is constructing V.
+>>
+>> Maybe you can make some reasonable assumptions about the size of 
+>> correlation (which probably should be lower the further time points 
+>> are separated, although if there are seasonal effects, then 
+>> measurements taken during similar seasons - even if they are further 
+>> apart - may tend to be more correlated again). Based on equations 
+>> (19.26) and (19.27) from the Gleser and Olkin? (2009) chapter, you can 
+>> then construct the V matrix.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: Ju Lee [mailto:juhyung2 at stanford.edu]
+>> Sent: Monday, 30 March, 2020 18:16
+>> To: Michael Dewey; Viechtbauer, Wolfgang (SP); 
+>> r-sig-meta-analysis at r-project.org
+>> Subject: Re: [R-meta] Dear Wolfgang
+>>
+>> Dear Wolfgang, Michael
+>> These questions are important, and thank you for pointing them out.
+>> In answers to your questions:
+>> 1. Studies are measuring predation or herbivory rate on experimental 
+>> prey in control and treatment conditions in the field. Large majority 
+>> of studies measure this over short term experiment and thus on a 
+>> single time point (ex. After 24 hr of field exposure).
+>>
+>> 2. However, some studies will monitor these responses over long-term 
+>> period over multiple seasons to understand the seasonal dynamics. The 
+>> issue here is that responses show seasonal fluctuation, which is what 
+>> they were looking for. But the reviewer of our study has warned 
+>> against using single representative timepoint within these multiple 
+>> measures (ex. Peak season) but rather time-average these multiple 
+>> measurements to reduce time-related bias.
+>>
+>> 3. So back to the point: In all of studies, in multiple time point, 
+>> same treatment vs. control group are being compared using the same 
+>> sampling method. We have mean and SD for all of these data point, 
+>> separately for control and treatment groups for each time point of 
+>> multiple measurements.
+>>
+>> 4. I am using Hedges' d as effect sizes.
+>> Thank you and I hope this clarifies the question better!
+>> Best,
+>> JU
+>>
+>> ________________________________________
+>> From: Michael Dewey <lists at dewey.myzen.co.uk>
+>> Sent: Monday, March 30, 2020 5:32 AM
+>> To: Viechtbauer, Wolfgang (SP) 
+>> <wolfgang.viechtbauer at maastrichtuniversity.nl>; Ju Lee 
+>> <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org 
+>> <r-sig-meta-analysis at r-project.org>
+>> Subject: Re: [R-meta] Dear Wolfgang
+>> And in addition to Wolfgang's comments it would be helpful to know 
+>> what scientific question underlies the decision to measure at multiple 
+>> time points. Presumably the authors of primary studies did not do it 
+>> for fun.
+>>
+>> Michael
+>>
+>> On 30/03/2020 11:37, Viechtbauer, Wolfgang (SP) wrote:
+>>> Dear Ju,
+>>>
+>>> Before I can try to address your actual questions, please say a bit 
+>>> more about the studies that measure responses at a single time point. 
+>>> Are groups (e.g., treatment versus control) being compared within 
+>>> these studies? Are the 'responses' continuous (such that means and 
+>>> SDs are being reported) or dichotomous (such that counts or 
+>>> proportions are being reported) or something else? And related to 
+>>> this, what effect size measure are you using for quantifying the 
+>>> group difference within studies? Standardized mean differences (which 
+>>> would make sense when means/SDs are being reported), risk differences 
+>>> or (log) risk/odds ratios (based on counts/proportions), or something 
+>>> else?
+>>>
+>>> And the studies that measure responses at multiple time points: Are 
+>>> they just doing the same thing that the 'single time point studies' 
+>>> are doing, but at multiple time points? For example, instead of 
+>>> reporting the means and SDs of the treatment and control group once, 
+>>> there are several follow-ups, such that such the means and SDs of the 
+>>> two groups are reported at each follow-up time point?
+>>>
+>>> Best,
+>>> Wolfgang
+>>>
+>>> -----Original Message-----
+>>> From: R-sig-meta-analysis
+>>> [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ju Lee
+>>> Sent: Sunday, 29 March, 2020 20:16
+>>> To: r-sig-meta-analysis at r-project.org
+>>> Subject: [R-meta] Dear Wolfgang
+>>>
+>>> Dear Wolfgang,
+>>>
+>>> I sincerely hope you are well and healthy.
+>>> I wanted to reach out regarding ways to incorporate studies with 
+>>> repeated-measures to overall mixed effect models.
+>>>
+>>> My data is almost entirely composed of studies measuring responses at 
+>>> a single time point, but there are few studies that have been 
+>>> measuring responses multiple times throughout study seasons. I was 
+>>> advised that time-averaging these multiple responses makes more sense 
+>>> for these studies.
+>>>
+>>> My understanding was that you could 1) do a fixed effect 
+>>> meta-analysis of these studies to generate a single mean effect sizes 
+>>> and sampling variance from these repeated measurements and then 2) 
+>>> incorporate the single effect size and variance into overall 
+>>> mixed-effect model. Is this a correct approach?
+>>>
+>>> If so, how would I calculate sampling variance from the fixed model 
+>>> in the step 1? Is it based on SE outputs of the fixed effect model?
+>>>
+>>> Thank you very much, and I look forward to hearing from you!
+>>> Best,
+>>> JU
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From juhyung2 @end|ng |rom @t@n|ord@edu  Tue Mar 31 22:44:29 2020
+From: juhyung2 @end|ng |rom @t@n|ord@edu (Ju Lee)
+Date: Tue, 31 Mar 2020 20:44:29 +0000
+Subject: [R-meta] Dear Wolfgang
+In-Reply-To: <941e3904-a0f6-527e-e567-d0261fe78321@dewey.myzen.co.uk>
+References: <BYAPR02MB55591E008ACC3CFA42714045F7CA0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <3a96292074454fc3bb90d95d88a41032@UM-MAIL3214.unimaas.nl>
+ <685fc21c-9fca-c136-81e6-2eb1a9dd32a2@dewey.myzen.co.uk>
+ <BYAPR02MB5559434DA310A9BA2B9EDC1AF7CB0@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <4f3b84ec5f5b4ccb8ac1f374d3e4a147@UM-MAIL3214.unimaas.nl>
+ <VI1PR06MB3055148607F19BA2EC2434D9C8CB0@VI1PR06MB3055.eurprd06.prod.outlook.com>
+ <a5b84c5b-429e-8c02-b98d-5daca941c746@imbi.uni-freiburg.de>,
+ <941e3904-a0f6-527e-e567-d0261fe78321@dewey.myzen.co.uk>
+Message-ID: <BYAPR02MB5559AFD22AA7C128FEE4495CF7C80@BYAPR02MB5559.namprd02.prod.outlook.com>
+
+Dear Wolfgang and all,
+
+Thank you very much for these different suggestions. If time-averaging effect sizes are less straightforward in our case, we may  lean more toward using a single final data point, based on the logic that all of the responses measured were accumulative to more general extent. We also considered standardizing this by using the first sampling (as Gerta suggested) instead, but these multiple time-point studies were conducted for a reason as in their particular study systems and responses being measured, it takes naturally longer to see treatment effects compared to ones used in short-term studies. Maybe it short vs. long term measurement as a moderator could be a supplementary moderator to see if that drove any response variations?
+
+Wolfgang: I have looked into the chapter that you have suggested in Gleser and Olkin (2009), and I am less clear from reading the section related to how you can assume the correlation estimate between Yj and Yj* in equation 19.26 and 27. Do you have any suggestions on relatively straightforward ways to calculate or estimate sample correlation from different means of same treatment or control groups across the multiple sampling time point?
+
+In this section of Gleser and Olkin (2009), they say: "When the sample covariance matrix of the endpoint measures for the study is published, ?jj* can be taken to be the sample correlation, rjj*. Otherwise, ?jj* will have to be imputed from other available information, for example, from the sample correlation for endpoints Yj and Yj* taken from another study."
+
+Thank you everyone for your time and inputs!
+Sincerely,
+JU
+________________________________
+From: Michael Dewey <lists at dewey.myzen.co.uk>
+Sent: Tuesday, March 31, 2020 4:28 AM
+To: Dr. Gerta R?cker <ruecker at imbi.uni-freiburg.de>; Nicky Welton <Nicky.Welton at bristol.ac.uk>; Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>; Ju Lee <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] Dear Wolfgang
+
+Indeed if the single time point studies have used different times Ju
+will probably want to do a meta-regression with time as a moderator so
+it would not matter too much if Ju chose any single value from the
+multiple time point studies. That would avoid the complexity of
+estimating the V matrix.
+
+Michael
+
+On 30/03/2020 19:42, Dr. Gerta R?cker wrote:
+> Dear Ju,
+>
+> Another (maybe simplistic) solution could be to use only one (e.g.,
+> always the first) time point for those studies that report repeated
+> measurements. This can be justified because you wrote that the "large
+> majority of studies measure this over short term experiment and thus on
+> a single time point" - so, as I understand, you it is only a minority of
+> studies that causes the multiplicity issue.
+>
+> A similar simplification is often done when including a small number of
+> cross-over trials into a meta-analysis of RCTs with parallel-group design.
+>
+> Best,
+>
+> Gerta
+>
+> Am 30.03.2020 um 20:36 schrieb Nicky Welton:
+>> If you are interested in modelling the time-course relationship then
+>> there is a new package in R to do this within a network meta-analysis
+>> framework (although it can also be used if there are only 2
+>> interventions):
+>> https://cran.r-project.org/web/packages/MBNMAtime/index.html
+>>
+>> Best wishes,
+>>
+>> Nicky
+>>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+>> On Behalf Of Viechtbauer, Wolfgang (SP)
+>> Sent: 30 March 2020 19:00
+>> To: Ju Lee <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org
+>> Subject: Re: [R-meta] Dear Wolfgang
+>>
+>> Thanks for the clarification.
+>>
+>> Computing a time-averaged d (or g) value is tricky because the values
+>> are not independent. So, if you meta-analyze them, the standard error
+>> of the pooled estimate would not be correct unless you take the
+>> dependency into consideration. And to answer one of your questions,
+>> squaring the standard error from the model would give you the sampling
+>> variance, but again, that value would not be correct.
+>>
+>> Basically what you have is the 'multiple-endpoint' case described here:
+>>
+>> http://www.metafor-project.org/doku.php/analyses:gleser2009#multiple-endpoint_studies
+>>
+>>
+>> You would need an estimate of the correlation between the repeated
+>> measurements (and if you have more than two time points, then an
+>> entire correlation matrix) to construct the V matrix for each study
+>> before meta-analyzing the values. Then you could use:
+>>
+>> res <- rma.mv(yi, V, data=dat)
+>>
+>> to pool the estimates into a time-averaged estimate, coef(res), and
+>> vcov(res) would give you the sampling variance. But the difficult part
+>> is constructing V.
+>>
+>> Maybe you can make some reasonable assumptions about the size of
+>> correlation (which probably should be lower the further time points
+>> are separated, although if there are seasonal effects, then
+>> measurements taken during similar seasons - even if they are further
+>> apart - may tend to be more correlated again). Based on equations
+>> (19.26) and (19.27) from the Gleser and Olkin  (2009) chapter, you can
+>> then construct the V matrix.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: Ju Lee [mailto:juhyung2 at stanford.edu]
+>> Sent: Monday, 30 March, 2020 18:16
+>> To: Michael Dewey; Viechtbauer, Wolfgang (SP);
+>> r-sig-meta-analysis at r-project.org
+>> Subject: Re: [R-meta] Dear Wolfgang
+>>
+>> Dear Wolfgang, Michael
+>> These questions are important, and thank you for pointing them out.
+>> In answers to your questions:
+>> 1. Studies are measuring predation or herbivory rate on experimental
+>> prey in control and treatment conditions in the field. Large majority
+>> of studies measure this over short term experiment and thus on a
+>> single time point (ex. After 24 hr of field exposure).
+>>
+>> 2. However, some studies will monitor these responses over long-term
+>> period over multiple seasons to understand the seasonal dynamics. The
+>> issue here is that responses show seasonal fluctuation, which is what
+>> they were looking for. But the reviewer of our study has warned
+>> against using single representative timepoint within these multiple
+>> measures (ex. Peak season) but rather time-average these multiple
+>> measurements to reduce time-related bias.
+>>
+>> 3. So back to the point: In all of studies, in multiple time point,
+>> same treatment vs. control group are being compared using the same
+>> sampling method. We have mean and SD for all of these data point,
+>> separately for control and treatment groups for each time point of
+>> multiple measurements.
+>>
+>> 4. I am using Hedges' d as effect sizes.
+>> Thank you and I hope this clarifies the question better!
+>> Best,
+>> JU
+>>
+>> ________________________________________
+>> From: Michael Dewey <lists at dewey.myzen.co.uk>
+>> Sent: Monday, March 30, 2020 5:32 AM
+>> To: Viechtbauer, Wolfgang (SP)
+>> <wolfgang.viechtbauer at maastrichtuniversity.nl>; Ju Lee
+>> <juhyung2 at stanford.edu>; r-sig-meta-analysis at r-project.org
+>> <r-sig-meta-analysis at r-project.org>
+>> Subject: Re: [R-meta] Dear Wolfgang
+>> And in addition to Wolfgang's comments it would be helpful to know
+>> what scientific question underlies the decision to measure at multiple
+>> time points. Presumably the authors of primary studies did not do it
+>> for fun.
+>>
+>> Michael
+>>
+>> On 30/03/2020 11:37, Viechtbauer, Wolfgang (SP) wrote:
+>>> Dear Ju,
+>>>
+>>> Before I can try to address your actual questions, please say a bit
+>>> more about the studies that measure responses at a single time point.
+>>> Are groups (e.g., treatment versus control) being compared within
+>>> these studies? Are the 'responses' continuous (such that means and
+>>> SDs are being reported) or dichotomous (such that counts or
+>>> proportions are being reported) or something else? And related to
+>>> this, what effect size measure are you using for quantifying the
+>>> group difference within studies? Standardized mean differences (which
+>>> would make sense when means/SDs are being reported), risk differences
+>>> or (log) risk/odds ratios (based on counts/proportions), or something
+>>> else?
+>>>
+>>> And the studies that measure responses at multiple time points: Are
+>>> they just doing the same thing that the 'single time point studies'
+>>> are doing, but at multiple time points? For example, instead of
+>>> reporting the means and SDs of the treatment and control group once,
+>>> there are several follow-ups, such that such the means and SDs of the
+>>> two groups are reported at each follow-up time point?
+>>>
+>>> Best,
+>>> Wolfgang
+>>>
+>>> -----Original Message-----
+>>> From: R-sig-meta-analysis
+>>> [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ju Lee
+>>> Sent: Sunday, 29 March, 2020 20:16
+>>> To: r-sig-meta-analysis at r-project.org
+>>> Subject: [R-meta] Dear Wolfgang
+>>>
+>>> Dear Wolfgang,
+>>>
+>>> I sincerely hope you are well and healthy.
+>>> I wanted to reach out regarding ways to incorporate studies with
+>>> repeated-measures to overall mixed effect models.
+>>>
+>>> My data is almost entirely composed of studies measuring responses at
+>>> a single time point, but there are few studies that have been
+>>> measuring responses multiple times throughout study seasons. I was
+>>> advised that time-averaging these multiple responses makes more sense
+>>> for these studies.
+>>>
+>>> My understanding was that you could 1) do a fixed effect
+>>> meta-analysis of these studies to generate a single mean effect sizes
+>>> and sampling variance from these repeated measurements and then 2)
+>>> incorporate the single effect size and variance into overall
+>>> mixed-effect model. Is this a correct approach?
+>>>
+>>> If so, how would I calculate sampling variance from the fixed model
+>>> in the step 1? Is it based on SE outputs of the fixed effect model?
+>>>
+>>> Thank you very much, and I look forward to hearing from you!
+>>> Best,
+>>> JU
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+--
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+	[[alternative HTML version deleted]]
+
+

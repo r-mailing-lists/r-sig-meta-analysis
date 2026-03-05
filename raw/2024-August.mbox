@@ -1,0 +1,3044 @@
+From jepu@to @end|ng |rom gm@||@com  Sat Aug  3 04:38:49 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Fri, 2 Aug 2024 21:38:49 -0500
+Subject: [R-meta] selection models in metafor with step truncation
+Message-ID: <CAFUVuJwptKov-GpXsFaa6vfwXhoycf4mDOxZMq7Jx8-zny50_A@mail.gmail.com>
+
+Hi Wolfgang,
+
+I see in the metafor documentation for selmodel (
+https://wviechtb.github.io/metafor/reference/selmodel.html#half-normal-negative-exponential-logistic-and-power-selection-models)
+that the half-normal, negative exponential, logistic, and power curve
+selection models can take a value for the step argument, as in the
+following code:
+
+library(metafor)
+dat <- dat.hahn2001
+res <- rma(yi, vi, data=dat, method="REML")
+selmodel(res, type="halfnorm", alternative="less")
+selmodel(res, type="halfnorm", alternative="less", step = .025)
+
+>From the description in the documentation, I wasn't sure how the step
+truncation is implemented. Say that the step threshold is called a, the
+p-value from study i is p_i, and the selection parameter is delta. Say that
+the non-truncated weight function is w(p_i). For a > 0, is the weight
+function
+min(1, w(p_i) / w(a))
+which you might call a "vertical" re-scaling? Or is it
+ifelse(p_i < a, 1, w((p_i - a) / (1 - a)))
+which you might call a "horizontal" re-scaling?
+
+I think for at least some of the selmodel types listed, the vertical and
+horizontal rescalings give different shapes. Could you clarify?
+
+Best,
+James
+
+	[[alternative HTML version deleted]]
+
+
+From t@m@r @end|ng |rom growprogre@@@@|  Tue Aug  6 15:20:08 2024
+From: t@m@r @end|ng |rom growprogre@@@@| (Tamar Novetsky)
+Date: Tue, 6 Aug 2024 09:20:08 -0400
+Subject: [R-meta] Performance of metafor::vcalc() vs
+ clubSandwich::impute_covariance_matrix()
+Message-ID: <CAFfZ5xnL-mGivzmVHQ1kCM+Te1BOpjN4NnfA9Yh9MpC5UJpg1A@mail.gmail.com>
+
+Hello,
+
+I am working on a script to run multiple meta-regressions on different
+subsets of the same dataset, and have been
+using clubSandwich::impute_covariance_matrix() to generate the
+variance-covariance matrix necessary as an input to metafor::rma.mv().
+However, I recently learned that impute_covariance_matrix() has been
+superseded by metafor::vcalc(), so I have been working to replace my usage
+of the former function with the latter. In that process, I discovered that
+vcalc() seems to be much slower than impute_covariance_matrix() - about
+150x slower in one use case that I benchmarked using the microbenchmark
+package. Since I will be running this many times in a loop, performance
+matters quite a lot to me in this context.
+
+Can anyone help me understand why vcalc() would be so much slower? Is it
+possible that I'm using it incorrectly?
+
+Secondly/possibly relatedly, I found that the results from vcalc() are
+always either exactly the same or exactly double the results from
+impute_covariance_matrix(). Does anyone have a sense of why that would be?
+Could that be related to the performance differences?
+
+Thanks so much for your help,
+
+
+*Tamar Novetsky* *(she/her)*
+Data Scientist I
+Eastern Time Zone
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Tue Aug  6 16:20:13 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Tue, 6 Aug 2024 09:20:13 -0500
+Subject: [R-meta] Performance of metafor::vcalc() vs
+ clubSandwich::impute_covariance_matrix()
+In-Reply-To: <CAFfZ5xnL-mGivzmVHQ1kCM+Te1BOpjN4NnfA9Yh9MpC5UJpg1A@mail.gmail.com>
+References: <CAFfZ5xnL-mGivzmVHQ1kCM+Te1BOpjN4NnfA9Yh9MpC5UJpg1A@mail.gmail.com>
+Message-ID: <CAFUVuJxRgzV0OEqKvoTgrif17rNzaG=xvFbbrTuSBfRw4vLnog@mail.gmail.com>
+
+Hi Tamar,
+
+The difference in compute time is because of a difference in how the
+default output of these functions is structured.
+clubSandwich::impute_covariance_matrix() returns a block-diagonal by
+default. metafor::vcalc() returns a full (dense) matrix by default. Say
+that you have J studies and study j has kj effect sizes. The block-diagonal
+matrix has sum(kj^2) entries, whereas the full matrix has sum(kj)^2
+entries. If J is large and the kjs are mostly small, this can make for a
+really big difference in object size. However, setting the option
+vcalc(sparse = TRUE) will return a block-diagonal matrix and should lead to
+performance comparable to impute_covariance_matrix().
+
+Regarding your second question, I'm not sure what might be going on. Could
+you provide a reproducible example?
+
+James
+
+On Tue, Aug 6, 2024 at 8:20?AM Tamar Novetsky via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> Hello,
+>
+> I am working on a script to run multiple meta-regressions on different
+> subsets of the same dataset, and have been
+> using clubSandwich::impute_covariance_matrix() to generate the
+> variance-covariance matrix necessary as an input to metafor::rma.mv().
+> However, I recently learned that impute_covariance_matrix() has been
+> superseded by metafor::vcalc(), so I have been working to replace my usage
+> of the former function with the latter. In that process, I discovered that
+> vcalc() seems to be much slower than impute_covariance_matrix() - about
+> 150x slower in one use case that I benchmarked using the microbenchmark
+> package. Since I will be running this many times in a loop, performance
+> matters quite a lot to me in this context.
+>
+> Can anyone help me understand why vcalc() would be so much slower? Is it
+> possible that I'm using it incorrectly?
+>
+> Secondly/possibly relatedly, I found that the results from vcalc() are
+> always either exactly the same or exactly double the results from
+> impute_covariance_matrix(). Does anyone have a sense of why that would be?
+> Could that be related to the performance differences?
+>
+> Thanks so much for your help,
+>
+>
+> *Tamar Novetsky* *(she/her)*
+> Data Scientist I
+> Eastern Time Zone
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From t@m@r @end|ng |rom growprogre@@@@|  Tue Aug  6 17:18:58 2024
+From: t@m@r @end|ng |rom growprogre@@@@| (Tamar Novetsky)
+Date: Tue, 6 Aug 2024 11:18:58 -0400
+Subject: [R-meta] Performance of metafor::vcalc() vs
+ clubSandwich::impute_covariance_matrix()
+In-Reply-To: <CAFUVuJxRgzV0OEqKvoTgrif17rNzaG=xvFbbrTuSBfRw4vLnog@mail.gmail.com>
+References: <CAFfZ5xnL-mGivzmVHQ1kCM+Te1BOpjN4NnfA9Yh9MpC5UJpg1A@mail.gmail.com>
+ <CAFUVuJxRgzV0OEqKvoTgrif17rNzaG=xvFbbrTuSBfRw4vLnog@mail.gmail.com>
+Message-ID: <CAFfZ5xmyMcQQt=eBPMm5jpV_6XDX+irLc5OdmZh9364JcRmcDw@mail.gmail.com>
+
+Thanks so much, James! Unfortunately, I didn't find a big enough
+improvement in performance using vcalc(sparse = TRUE) - in the example
+below, the default vcalc arguments take ~100x longer than
+impute_covariance_matrix, while vcalc(sparse = TRUE) takes ~60x longer.
+
+I couldn't reproduce the 2x values using non-proprietary data, so there
+might just be something weird going on with my dataset!
+
+Reproducible example (adapted from metafor's examples in the vcalc function
+documentation):
+```
+library(tidyverse)
+library(metafor)
+library(clubSandwich)
+library(microbenchmark)
+set.seed(42)
+
+# example data from metafor
+dat <- dat.assink2016
+
+# augment data so it has >1500 rows
+new_rows <-
+  tibble(
+    study = 18:167,
+    n_esid = sample(x = 1:max(dat$esid), size = 150, replace = TRUE)
+  ) %>%
+  uncount(n_esid) %>%
+  group_by(study) %>%
+  mutate(esid = row_number()) %>%
+  ungroup() %>%
+  mutate(
+    id = row_number() + 100,
+    yi = rnorm(nrow(.), mean(dat$yi), sd(dat$yi)),
+    vi = rnorm(nrow(.), mean(dat$vi), sd(dat$vi)),
+    vi = if_else(vi < 0, -1*vi, vi), # make sure vi is always positive
+    pubstatus = sample(x = dat$pubstatus, size = nrow(.), replace = TRUE),
+    year = sample(x = dat$year, size = nrow(.), replace = TRUE),
+    deltype = sample(x = dat$deltype, size = nrow(.), replace = TRUE)
+  )
+dat_big <- bind_rows(dat, new_rows)
+
+# benchmark performance with full matrix (this takes a minute to run)
+res <- microbenchmark(
+  "metafor" = vcalc(vi, cluster = study, obs = esid, data = dat_big, rho =
+0.6),
+  "clubSandwich" = impute_covariance_matrix(vi = dat_big$vi, cluster =
+dat_big$study, r = 0.6, return_list = FALSE),
+  times = 10
+)
+summary(res)
+
+# benchmark performance with sparse matrix (also takes a minute to run)
+res_sparse <- microbenchmark(
+  "metafor" = vcalc(vi, cluster = study, obs = esid, data = dat_big, rho =
+0.6, sparse = TRUE),
+  "clubSandwich" = impute_covariance_matrix(vi = dat_big$vi, cluster =
+dat_big$study, r = 0.6, return_list = FALSE),
+  times = 10
+)
+summary(res_sparse)
+```
+
+Thanks again,
+
+
+*Tamar Novetsky* *(she/her)*
+Data Scientist I
+Eastern Time Zone
+
+
+On Tue, Aug 6, 2024 at 10:20?AM James Pustejovsky <jepusto at gmail.com> wrote:
+
+> Hi Tamar,
+>
+> The difference in compute time is because of a difference in how the
+> default output of these functions is structured.
+> clubSandwich::impute_covariance_matrix() returns a block-diagonal by
+> default. metafor::vcalc() returns a full (dense) matrix by default. Say
+> that you have J studies and study j has kj effect sizes. The block-diagonal
+> matrix has sum(kj^2) entries, whereas the full matrix has sum(kj)^2
+> entries. If J is large and the kjs are mostly small, this can make for a
+> really big difference in object size. However, setting the option
+> vcalc(sparse = TRUE) will return a block-diagonal matrix and should lead to
+> performance comparable to impute_covariance_matrix().
+>
+> Regarding your second question, I'm not sure what might be going on. Could
+> you provide a reproducible example?
+>
+> James
+>
+> On Tue, Aug 6, 2024 at 8:20?AM Tamar Novetsky via R-sig-meta-analysis <
+> r-sig-meta-analysis at r-project.org> wrote:
+>
+>> Hello,
+>>
+>> I am working on a script to run multiple meta-regressions on different
+>> subsets of the same dataset, and have been
+>> using clubSandwich::impute_covariance_matrix() to generate the
+>> variance-covariance matrix necessary as an input to metafor::rma.mv().
+>> However, I recently learned that impute_covariance_matrix() has been
+>> superseded by metafor::vcalc(), so I have been working to replace my usage
+>> of the former function with the latter. In that process, I discovered that
+>> vcalc() seems to be much slower than impute_covariance_matrix() - about
+>> 150x slower in one use case that I benchmarked using the microbenchmark
+>> package. Since I will be running this many times in a loop, performance
+>> matters quite a lot to me in this context.
+>>
+>> Can anyone help me understand why vcalc() would be so much slower? Is it
+>> possible that I'm using it incorrectly?
+>>
+>> Secondly/possibly relatedly, I found that the results from vcalc() are
+>> always either exactly the same or exactly double the results from
+>> impute_covariance_matrix(). Does anyone have a sense of why that would be?
+>> Could that be related to the performance differences?
+>>
+>> Thanks so much for your help,
+>>
+>>
+>> *Tamar Novetsky* *(she/her)*
+>> Data Scientist I
+>> Eastern Time Zone
+>>
+>>         [[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Tue Aug  6 20:50:08 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Tue, 6 Aug 2024 13:50:08 -0500
+Subject: [R-meta] Performance of metafor::vcalc() vs
+ clubSandwich::impute_covariance_matrix()
+In-Reply-To: <CAFfZ5xmyMcQQt=eBPMm5jpV_6XDX+irLc5OdmZh9364JcRmcDw@mail.gmail.com>
+References: <CAFfZ5xnL-mGivzmVHQ1kCM+Te1BOpjN4NnfA9Yh9MpC5UJpg1A@mail.gmail.com>
+ <CAFUVuJxRgzV0OEqKvoTgrif17rNzaG=xvFbbrTuSBfRw4vLnog@mail.gmail.com>
+ <CAFfZ5xmyMcQQt=eBPMm5jpV_6XDX+irLc5OdmZh9364JcRmcDw@mail.gmail.com>
+Message-ID: <CAFUVuJwkxbGmVshfWKAEEmhJg+2bFn5izZXP4Ra439c6BqJvGQ@mail.gmail.com>
+
+Hi Tamar,
+
+Thanks for the reprex. Wow this surprised me. It looks like the biggest
+source of compute time in vcalc() is assignments to the sparse matrix
+representation of V. There might be a way to improve efficiency there, but
+will have to confer with Wolfgang.
+
+If you are able to reproduce the other issue with getting different results
+between vcalc() and impute_covariance_matrix(), please do share.
+
+Just to provide a little bit of additional context, I am deprecating
+impute_covariance_matrix() because it is an outlier in the clubSandwich
+package. It is essentially the only function in the package that is
+specific to meta-analysis workflows. All other package functionality
+involves computing cluster-robust variance estimators and associated
+quantities (hypothesis tests, confidence intervals, etc.). In terms of
+conceptual organization, it makes more sense for a function like
+impute_covariance_matrix() to live in metafor. However,
+impute_covariance_matrix() is not going to disappear entirely from
+clubSandwich, so you could certainly continue using it in the short term
+for purposes of computational efficiency.
+
+James
+
+On Tue, Aug 6, 2024 at 10:19?AM Tamar Novetsky <tamar at growprogress.ai>
+wrote:
+
+> Thanks so much, James! Unfortunately, I didn't find a big enough
+> improvement in performance using vcalc(sparse = TRUE) - in the example
+> below, the default vcalc arguments take ~100x longer than
+> impute_covariance_matrix, while vcalc(sparse = TRUE) takes ~60x longer.
+>
+> I couldn't reproduce the 2x values using non-proprietary data, so there
+> might just be something weird going on with my dataset!
+>
+> Reproducible example (adapted from metafor's examples in the vcalc
+> function documentation):
+> ```
+> library(tidyverse)
+> library(metafor)
+> library(clubSandwich)
+> library(microbenchmark)
+> set.seed(42)
+>
+> # example data from metafor
+> dat <- dat.assink2016
+>
+> # augment data so it has >1500 rows
+> new_rows <-
+>   tibble(
+>     study = 18:167,
+>     n_esid = sample(x = 1:max(dat$esid), size = 150, replace = TRUE)
+>   ) %>%
+>   uncount(n_esid) %>%
+>   group_by(study) %>%
+>   mutate(esid = row_number()) %>%
+>   ungroup() %>%
+>   mutate(
+>     id = row_number() + 100,
+>     yi = rnorm(nrow(.), mean(dat$yi), sd(dat$yi)),
+>     vi = rnorm(nrow(.), mean(dat$vi), sd(dat$vi)),
+>     vi = if_else(vi < 0, -1*vi, vi), # make sure vi is always positive
+>     pubstatus = sample(x = dat$pubstatus, size = nrow(.), replace = TRUE),
+>     year = sample(x = dat$year, size = nrow(.), replace = TRUE),
+>     deltype = sample(x = dat$deltype, size = nrow(.), replace = TRUE)
+>   )
+> dat_big <- bind_rows(dat, new_rows)
+>
+> # benchmark performance with full matrix (this takes a minute to run)
+> res <- microbenchmark(
+>   "metafor" = vcalc(vi, cluster = study, obs = esid, data = dat_big, rho =
+> 0.6),
+>   "clubSandwich" = impute_covariance_matrix(vi = dat_big$vi, cluster =
+> dat_big$study, r = 0.6, return_list = FALSE),
+>   times = 10
+> )
+> summary(res)
+>
+> # benchmark performance with sparse matrix (also takes a minute to run)
+> res_sparse <- microbenchmark(
+>   "metafor" = vcalc(vi, cluster = study, obs = esid, data = dat_big, rho =
+> 0.6, sparse = TRUE),
+>   "clubSandwich" = impute_covariance_matrix(vi = dat_big$vi, cluster =
+> dat_big$study, r = 0.6, return_list = FALSE),
+>   times = 10
+> )
+> summary(res_sparse)
+> ```
+>
+> Thanks again,
+>
+>
+> *Tamar Novetsky* *(she/her)*
+> Data Scientist I
+> Eastern Time Zone
+>
+>
+> On Tue, Aug 6, 2024 at 10:20?AM James Pustejovsky <jepusto at gmail.com>
+> wrote:
+>
+>> Hi Tamar,
+>>
+>> The difference in compute time is because of a difference in how the
+>> default output of these functions is structured.
+>> clubSandwich::impute_covariance_matrix() returns a block-diagonal by
+>> default. metafor::vcalc() returns a full (dense) matrix by default. Say
+>> that you have J studies and study j has kj effect sizes. The block-diagonal
+>> matrix has sum(kj^2) entries, whereas the full matrix has sum(kj)^2
+>> entries. If J is large and the kjs are mostly small, this can make for a
+>> really big difference in object size. However, setting the option
+>> vcalc(sparse = TRUE) will return a block-diagonal matrix and should lead to
+>> performance comparable to impute_covariance_matrix().
+>>
+>> Regarding your second question, I'm not sure what might be going on.
+>> Could you provide a reproducible example?
+>>
+>> James
+>>
+>> On Tue, Aug 6, 2024 at 8:20?AM Tamar Novetsky via R-sig-meta-analysis <
+>> r-sig-meta-analysis at r-project.org> wrote:
+>>
+>>> Hello,
+>>>
+>>> I am working on a script to run multiple meta-regressions on different
+>>> subsets of the same dataset, and have been
+>>> using clubSandwich::impute_covariance_matrix() to generate the
+>>> variance-covariance matrix necessary as an input to metafor::rma.mv().
+>>> However, I recently learned that impute_covariance_matrix() has been
+>>> superseded by metafor::vcalc(), so I have been working to replace my
+>>> usage
+>>> of the former function with the latter. In that process, I discovered
+>>> that
+>>> vcalc() seems to be much slower than impute_covariance_matrix() - about
+>>> 150x slower in one use case that I benchmarked using the microbenchmark
+>>> package. Since I will be running this many times in a loop, performance
+>>> matters quite a lot to me in this context.
+>>>
+>>> Can anyone help me understand why vcalc() would be so much slower? Is it
+>>> possible that I'm using it incorrectly?
+>>>
+>>> Secondly/possibly relatedly, I found that the results from vcalc() are
+>>> always either exactly the same or exactly double the results from
+>>> impute_covariance_matrix(). Does anyone have a sense of why that would
+>>> be?
+>>> Could that be related to the performance differences?
+>>>
+>>> Thanks so much for your help,
+>>>
+>>>
+>>> *Tamar Novetsky* *(she/her)*
+>>> Data Scientist I
+>>> Eastern Time Zone
+>>>
+>>>         [[alternative HTML version deleted]]
+>>>
+>>> _______________________________________________
+>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>> To manage your subscription to this mailing list, go to:
+>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>
+>>
+
+	[[alternative HTML version deleted]]
+
+
+From n@m|ce|| @end|ng |rom gm@||@com  Fri Aug  9 02:30:31 2024
+From: n@m|ce|| @end|ng |rom gm@||@com (Nicholas Miceli)
+Date: Thu, 8 Aug 2024 19:30:31 -0500
+Subject: [R-meta] Coding for meta-analysis.
+Message-ID: <CABg5ehbVFB7k6dg3wofk_y+iavad-d2mSPKwiajtADAq8NXQ9Q@mail.gmail.com>
+
+When coding studies to be included in a meta-analysis (meta-regression) not
+all of them will have the same covariates. My question deals with the
+following situation.
+
+One study has age and sex
+One study has age, sex, and exposure to an infectious disease.
+
+Would it be incorrect to code the first one as "0" because it doesn't have
+the exposure variable, or should it be left as a missing variable?
+
+Apologies for asking what is probably a "n00b" question. It has not been
+addressed in Borenstein or Petitte. (I have more reading ahead of me.)
+
+Thank you for your time and input.
+
+Regards,
+
+N. S. Miceli
+
+	[[alternative HTML version deleted]]
+
+
+From n@m|ce|| @end|ng |rom gm@||@com  Fri Aug  9 18:16:04 2024
+From: n@m|ce|| @end|ng |rom gm@||@com (Nicholas Miceli)
+Date: Fri, 9 Aug 2024 11:16:04 -0500
+Subject: [R-meta] Coding for meta-analysis; answered.
+Message-ID: <CABg5ehYk3UEkU3Ouj4FiWM0WrFn1fLahJrtY91c5VJczvMZ=+Q@mail.gmail.com>
+
+Just got an answer to my previously posted question. As I suspected but was
+unsure, the variables not used in a given study which are used in others
+should be left as missing variables.
+
+Thank you to all concerned.
+
+N. S. Miceli
+
+	[[alternative HTML version deleted]]
+
+
+From @@nchox@v|erx@v|er @end|ng |rom gm@||@com  Sun Aug 11 21:28:05 2024
+From: @@nchox@v|erx@v|er @end|ng |rom gm@||@com (Sancho Xavier)
+Date: Sun, 11 Aug 2024 19:28:05 +0000
+Subject: [R-meta] Facing some issues on Meta - regression
+Message-ID: <SJ0PR12MB69890777581E596D4C650399F6842@SJ0PR12MB6989.namprd12.prod.outlook.com>
+
+Hi everyone, I hope you're all doing well.
+I need your help with something. I'm applying a meta-regression on a dataset where I initially used the metaprop function to obtain the pooled proportions of hypertension. Now, I'm trying to understand how variables like the year of publication, study type, and publication pathways influence the effect size (proportion) in the meta-analysis.
+Dataset (called "hiper")
+[cid:7fbab9a8-0f72-44bd-ad97-2e17a7d4568b]
+
+Here are the scripts I used:
+First, I applied metaprop:
+[cid:cd051df0-f6ac-4123-ae10-b194bfea08c2]
+
+Next, I applied the meta-regression:
+[cid:a0b758aa-ec81-497a-8fd6-208790109d3f]
+
+After generating the plot (see below), I noticed that without transforming the TE and seTE values, the proportions on the x-axis appear as negative values. I would like to know if my scripts for the meta-regression are correct and whether it would be necessary to apply a logarithmic transformation (transf.ilogit(m.prop$TE) and transf.ilogit(m.prop$seTE)) to fix this.
+Additionally, I would appreciate your advice on which method is more appropriate: using the transformed values or the non-transformed ones?
+[cid:5612e885-24f0-4220-85f4-dc3fcb752570]
+
+ Thanks in advance for your help!
+Best wishes,
+
+Sancho Xavier
+Candidate for Postgraduate Programme in Epidemiology in Public Health
+MBA in Data Science and Analytics at USP (ongoing)
+Linkedin: linkedin.com/in/sancho-xavier-59565a18a
+Orcid iD: https://orcid.org/0000-0001-9493-4098
+Web of Science (Clarivate): https://www.webofscience.com/wos/author/record/GON-5675-2022
+Reference Citation Analysis (RCA): https://referencecitationanalysis.com/00001471
+Whatsapp: +258 852255846
+------------------------------------------------------------------------------
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240811/c0a665e8/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image.png
+Type: image/png
+Size: 26199 bytes
+Desc: image.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240811/c0a665e8/attachment-0004.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image.png
+Type: image/png
+Size: 25364 bytes
+Desc: image.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240811/c0a665e8/attachment-0005.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image.png
+Type: image/png
+Size: 8950 bytes
+Desc: image.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240811/c0a665e8/attachment-0006.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image.png
+Type: image/png
+Size: 92359 bytes
+Desc: image.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240811/c0a665e8/attachment-0007.png>
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Mon Aug 12 13:04:24 2024
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 12 Aug 2024 12:04:24 +0100
+Subject: [R-meta] Facing some issues on Meta - regression
+In-Reply-To: <SJ0PR12MB69890777581E596D4C650399F6842@SJ0PR12MB6989.namprd12.prod.outlook.com>
+References: <SJ0PR12MB69890777581E596D4C650399F6842@SJ0PR12MB6989.namprd12.prod.outlook.com>
+Message-ID: <3e3b9ce6-3ceb-459f-bcb4-0b6a3eafd613@dewey.myzen.co.uk>
+
+It would be easier to help you if you (a) showed your data using dput(), 
+(b) pasted your actual code rather than showing a screenshot which means 
+having to type it all in again.
+
+Having said that I believe that the plot functions in meta have an 
+argument to backtransform the estimates. From the help for bubble
+
+Backtransf
+
+A logical indicating whether results for relative summary measures 
+(argument sm equal to "OR", "RR", "HR", or "IRR") should be back 
+transformed. If backtransf=TRUE, results for sm="OR" are printed as odds 
+ratios rather than log odds ratios, for example.
+
+Michael
+
+On 11/08/2024 20:28, Sancho Xavier via R-sig-meta-analysis wrote:
+> Hi everyone, I hope you're all doing well.
+> I need your help with something. I'm applying a meta-regression on a 
+> dataset where I initially used the |metaprop|?function to obtain the 
+> pooled proportions of hypertension. Now, I'm trying to understand how 
+> variables like the year of publication, study type, and publication 
+> pathways influence the effect size (proportion) in the meta-analysis.
+> Dataset (called "hiper")
+> 
+> Here are the scripts I used:
+> First, I applied |metaprop|:
+> 
+> Next, I applied the meta-regression:
+> 
+> After generating the plot (see below), I noticed that without 
+> transforming the |TE|?and |seTE|?values, the proportions on the x-axis 
+> appear as negative values. I would like to know if my scripts for the 
+> meta-regression are correct and whether it would be necessary to apply a 
+> logarithmic transformation (|transf.ilogit(m.prop$TE)|?and 
+> |transf.ilogit(m.prop$seTE)|) to fix this.
+> Additionally, I would appreciate your advice on which method is more 
+> appropriate: using the transformed values or the non-transformed ones?
+> 
+>  ?Thanks in advance for your help!
+> Best wishes,
+> 
+> *Sancho Xavier*
+> Candidate for Postgraduate Programme in Epidemiology in Public Health
+> MBA in Data Science and Analytics at USP (ongoing)
+> *Linkedin:*?linkedin.com/in/sancho-xavier-59565a18a
+> *Orcid iD:*?https://orcid.org/0000-0001-9493-4098
+> *Web of Science (Clarivate):* 
+> https://www.webofscience.com/wos/author/record/GON-5675-2022 
+> <https://www.webofscience.com/wos/author/record/GON-5675-2022>
+> *Reference Citation Analysis (RCA): 
+> *https://referencecitationanalysis.com/00001471 
+> <https://referencecitationanalysis.com/00001471>
+> *Whatsapp: *+258 852255846
+> ------------------------------------------------------------------------------
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+This email has been checked for viruses by Avast antivirus software.
+www.avast.com
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Mon Aug 12 14:02:49 2024
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?utf-8?B?RHIuIEdlcnRhIFLDvGNrZXI=?=)
+Date: Mon, 12 Aug 2024 12:02:49 +0000
+Subject: [R-meta] 
+ [SPAM](FN)  Re:  Facing some issues on Meta - regression
+In-Reply-To: <3e3b9ce6-3ceb-459f-bcb4-0b6a3eafd613@dewey.myzen.co.uk>
+References: <SJ0PR12MB69890777581E596D4C650399F6842@SJ0PR12MB6989.namprd12.prod.outlook.com>
+ <3e3b9ce6-3ceb-459f-bcb4-0b6a3eafd613@dewey.myzen.co.uk>
+Message-ID: <0989e67ca1fe48e184627b05731734cb@uniklinik-freiburg.de>
+
+Hi,
+
+Michael is right with the argument backtransf, in principle. For example, for metabin(), bubble.metareg() takes the summary measure (e.g., "RR") from the metabin object, see code below. However, this doesn't seem to work with metaprop(), as also seen using the code below. @Guido?
+
+Best,
+Gerta
+
+# metabin()
+
+data(Olkin1995)
+m1 <- metabin(ev.exp, n.exp, ev.cont, n.cont,
+              data = Olkin1995, 
+              studlab = paste(author, year),
+              method = "Inverse")
+m1$sm
+mr1 <- metareg(m1, year)
+mr1$sm          # NULL
+mr1$.meta$x$sm  # "RR"
+bubble(mr1)     # log scale automatically applied
+
+# It is different for metaprop():
+
+event <- c(81, 15, 1, 1, 60, 7)
+n <- c(263, 148, 20, 29, 300, 20)
+m2 <- metaprop(event, n) 
+m2$sm
+covar <- rnorm(length(n))
+mr2<- metareg(m2, covar)
+mr2$sm                         # NULL 
+mr2$.meta$x$sm                 # "PLOGIT"
+bubble(mr2)
+bubble(mr2, backtransf = TRUE) # Doesn't work!
+m2a$sm <- "PLOGIT"
+bubble(mr2, backtransf = TRUE) # Still doesn't work!
+
+
+
+UNIVERSIT?TSKLINIKUM FREIBURG
+Institute for Medical Biometry and Statistics
+
+Dr. Gerta R?cker
+Guest Scientist
+
+Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+gerta.ruecker at uniklinik-freiburg.de
+
+https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+
+-----Urspr?ngliche Nachricht-----
+Von: Michael Dewey via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> 
+Gesendet: Montag, 12. August 2024 13:04
+An: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Michael Dewey <lists at dewey.myzen.co.uk>
+Betreff: [SPAM](FN) Re: [R-meta] Facing some issues on Meta - regression
+
+It would be easier to help you if you (a) showed your data using dput(), 
+(b) pasted your actual code rather than showing a screenshot which means 
+having to type it all in again.
+
+Having said that I believe that the plot functions in meta have an 
+argument to backtransform the estimates. From the help for bubble
+
+Backtransf
+
+A logical indicating whether results for relative summary measures 
+(argument sm equal to "OR", "RR", "HR", or "IRR") should be back 
+transformed. If backtransf=TRUE, results for sm="OR" are printed as odds 
+ratios rather than log odds ratios, for example.
+
+Michael
+
+On 11/08/2024 20:28, Sancho Xavier via R-sig-meta-analysis wrote:
+> Hi everyone, I hope you're all doing well.
+> I need your help with something. I'm applying a meta-regression on a 
+> dataset where I initially used the |metaprop|?function to obtain the 
+> pooled proportions of hypertension. Now, I'm trying to understand how 
+> variables like the year of publication, study type, and publication 
+> pathways influence the effect size (proportion) in the meta-analysis.
+> Dataset (called "hiper")
+> 
+> Here are the scripts I used:
+> First, I applied |metaprop|:
+> 
+> Next, I applied the meta-regression:
+> 
+> After generating the plot (see below), I noticed that without 
+> transforming the |TE|?and |seTE|?values, the proportions on the x-axis 
+> appear as negative values. I would like to know if my scripts for the 
+> meta-regression are correct and whether it would be necessary to apply a 
+> logarithmic transformation (|transf.ilogit(m.prop$TE)|?and 
+> |transf.ilogit(m.prop$seTE)|) to fix this.
+> Additionally, I would appreciate your advice on which method is more 
+> appropriate: using the transformed values or the non-transformed ones?
+> 
+>  ?Thanks in advance for your help!
+> Best wishes,
+> 
+> *Sancho Xavier*
+> Candidate for Postgraduate Programme in Epidemiology in Public Health
+> MBA in Data Science and Analytics at USP (ongoing)
+> *Linkedin:*?linkedin.com/in/sancho-xavier-59565a18a
+> *Orcid iD:*?https://orcid.org/0000-0001-9493-4098
+> *Web of Science (Clarivate):* 
+> https://www.webofscience.com/wos/author/record/GON-5675-2022 
+> <https://www.webofscience.com/wos/author/record/GON-5675-2022>
+> *Reference Citation Analysis (RCA): 
+> *https://referencecitationanalysis.com/00001471 
+> <https://referencecitationanalysis.com/00001471>
+> *Whatsapp: *+258 852255846
+> ------------------------------------------------------------------------------
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+This email has been checked for viruses by Avast antivirus software.
+www.avast.com
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+From @@nchox@v|erx@v|er @end|ng |rom gm@||@com  Mon Aug 12 15:18:30 2024
+From: @@nchox@v|erx@v|er @end|ng |rom gm@||@com (Sancho Xavier)
+Date: Mon, 12 Aug 2024 13:18:30 +0000
+Subject: [R-meta] Facing some issues on Meta - regression
+In-Reply-To: <3e3b9ce6-3ceb-459f-bcb4-0b6a3eafd613@dewey.myzen.co.uk>
+References: <SJ0PR12MB69890777581E596D4C650399F6842@SJ0PR12MB6989.namprd12.prod.outlook.com>
+ <3e3b9ce6-3ceb-459f-bcb4-0b6a3eafd613@dewey.myzen.co.uk>
+Message-ID: <SJ0PR12MB6989F97C22B2789D26B1DB51F6852@SJ0PR12MB6989.namprd12.prod.outlook.com>
+
+It seems to me that the specific function sm = "PLOGIT" for calculating proportions using the number of events and the number of observations (populations) in the metaprop function employs a logit transformation.
+Therefore, to represent the proportions in the figure (meta-regression) without negative values on the X-axis, it would be necessary to apply the inverse logit transformation (using transf.ilogit). I'm not sure if this is scientifically the correct approach (applying the inverse logit transformation).
+
+You can use the dataset and de codes below:
+Dataset called => opioidmisuse
+codes => Testing_sharing
+
+Sancho Xavier
+Candidate for Postgraduate Programme in Epidemiology in Public Health
+MBA in Data Science and Analytics at USP (ongoing)
+Linkedin: linkedin.com/in/sancho-xavier-59565a18a
+Orcid iD: https://orcid.org/0000-0001-9493-4098
+Web of Science (Clarivate): https://www.webofscience.com/wos/author/record/GON-5675-2022
+Reference Citation Analysis (RCA): https://referencecitationanalysis.com/00001471
+Whatsapp: +258 852255846
+------------------------------------------------------------------------------
+________________________________
+De: Michael Dewey <lists at dewey.myzen.co.uk>
+Enviado: segunda-feira, 12 de agosto de 2024 07:04
+Para: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Sancho Xavier <sanchoxavierxavier at gmail.com>
+Assunto: Re: [R-meta] Facing some issues on Meta - regression
+
+It would be easier to help you if you (a) showed your data using dput(),
+(b) pasted your actual code rather than showing a screenshot which means
+having to type it all in again.
+
+Having said that I believe that the plot functions in meta have an
+argument to backtransform the estimates. From the help for bubble
+
+Backtransf
+
+A logical indicating whether results for relative summary measures
+(argument sm equal to "OR", "RR", "HR", or "IRR") should be back
+transformed. If backtransf=TRUE, results for sm="OR" are printed as odds
+ratios rather than log odds ratios, for example.
+
+Michael
+
+On 11/08/2024 20:28, Sancho Xavier via R-sig-meta-analysis wrote:
+> Hi everyone, I hope you're all doing well.
+> I need your help with something. I'm applying a meta-regression on a
+> dataset where I initially used the |metaprop| function to obtain the
+> pooled proportions of hypertension. Now, I'm trying to understand how
+> variables like the year of publication, study type, and publication
+> pathways influence the effect size (proportion) in the meta-analysis.
+> Dataset (called "hiper")
+>
+> Here are the scripts I used:
+> First, I applied |metaprop|:
+>
+> Next, I applied the meta-regression:
+>
+> After generating the plot (see below), I noticed that without
+> transforming the |TE| and |seTE| values, the proportions on the x-axis
+> appear as negative values. I would like to know if my scripts for the
+> meta-regression are correct and whether it would be necessary to apply a
+> logarithmic transformation (|transf.ilogit(m.prop$TE)| and
+> |transf.ilogit(m.prop$seTE)|) to fix this.
+> Additionally, I would appreciate your advice on which method is more
+> appropriate: using the transformed values or the non-transformed ones?
+>
+>   Thanks in advance for your help!
+> Best wishes,
+>
+> *Sancho Xavier*
+> Candidate for Postgraduate Programme in Epidemiology in Public Health
+> MBA in Data Science and Analytics at USP (ongoing)
+> *Linkedin:* linkedin.com/in/sancho-xavier-59565a18a
+> *Orcid iD:* https://orcid.org/0000-0001-9493-4098
+> *Web of Science (Clarivate):*
+> https://www.webofscience.com/wos/author/record/GON-5675-2022
+> <https://www.webofscience.com/wos/author/record/GON-5675-2022>
+> *Reference Citation Analysis (RCA):
+> *https://referencecitationanalysis.com/00001471
+> <https://referencecitationanalysis.com/00001471>
+> *Whatsapp: *+258 852255846
+> ------------------------------------------------------------------------------
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+--
+This email has been checked for viruses by Avast antivirus software.
+www.avast.com<http://www.avast.com>
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240812/64c69a38/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: opioidmisuse.rda
+Type: application/octet-stream
+Size: 415 bytes
+Desc: opioidmisuse.rda
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240812/64c69a38/attachment-0002.obj>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Testing_sharing.R
+Type: application/octet-stream
+Size: 1269 bytes
+Desc: Testing_sharing.R
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240812/64c69a38/attachment-0003.obj>
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Mon Aug 12 16:23:43 2024
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?iso-8859-1?Q?Dr=2E_Gerta_R=FCcker?=)
+Date: Mon, 12 Aug 2024 14:23:43 +0000
+Subject: [R-meta] Facing some issues on Meta - regression
+In-Reply-To: <SJ0PR12MB6989F97C22B2789D26B1DB51F6852@SJ0PR12MB6989.namprd12.prod.outlook.com>
+References: <SJ0PR12MB69890777581E596D4C650399F6842@SJ0PR12MB6989.namprd12.prod.outlook.com>
+ <3e3b9ce6-3ceb-459f-bcb4-0b6a3eafd613@dewey.myzen.co.uk>
+ <SJ0PR12MB6989F97C22B2789D26B1DB51F6852@SJ0PR12MB6989.namprd12.prod.outlook.com>
+Message-ID: <460ed22a836a43a1af27ff7e4b201f6e@uniklinik-freiburg.de>
+
+Dear Sancho,
+
+It is correct that the back-transformation should be the inverse of the logit, which is plogis().
+
+Thank you for sending data and code. However, the code works only after some changes:
+1. data set called hiper does not exist, the data you provided is called OpioidMisuse
+2. column events does not exist, the correct spelling is event
+3. column id_article does not exist, has to replaced with author
+4. column population does not exist, has to be replaced with n
+5. Year_publi is not part of the data set and is defined in your code only after it is needed
+
+After fixing all this, I could run your code. 
+In the spirit of meta, transformatuon of the y-axis is meant to work automatically (or after using the argument backtransf, as Michael wrote). However, as I already wrote, this does not work with metaprop(), for reasons I don't know. The call would be
+
+bubble(m.prop.reg, studlab = TRUE, backtransf = TRUE)
+
+Thus, as said before, this is a question to @Guido who maintains the meta package.
+
+Best,
+Gerta
+
+
+
+
+
+
+
+
+UNIVERSIT?TSKLINIKUM FREIBURG
+Institute for Medical Biometry and Statistics
+
+Dr. Gerta R?cker
+Guest Scientist
+
+Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+gerta.ruecker at uniklinik-freiburg.de
+
+https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+Von: Sancho Xavier via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> 
+Gesendet: Montag, 12. August 2024 15:19
+An: Michael Dewey <lists at dewey.myzen.co.uk>; R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Sancho Xavier <sanchoxavierxavier at gmail.com>
+Betreff: [SPAM](FN) Re: [R-meta] Facing some issues on Meta - regression
+
+It seems to me that the specific function sm = "PLOGIT"?for calculating proportions using the number of events and the number of observations (populations) in the metaprop?function employs a logit transformation.
+Therefore, to represent the proportions in the figure (meta-regression) without negative values on the X-axis, it would be necessary to apply the inverse logit transformation (using transf.ilogit). I'm not sure if this is scientifically the correct approach (applying the inverse logit transformation).
+
+You can use the dataset and de codes below:
+Dataset called => opioidmisuse
+codes => Testing_sharing
+
+Sancho Xavier
+Candidate for Postgraduate Programme in Epidemiology in Public Health
+MBA in Data Science and Analytics at USP (ongoing)
+Linkedin:?linkedin.com/in/sancho-xavier-59565a18a
+Orcid iD:?https://orcid.org/0000-0001-9493-4098
+Web of Science (Clarivate):?https://www.webofscience.com/wos/author/record/GON-5675-2022
+Reference Citation Analysis (RCA): https://referencecitationanalysis.com/00001471
+Whatsapp: +258 852255846?
+------------------------------------------------------------------------------
+________________________________________
+De: Michael Dewey <mailto:lists at dewey.myzen.co.uk>
+Enviado: segunda-feira, 12 de agosto de 2024 07:04
+Para: R Special Interest Group for Meta-Analysis <mailto:r-sig-meta-analysis at r-project.org>
+Cc: Sancho Xavier <mailto:sanchoxavierxavier at gmail.com>
+Assunto: Re: [R-meta] Facing some issues on Meta - regression 
+?
+It would be easier to help you if you (a) showed your data using dput(), 
+(b) pasted your actual code rather than showing a screenshot which means 
+having to type it all in again.
+
+Having said that I believe that the plot functions in meta have an 
+argument to backtransform the estimates. From the help for bubble
+
+Backtransf
+
+A logical indicating whether results for relative summary measures 
+(argument sm equal to "OR", "RR", "HR", or "IRR") should be back 
+transformed. If backtransf=TRUE, results for sm="OR" are printed as odds 
+ratios rather than log odds ratios, for example.
+
+Michael
+
+On 11/08/2024 20:28, Sancho Xavier via R-sig-meta-analysis wrote:
+> Hi everyone, I hope you're all doing well.
+> I need your help with something. I'm applying a meta-regression on a 
+> dataset where I initially used the |metaprop|?function to obtain the 
+> pooled proportions of hypertension. Now, I'm trying to understand how 
+> variables like the year of publication, study type, and publication 
+> pathways influence the effect size (proportion) in the meta-analysis.
+> Dataset (called "hiper")
+> 
+> Here are the scripts I used:
+> First, I applied |metaprop|:
+> 
+> Next, I applied the meta-regression:
+> 
+> After generating the plot (see below), I noticed that without 
+> transforming the |TE|?and |seTE|?values, the proportions on the x-axis 
+> appear as negative values. I would like to know if my scripts for the 
+> meta-regression are correct and whether it would be necessary to apply a
+> logarithmic transformation (|transf.ilogit(m.prop$TE)|?and 
+> |transf.ilogit(m.prop$seTE)|) to fix this.
+> Additionally, I would appreciate your advice on which method is more 
+> appropriate: using the transformed values or the non-transformed ones?
+> 
+>? ?Thanks in advance for your help!
+> Best wishes,
+> 
+> *Sancho Xavier*
+> Candidate for Postgraduate Programme in Epidemiology in Public Health
+> MBA in Data Science and Analytics at USP (ongoing)
+> *Linkedin:*?linkedin.com/in/sancho-xavier-59565a18a
+> *Orcid iD:*?https://orcid.org/0000-0001-9493-4098
+> *Web of Science (Clarivate):* 
+> https://www.webofscience.com/wos/author/record/GON-5675-2022 
+> <https://www.webofscience.com/wos/author/record/GON-5675-2022>
+> *Reference Citation Analysis (RCA): 
+> *https://referencecitationanalysis.com/00001471 
+> <https://referencecitationanalysis.com/00001471>
+> *Whatsapp: *+258 852255846
+> ------------------------------------------------------------------------------
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ mailto:R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+This email has been checked for viruses by Avast antivirus software.
+http://www.avast.com
+
+
+From t@m@r @end|ng |rom growprogre@@@@|  Mon Aug 12 16:26:45 2024
+From: t@m@r @end|ng |rom growprogre@@@@| (Tamar Novetsky)
+Date: Mon, 12 Aug 2024 10:26:45 -0400
+Subject: [R-meta] Subgroup analysis best practices
+Message-ID: <CAFfZ5xk3S=FP5bvPd0bAwv80YRX=RimhPVUn6Z=JRVFuhQYAMg@mail.gmail.com>
+
+Hello all,
+
+I have a dataset with topline and subgroup-level treatment effects, and I
+would like to be able to answer questions like "[how much] does this
+subgroup perform better/worse than average?". I know that I can use ANOVA
+to test whether there is variation between the groups, but I am having a
+hard time figuring out the best way to compare each subgroup to the others
+or to the overall effect. I would rather be able to say how a subgroup's
+effect compares to the overall effect (or the effect of all people not in
+that subgroup), rather than make pairwise comparisons between the
+subgroups. Are there best practices on statistical tests to use for this
+purpose?
+
+Thanks,
+
+
+*Tamar Novetsky* *(she/her)*
+Data Scientist I
+Eastern Time Zone
+
+	[[alternative HTML version deleted]]
+
+
+From gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de  Mon Aug 12 22:38:04 2024
+From: gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de (Dr. Guido Schwarzer)
+Date: Mon, 12 Aug 2024 20:38:04 +0000
+Subject: [R-meta] Facing some issues on Meta - regression
+In-Reply-To: <460ed22a836a43a1af27ff7e4b201f6e@uniklinik-freiburg.de>
+References: <SJ0PR12MB69890777581E596D4C650399F6842@SJ0PR12MB6989.namprd12.prod.outlook.com>
+ <3e3b9ce6-3ceb-459f-bcb4-0b6a3eafd613@dewey.myzen.co.uk>
+ <SJ0PR12MB6989F97C22B2789D26B1DB51F6852@SJ0PR12MB6989.namprd12.prod.outlook.com>
+ <460ed22a836a43a1af27ff7e4b201f6e@uniklinik-freiburg.de>
+Message-ID: <EE88DEFE-9C4C-4B9F-8313-949D293DA6D4@uniklinik-freiburg.de>
+
+Hi all,
+
+The argument 'backtransf = TRUE' was not recognized by bubble.metareg() for the logit-transformation (and other transformations) as this results in a non-linear regression line. The argument worked for relative effect measures like the odds or risk ratio as a logarithmic scale was be used on the y-axis (in this case the regression line is a straight line).
+
+The development version of meta on GitHub allows now to show the back-transformed proportions on the y-axis (with exception of the Freeman-Tukey transformation which needs an average sample size in the back-transformation). For example, metaprop() with logit-transformed proportions:
+
+remotes::install_github("guido-s/meta")
+library("meta")
+data(Olkin1995)
+m <- metaprop(ev.exp, n.exp, data = Olkin1995)
+bubble(metareg(m, year)) 
+bubble(metareg(m, year), backtransf = FALSE)
+
+Best,
+Guido
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Aug 13 11:45:15 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 13 Aug 2024 09:45:15 +0000
+Subject: [R-meta] Performance of metafor::vcalc() vs
+ clubSandwich::impute_covariance_matrix()
+In-Reply-To: <CAFUVuJwkxbGmVshfWKAEEmhJg+2bFn5izZXP4Ra439c6BqJvGQ@mail.gmail.com>
+References: <CAFfZ5xnL-mGivzmVHQ1kCM+Te1BOpjN4NnfA9Yh9MpC5UJpg1A@mail.gmail.com>
+ <CAFUVuJxRgzV0OEqKvoTgrif17rNzaG=xvFbbrTuSBfRw4vLnog@mail.gmail.com>
+ <CAFfZ5xmyMcQQt=eBPMm5jpV_6XDX+irLc5OdmZh9364JcRmcDw@mail.gmail.com>
+ <CAFUVuJwkxbGmVshfWKAEEmhJg+2bFn5izZXP4Ra439c6BqJvGQ@mail.gmail.com>
+Message-ID: <AS8PR08MB9193F53FE9585927A10A3DB98B862@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi all,
+
+Chiming in here after a while (coming back to the office after my summer break).
+
+I didn't pay much attention to speed issues when writing vcalc(), since model fitting with large datasets is going to be the bottleneck, not the construction of the V matrix (whether constructing V takes 0.1 or 1 second hardly matters when model fitting can take minutes). Also, due to the additional functionality vcalc() provides, some of the internal computations are going to be slower. Not sure if there is a way to use Map() (as cleverly used in impute_covariance_matrix()) to avoid the double-loop I use in vcalc() -- pull requests welcome!
+
+However, for the particular use case given here, one can speed things up further by distilling things down to the mere essence. For example:
+
+vfast <- function(vi, study, rho) {
+
+   ids <- unique(study)
+   out <- lapply(ids, function(id) {
+      sel <- study == id
+      n <- sum(sel)
+      R <- matrix(rho, n, n)
+      diag(R) <- 1
+      S <- diag(sqrt(vi[sel]), n, n)
+      S %*% R %*% S
+   })
+   bldiag(out)
+
+}
+
+all.equal(vcalc(vi, cluster = study, obs = esid, data = dat_big, rho = 0.6),
+          vfast(dat_big$vi, dat_big$study, rho = 0.6))
+
+# benchmark performance with full matrix
+res <- microbenchmark(
+  "metafor" = vcalc(vi, cluster = study, obs = esid, data = dat_big, rho = 0.6),
+  "clubSandwich" = impute_covariance_matrix(vi = dat_big$vi, cluster = dat_big$study, r = 0.6, return_list = FALSE),
+  "vfast" = vfast(dat_big$vi, dat_big$study, rho = 0.6),
+  times = 10
+)
+summary(res)
+
+This is now around 5 times faster than impute_covariance_matrix() (about 0.02 seconds on average) and I assume one could speed this up even further.
+
+@James: The deprecation message (Please use `metaffor::vcalc()` instead.) has a typo (should be metafor::vcalc()).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of James Pustejovsky via R-sig-meta-analysis
+> Sent: Tuesday, August 6, 2024 20:50
+> To: Tamar Novetsky <tamar at growprogress.ai>
+> Cc: James Pustejovsky <jepusto at gmail.com>; R Special Interest Group for Meta-
+> Analysis <r-sig-meta-analysis at r-project.org>
+> Subject: Re: [R-meta] Performance of metafor::vcalc() vs
+> clubSandwich::impute_covariance_matrix()
+>
+> Hi Tamar,
+>
+> Thanks for the reprex. Wow this surprised me. It looks like the biggest
+> source of compute time in vcalc() is assignments to the sparse matrix
+> representation of V. There might be a way to improve efficiency there, but
+> will have to confer with Wolfgang.
+>
+> If you are able to reproduce the other issue with getting different results
+> between vcalc() and impute_covariance_matrix(), please do share.
+>
+> Just to provide a little bit of additional context, I am deprecating
+> impute_covariance_matrix() because it is an outlier in the clubSandwich
+> package. It is essentially the only function in the package that is
+> specific to meta-analysis workflows. All other package functionality
+> involves computing cluster-robust variance estimators and associated
+> quantities (hypothesis tests, confidence intervals, etc.). In terms of
+> conceptual organization, it makes more sense for a function like
+> impute_covariance_matrix() to live in metafor. However,
+> impute_covariance_matrix() is not going to disappear entirely from
+> clubSandwich, so you could certainly continue using it in the short term
+> for purposes of computational efficiency.
+>
+> James
+>
+> On Tue, Aug 6, 2024 at 10:19?AM Tamar Novetsky <tamar at growprogress.ai>
+> wrote:
+>
+> > Thanks so much, James! Unfortunately, I didn't find a big enough
+> > improvement in performance using vcalc(sparse = TRUE) - in the example
+> > below, the default vcalc arguments take ~100x longer than
+> > impute_covariance_matrix, while vcalc(sparse = TRUE) takes ~60x longer.
+> >
+> > I couldn't reproduce the 2x values using non-proprietary data, so there
+> > might just be something weird going on with my dataset!
+> >
+> > Reproducible example (adapted from metafor's examples in the vcalc
+> > function documentation):
+> > ```
+> > library(tidyverse)
+> > library(metafor)
+> > library(clubSandwich)
+> > library(microbenchmark)
+> > set.seed(42)
+> >
+> > # example data from metafor
+> > dat <- dat.assink2016
+> >
+> > # augment data so it has >1500 rows
+> > new_rows <-
+> >   tibble(
+> >     study = 18:167,
+> >     n_esid = sample(x = 1:max(dat$esid), size = 150, replace = TRUE)
+> >   ) %>%
+> >   uncount(n_esid) %>%
+> >   group_by(study) %>%
+> >   mutate(esid = row_number()) %>%
+> >   ungroup() %>%
+> >   mutate(
+> >     id = row_number() + 100,
+> >     yi = rnorm(nrow(.), mean(dat$yi), sd(dat$yi)),
+> >     vi = rnorm(nrow(.), mean(dat$vi), sd(dat$vi)),
+> >     vi = if_else(vi < 0, -1*vi, vi), # make sure vi is always positive
+> >     pubstatus = sample(x = dat$pubstatus, size = nrow(.), replace = TRUE),
+> >     year = sample(x = dat$year, size = nrow(.), replace = TRUE),
+> >     deltype = sample(x = dat$deltype, size = nrow(.), replace = TRUE)
+> >   )
+> > dat_big <- bind_rows(dat, new_rows)
+> >
+> > # benchmark performance with full matrix (this takes a minute to run)
+> > res <- microbenchmark(
+> >   "metafor" = vcalc(vi, cluster = study, obs = esid, data = dat_big, rho =
+> > 0.6),
+> >   "clubSandwich" = impute_covariance_matrix(vi = dat_big$vi, cluster =
+> > dat_big$study, r = 0.6, return_list = FALSE),
+> >   times = 10
+> > )
+> > summary(res)
+> >
+> > # benchmark performance with sparse matrix (also takes a minute to run)
+> > res_sparse <- microbenchmark(
+> >   "metafor" = vcalc(vi, cluster = study, obs = esid, data = dat_big, rho =
+> > 0.6, sparse = TRUE),
+> >   "clubSandwich" = impute_covariance_matrix(vi = dat_big$vi, cluster =
+> > dat_big$study, r = 0.6, return_list = FALSE),
+> >   times = 10
+> > )
+> > summary(res_sparse)
+> > ```
+> >
+> > Thanks again,
+> >
+> >
+> > *Tamar Novetsky* *(she/her)*
+> > Data Scientist I
+> > Eastern Time Zone
+> >
+> >
+> > On Tue, Aug 6, 2024 at 10:20?AM James Pustejovsky <jepusto at gmail.com>
+> > wrote:
+> >
+> >> Hi Tamar,
+> >>
+> >> The difference in compute time is because of a difference in how the
+> >> default output of these functions is structured.
+> >> clubSandwich::impute_covariance_matrix() returns a block-diagonal by
+> >> default. metafor::vcalc() returns a full (dense) matrix by default. Say
+> >> that you have J studies and study j has kj effect sizes. The block-diagonal
+> >> matrix has sum(kj^2) entries, whereas the full matrix has sum(kj)^2
+> >> entries. If J is large and the kjs are mostly small, this can make for a
+> >> really big difference in object size. However, setting the option
+> >> vcalc(sparse = TRUE) will return a block-diagonal matrix and should lead to
+> >> performance comparable to impute_covariance_matrix().
+> >>
+> >> Regarding your second question, I'm not sure what might be going on.
+> >> Could you provide a reproducible example?
+> >>
+> >> James
+> >>
+> >> On Tue, Aug 6, 2024 at 8:20?AM Tamar Novetsky via R-sig-meta-analysis <
+> >> r-sig-meta-analysis at r-project.org> wrote:
+> >>
+> >>> Hello,
+> >>>
+> >>> I am working on a script to run multiple meta-regressions on different
+> >>> subsets of the same dataset, and have been
+> >>> using clubSandwich::impute_covariance_matrix() to generate the
+> >>> variance-covariance matrix necessary as an input to metafor::rma.mv().
+> >>> However, I recently learned that impute_covariance_matrix() has been
+> >>> superseded by metafor::vcalc(), so I have been working to replace my
+> >>> usage
+> >>> of the former function with the latter. In that process, I discovered
+> >>> that
+> >>> vcalc() seems to be much slower than impute_covariance_matrix() - about
+> >>> 150x slower in one use case that I benchmarked using the microbenchmark
+> >>> package. Since I will be running this many times in a loop, performance
+> >>> matters quite a lot to me in this context.
+> >>>
+> >>> Can anyone help me understand why vcalc() would be so much slower? Is it
+> >>> possible that I'm using it incorrectly?
+> >>>
+> >>> Secondly/possibly relatedly, I found that the results from vcalc() are
+> >>> always either exactly the same or exactly double the results from
+> >>> impute_covariance_matrix(). Does anyone have a sense of why that would
+> >>> be?
+> >>> Could that be related to the performance differences?
+> >>>
+> >>> Thanks so much for your help,
+> >>>
+> >>> *Tamar Novetsky* *(she/her)*
+> >>> Data Scientist I
+> >>> Eastern Time Zone
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Aug 13 12:39:29 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 13 Aug 2024 10:39:29 +0000
+Subject: [R-meta] selection models in metafor with step truncation
+In-Reply-To: <CAFUVuJwptKov-GpXsFaa6vfwXhoycf4mDOxZMq7Jx8-zny50_A@mail.gmail.com>
+References: <CAFUVuJwptKov-GpXsFaa6vfwXhoycf4mDOxZMq7Jx8-zny50_A@mail.gmail.com>
+Message-ID: <AS8PR08MB919317A1816BD890636FDE8D8B862@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi James,
+
+Catching up on posts here. See:
+
+https://github.com/wviechtb/metafor/blob/master/R/selmodel.rma.uni.r#L457
+
+Assuming preci=1 and using your notation, this is:
+
+ifelse(p_i < a, 1, w(p_i) / w(a))
+
+which I think (first day back in the office - brain is still in warm-up mode) is equivalent to min(1, w(p_i) / w(a)).
+
+I didn't consider the other possibility. Interesting idea -- I just tried this out and it does indeed give different results for some of the datasets that I used.
+
+Do you think one of these two options makes more sense?
+
+Happy to add this alternative version if you would like to see this in selmodel().
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of James Pustejovsky via R-sig-meta-analysis
+> Sent: Saturday, August 3, 2024 04:39
+> To: R meta <r-sig-meta-analysis at r-project.org>
+> Cc: James Pustejovsky <jepusto at gmail.com>
+> Subject: [R-meta] selection models in metafor with step truncation
+>
+> Hi Wolfgang,
+>
+> I see in the metafor documentation for selmodel (
+> https://wviechtb.github.io/metafor/reference/selmodel.html#half-normal-negative-
+> exponential-logistic-and-power-selection-models)
+> that the half-normal, negative exponential, logistic, and power curve
+> selection models can take a value for the step argument, as in the
+> following code:
+>
+> library(metafor)
+> dat <- dat.hahn2001
+> res <- rma(yi, vi, data=dat, method="REML")
+> selmodel(res, type="halfnorm", alternative="less")
+> selmodel(res, type="halfnorm", alternative="less", step = .025)
+>
+> From the description in the documentation, I wasn't sure how the step
+> truncation is implemented. Say that the step threshold is called a, the
+> p-value from study i is p_i, and the selection parameter is delta. Say that
+> the non-truncated weight function is w(p_i). For a > 0, is the weight
+> function
+> min(1, w(p_i) / w(a))
+> which you might call a "vertical" re-scaling? Or is it
+> ifelse(p_i < a, 1, w((p_i - a) / (1 - a)))
+> which you might call a "horizontal" re-scaling?
+>
+> I think for at least some of the selmodel types listed, the vertical and
+> horizontal rescalings give different shapes. Could you clarify?
+>
+> Best,
+> James
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Tue Aug 13 13:37:26 2024
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?utf-8?B?RHIuIEdlcnRhIFLDvGNrZXI=?=)
+Date: Tue, 13 Aug 2024 11:37:26 +0000
+Subject: [R-meta] Facing some issues on Meta - regression
+In-Reply-To: <EE88DEFE-9C4C-4B9F-8313-949D293DA6D4@uniklinik-freiburg.de>
+References: <SJ0PR12MB69890777581E596D4C650399F6842@SJ0PR12MB6989.namprd12.prod.outlook.com>
+ <3e3b9ce6-3ceb-459f-bcb4-0b6a3eafd613@dewey.myzen.co.uk>
+ <SJ0PR12MB6989F97C22B2789D26B1DB51F6852@SJ0PR12MB6989.namprd12.prod.outlook.com>
+ <460ed22a836a43a1af27ff7e4b201f6e@uniklinik-freiburg.de>
+ <EE88DEFE-9C4C-4B9F-8313-949D293DA6D4@uniklinik-freiburg.de>
+Message-ID: <062b2f0dd0e8429d92a84f8c8fdb952e@uniklinik-freiburg.de>
+
+Thank you Guido!
+
+There are always two ways for backtransforming:
+First, backtransform to a linear y-axis with equidistant proportions (0, 0.1, 0.2, ..., 1). This is what you have now implemented for sm = "PLOGIT", and of course it results in a non-linear regression curve (which is nice).
+
+The other possibility would be to keep the figure as is, i.e., the transformed y-axis and a linear line, and only change the marks on the y-axis. This keeps the regression line linear and is the default for bubble plots following metabin:
+
+m1 <- metabin(ev.exp, n.exp, ev.cont, n.cont, sm = "OR",
+              data = Olkin1995, studlab = paste(author, year))
+mr1 <- metareg(m1, year)
+bubble(mr1)
+bubble(mr1, backtransf = FALSE) 
+
+This would be the apparent alternative also for metaprop().
+
+Best,
+Gerta
+
+
+-----Urspr?ngliche Nachricht-----
+Von: Dr. Guido Schwarzer <guido.schwarzer at uniklinik-freiburg.de> 
+
+Hi all,
+
+The argument 'backtransf = TRUE' was not recognized by bubble.metareg() for the logit-transformation (and other transformations) as this results in a non-linear regression line. The argument worked for relative effect measures like the odds or risk ratio as a logarithmic scale was be used on the y-axis (in this case the regression line is a straight line).
+
+The development version of meta on GitHub allows now to show the back-transformed proportions on the y-axis (with exception of the Freeman-Tukey transformation which needs an average sample size in the back-transformation). For example, metaprop() with logit-transformed proportions:
+
+remotes::install_github("guido-s/meta")
+library("meta")
+data(Olkin1995)
+m <- metaprop(ev.exp, n.exp, data = Olkin1995)
+bubble(metareg(m, year)) 
+bubble(metareg(m, year), backtransf = FALSE)
+
+Best,
+Guido
+
+
+From gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de  Tue Aug 13 20:45:24 2024
+From: gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de (Dr. Guido Schwarzer)
+Date: Tue, 13 Aug 2024 18:45:24 +0000
+Subject: [R-meta] Facing some issues on Meta - regression
+In-Reply-To: <062b2f0dd0e8429d92a84f8c8fdb952e@uniklinik-freiburg.de>
+References: <SJ0PR12MB69890777581E596D4C650399F6842@SJ0PR12MB6989.namprd12.prod.outlook.com>
+ <3e3b9ce6-3ceb-459f-bcb4-0b6a3eafd613@dewey.myzen.co.uk>
+ <SJ0PR12MB6989F97C22B2789D26B1DB51F6852@SJ0PR12MB6989.namprd12.prod.outlook.com>
+ <460ed22a836a43a1af27ff7e4b201f6e@uniklinik-freiburg.de>
+ <EE88DEFE-9C4C-4B9F-8313-949D293DA6D4@uniklinik-freiburg.de>
+ <062b2f0dd0e8429d92a84f8c8fdb952e@uniklinik-freiburg.de>
+Message-ID: <EE2D770C-AF61-4FD1-9B0F-B6C107803B5A@uniklinik-freiburg.de>
+
+Hi Gerta,
+
+As I wrote, in bubble.metareg() the transformed y-axis with appropriate tick marks and back-transformed labels only works for relative effect measures, i.e., OR, RR, HR, DOR (and since the last update with summary measures PLN, MLN and IRLN). In these cases, the scatter plot is generated with the argument 'log = "y"' and R generates appropriate tick marks and labels. See, for example,
+plot(1:10, 1:10, log = "y")
+
+I do not know how to automatically generate 'reasonable' tick mark positions for other non-linear transformation (let's say the arcsine or logit transformation). Maybe somebody has a suggestion?
+
+It is now possible to suppress the generation of the x- or y-axis using argument 'axes', e.g.,
+bubble(metareg(m, year), backtransf = FALSE, ylab = "", axes = "x")
+
+Afterwards, the y-axis can be manually added, for example,
+props <- c(0.05, 0.1, 0.2, 0.3, 0.4)
+axis(2, at = p2logit(props), labels = props)
+mtext("Proportion", 2, line = 2.5)
+
+I could think of adding an argument 'labels', or similar, to bubble.metareg() to specify the labels for the tick marks on the y-axis. In the spirit of the previous example, bubble(mreg, labels = c(0.05, 0.1, 0.2, 0.3, 0.4)). 
+
+Best,
+Guido
+
+
+From d@ny@n@d@|01 @end|ng |rom gm@||@com  Fri Aug 16 03:20:07 2024
+From: d@ny@n@d@|01 @end|ng |rom gm@||@com (Danyang Dai)
+Date: Fri, 16 Aug 2024 11:20:07 +1000
+Subject: [R-meta] Output value reported from metaprop function
+Message-ID: <CAGr7YjdHmhJQuLy7=9se46JTOMr9iTc6FAWe7oW6RGAwZyydvA@mail.gmail.com>
+
+Dear R Mata group members
+
+Thank you for developing and contributing to the meta package. I enjoy
+using R for my research work and it is great to have packages that help us
+to do meta analysis.
+
+I am currently conducting a meta analysis on prevalence using the metaprop
+function (not for randomised control trials). For the transformation
+method, I am using Freeman-Tukey Double arcsine transformation (sm="PFT"). I
+am using both random effect and fixed effect. The printed output from the
+metaprop function shows the proportion for random effect and fixed effect
+as the *backtransf* in the *metaprop* function was set to be true by
+default. However, when I try to use $ to extract the values, they are not
+the same value as the printed output.  I looked up the documentation for
+the metaprop function. It seems that the test_meta$TE.random the
+untransformed value and if I want the proportion reported from the printed
+meta output, I would need to use the *backtransf()* function. When I did
+try to use the *backtransf() *to obtain the transformed proportions for the
+fixed effect model and random effect model, I got somewhat similar values
+but not exact values. I suspect that it is probably due to rounding errors
+but I am wondering if there is a way to obtain consistent proportion values
+from the printed values and the meta objects? I am also a bit confused with
+the outputs and the meta estimate. If metaprop(*backtransf = TRUE*), then
+it will print the proportion, if metaprop(*backtransf = FALSE*), then it
+will print the transformed proportion. Would you please explain more about
+which proportion and transformed proportion please?
+
+I appreciate all your suggestions and help and I look forward to hearing
+from you all! Thanks!
+
+See below: (Please see the sample text_data and code attached for
+reproducibility. )
+
+[image: Screenshot 2024-08-16 at 10.54.03.png]
+[image: Screenshot 2024-08-16 at 10.53.30.png]
+
+
+Kind regards
+Daidai
+Github: https://github.com/DanyangDai
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240816/573577ed/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Screenshot 2024-08-16 at 10.54.03.png
+Type: image/png
+Size: 134810 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240816/573577ed/attachment-0002.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Screenshot 2024-08-16 at 10.53.30.png
+Type: image/png
+Size: 131388 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240816/573577ed/attachment-0003.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: test_data.csv
+Type: text/csv
+Size: 255 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240816/573577ed/attachment-0001.csv>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: test_meta.R
+Type: application/octet-stream
+Size: 438 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240816/573577ed/attachment-0001.obj>
+
+From jepu@to @end|ng |rom gm@||@com  Fri Aug 16 04:22:53 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 15 Aug 2024 21:22:53 -0500
+Subject: [R-meta] Performance of metafor::vcalc() vs
+ clubSandwich::impute_covariance_matrix()
+In-Reply-To: <AS8PR08MB9193F53FE9585927A10A3DB98B862@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CAFfZ5xnL-mGivzmVHQ1kCM+Te1BOpjN4NnfA9Yh9MpC5UJpg1A@mail.gmail.com>
+ <CAFUVuJxRgzV0OEqKvoTgrif17rNzaG=xvFbbrTuSBfRw4vLnog@mail.gmail.com>
+ <CAFfZ5xmyMcQQt=eBPMm5jpV_6XDX+irLc5OdmZh9364JcRmcDw@mail.gmail.com>
+ <CAFUVuJwkxbGmVshfWKAEEmhJg+2bFn5izZXP4Ra439c6BqJvGQ@mail.gmail.com>
+ <AS8PR08MB9193F53FE9585927A10A3DB98B862@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <CAFUVuJwMgFsScnkDqe+2mB+1cimu0pn_5QnczDK7MeDftGmaPQ@mail.gmail.com>
+
+On Tue, Aug 13, 2024 at 4:45?AM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> @James: The deprecation message (Please use `metaffor::vcalc()` instead.)
+> has a typo (should be metafor::vcalc()).
+>
+
+Shoot. Thanks for pointing this out. I/ve corrected it in the dev version
+on Github.
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Fri Aug 16 04:35:00 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 15 Aug 2024 21:35:00 -0500
+Subject: [R-meta] selection models in metafor with step truncation
+In-Reply-To: <AS8PR08MB919317A1816BD890636FDE8D8B862@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CAFUVuJwptKov-GpXsFaa6vfwXhoycf4mDOxZMq7Jx8-zny50_A@mail.gmail.com>
+ <AS8PR08MB919317A1816BD890636FDE8D8B862@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <CAFUVuJzpL8zmoUU+Q7PhKZArMZBoKBbRcGueE0Uho+svqbH1ow@mail.gmail.com>
+
+Hi Wolfgang,
+
+Thanks for clarifying. I asked mainly because I'm (slowly) writing up notes
+on a bunch of selection models (links below) and wanted to make sure that
+I'm giving accurate descriptions of the metafor implementations. I don't
+have any solid intuition about which of the possibilities would be
+better--I would guess that any difference in fit might be pretty minor, but
+really not sure at all.
+
+James
+
+Notes on step function model:
+https://jepusto.com/posts/step-function-selection-models/
+Notes on Copas model: https://jepusto.com/posts/Copas-selection-models/
+
+On Tue, Aug 13, 2024 at 5:39?AM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Hi James,
+>
+> Catching up on posts here. See:
+>
+> https://github.com/wviechtb/metafor/blob/master/R/selmodel.rma.uni.r#L457
+>
+> Assuming preci=1 and using your notation, this is:
+>
+> ifelse(p_i < a, 1, w(p_i) / w(a))
+>
+> which I think (first day back in the office - brain is still in warm-up
+> mode) is equivalent to min(1, w(p_i) / w(a)).
+>
+> I didn't consider the other possibility. Interesting idea -- I just tried
+> this out and it does indeed give different results for some of the datasets
+> that I used.
+>
+> Do you think one of these two options makes more sense?
+>
+> Happy to add this alternative version if you would like to see this in
+> selmodel().
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of James Pustejovsky via R-sig-meta-analysis
+> > Sent: Saturday, August 3, 2024 04:39
+> > To: R meta <r-sig-meta-analysis at r-project.org>
+> > Cc: James Pustejovsky <jepusto at gmail.com>
+> > Subject: [R-meta] selection models in metafor with step truncation
+> >
+> > Hi Wolfgang,
+> >
+> > I see in the metafor documentation for selmodel (
+> >
+> https://wviechtb.github.io/metafor/reference/selmodel.html#half-normal-negative-
+> > exponential-logistic-and-power-selection-models)
+> > that the half-normal, negative exponential, logistic, and power curve
+> > selection models can take a value for the step argument, as in the
+> > following code:
+> >
+> > library(metafor)
+> > dat <- dat.hahn2001
+> > res <- rma(yi, vi, data=dat, method="REML")
+> > selmodel(res, type="halfnorm", alternative="less")
+> > selmodel(res, type="halfnorm", alternative="less", step = .025)
+> >
+> > From the description in the documentation, I wasn't sure how the step
+> > truncation is implemented. Say that the step threshold is called a, the
+> > p-value from study i is p_i, and the selection parameter is delta. Say
+> that
+> > the non-truncated weight function is w(p_i). For a > 0, is the weight
+> > function
+> > min(1, w(p_i) / w(a))
+> > which you might call a "vertical" re-scaling? Or is it
+> > ifelse(p_i < a, 1, w((p_i - a) / (1 - a)))
+> > which you might call a "horizontal" re-scaling?
+> >
+> > I think for at least some of the selmodel types listed, the vertical and
+> > horizontal rescalings give different shapes. Could you clarify?
+> >
+> > Best,
+> > James
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Aug 16 10:58:56 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 16 Aug 2024 08:58:56 +0000
+Subject: [R-meta] Performance of metafor::vcalc() vs
+ clubSandwich::impute_covariance_matrix()
+In-Reply-To: <CAFUVuJwMgFsScnkDqe+2mB+1cimu0pn_5QnczDK7MeDftGmaPQ@mail.gmail.com>
+References: <CAFfZ5xnL-mGivzmVHQ1kCM+Te1BOpjN4NnfA9Yh9MpC5UJpg1A@mail.gmail.com>
+ <CAFUVuJxRgzV0OEqKvoTgrif17rNzaG=xvFbbrTuSBfRw4vLnog@mail.gmail.com>
+ <CAFfZ5xmyMcQQt=eBPMm5jpV_6XDX+irLc5OdmZh9364JcRmcDw@mail.gmail.com>
+ <CAFUVuJwkxbGmVshfWKAEEmhJg+2bFn5izZXP4Ra439c6BqJvGQ@mail.gmail.com>
+ <AS8PR08MB9193F53FE9585927A10A3DB98B862@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAFUVuJwMgFsScnkDqe+2mB+1cimu0pn_5QnczDK7MeDftGmaPQ@mail.gmail.com>
+Message-ID: <AS8PR08MB91936C4CA1A0B8B3BC8BB6D98B812@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+My thanks to James, who made a pull request on Github (https://github.com/wviechtb/metafor/pull/85) with some tweaks that speed up the computations in vcalc() by a factor of 10 or so for large matrices. This has been merged into the devel version.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: James Pustejovsky <jepusto at gmail.com>
+> Sent: Friday, August 16, 2024 04:23
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>; Tamar Novetsky <tamar at growprogress.ai>
+> Subject: Re: [R-meta] Performance of metafor::vcalc() vs
+> clubSandwich::impute_covariance_matrix()
+>
+> On Tue, Aug 13, 2024 at 4:45?AM Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> @James: The deprecation message (Please use `metaffor::vcalc()` instead.) has a
+> typo (should be metafor::vcalc()).
+>
+> Shoot. Thanks for pointing this out. I/ve corrected it in the dev version on
+> Github.
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Aug 16 11:07:16 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 16 Aug 2024 09:07:16 +0000
+Subject: [R-meta] selection models in metafor with step truncation
+In-Reply-To: <CAFUVuJzpL8zmoUU+Q7PhKZArMZBoKBbRcGueE0Uho+svqbH1ow@mail.gmail.com>
+References: <CAFUVuJwptKov-GpXsFaa6vfwXhoycf4mDOxZMq7Jx8-zny50_A@mail.gmail.com>
+ <AS8PR08MB919317A1816BD890636FDE8D8B862@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAFUVuJzpL8zmoUU+Q7PhKZArMZBoKBbRcGueE0Uho+svqbH1ow@mail.gmail.com>
+Message-ID: <AS8PR08MB91935CC1E7943F754D76DACD8B812@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Very interesting reads!
+
+In the cases that I examined, the difference between these two versions was quite minor (and in fact, using something like step=.025 in the first place also has only a minor influence compared to not using a step threshold at all). But I should spell out more clearly which version in currently implemented and I will consider adding the other rescaling as well (to make it even more difficult for people to choose among the dozens of models available ...).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: James Pustejovsky <jepusto at gmail.com>
+> Sent: Friday, August 16, 2024 04:35
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Subject: Re: [R-meta] selection models in metafor with step truncation
+>
+> Hi Wolfgang,
+>
+> Thanks for clarifying. I asked mainly because I'm (slowly) writing up notes on a
+> bunch of selection models (links below) and wanted to make sure that I'm giving
+> accurate descriptions of the metafor implementations. I don't have any solid
+> intuition about which of the possibilities would be better--I would guess
+> that any difference in fit might be pretty minor, but really not sure at all.
+>
+> James
+>
+> Notes on step function model: https://jepusto.com/posts/step-function-selection-
+> models/
+> Notes on Copas model: https://jepusto.com/posts/Copas-selection-models/
+>
+> On Tue, Aug 13, 2024 at 5:39?AM Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Hi James,
+>
+> Catching up on posts here. See:
+>
+> https://github.com/wviechtb/metafor/blob/master/R/selmodel.rma.uni.r#L457
+>
+> Assuming preci=1 and using your notation, this is:
+>
+> ifelse(p_i < a, 1, w(p_i) / w(a))
+>
+> which I think (first day back in the office - brain is still in warm-up mode) is
+> equivalent to min(1, w(p_i) / w(a)).
+>
+> I didn't consider the other possibility. Interesting idea -- I just tried this
+> out and it does indeed give different results for some of the datasets that I
+> used.
+>
+> Do you think one of these two options makes more sense?
+>
+> Happy to add this alternative version if you would like to see this in
+> selmodel().
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of James Pustejovsky via R-sig-meta-analysis
+> > Sent: Saturday, August 3, 2024 04:39
+> > To: R meta <mailto:r-sig-meta-analysis at r-project.org>
+> > Cc: James Pustejovsky <mailto:jepusto at gmail.com>
+> > Subject: [R-meta] selection models in metafor with step truncation
+> >
+> > Hi Wolfgang,
+> >
+> > I see in the metafor documentation for selmodel (
+> > https://wviechtb.github.io/metafor/reference/selmodel.html#half-normal-
+> negative-
+> > exponential-logistic-and-power-selection-models)
+> > that the half-normal, negative exponential, logistic, and power curve
+> > selection models can take a value for the step argument, as in the
+> > following code:
+> >
+> > library(metafor)
+> > dat <- dat.hahn2001
+> > res <- rma(yi, vi, data=dat, method="REML")
+> > selmodel(res, type="halfnorm", alternative="less")
+> > selmodel(res, type="halfnorm", alternative="less", step = .025)
+> >
+> > From the description in the documentation, I wasn't sure how the step
+> > truncation is implemented. Say that the step threshold is called a, the
+> > p-value from study i is p_i, and the selection parameter is delta. Say that
+> > the non-truncated weight function is w(p_i). For a > 0, is the weight
+> > function
+> > min(1, w(p_i) / w(a))
+> > which you might call a "vertical" re-scaling? Or is it
+> > ifelse(p_i < a, 1, w((p_i - a) / (1 - a)))
+> > which you might call a "horizontal" re-scaling?
+> >
+> > I think for at least some of the selmodel types listed, the vertical and
+> > horizontal rescalings give different shapes. Could you clarify?
+> >
+> > Best,
+> > James
+
+From @@ge|r@d @end|ng |rom cb@@mpg@de  Mon Aug 19 13:30:59 2024
+From: @@ge|r@d @end|ng |rom cb@@mpg@de (Andrea Asgeirsdottir)
+Date: Mon, 19 Aug 2024 13:30:59 +0200 (CEST)
+Subject: [R-meta] Subgroup correlated effects working model with additional
+ random effects
+Message-ID: <1258012074.268861.1724067059073.JavaMail.zimbra@cbs.mpg.de>
+
+Hello all,
+
+I am conducting a meta-analysis on executive functions (EF) in adolescents. The meta-analysis includes studies that compare two groups of adolescents on at least one EF domain (inhibition, working memory, cognitive flexibility, decision-making, planning, verbal fluency). Not all studies included in the meta-analysis measure each domain. Most studies use several tasks to measure each domain. Often, more than one effect size is reported for each task. I am having some trouble specifying the working models, which I?ll then combine with RVE methods.
+
+The first aim is to answer the question of whether one group is generally more impaired on executive functioning compared to the other group (independent of domains). For this I have the following: 
+
+Variance-covariance matrix:
+vEF_overall <- vcalc(
+  vi = vi, 
+  cluster = StudyID, 
+  obs = ESID, 
+  rho = 0.6, 
+  data = adolEF
+)
+
+Overall-difference working model:
+overallEF <- rma.mv(
+  yi,
+  V = vEF_overall,
+  random = ~ ESID | StudyID,
+  struct = "HCS",
+  data = adolEF,
+  method = "REML",
+  sparse = TRUE
+)
+
+The second aim is to determine which subdomains show the most pronounced impairments. To compare EF domains, I have specified a variance-covariance matrix with DomainID as subgroup: 
+
+Variance-covariance matrix for the subgroup correlated effects model:
+vEF_SCE <- vcalc(
+  vi = vi, 
+  cluster = StudyID, 
+  subgroup = DomainID
+  obs = ESID, 
+  rho = 0.6, 
+  data = adolEF
+)
+
+Differences-between-domains working model (SCE model):
+domainEF  <- rma.mv(
+  yi ~ 0 + DomainID,
+  V = vEF_SCE,
+  random = list(~ DomainID | StudyID, ~ 1 | Task, ~ 1 | ESID),
+  struct = "DIAG",
+  data = adoleEF,
+  method = "REML",
+  sparse = TRUE
+)
+
+Do these specifications seem reasonable? I am unsure about the following:
+1)  How to specify the random effects in the second working model. The tasks used to index each domain vary between studies, but each task is usually included in several studies. I followed Pustejovsky & Tipton (2021) for specifying a SCE model, but added random effects for task and effect sizes. 
+2) Does it make sense to specify two separate variance-covariance matrices for the two working models? I?ve specified struct as ?HCS? in the first one since not all studies assess all of the EF domains (after reading this: https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-July/004827.html) and as ?DIAG?  in the subgroup (domains) model after seeing it specified like that in the example code provided by Pustejovsky & Tipton (https://osf.io/z27wt). Is it advisable to make these more specific, by e.g. including type = Task, since effect size estimates from tasks that tap the same EF domains can be expected to have correlated sampling errors?
+
+Best wishes,
+Andrea
+---
+Doctoral researcher
+Omega lab, Department of Neurology
+Max Planck Institute for Human Cognitive and Brain Sciences
+Stephanstra?e 1a
+04103 Leipzig, Germany
+
+
+From jepu@to @end|ng |rom gm@||@com  Wed Aug 21 18:01:26 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 21 Aug 2024 11:01:26 -0500
+Subject: [R-meta] 
+ Subgroup correlated effects working model with additional
+ random effects
+In-Reply-To: <1258012074.268861.1724067059073.JavaMail.zimbra@cbs.mpg.de>
+References: <1258012074.268861.1724067059073.JavaMail.zimbra@cbs.mpg.de>
+Message-ID: <CAFUVuJyUpgFcm-=TW5F54a6ROC3bDZu6kL3A=TSoE7uPg_LJHw@mail.gmail.com>
+
+Hi Andrea,
+
+Comments inline below.
+
+James
+
+On Mon, Aug 19, 2024 at 6:31?AM Andrea Asgeirsdottir via
+R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+
+> Hello all,
+>
+> I am conducting a meta-analysis on executive functions (EF) in
+> adolescents. The meta-analysis includes studies that compare two groups of
+> adolescents on at least one EF domain (inhibition, working memory,
+> cognitive flexibility, decision-making, planning, verbal fluency). Not all
+> studies included in the meta-analysis measure each domain. Most studies use
+> several tasks to measure each domain. Often, more than one effect size is
+> reported for each task. I am having some trouble specifying the working
+> models, which I?ll then combine with RVE methods.
+>
+> The first aim is to answer the question of whether one group is generally
+> more impaired on executive functioning compared to the other group
+> (independent of domains). For this I have the following:
+>
+> Variance-covariance matrix:
+> vEF_overall <- vcalc(
+>   vi = vi,
+>   cluster = StudyID,
+>   obs = ESID,
+>   rho = 0.6,
+>   data = adolEF
+> )
+>
+>
+This assumes a common sampling correlation of 0.6 for every pair of effect
+sizes coming from the same study, without drawing any distinction between
+effects from the same domain or same task versus effects from different
+tasks. If you would like, you could use the type argument of vcalc()
+together with a pair of values for rho to have a different correlation for
+ES from the same domain versus those from different domains. See point #3
+under Details in the vcalc documentation:
+https://wviechtb.github.io/metafor/reference/vcalc.html
+Ideally, you could motivate the choice of rho value(s) based on empirical
+data or at least shared understanding of correlations within and across
+tasks.
+
+
+Overall-difference working model:
+> overallEF <- rma.mv(
+>   yi,
+>   V = vEF_overall,
+>   random = ~ ESID | StudyID,
+>   struct = "HCS",
+>   data = adolEF,
+>   method = "REML",
+>   sparse = TRUE
+> )
+>
+>
+This specification will not work because there is no replication of ESID
+across studies. I would suggest instead
+random = ~ 1 | StudyID / ESID
+which is a "plain vanilla" correlated-and-hierarchical effects model. Or if
+you want to include an intermediate level for tasks:
+random = ~ 1 | StudyID / Task / ESID
+which would be a CHE+ model.
+
+The second aim is to determine which subdomains show the most pronounced
+> impairments. To compare EF domains, I have specified a variance-covariance
+> matrix with DomainID as subgroup:
+>
+> Variance-covariance matrix for the subgroup correlated effects model:
+> vEF_SCE <- vcalc(
+>   vi = vi,
+>   cluster = StudyID,
+>   subgroup = DomainID
+>   obs = ESID,
+>   rho = 0.6,
+>   data = adolEF
+> )
+>
+
+See comments above about within/between domain correlations. Otherwise the
+syntax looks right.
+
+
+>
+> Differences-between-domains working model (SCE model):
+> domainEF  <- rma.mv(
+>   yi ~ 0 + DomainID,
+>   V = vEF_SCE,
+>   random = list(~ DomainID | StudyID, ~ 1 | Task, ~ 1 | ESID),
+>   struct = "DIAG",
+>   data = adoleEF,
+>   method = "REML",
+>   sparse = TRUE
+> )
+>
+>
+This specification has study-level random effects for each domain, treating
+the domains as independent both within and across studies, task-level
+random effects, and ES-level random effects. A couple of notes here:
+
+* Specifying ~ 1 | Task will yield one random effect per unique task. If
+Task has common levels across studies, then this will result in
+cross-classified random effects. Is this what you intend? Or did you want
+to treat tasks as nested within studies (as in the CHE+ specification,
+suggested above)?
+
+* Specifying ~ 1 | ESID will yield one random effect per unique level of
+ESID. Make sure that ESID has a unique level for _every_ observation for
+this syntax to work as intended. This model assumes that the within-study,
+within-domain heterogeneity is the same for every domain of EF. As an
+alternative (and ignoring task-level random effects for the moment), you
+could allow the within-study heterogeneity to differ by domain using
+random = list(~ DomainID | StudyID, ~ DomainID | ESID),
+struct = c("DIAG","DIAG")
+This model would then be equivalent to fitting a CHE model to the subset of
+effects for each domain, as in
+rma.mv(
+  yi,
+  V = vEF_overall,
+  random = ~ 1 | StudyID /. ESID,
+  data = adolEF,
+  subset = DomainID == <specific domain level>,
+  method = "REML",
+  sparse = TRUE
+)
+
+
+
+> Do these specifications seem reasonable? I am unsure about the following:
+> 1)  How to specify the random effects in the second working model. The
+> tasks used to index each domain vary between studies, but each task is
+> usually included in several studies. I followed Pustejovsky & Tipton (2021)
+> for specifying a SCE model, but added random effects for task and effect
+> sizes.
+> 2) Does it make sense to specify two separate variance-covariance matrices
+> for the two working models? I?ve specified struct as ?HCS? in the first one
+> since not all studies assess all of the EF domains (after reading this:
+> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-July/004827.html)
+> and as ?DIAG?  in the subgroup (domains) model after seeing it specified
+> like that in the example code provided by Pustejovsky & Tipton (
+> https://osf.io/z27wt). Is it advisable to make these more specific, by
+> e.g. including type = Task, since effect size estimates from tasks that tap
+> the same EF domains can be expected to have correlated sampling errors?
+>
+> Best wishes,
+> Andrea
+> ---
+> Doctoral researcher
+> Omega lab, Department of Neurology
+> Max Planck Institute for Human Cognitive and Brain Sciences
+> Stephanstra?e 1a
+> 04103 Leipzig, Germany
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m@x|m|||@n@@te|n|nger @end|ng |rom un|v|e@@c@@t  Fri Aug 23 13:08:51 2024
+From: m@x|m|||@n@@te|n|nger @end|ng |rom un|v|e@@c@@t (Maximilian Steininger)
+Date: Fri, 23 Aug 2024 13:08:51 +0200
+Subject: [R-meta] Outlier and influential case analysis for multilevel
+ meta-analysis with RVE
+Message-ID: <603E3F6E-41AA-46BA-B5DC-B18B54458F2D@univie.ac.at>
+
+Dear all,
+
+I am conducting a three-level meta-analysis where I have different dependency structures in my data. I model the dependency by approximating the var-cov matrix, followed by estimating a three-level model and then I apply robust variance estimation to compute my outcome (as suggested e.g. here: https://wviechtb.github.io/metafor/reference/misc-recs.html#general-workflow-for-meta-analyses-involving-complex-dependency-structures <https://wviechtb.github.io/metafor/reference/misc-recs.html#general-workflow-for-meta-analyses-involving-complex-dependency-structures>)
+
+I wanted to do some sensitivity analysis on the model by running outlier and influential diagnostics. However, most of the proposed diagnostics do not work on "robust.rma" objects.
+
+So far I did some model diagnostics by calculating cook's distance and hat values for my robust model (see e.g., https://wviechtb.github.io/metafor/reference/influence.rma.mv.html <https://wviechtb.github.io/metafor/reference/influence.rma.mv.html>). But as far as I am concerned these "only" give me information on influential cases and not outliers.
+
+What is the best approach to check for outliers when using robust models? Are the two options below a sensible approach to check for outliers?
+
+According to this source a possible but rather conservative approach is to label all studies as outliers that have confidence intervals that do not overlap with the confidence interval of the pooled effect. (see: https://cjvanlissa.github.io/Doing-Meta-Analysis-in-R/detecting-outliers-influential-cases.html <https://cjvanlissa.github.io/Doing-Meta-Analysis-in-R/detecting-outliers-influential-cases.html>).
+Is it a feasible option to perform outlier diagnostics for the non-robust model as suggested e.g. by Viechtbauer & Cheung (2010; 10.1002/jrsm.11). My approach here would be to identify outliers based on the non-robust model --> exclude the outliers --> rerun the whole analysis without the outliers (i.e., approximate var-cov matrix, estimate three-level model, apply robust variance estimation for the subset of studies).
+Or are there other, more elegant ways to do this?
+
+Best and many thanks!
+??
+
+Mag. Maximilian Steininger
+  PhD candidate
+
+  Social, Cognitive and Affective Neuroscience Unit
+  Faculty of Psychology
+  University of Vienna
+
+  Liebiggasse 5
+  1010 Vienna, Austria
+
+  e: maximilian.steininger at univie.ac.at
+  w: http://scan.psy.univie.ac.at
+
+
+	[[alternative HTML version deleted]]
+
+
+From @@ge|r@d @end|ng |rom cb@@mpg@de  Fri Aug 23 14:47:50 2024
+From: @@ge|r@d @end|ng |rom cb@@mpg@de (Andrea Asgeirsdottir)
+Date: Fri, 23 Aug 2024 14:47:50 +0200 (CEST)
+Subject: [R-meta] 
+ Subgroup correlated effects working model with additional
+ random effects
+In-Reply-To: <CAFUVuJyUpgFcm-=TW5F54a6ROC3bDZu6kL3A=TSoE7uPg_LJHw@mail.gmail.com>
+References: <1258012074.268861.1724067059073.JavaMail.zimbra@cbs.mpg.de>
+ <CAFUVuJyUpgFcm-=TW5F54a6ROC3bDZu6kL3A=TSoE7uPg_LJHw@mail.gmail.com>
+Message-ID: <924898653.216623.1724417270927.JavaMail.zimbra@cbs.mpg.de>
+
+Hi James,
+
+Thank you for your comments, they have been really helpful. For the second model, I am leaning towards the model you suggested with random effects 
+random = list(~ DomainID | StudyID, ~ DomainID | ESID), 
+since I am interested in differences between domains. 
+I am still unsure whether including cross-classified random effects for tasks is important. Tasks are nested within domains but the same tasks are included in many different studies. Below is a datastructure capturing the structure of my data: 
+dataStructure <- structure(list(StudyID = c(1L, 1L, 1L, 1L, 1L, 1L, 2L, 2L, 2L, 
+2L, 2L, 2L, 3L, 3L, 3L, 3L), DomainID = c(3L, 3L, 3L, 1L, 1L, 
+1L, 2L, 2L, 2L, 1L, 1L, 1L, 1L, 2L, 2L, 3L), DomainName = c("WM", 
+"WM", "WM", "Inhibition", "Inhibition", "Inhibition", "CF", "CF", 
+"CF", "Inhibition", "Inhibition", "Inhibition", "Inhibition", 
+"CF", "CF", "WM"), Task = c(7L, 8L, 8L, 1L, 1L, 2L, 4L, 4L, 5L, 
+1L, 2L, 2L, 3L, 6L, 4L, 8L), TaskName = c("N-back", "Spatial WM", 
+"Spatial WM", "Stop-signal", "Stop-signal", "Stroop", "WCST", 
+"WCST", "Trail making test", "Stop-signal", "Stroop", "Stroop", 
+"Go/No-Go", "Set-shift task", "WCST", "Spatial WM"), ESID = 1:16, 
+    ESTYPE = c("Response time", "Accuracy", "Response time", 
+    "SSRT", "Accuracy", "Response time", "Perseverative error", 
+    "Random error", "Response time", "SSRT", "Accuracy", "Interference effect", 
+    "Commission errors", "Perseverative error", "Perseverative error", 
+    "Accuracy")), class = "data.frame", row.names = c(NA, -16L
+))
+
+Where the domain Inhibition includes the Stop signal (1), Stroop (2), and Go/No-Go (3) tasks 
+Cognitive flexibility includes WCST (4), Trail making test (5), and Set-shift task (6)
+Working memory includes N-back (7) and Spatial WM (8). 
+
+Is including cross-classified random effects necessary if the focus of my question is on domains?
+
+Best wishes,
+Andrea
+
+
+
+----- Original Message -----
+> From: "James Pustejovsky" <jepusto at gmail.com>
+> To: "R Special Interest Group for Meta-Analysis" <r-sig-meta-analysis at r-project.org>
+> Cc: "Andrea Asgeirsdottir" <asgeirsd at cbs.mpg.de>
+> Sent: Wednesday, 21 August, 2024 16:01:26
+> Subject: Re: [R-meta] Subgroup correlated effects working model with additional random effects
+
+> Hi Andrea,
+> 
+> Comments inline below.
+> 
+> James
+> 
+> On Mon, Aug 19, 2024 at 6:31?AM Andrea Asgeirsdottir via
+> R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+> 
+>> Hello all,
+>>
+>> I am conducting a meta-analysis on executive functions (EF) in
+>> adolescents. The meta-analysis includes studies that compare two groups of
+>> adolescents on at least one EF domain (inhibition, working memory,
+>> cognitive flexibility, decision-making, planning, verbal fluency). Not all
+>> studies included in the meta-analysis measure each domain. Most studies use
+>> several tasks to measure each domain. Often, more than one effect size is
+>> reported for each task. I am having some trouble specifying the working
+>> models, which I?ll then combine with RVE methods.
+>>
+>> The first aim is to answer the question of whether one group is generally
+>> more impaired on executive functioning compared to the other group
+>> (independent of domains). For this I have the following:
+>>
+>> Variance-covariance matrix:
+>> vEF_overall <- vcalc(
+>>   vi = vi,
+>>   cluster = StudyID,
+>>   obs = ESID,
+>>   rho = 0.6,
+>>   data = adolEF
+>> )
+>>
+>>
+> This assumes a common sampling correlation of 0.6 for every pair of effect
+> sizes coming from the same study, without drawing any distinction between
+> effects from the same domain or same task versus effects from different
+> tasks. If you would like, you could use the type argument of vcalc()
+> together with a pair of values for rho to have a different correlation for
+> ES from the same domain versus those from different domains. See point #3
+> under Details in the vcalc documentation:
+> https://wviechtb.github.io/metafor/reference/vcalc.html
+> Ideally, you could motivate the choice of rho value(s) based on empirical
+> data or at least shared understanding of correlations within and across
+> tasks.
+> 
+> 
+> Overall-difference working model:
+>> overallEF <- rma.mv(
+>>   yi,
+>>   V = vEF_overall,
+>>   random = ~ ESID | StudyID,
+>>   struct = "HCS",
+>>   data = adolEF,
+>>   method = "REML",
+>>   sparse = TRUE
+>> )
+>>
+>>
+> This specification will not work because there is no replication of ESID
+> across studies. I would suggest instead
+> random = ~ 1 | StudyID / ESID
+> which is a "plain vanilla" correlated-and-hierarchical effects model. Or if
+> you want to include an intermediate level for tasks:
+> random = ~ 1 | StudyID / Task / ESID
+> which would be a CHE+ model.
+> 
+> The second aim is to determine which subdomains show the most pronounced
+>> impairments. To compare EF domains, I have specified a variance-covariance
+>> matrix with DomainID as subgroup:
+>>
+>> Variance-covariance matrix for the subgroup correlated effects model:
+>> vEF_SCE <- vcalc(
+>>   vi = vi,
+>>   cluster = StudyID,
+>>   subgroup = DomainID
+>>   obs = ESID,
+>>   rho = 0.6,
+>>   data = adolEF
+>> )
+>>
+> 
+> See comments above about within/between domain correlations. Otherwise the
+> syntax looks right.
+> 
+> 
+>>
+>> Differences-between-domains working model (SCE model):
+>> domainEF  <- rma.mv(
+>>   yi ~ 0 + DomainID,
+>>   V = vEF_SCE,
+>>   random = list(~ DomainID | StudyID, ~ 1 | Task, ~ 1 | ESID),
+>>   struct = "DIAG",
+>>   data = adoleEF,
+>>   method = "REML",
+>>   sparse = TRUE
+>> )
+>>
+>>
+> This specification has study-level random effects for each domain, treating
+> the domains as independent both within and across studies, task-level
+> random effects, and ES-level random effects. A couple of notes here:
+> 
+> * Specifying ~ 1 | Task will yield one random effect per unique task. If
+> Task has common levels across studies, then this will result in
+> cross-classified random effects. Is this what you intend? Or did you want
+> to treat tasks as nested within studies (as in the CHE+ specification,
+> suggested above)?
+> 
+> * Specifying ~ 1 | ESID will yield one random effect per unique level of
+> ESID. Make sure that ESID has a unique level for _every_ observation for
+> this syntax to work as intended. This model assumes that the within-study,
+> within-domain heterogeneity is the same for every domain of EF. As an
+> alternative (and ignoring task-level random effects for the moment), you
+> could allow the within-study heterogeneity to differ by domain using
+> random = list(~ DomainID | StudyID, ~ DomainID | ESID),
+> struct = c("DIAG","DIAG")
+> This model would then be equivalent to fitting a CHE model to the subset of
+> effects for each domain, as in
+> rma.mv(
+>  yi,
+>  V = vEF_overall,
+>  random = ~ 1 | StudyID /. ESID,
+>  data = adolEF,
+>  subset = DomainID == <specific domain level>,
+>  method = "REML",
+>  sparse = TRUE
+> )
+> 
+> 
+> 
+>> Do these specifications seem reasonable? I am unsure about the following:
+>> 1)  How to specify the random effects in the second working model. The
+>> tasks used to index each domain vary between studies, but each task is
+>> usually included in several studies. I followed Pustejovsky & Tipton (2021)
+>> for specifying a SCE model, but added random effects for task and effect
+>> sizes.
+>> 2) Does it make sense to specify two separate variance-covariance matrices
+>> for the two working models? I?ve specified struct as ?HCS? in the first one
+>> since not all studies assess all of the EF domains (after reading this:
+>> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-July/004827.html)
+>> and as ?DIAG?  in the subgroup (domains) model after seeing it specified
+>> like that in the example code provided by Pustejovsky & Tipton (
+>> https://osf.io/z27wt). Is it advisable to make these more specific, by
+>> e.g. including type = Task, since effect size estimates from tasks that tap
+>> the same EF domains can be expected to have correlated sampling errors?
+>>
+>> Best wishes,
+>> Andrea
+>> ---
+>> Doctoral researcher
+>> Omega lab, Department of Neurology
+>> Max Planck Institute for Human Cognitive and Brain Sciences
+>> Stephanstra?e 1a
+>> 04103 Leipzig, Germany
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From jepu@to @end|ng |rom gm@||@com  Sat Aug 24 14:40:53 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Sat, 24 Aug 2024 07:40:53 -0500
+Subject: [R-meta] Outlier and influential case analysis for multilevel
+ meta-analysis with RVE
+In-Reply-To: <603E3F6E-41AA-46BA-B5DC-B18B54458F2D@univie.ac.at>
+References: <603E3F6E-41AA-46BA-B5DC-B18B54458F2D@univie.ac.at>
+Message-ID: <CAFUVuJw9YXn4LMJPA90zrsoBpg_Nhc=aTM8BDZYXZzC0EN+1mQ@mail.gmail.com>
+
+I think it makes sense to do the analysis of outliers and influential cases
+before applying RVE. One way to think about this approach is that you are
+examining the assumptions _of the working model_, to understand the extent
+to which those assumptions are reasonable, even if you will later use RVE
+to protect against model misspecification.
+
+I think this approach is advantageous because it gives access to a richer
+set of diagnostic tools, whereas the other approach is just a single
+rule-of-thumb (one which I don't think has a strong statistical rationale
+in the first place).
+
+A further challenge here that I don't think has been addressed thoroughly
+in the meta-analysis methods literature is how to think about outliers in
+the multilevel context. When there is both between-study and within-study
+variation, one could imagine there being outlying studies, outlying effect
+sizes with respect to the overall distribution, or outlying effect sizes
+relative to the distribution of effects within the same study. Perhaps
+others on the list know of guidance about how to diagnose these features.
+
+Best,
+James
+
+On Fri, Aug 23, 2024 at 6:09?AM Maximilian Steininger via
+R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+
+> Dear all,
+>
+> I am conducting a three-level meta-analysis where I have different
+> dependency structures in my data. I model the dependency by approximating
+> the var-cov matrix, followed by estimating a three-level model and then I
+> apply robust variance estimation to compute my outcome (as suggested e.g.
+> here:
+> https://wviechtb.github.io/metafor/reference/misc-recs.html#general-workflow-for-meta-analyses-involving-complex-dependency-structures
+> <
+> https://wviechtb.github.io/metafor/reference/misc-recs.html#general-workflow-for-meta-analyses-involving-complex-dependency-structures
+> >)
+>
+> I wanted to do some sensitivity analysis on the model by running outlier
+> and influential diagnostics. However, most of the proposed diagnostics do
+> not work on "robust.rma" objects.
+>
+> So far I did some model diagnostics by calculating cook's distance and hat
+> values for my robust model (see e.g.,
+> https://wviechtb.github.io/metafor/reference/influence.rma.mv.html <
+> https://wviechtb.github.io/metafor/reference/influence.rma.mv.html>). But
+> as far as I am concerned these "only" give me information on influential
+> cases and not outliers.
+>
+> What is the best approach to check for outliers when using robust models?
+> Are the two options below a sensible approach to check for outliers?
+>
+> According to this source a possible but rather conservative approach is to
+> label all studies as outliers that have confidence intervals that do not
+> overlap with the confidence interval of the pooled effect. (see:
+> https://cjvanlissa.github.io/Doing-Meta-Analysis-in-R/detecting-outliers-influential-cases.html
+> <
+> https://cjvanlissa.github.io/Doing-Meta-Analysis-in-R/detecting-outliers-influential-cases.html
+> >).
+> Is it a feasible option to perform outlier diagnostics for the non-robust
+> model as suggested e.g. by Viechtbauer & Cheung (2010; 10.1002/jrsm.11). My
+> approach here would be to identify outliers based on the non-robust model
+> --> exclude the outliers --> rerun the whole analysis without the outliers
+> (i.e., approximate var-cov matrix, estimate three-level model, apply robust
+> variance estimation for the subset of studies).
+> Or are there other, more elegant ways to do this?
+>
+> Best and many thanks!
+> ??
+>
+> Mag. Maximilian Steininger
+>   PhD candidate
+>
+>   Social, Cognitive and Affective Neuroscience Unit
+>   Faculty of Psychology
+>   University of Vienna
+>
+>   Liebiggasse 5
+>   1010 Vienna, Austria
+>
+>   e: maximilian.steininger at univie.ac.at
+>   w: http://scan.psy.univie.ac.at
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From |e||d26 @end|ng |rom gm@||@com  Sun Aug 25 22:40:59 2024
+From: |e||d26 @end|ng |rom gm@||@com (Emanuel Schembri)
+Date: Sun, 25 Aug 2024 22:40:59 +0200
+Subject: [R-meta] Two large forest plots in one image
+In-Reply-To: <4E61F6C3-EC35-4C6F-AF4C-864A7AF431A6@uniklinik-freiburg.de>
+References: <CAE89KOM=0Xv0aaGm__Ucd+vBFs_vSNfQxXi4MyeF=7L+xF+GTw@mail.gmail.com>
+ <4E61F6C3-EC35-4C6F-AF4C-864A7AF431A6@uniklinik-freiburg.de>
+Message-ID: <CAE89KOOHwkwEURR7W2HSHeWFdb00fqW2a1AGk1+xO02QNyfBcQ@mail.gmail.com>
+
+Dear Guido,
+
+Apologies for the late reply.
+
+I have been trying to work it out with your code, but unfortunately,
+it was not coming out nicely.
+
+However, I managed to use the {magik} package to work around it with
+visually appealing images.
+
+Kindest regards,
+
+Emanuel
+
+
+
+Below is the code:
+
+Save each forest plot using the Plots -> Export -> Save as Image.
+
+Save each forest plot in png format using a constant width of 950 and
+an appropriate height so they fit well.
+
+
+
+library(magick)
+
+
+
+# Load the images
+
+img1 <- image_read("image_1.png")
+
+img2 <- image_read("image_2.png")
+
+img3 <- image_read("image_3.png")
+
+
+
+# Annotate each image with a letter
+
+img1_annotated <- image_annotate(img1, "A", size = 40, gravity =
+"northwest", color = "black")
+
+img2_annotated <- image_annotate(img2, "B", size = 40, gravity =
+"northwest", color = "black")
+
+img3_annotated <- image_annotate(img3, "C", size = 40, gravity =
+"northwest", color = "black")
+
+
+
+# Display the annotated images (optional)
+
+img1_annotated
+
+img2_annotated
+
+img3_annotated
+
+
+
+# Combine images into a grid
+
+combined_image <- image_append(c(img1_annotated,
+img2_annotated,img3_annotated), stack = TRUE)
+
+
+
+# add extra white space around the combined plot
+
+padded_legend <- image_border(combined_image, color = "white",
+geometry = "50x20")
+
+padded_legend
+
+
+
+# Save the combined image
+
+image_write(padded_legend, path = "combined_plots_123.png")
+
+
+On Mon, Jul 29, 2024 at 5:49?PM Dr. Guido Schwarzer
+<guido.schwarzer at uniklinik-freiburg.de> wrote:
+>
+> Emanuel,
+>
+> I typically generate a PDF-file using pushViewport() from the grid package. The code below works for two forest plots either side by side or one below the other.
+>
+> Best,
+> Guido
+>
+>
+> library("meta")
+> library("grid")
+>
+> E1 <- structure(list(study = c("Barratt", "Carli", "Gupta", "Taqi",
+> "Chen", "H?bner", "Zutshi", "Park", "Klotz", "Mohamad", "Chen",
+> "Tsui"), year = c(2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000,
+> 2000, 2000, 2000, 2000), ev.EZ = c(1, 3, 1, 1, 0, 2, 0, 1, 1,
+> 0, 0, 0), n.EZ = c(55, 41, 60, 9, 26, 65, 31, 25, 21, 28, 25,
+> 57), ev.PPA = c(1, 4, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0), n.PPA = c(55,
+> 42, 60, 11, 27, 57, 28, 22, 21, 28, 25, 54), TRX = c(1, 2, 1,
+> 1, 1, 1, 1, 2, 2, 2, 2, 2), TIME = c("Update", "Update", "Update",
+> "Old", "Old", "Old", "Old", "Old", "Old", "Old", "Old", "Old"
+> )), class = c("tbl_df", "tbl", "data.frame"), row.names = c(NA,
+> -12L))
+>
+>
+> E2 <- structure(list(study = c("Steinberg", "Parker", "Madej", "Schumann",
+> "Carli", "Tsui", "Xu", "Park", "Cho", "Xu", "Yosunkaya", "Mann",
+> "Jayr", "Aceto"), year = c(2000, 2000, 2000, 2000, 2000, 2000,
+> 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000), ev.EZ = c(8,
+> 3, 6, 16, 10, 10, 4, 11, 7, 5, 16, 30, 16, 2), n.EZ = c(51, 55,
+> 41, 60, 20, 31, 20, 51, 20, 36, 21, 57, 38, 20), ev.PPA = c(9,
+> 11, 8, 27, 11, 10, 3, 3, 9, 11, 17, 29, 14, 0), n.PPA = c(51,
+> 55, 42, 60, 20, 33, 21, 48, 10, 32, 21, 54, 46, 19), TRX = c(2,
+> 1, 1, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2), TIME = c("Update", "Update",
+> "Update", "Update", "Old", "Old", "Old", "Old", "Old", "Old",
+> "Old", "Old", "Old", "Old")), class = c("tbl_df", "tbl", "data.frame"
+> ), row.names = c(NA, -14L))
+>
+>
+> M3 <-  metabin(ev.EZ, n.EZ, ev.PPA, n.PPA,
+>                data = E1,
+>                studlab = paste0(study, " (", year, ")"),
+>                sm = "RR",
+>                method = "MH",
+>                subgroup = TIME)
+>
+> M4 <- metabin(ev.EZ, n.EZ, ev.PPA, n.PPA,
+>               data = E2,
+>               studlab = paste0(study, " (", year, ")"),
+>               sm = "RR",
+>               method = "MH",
+>               subgroup = TRX)
+>
+>
+> height <- 14
+> width <- 9
+> #
+> ncols <- 1
+> nrows <- 2
+> #
+> firstrow <- 0.5
+> firstcol <- 0.5
+>
+> pdf("two-forestplots.pdf", width = width, height = height)
+>
+> pushViewport(
+>   viewport(
+>     layout = grid.layout(
+>     nrow = nrows, ncol = ncols,
+>     widths = unit(2 * c(firstcol, 1 - firstcol) * width / ncols,
+>                   "inches"),
+>     heights = unit(2 * c(firstrow, 1 - firstrow) * height / nrows,
+>                   "inches"))
+>   )
+>   )
+>
+> pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
+>
+> forest(M3, new = FALSE,
+>        common = FALSE,
+>        test.overall.random=TRUE,
+>        prediction=TRUE,
+>        print.Q=TRUE,
+>        print.Q.pval=TRUE,
+>        just = "right",
+>        layout = "RevMan5",
+>        pooled.events=TRUE,
+>        sortvar = year)
+>
+> grid.text("Figure A", 0.025, 0.96, gp = grid::gpar(cex = 1.5), just = "left")
+>
+> popViewport()
+>
+> pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 2))
+>
+> forest(M4, new = FALSE,
+>        common = FALSE,
+>        test.overall.random=TRUE,
+>        prediction=TRUE,
+>        print.Q=TRUE,
+>        print.Q.pval=TRUE,
+>        just = "right",
+>        layout = "RevMan5",
+>        pooled.events=TRUE,
+>        sortvar = year)
+>
+> grid.text("Figure B", 0.025, 0.98, gp = grid::gpar(cex = 1.5), just = "left")
+>
+> popViewport()
+>
+> dev.off()
+>
+
+
+From m@x|m|||@n@@te|n|nger @end|ng |rom un|v|e@@c@@t  Mon Aug 26 07:54:19 2024
+From: m@x|m|||@n@@te|n|nger @end|ng |rom un|v|e@@c@@t (Maximilian Steininger)
+Date: Mon, 26 Aug 2024 07:54:19 +0200
+Subject: [R-meta] Outlier and influential case analysis for multilevel
+ meta-analysis with RVE
+In-Reply-To: <CAFUVuJw9YXn4LMJPA90zrsoBpg_Nhc=aTM8BDZYXZzC0EN+1mQ@mail.gmail.com>
+References: <603E3F6E-41AA-46BA-B5DC-B18B54458F2D@univie.ac.at>
+ <CAFUVuJw9YXn4LMJPA90zrsoBpg_Nhc=aTM8BDZYXZzC0EN+1mQ@mail.gmail.com>
+Message-ID: <D474F2D8-AD13-48F7-8076-F7960A8BD5FD@univie.ac.at>
+
+Dear James, 
+
+Thanks a lot for your input. Then I will do the diagnostics before applying RVE!
+
+I agree that it?s quite challenging to define what an outlier is in the multilevel context. Since I have very few effect sizes per study (max. 3, mostly 1) and a big between-study (and not so much within-study) heterogeneity, my approach would be to identify outlying effect sizes with respect to overall distribution. Do you have any suggestions for further reading on this topic?
+
+Best and many thanks!
+
+Max
+??
+
+Mag. Maximilian Steininger
+  PhD candidate
+
+  Social, Cognitive and Affective Neuroscience Unit
+  Faculty of Psychology
+  University of Vienna
+
+  Liebiggasse 5
+  1010 Vienna, Austria
+
+  e: maximilian.steininger at univie.ac.at
+  w: http://scan.psy.univie.ac.at
+
+> Am 24.08.2024 um 14:40 schrieb James Pustejovsky via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>:
+> 
+> I think it makes sense to do the analysis of outliers and influential cases
+> before applying RVE. One way to think about this approach is that you are
+> examining the assumptions _of the working model_, to understand the extent
+> to which those assumptions are reasonable, even if you will later use RVE
+> to protect against model misspecification.
+> 
+> I think this approach is advantageous because it gives access to a richer
+> set of diagnostic tools, whereas the other approach is just a single
+> rule-of-thumb (one which I don't think has a strong statistical rationale
+> in the first place).
+> 
+> A further challenge here that I don't think has been addressed thoroughly
+> in the meta-analysis methods literature is how to think about outliers in
+> the multilevel context. When there is both between-study and within-study
+> variation, one could imagine there being outlying studies, outlying effect
+> sizes with respect to the overall distribution, or outlying effect sizes
+> relative to the distribution of effects within the same study. Perhaps
+> others on the list know of guidance about how to diagnose these features.
+> 
+> Best,
+> James
+> 
+> On Fri, Aug 23, 2024 at 6:09?AM Maximilian Steininger via
+> R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+> 
+>> Dear all,
+>> 
+>> I am conducting a three-level meta-analysis where I have different
+>> dependency structures in my data. I model the dependency by approximating
+>> the var-cov matrix, followed by estimating a three-level model and then I
+>> apply robust variance estimation to compute my outcome (as suggested e.g.
+>> here:
+>> https://wviechtb.github.io/metafor/reference/misc-recs.html#general-workflow-for-meta-analyses-involving-complex-dependency-structures
+>> <
+>> https://wviechtb.github.io/metafor/reference/misc-recs.html#general-workflow-for-meta-analyses-involving-complex-dependency-structures
+>>> )
+>> 
+>> I wanted to do some sensitivity analysis on the model by running outlier
+>> and influential diagnostics. However, most of the proposed diagnostics do
+>> not work on "robust.rma" objects.
+>> 
+>> So far I did some model diagnostics by calculating cook's distance and hat
+>> values for my robust model (see e.g.,
+>> https://wviechtb.github.io/metafor/reference/influence.rma.mv.html <
+>> https://wviechtb.github.io/metafor/reference/influence.rma.mv.html>). But
+>> as far as I am concerned these "only" give me information on influential
+>> cases and not outliers.
+>> 
+>> What is the best approach to check for outliers when using robust models?
+>> Are the two options below a sensible approach to check for outliers?
+>> 
+>> According to this source a possible but rather conservative approach is to
+>> label all studies as outliers that have confidence intervals that do not
+>> overlap with the confidence interval of the pooled effect. (see:
+>> https://cjvanlissa.github.io/Doing-Meta-Analysis-in-R/detecting-outliers-influential-cases.html
+>> <
+>> https://cjvanlissa.github.io/Doing-Meta-Analysis-in-R/detecting-outliers-influential-cases.html
+>>> ).
+>> Is it a feasible option to perform outlier diagnostics for the non-robust
+>> model as suggested e.g. by Viechtbauer & Cheung (2010; 10.1002/jrsm.11). My
+>> approach here would be to identify outliers based on the non-robust model
+>> --> exclude the outliers --> rerun the whole analysis without the outliers
+>> (i.e., approximate var-cov matrix, estimate three-level model, apply robust
+>> variance estimation for the subset of studies).
+>> Or are there other, more elegant ways to do this?
+>> 
+>> Best and many thanks!
+>> ??
+>> 
+>> Mag. Maximilian Steininger
+>>  PhD candidate
+>> 
+>>  Social, Cognitive and Affective Neuroscience Unit
+>>  Faculty of Psychology
+>>  University of Vienna
+>> 
+>>  Liebiggasse 5
+>>  1010 Vienna, Austria
+>> 
+>>  e: maximilian.steininger at univie.ac.at
+>>  w: http://scan.psy.univie.ac.at
+>> 
+>> 
+>>        [[alternative HTML version deleted]]
+>> 
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From jepu@to @end|ng |rom gm@||@com  Mon Aug 26 17:15:03 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Mon, 26 Aug 2024 10:15:03 -0500
+Subject: [R-meta] Outlier and influential case analysis for multilevel
+ meta-analysis with RVE
+In-Reply-To: <D474F2D8-AD13-48F7-8076-F7960A8BD5FD@univie.ac.at>
+References: <603E3F6E-41AA-46BA-B5DC-B18B54458F2D@univie.ac.at>
+ <CAFUVuJw9YXn4LMJPA90zrsoBpg_Nhc=aTM8BDZYXZzC0EN+1mQ@mail.gmail.com>
+ <D474F2D8-AD13-48F7-8076-F7960A8BD5FD@univie.ac.at>
+Message-ID: <CAFUVuJyubgZS3JSw0=iY98w0Tpz-itrdHkA6Z8e779B2kn+CjQ@mail.gmail.com>
+
+Unfortunately I don't have any suggestions for readings about this issue.
+Perhaps other on the listserv know of good readings?
+James
+
+On Mon, Aug 26, 2024 at 12:54?AM Maximilian Steininger <
+maximilian.steininger at univie.ac.at> wrote:
+
+> Dear James,
+>
+> Thanks a lot for your input. Then I will do the diagnostics before
+> applying RVE!
+>
+> I agree that it?s quite challenging to define what an outlier is in the
+> multilevel context. Since I have very few effect sizes per study (max. 3,
+> mostly 1) and a big between-study (and not so much within-study)
+> heterogeneity, my approach would be to identify outlying effect sizes with
+> respect to overall distribution. Do you have any suggestions for further
+> reading on this topic?
+>
+> Best and many thanks!
+>
+> Max
+> ??
+>
+> Mag. Maximilian Steininger
+>   PhD candidate
+>
+>   Social, Cognitive and Affective Neuroscience Unit
+>   Faculty of Psychology
+>   University of Vienna
+>
+>   Liebiggasse 5
+>   1010 Vienna, Austria
+>
+>   e: maximilian.steininger at univie.ac.at
+>   w: http://scan.psy.univie.ac.at
+>
+> > Am 24.08.2024 um 14:40 schrieb James Pustejovsky via R-sig-meta-analysis
+> <r-sig-meta-analysis at r-project.org>:
+> >
+> > I think it makes sense to do the analysis of outliers and influential
+> cases
+> > before applying RVE. One way to think about this approach is that you are
+> > examining the assumptions _of the working model_, to understand the
+> extent
+> > to which those assumptions are reasonable, even if you will later use RVE
+> > to protect against model misspecification.
+> >
+> > I think this approach is advantageous because it gives access to a richer
+> > set of diagnostic tools, whereas the other approach is just a single
+> > rule-of-thumb (one which I don't think has a strong statistical rationale
+> > in the first place).
+> >
+> > A further challenge here that I don't think has been addressed thoroughly
+> > in the meta-analysis methods literature is how to think about outliers in
+> > the multilevel context. When there is both between-study and within-study
+> > variation, one could imagine there being outlying studies, outlying
+> effect
+> > sizes with respect to the overall distribution, or outlying effect sizes
+> > relative to the distribution of effects within the same study. Perhaps
+> > others on the list know of guidance about how to diagnose these features.
+> >
+> > Best,
+> > James
+> >
+> > On Fri, Aug 23, 2024 at 6:09?AM Maximilian Steininger via
+> > R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+> >
+> >> Dear all,
+> >>
+> >> I am conducting a three-level meta-analysis where I have different
+> >> dependency structures in my data. I model the dependency by
+> approximating
+> >> the var-cov matrix, followed by estimating a three-level model and then
+> I
+> >> apply robust variance estimation to compute my outcome (as suggested
+> e.g.
+> >> here:
+> >>
+> https://wviechtb.github.io/metafor/reference/misc-recs.html#general-workflow-for-meta-analyses-involving-complex-dependency-structures
+> >> <
+> >>
+> https://wviechtb.github.io/metafor/reference/misc-recs.html#general-workflow-for-meta-analyses-involving-complex-dependency-structures
+> >>> )
+> >>
+> >> I wanted to do some sensitivity analysis on the model by running outlier
+> >> and influential diagnostics. However, most of the proposed diagnostics
+> do
+> >> not work on "robust.rma" objects.
+> >>
+> >> So far I did some model diagnostics by calculating cook's distance and
+> hat
+> >> values for my robust model (see e.g.,
+> >> https://wviechtb.github.io/metafor/reference/influence.rma.mv.html <
+> >> https://wviechtb.github.io/metafor/reference/influence.rma.mv.html>).
+> But
+> >> as far as I am concerned these "only" give me information on influential
+> >> cases and not outliers.
+> >>
+> >> What is the best approach to check for outliers when using robust
+> models?
+> >> Are the two options below a sensible approach to check for outliers?
+> >>
+> >> According to this source a possible but rather conservative approach is
+> to
+> >> label all studies as outliers that have confidence intervals that do not
+> >> overlap with the confidence interval of the pooled effect. (see:
+> >>
+> https://cjvanlissa.github.io/Doing-Meta-Analysis-in-R/detecting-outliers-influential-cases.html
+> >> <
+> >>
+> https://cjvanlissa.github.io/Doing-Meta-Analysis-in-R/detecting-outliers-influential-cases.html
+> >>> ).
+> >> Is it a feasible option to perform outlier diagnostics for the
+> non-robust
+> >> model as suggested e.g. by Viechtbauer & Cheung (2010;
+> 10.1002/jrsm.11). My
+> >> approach here would be to identify outliers based on the non-robust
+> model
+> >> --> exclude the outliers --> rerun the whole analysis without the
+> outliers
+> >> (i.e., approximate var-cov matrix, estimate three-level model, apply
+> robust
+> >> variance estimation for the subset of studies).
+> >> Or are there other, more elegant ways to do this?
+> >>
+> >> Best and many thanks!
+> >> ??
+> >>
+> >> Mag. Maximilian Steininger
+> >>  PhD candidate
+> >>
+> >>  Social, Cognitive and Affective Neuroscience Unit
+> >>  Faculty of Psychology
+> >>  University of Vienna
+> >>
+> >>  Liebiggasse 5
+> >>  1010 Vienna, Austria
+> >>
+> >>  e: maximilian.steininger at univie.ac.at
+> >>  w: http://scan.psy.univie.ac.at
+> >>
+> >>
+> >>        [[alternative HTML version deleted]]
+> >>
+> >> _______________________________________________
+> >> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> >> To manage your subscription to this mailing list, go to:
+> >> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >>
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From chr|@t|@n@roever @end|ng |rom med@un|-goett|ngen@de  Sat Aug 31 17:43:45 2024
+From: chr|@t|@n@roever @end|ng |rom med@un|-goett|ngen@de (=?utf-8?B?UsO2dmVyLCBDaHJpc3RpYW4=?=)
+Date: Sat, 31 Aug 2024 15:43:45 +0000
+Subject: [R-meta] [+externe Mail+]  Subgroup analysis best practices
+In-Reply-To: <CAFfZ5xk3S=FP5bvPd0bAwv80YRX=RimhPVUn6Z=JRVFuhQYAMg@mail.gmail.com>
+References: <CAFfZ5xk3S=FP5bvPd0bAwv80YRX=RimhPVUn6Z=JRVFuhQYAMg@mail.gmail.com>
+Message-ID: <ba5e05c26eee78cdb6c932dc22665091fa7f42b3.camel@med.uni-goettingen.de>
+
+Dear Tamar,
+
+you were thinking of a case where you have several studies, and for
+each you have an overall effect as well as effects within subgroups
+(say, effects for male and female patient subgroups). Correct?
+
+As long as you have only two subgroups, the relatively easy solution
+would be to compute the contrast for each study and then meta-analyze
+those. For example, if you have log odds ratios (log-ORs) for males and
+females, you compute the difference between these (which then
+corresponds to the log ratio of ORs (log-ROR)) and perform a meta-
+analysis of these RORs.
+
+The advantage of this method is that you're actually only making direct
+subgroup comparisons "within studies" and then pooling these. Anything
+else (i.e., anything involving a direct comparison of the first study's
+subgroup A to the second study's subgroup B) would probably be somewhat
+controversial, in particular if you are dealing with randomized
+controlled studies.
+
+(Note however that you may get discrepancies between this "average
+difference" and the "difference of averages" that you would get when
+pooling all the male effects and all the female effects separately and
+then comparing these two.)
+
+Once you have more than two subgroups, I am not sure there would be an
+easy/standard solution. Suppose you have subgroups A, B and C. For each
+study, you could pool the effects for B and C, compute the difference
+to group A and pool these differences as above. Then do the same for
+groups B and C. (From your description, it seems like this was also
+what you may have had in mind.) A somewhat implicit assumption would
+seem to be that you only expect one of the subgroups to differ from the
+remaining two (?). The alternative would be to compute all three
+contrasts (A vs. B, A vs. C and B vs. C), and pool these, which in this
+case again requires you to perform 3 meta-analyses. Once you have more
+than 3 subgroups, the number of possible pairwise comparisons however
+increases quickly. Also, you may start running into multiple-testing
+problems.
+
+I am wondering whether one might also be able to approach this as some
+kind of network-meta-analysis problem (treating a three-subgroup study
+like a three-armed trial) ... any ideas anyone?
+
+Cheers,
+
+Christian
+ 
+
+On Mon, 2024-08-12 at 10:26 -0400, Tamar Novetsky via R-sig-meta-
+analysis wrote:
+> Hello all,
+> 
+> I have a dataset with topline and subgroup-level treatment effects,
+> and I
+> would like to be able to answer questions like "[how much] does this
+> subgroup perform better/worse than average?". I know that I can use
+> ANOVA
+> to test whether there is variation between the groups, but I am
+> having a
+> hard time figuring out the best way to compare each subgroup to the
+> others
+> or to the overall effect. I would rather be able to say how a
+> subgroup's
+> effect compares to the overall effect (or the effect of all people
+> not in
+> that subgroup), rather than make pairwise comparisons between the
+> subgroups. Are there best practices on statistical tests to use for
+> this
+> purpose?
+> 
+> Thanks,
+> 
+> 
+> *Tamar Novetsky* *(she/her)*
+> Data Scientist I
+> Eastern Time Zone
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+

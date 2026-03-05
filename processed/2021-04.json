@@ -1,0 +1,63 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2021-04",
+  "messages": [
+    {
+      "id": "msg-8825f21b1d32",
+      "message_id": "<CACgv6yV3bGbVg++3vRLb-dVAZ31B_MRxWYex6LLH_wLzqc7LCg@mail.gmail.com>",
+      "from_name": "Simon Harmel",
+      "from_email_hash": "b2479c2043c7e11b87d7b142a228829c7cb76ea995058d0d0fcb40d9482a34d4",
+      "date": "2021-04-30T18:41:34-05:00",
+      "subject": "[R-meta] Capturing the variability at the lowest level of longitudinal studies",
+      "subject_clean": "[R-meta] Capturing the variability at the lowest level of longitudinal studies",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi All,\n\nI'm running a meta-analysis on a sample of longitudinal studies. However,\nthere is so much variability both in the number and in the value of the\ntime points used in each study.\n\nMy general data structure looks like:\n\nstudy  yi  time  esid x1\n  1      .1    1     1\n  1      .2    4     2\n  2      .3    2     3\n  2      .4    2     4\n  2      .5    2     5\n  3      .6    3     6\n\nI was wondering what --rma.mv()-- syntax can capture the variability at the\nlowest level in my data?\n\nCurrently, I'm using the following, which I know can't capture the\nvariability at the lowest level in my data:\n\nm1 <- rma.mv(yi ~ time + x1, V = V, struct = \"HAR\",\n                   random = ~time | study,\n                   data = data)\n\nI also tried the following:\n\nm2 <- rma.mv(yi ~ time + x1, V = V, struct = c(\"HAR\",\"HAR\"),\n                           random = list(~time | study, ~time | esid),\n                           data = data)\n\nBut I get a warning that says:\n\"Each level of the outer factor contains only a single level of the inner\nfactor, so fixed value of phi to 0. \"\n\n\nI appreciate your expertise,\nSimon\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi All,\n\nI'm running a meta-analysis on a sample of longitudinal studies. However,\nthere is so much variability both in the number and in the value of the\ntime points used in each study.\n\nMy general d",
+      "thread_id": "thread-8825f21b1d32",
+      "thread_depth": 0,
+      "month": "2021-04"
+    },
+    {
+      "id": "msg-2882475559cc",
+      "message_id": "<CAEvy2r2+KdTzxnoO8qkztznN=ELxX7QHSpKOtSDrrGX6Cz+LQQ@mail.gmail.com>",
+      "from_name": "Farzad Keyhan",
+      "from_email_hash": "9b4875ee25b911b9caba37f7ffb9cba70ddcdcf920d2d700bb791cffd92925d3",
+      "date": "2021-04-30T20:22:32-05:00",
+      "subject": "[R-meta] clubSandwich: Computing covariance matrix for autoregressive effects",
+      "subject_clean": "[R-meta] clubSandwich: Computing covariance matrix for autoregressive effects",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear List Members,\n\nI'm trying to form an autoregressive variance-covariance matrix for my\nstudies using the clubSandwich package. But for most of my studies, the\nresultant matrices seem to be non-positive definite as suggested by the\nwarning message. My reproducible R code is below.\n\nAm I missing something?\n\nThank you all, Fred\n-------------\nlibrary(clubSandwich)\n\ndat = read.csv(\"https://raw.githubusercontent.com/ilzl/i/master/z.csv\")\n\nimpute_covariance_matrix(vi = dat$vi, cluster = dat$studyID,\n                              ti = dat$time, ar1 = .7)\n\nWarning message:\nIn check_PD(vcov_list) :\n  The following clusters have non-positive definite covariance matrices:\nA1\nB1\nB2\nB3\nB4\nB6\nD1\nD2\nD3\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear List Members,\n\nI'm trying to form an autoregressive variance-covariance matrix for my\nstudies using the clubSandwich package. But for most of my studies, the\nresultant matrices seem to be non-pos",
+      "thread_id": "thread-2882475559cc",
+      "thread_depth": 0,
+      "month": "2021-04"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-8825f21b1d32",
+      "subject": "[R-meta] Capturing the variability at the lowest level of longitudinal studies",
+      "message_count": 1,
+      "participants": [
+        "Simon Harmel"
+      ],
+      "started": "2021-04-30T18:41:34-05:00",
+      "last_reply": "2021-04-30T18:41:34-05:00",
+      "root_message_id": "msg-8825f21b1d32"
+    },
+    {
+      "id": "thread-2882475559cc",
+      "subject": "[R-meta] clubSandwich: Computing covariance matrix for autoregressive effects",
+      "message_count": 1,
+      "participants": [
+        "Farzad Keyhan"
+      ],
+      "started": "2021-04-30T20:22:32-05:00",
+      "last_reply": "2021-04-30T20:22:32-05:00",
+      "root_message_id": "msg-2882475559cc"
+    }
+  ]
+}

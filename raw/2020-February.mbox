@@ -1,0 +1,4661 @@
+From jot@|on@o @end|ng |rom gm@||@com  Mon Feb  3 17:15:45 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Mon, 3 Feb 2020 16:15:45 +0000
+Subject: [R-meta] Warning message when using rma.glmm for meta-analysis
+Message-ID: <CAF8zgfYOrVVK_iw3Z6isTyOmxw7Mhef5_y86Xveec7jDdycq9Q@mail.gmail.com>
+
+Dear all,
+
+I am conducting a meta-analysis on a binomial variable. I used the
+following code
+
+
+*> pes.glmm=rma.glmm(xi=nlameanimal, ni=ssizeanimal,
+data=prevalence_2020_nomv, measure="PLO")*
+
+
+*> pes=predict(pes.glmm, transf=transf.ilogit)> print(pes)*
+
+A got the following warning:
+
+*Registered S3 methods overwritten by 'lme4' :*
+
+
+
+
+
+*  method                          from   cooks.distance.influence.merMod
+car    influence.merMod                car    predict.merMod
+   MuMIn  dfbeta.influence.merMod         car    dfbetas.influence.merMod
+     car *
+
+I did get an output for the analysis but would like to confirm that this is
+just a warning and has not had any implication on the analysis and
+consequently the output. Many thanks for any help.
+
+Wishing all a great afternoon,
+
+-- 
+Jo?o Afonso
+*DVM, MSc Veterinary Epidemiology*
+*PhD Student *
+*Department of Infection and Global Health*
+*University of Liverpool*
+*+351914812305*
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Feb  3 18:20:29 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 3 Feb 2020 17:20:29 +0000
+Subject: [R-meta] Warning message when using rma.glmm for meta-analysis
+In-Reply-To: <CAF8zgfYOrVVK_iw3Z6isTyOmxw7Mhef5_y86Xveec7jDdycq9Q@mail.gmail.com>
+References: <CAF8zgfYOrVVK_iw3Z6isTyOmxw7Mhef5_y86Xveec7jDdycq9Q@mail.gmail.com>
+Message-ID: <ff6fae7bf021406c974818a984710316@UM-MAIL3214.unimaas.nl>
+
+Dear Jo?o,
+
+Please post in plain text. HTML emails get garbled on this mailing list and are hard to read.
+
+You apparently have the 'car' package loaded. That's fine and won't cause any issues, at least not with respect to what rma.glmm() is doing.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Joao Afonso
+Sent: Monday, 03 February, 2020 17:16
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Warning message when using rma.glmm for meta-analysis
+
+Dear all,
+
+I am conducting a meta-analysis on a binomial variable. I used the
+following code
+
+*> pes.glmm=rma.glmm(xi=nlameanimal, ni=ssizeanimal,
+data=prevalence_2020_nomv, measure="PLO")*
+
+*> pes=predict(pes.glmm, transf=transf.ilogit)> print(pes)*
+
+A got the following warning:
+
+*Registered S3 methods overwritten by 'lme4' :*
+
+*  method                          from   cooks.distance.influence.merMod
+car    influence.merMod                car    predict.merMod
+   MuMIn  dfbeta.influence.merMod         car    dfbetas.influence.merMod
+     car *
+
+I did get an output for the analysis but would like to confirm that this is
+just a warning and has not had any implication on the analysis and
+consequently the output. Many thanks for any help.
+
+Wishing all a great afternoon,
+
+-- 
+Jo?o Afonso
+*DVM, MSc Veterinary Epidemiology*
+*PhD Student *
+*Department of Infection and Global Health*
+*University of Liverpool*
+*+351914812305*
+
+From jot@|on@o @end|ng |rom gm@||@com  Mon Feb  3 18:59:23 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Mon, 3 Feb 2020 17:59:23 +0000
+Subject: [R-meta] mismatch in outputs from meta-analysis and corresponding
+ forest plot
+Message-ID: <CAF8zgfYBx4eRjbd_oos+tBzYDk6NnwJfGG0653SHZkzR58pb+A@mail.gmail.com>
+
+Dear all,
+
+I am conducting a meta-analysis and came across an odd issue. I ran the
+model for assessing the moderator effect of a variable as per below
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*subganal.lcmbi=rma(yi, vi, data=ies.logit.lcmbi, mods=~lcmbi,
+method="DL")pes.logit.lcm=rma(yi, vi, data=ies.logit.lcmbi,
+mods=~lcmbi=="Records", method="DL")pes.logit.records=rma(yi, vi,
+data=ies.logit.lcmbi, mods=~lcmbi=="Locomotion Scoring Method",
+method="DL")pes.subg.lcmbi=predict(subganal.lcmbi,transf=transf.ilogit)dat.samevar=data.frame(estimate=c((pes.logit.lcm$b)[1],
+(pes.logit.records$b)[1]),stderror=c((pes.logit.lcm$se)[1],
+(pes.logit.records$se)[1]),tau2=subganal.lcmbi$tau2)pes.logit.lcm=rma(estimate,
+sei=stderror,method="DL",data=dat.samevar)pes.lcmbi=predict(pes.logit.lcm,
+transf=transf.ilogit)print(pes.logit.lcm, digits=3) #display subgroup 1
+summary effect sizeprint(pes.logit.records, digits=3) #display subgroup 2
+summary effect sizeprint(subganal.lcmbi, digits=3) #display subgroup
+analysis resultsprint(pes.lcmbi, digits=3) #display recomputed summary
+effect size*
+
+and got the following output
+
+
+*  pred ci.lb <http://ci.lb> ci.ub cr.lb <http://cr.lb> cr.ub  0.237 0.149
+0.355 0.112 0.434*
+
+However when plotting the corresponding forest plot I get the pooled at
+0.27 (0.08 - 0.53).
+
+Any idea of what could be producing this or what could I be doing wrong?
+
+Many thanks,
+
+Joao
+
+
+-- 
+Jo?o Afonso
+*DVM, MSc Veterinary Epidemiology*
+*PhD Student *
+*Department of Infection and Global Health*
+*University of Liverpool*
+*+351914812305*
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Mon Feb  3 19:28:14 2020
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 3 Feb 2020 18:28:14 +0000
+Subject: [R-meta] 
+ mismatch in outputs from meta-analysis and corresponding forest plot
+In-Reply-To: <CAF8zgfYBx4eRjbd_oos+tBzYDk6NnwJfGG0653SHZkzR58pb+A@mail.gmail.com>
+References: <CAF8zgfYBx4eRjbd_oos+tBzYDk6NnwJfGG0653SHZkzR58pb+A@mail.gmail.com>
+Message-ID: <712f2ae9-e213-5181-9854-eff70a2b36b7@dewey.myzen.co.uk>
+
+Dear Joao
+
+Nobody is going to be able to understand your posts if you keep posting 
+in HTML as what we see is not what you sent. Please post in plain text. 
+I do not use gmail but I am told you can post in plain text from it.
+
+Michael
+
+On 03/02/2020 17:59, Joao Afonso wrote:
+> Dear all,
+> 
+> I am conducting a meta-analysis and came across an odd issue. I ran the
+> model for assessing the moderator effect of a variable as per below
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> *subganal.lcmbi=rma(yi, vi, data=ies.logit.lcmbi, mods=~lcmbi,
+> method="DL")pes.logit.lcm=rma(yi, vi, data=ies.logit.lcmbi,
+> mods=~lcmbi=="Records", method="DL")pes.logit.records=rma(yi, vi,
+> data=ies.logit.lcmbi, mods=~lcmbi=="Locomotion Scoring Method",
+> method="DL")pes.subg.lcmbi=predict(subganal.lcmbi,transf=transf.ilogit)dat.samevar=data.frame(estimate=c((pes.logit.lcm$b)[1],
+> (pes.logit.records$b)[1]),stderror=c((pes.logit.lcm$se)[1],
+> (pes.logit.records$se)[1]),tau2=subganal.lcmbi$tau2)pes.logit.lcm=rma(estimate,
+> sei=stderror,method="DL",data=dat.samevar)pes.lcmbi=predict(pes.logit.lcm,
+> transf=transf.ilogit)print(pes.logit.lcm, digits=3) #display subgroup 1
+> summary effect sizeprint(pes.logit.records, digits=3) #display subgroup 2
+> summary effect sizeprint(subganal.lcmbi, digits=3) #display subgroup
+> analysis resultsprint(pes.lcmbi, digits=3) #display recomputed summary
+> effect size*
+> 
+> and got the following output
+> 
+> 
+> *  pred ci.lb <http://ci.lb> ci.ub cr.lb <http://cr.lb> cr.ub  0.237 0.149
+> 0.355 0.112 0.434*
+> 
+> However when plotting the corresponding forest plot I get the pooled at
+> 0.27 (0.08 - 0.53).
+> 
+> Any idea of what could be producing this or what could I be doing wrong?
+> 
+> Many thanks,
+> 
+> Joao
+> 
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Tue Feb  4 12:07:02 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Tue, 4 Feb 2020 11:07:02 +0000
+Subject: [R-meta] mismatch in outputs from meta-analysis and corresponding
+ forest plot
+Message-ID: <CAF8zgfZeWq1SMY--jnSfodJvEdWr=XbWts1nLb3z1-3ja_JMMA@mail.gmail.com>
+
+Dear all,
+
+I am conducting a meta-analysis and came across an odd issue. I ran the
+model for assessing the moderator effect of a variable as per below.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*subganal.lcmbi=rma(yi, vi, data=ies.logit.lcmbi, mods=~lcmbi,
+method="DL")pes.logit.lcm=rma(yi, vi, data=ies.logit.lcmbi,
+mods=~lcmbi=="Records", method="DL")pes.logit.records=rma(yi, vi,
+data=ies.logit.lcmbi, mods=~lcmbi=="Locomotion Scoring Method",
+method="DL")pes.subg.lcmbi=predict(subganal.lcmbi,transf=transf.ilogit)dat.samevar=data.frame(estimate=c((pes.logit.lcm$b)[1],
+(pes.logit.records$b)[1]),stderror=c((pes.logit.lcm$se)[1],
+(pes.logit.records$se)[1]),tau2=subganal.lcmbi$tau2)pes.logit.lcm=rma(estimate,
+sei=stderror,method="DL",data=dat.samevar)pes.lcmbi=predict(pes.logit.lcm,
+transf=transf.ilogit)print(pes.logit.lcm, digits=3) #display subgroup 1
+summary effect sizeprint(pes.logit.records, digits=3) #display subgroup 2
+summary effect sizeprint(subganal.lcmbi, digits=3) #display subgroup
+analysis resultsprint(pes.lcmbi, digits=3) #display recomputed summary
+effect size*
+
+and got the following output
+
+
+*  pred ci.lb <http://ci.lb/> ci.ub cr.lb <http://cr.lb/> cr.ub 0.237 0.149
+0.355 0.112 0.434*
+
+However when plotting the corresponding forest plot I get the pooled at
+0.25 (0.21 - 0.31).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*subganal.lcmbi=rma(yi, vi, data=ies.logit.lcmbi, mods=~lcmbi,
+method="DL")pes.summary=metaprop(nlameanimal, ssizeanimal, author,
+data=ies.logit.lcmbi,                     sm="PLO",
+ method.tau="DL",                     method.ci <http://method.ci>="NAsm",
+                   byvar=lcmbi,                     tau.common=TRUE,
+
+ tau.preset=sqrt(subganal.lcmbi$tau2))precision=sqrt(ies.logit.lcmbi$vi)jpeg(file="forest_cow_all_lcmbi.jpeg",
+width=11, height=12, units="in", res=300)forest(pes.summary,
+ xlim=c(0,1),       pscale=1,       rightcols=FALSE,
+ leftcols=c("studlab", "effect", "ci"),       leftlabs=c("Study",
+"Prevalence", "95% C.I."),       text.random="Prevalence of Lameness in
+British Dairy Cattle",       bylab = "Lameness Data Source",
+ print.byvar = TRUE,       xlab="Prevalence of Lameness", smlab="",
+ weight.study="random", squaresize=0.5, col.square="navy",
+ col.diamond="maroon", col.diamond.lines="maroon",
+ pooled.totals=FALSE,       comb.fixed=FALSE,       fs.hetstat=10,
+ print.tau2=TRUE,       print.Q=TRUE,       print.pval.Q=TRUE,
+ print.I2=TRUE,       digits=2,       sortvar = precision)dev.off()*
+
+Any idea of what could be producing this or what could I be doing wrong?
+
+Many thanks,
+
+Joao
+
+
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+	[[alternative HTML version deleted]]
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Tue Feb  4 18:16:38 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Tue, 4 Feb 2020 17:16:38 +0000
+Subject: [R-meta] Meta-analysis of incidence data with double arcsine
+ transformation
+Message-ID: <CAF8zgfbi7hvU=JT7GAiBoxVbsZB6O9XDC5hGb7WNZdkYMYLPoQ@mail.gmail.com>
+
+Dear all,
+
+I am conducting a meta-analysis on incidence data. I have basically adapted
+a previous model that I had used for conducting an analysis on prevalence
+data, producing the following model:
+
+
+
+
+
+
+*ies.da=escalc(xi=nototal_stand, ti=ssizeanimal, data=inc_all_nomv,
+measure="IRLN", add=0)pes.da=rma(yi, vi, data=ies.da, method =
+"DL")pes=predict(pes.da, transf=transf.ipft.hm <http://transf.ipft.hm>,
+targ=list(ti=inc_all_nomv$ssizeanimal))print(pes.da,
+digits=3)confint(pes.da, digits=3)print(pes, digits=3)*
+
+The model runs fine and there doesn't seem to be an error. The output is as
+follows:
+
+
+
+
+
+
+
+
+
+*Random-Effects Model (k = 26; tau^2 estimator: DL)tau^2 (estimated amount
+of total heterogeneity): 0.896 (SE = 0.590)tau (square root of estimated
+tau^2 value):      0.947I^2 (total heterogeneity / total variability):
+99.96%H^2 (total variability / sampling variability):  2704.01Test for
+Heterogeneity:Q(df = 25) = 67600.255, p-val < .001*
+
+
+
+
+*Model Results:estimate     se    zval   pval   ci.lb <http://ci.lb>
+ci.ub   -1.075  0.188  -5.729  <.001  -1.443  -0.707  ****
+
+
+
+
+*print(pes, digits=3)  pred ci.lb <http://ci.lb> ci.ub cr.lb <http://cr.lb>
+cr.ub  0.000 0.000 0.000 0.000 0.531 *
+
+The last bit of the output ( *print(pes, digits=3)*) is what's concerning
+me as it seems that the back transformation hasn't been made correctly. Any
+idea of what I could be doing wrong?
+
+Many thanks for all the help!
+
+Wishing all a great day,
+
+
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+	[[alternative HTML version deleted]]
+
+
+From dm@h@b@n @end|ng |rom gm@||@com  Wed Feb  5 22:16:14 2020
+From: dm@h@b@n @end|ng |rom gm@||@com (=?UTF-8?Q?Daniel_M=C3=B8nsted_Shabanzadeh?=)
+Date: Wed, 5 Feb 2020 22:16:14 +0100
+Subject: [R-meta] Back transformation of arcsine transformed data in
+ meta-regression
+Message-ID: <CABgeOtP5J_vS5ZOKkwAMecmh4d1dZcNs15=3ES_Pjw03LWBg5w@mail.gmail.com>
+
+Hey
+
+I am performing a meta-regression analysis with both a continuous and a
+categorical variable and use the arcsine transformation.
+
+b<-rma(xi=compl_treat, ni=total, mods = ~age_cor+year, measure = "PAS",
+data=a)
+print(b)
+
+Mixed-Effects Model (k = 425; tau^2 estimator: REML)
+
+tau^2 (estimated amount of residual heterogeneity):     0.0165 (SE = 0.0013)
+tau (square root of estimated tau^2 value):             0.1286
+I^2 (residual heterogeneity / unaccounted variability): 99.57%
+H^2 (unaccounted variability / sampling variability):   230.02
+R^2 (amount of heterogeneity accounted for):            4.23%
+
+Test for Residual Heterogeneity:
+QE(df = 418) = 42191.1379, p-val < .0001
+
+Test of Moderators (coefficients 2:7):
+QM(df = 6) = 24.6125, p-val = 0.0004
+
+Model Results:
+
+                estimate      se     zval    pval    ci.lb   ci.ub
+intrcpt           3.0578  1.5361   1.9907  0.0465   0.0471  6.0684    *
+age_cor1          0.0206  0.0175   1.1769  0.2392  -0.0137  0.0549
+age_cor2          0.0276  0.0271   1.0189  0.3082  -0.0255  0.0807
+age_cor3          0.0738  0.0184   4.0149  <.0001   0.0378  0.1098  ***
+age_cor4         -0.0170  0.0340  -0.4991  0.6177  -0.0837  0.0497
+age_cormissing   -0.0292  0.0506  -0.5785  0.5629  -0.1283  0.0698
+year             -0.0014  0.0008  -1.8830  0.0597  -0.0029  0.0001    .
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+
+
+Using the usual back transformation gives strange estimates of proportions.
+Since i have added the continuous variable "year" it has been looking odd.
+
+c<-predict(b, newmods=rbind(0, diag(6)), transf=transf.iarcsin)
+print(c)
+
+    pred  ci.lb  ci.ub  cr.lb  cr.ub
+1 1.0000 0.0022 1.0000 0.0013 1.0000
+2 1.0000 0.0037 1.0000 0.0025 1.0000
+3 1.0000 0.0044 1.0000 0.0031 1.0000
+4 1.0000 0.0145 1.0000 0.0121 1.0000
+5 1.0000 0.0009 1.0000 0.0004 1.0000
+6 1.0000 0.0005 1.0000 0.0001 1.0000
+7 1.0000 0.0022 1.0000 0.0013 1.0000
+
+
+What is the mistake here? Any other way of transforming the data back to
+proportions?
+Ideas appreciated.
+
+Regards,
+Daniel
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Thu Feb  6 09:09:04 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Thu, 6 Feb 2020 09:09:04 +0100
+Subject: [R-meta] Back transformation of arcsine transformed data in
+ meta-regression
+In-Reply-To: <CABgeOtP5J_vS5ZOKkwAMecmh4d1dZcNs15=3ES_Pjw03LWBg5w@mail.gmail.com>
+References: <CABgeOtP5J_vS5ZOKkwAMecmh4d1dZcNs15=3ES_Pjw03LWBg5w@mail.gmail.com>
+Message-ID: <fc2d5007-111a-583a-d5d0-b48c07863391@imbi.uni-freiburg.de>
+
+Daniel,
+
+The maximum value you can get for arcsine transformed proportions is 
+1.571 (for a proportion of 100%) which you can see using the following R 
+command: asin(sqrt(1))
+
+Accordingly, the intercept 3.06 in your meta-regression is way of the 
+mark due to extrapolating the effect of the continuous variable year. 
+The intercept represents the effect at year 0 A.D.
+
+I would suggest that you center the variable year around some value.
+
+Best wishes, Guido
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+From @1rerog@ @end|ng |rom un|-tr|er@de  Fri Feb  7 16:42:55 2020
+From: @1rerog@ @end|ng |rom un|-tr|er@de (Rogasch, Rebecca Manuela Madeleine)
+Date: Fri, 7 Feb 2020 15:42:55 +0000
+Subject: [R-meta] [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+Message-ID: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+
+Dear experts,
+
+I'm seeking advice regarding an error message in network meta-analysis using the netmeta package.
+
+To briefly outline the objective and describe the data structure:
+I am conducting a network meta-analysis on the effectiveness of PTSD intervention programs.
+The primary outcome is the PTSD total symptom score (=continuous outcome).
+All studies are randomized-controlled trials. There are 8 three-arm studies in my data set and 64 two-arm studies.
+I calculated the SMD (post-post) from means and SDs.
+
+Here is an example for the data structure:
+
+
+ studlab sampleID  OutcID   TR1   TR2    Mt2TR1  SDt2TR1  Mt2TR2  SDt2TR2  n_TR1 n_TR2 n_total    smd    se
+
+       1      101 10101     EMDR   WL    22.87    20.27    54.21   16.26    15    14      29    -1.65  0.19
+
+     100    10001 1000101   NET    WL    55.07    27.01    76.86   17.14    19    19      38    -0.94  0.12
+
+     104    10401 1040101   NET   PsEd   19.10    11.70    21.20    9.40    17    12      29    -0.19  0.14
+
+
+
+When applying the netmeta function I get the following error message:
+
+> mn1 <- netmeta(smd, se, TR1, TR2, studlab, data=dat3, sm="SMD", comb.random=TRUE)
+
+Error: Problems in multi-arm studies!
+- Studies with inconsistent treatment estimates: '107', '121', '130', '15', '22', '34', '36', '87'
+- Please check original data used as input to netmeta().
+- For more details, re-run netmeta() with argument details.chkmultiarm = TRUE.
+- Argument 'tol.multiarm' in netmeta() can be used to relax consistency
+assumption for multi-arm studies (if appropriate).
+
+My questions are as follows:
+
+  1.  I am not able to make sense of the error message regarding inconsistency within the 3-arm-studies. Can anyone help?
+  2.  When setting the argument tol.multiarm = 0.05 it runs without any error message.
+
+However, I am not sure what the argument does, exactly, and haven't been able to find any detailed information.
+
+Does anyone know what the argument does or where I can find further information?
+
+Looking forward to hearing from you!
+Best regards,
+Rebecca
+
+	[[alternative HTML version deleted]]
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Fri Feb  7 17:36:16 2020
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Fri, 7 Feb 2020 17:36:16 +0100
+Subject: [R-meta] 
+ [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+In-Reply-To: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+References: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+Message-ID: <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>
+
+Dear Rebecca,
+
+First to the theoretical background of this error message: If you have a 
+three-arm study, treatment effects within the study must be consistent. 
+This means that for three arms A, B, C you have mean values x_A, x_B, 
+x_C of your score. The contrasts (differences) then are
+
+  * for A vs B: d_AB = x_A - x_B
+  * for A vs C: d_AC = x_A - x_C
+  * for B vs C: d_BC = x_B - x_C
+
+That is, you have relations between the three contrasts, e.g., d_AC = 
+d_AB + d_BC. If the data do not fulfill these relations, an error 
+message is given.
+
+However, I have a problem with understanding your data structure, and 
+thus I don't fully understand how this can happen in your case. You say 
+you have three-arm studies, but how are they entered? Unfortunately, the 
+first three studies in your extract of the data are all two-arm. How do 
+the three-arm studies look in the data?
+
+It would be easier to help if we could see the whole data set or at 
+least data for a three-arm study.
+
+Best,
+
+Gerta
+
+
+Am 07.02.2020 um 16:42 schrieb Rogasch, Rebecca Manuela Madeleine:
+> Dear experts,
+>
+> I'm seeking advice regarding an error message in network meta-analysis using the netmeta package.
+>
+> To briefly outline the objective and describe the data structure:
+> I am conducting a network meta-analysis on the effectiveness of PTSD intervention programs.
+> The primary outcome is the PTSD total symptom score (=continuous outcome).
+> All studies are randomized-controlled trials. There are 8 three-arm studies in my data set and 64 two-arm studies.
+> I calculated the SMD (post-post) from means and SDs.
+>
+> Here is an example for the data structure:
+>
+>
+>   studlab sampleID  OutcID   TR1   TR2    Mt2TR1  SDt2TR1  Mt2TR2  SDt2TR2  n_TR1 n_TR2 n_total    smd    se
+>
+>         1      101 10101     EMDR   WL    22.87    20.27    54.21   16.26    15    14      29    -1.65  0.19
+>
+>       100    10001 1000101   NET    WL    55.07    27.01    76.86   17.14    19    19      38    -0.94  0.12
+>
+>       104    10401 1040101   NET   PsEd   19.10    11.70    21.20    9.40    17    12      29    -0.19  0.14
+>
+>
+>
+> When applying the netmeta function I get the following error message:
+>
+>> mn1 <- netmeta(smd, se, TR1, TR2, studlab, data=dat3, sm="SMD", comb.random=TRUE)
+> Error: Problems in multi-arm studies!
+> - Studies with inconsistent treatment estimates: '107', '121', '130', '15', '22', '34', '36', '87'
+> - Please check original data used as input to netmeta().
+> - For more details, re-run netmeta() with argument details.chkmultiarm = TRUE.
+> - Argument 'tol.multiarm' in netmeta() can be used to relax consistency
+> assumption for multi-arm studies (if appropriate).
+>
+> My questions are as follows:
+>
+>    1.  I am not able to make sense of the error message regarding inconsistency within the 3-arm-studies. Can anyone help?
+>    2.  When setting the argument tol.multiarm = 0.05 it runs without any error message.
+>
+> However, I am not sure what the argument does, exactly, and haven't been able to find any detailed information.
+>
+> Does anyone know what the argument does or where I can find further information?
+>
+> Looking forward to hearing from you!
+> Best regards,
+> Rebecca
+>
+> 	[[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Fri Feb  7 17:49:50 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Fri, 7 Feb 2020 17:49:50 +0100
+Subject: [R-meta] 
+ [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+In-Reply-To: <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>
+References: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+ <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>
+Message-ID: <e557b7db-bca7-6978-4aae-0a6f537206a1@imbi.uni-freiburg.de>
+
+Hi Rebecca,
+
+I assume the problem is related to calculating SMDs in multi-arm 
+studies. Each pairwise comparison (in a multi-arm study) uses a 
+different pooled standard deviation to calculate the SMD which leads to 
+inconsistent effects.
+
+You could / should use pairwise() to calculate the SMDs which considers 
+the same pooled standard deviation to calculate the SMD in multi-arm 
+studies.
+
+Best wishes, Guido
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Fri Feb  7 19:47:08 2020
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Fri, 7 Feb 2020 19:47:08 +0100
+Subject: [R-meta] 
+ [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+In-Reply-To: <2ecc96799a754f9eb3ca509e4f712484@uni-trier.de>
+References: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+ <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>
+ <2ecc96799a754f9eb3ca509e4f712484@uni-trier.de>
+Message-ID: <93d163a1-8f95-41d8-bded-2f95e940da4b@imbi.uni-freiburg.de>
+
+Dear Rebecca,
+
+
+Please always respond to the mailing list.
+
+
+In fact, Guido is right and you should calculate the SMDs for the 
+three-arm studies in the way he described.
+
+
+Best,
+
+Gerta
+
+
+
+
+Am 07.02.2020 um 18:42 schrieb Rogasch, Rebecca Manuela Madeleine:
+>
+> Dear Gerta,
+>
+>
+> many thanks for the quick Response!
+>
+>
+> I'll be glad to send additional infomation.
+>
+> In case the error message is related to my calculations of effect 
+> sizes in the 3-arm-studies
+>
+> the Output attatched might help to identify the source of the Problem.
+>
+>
+> (I haven't merged the Information of other variables yet [not relevant 
+> here], which is why there are lots of missings for the 3-arm studies)
+>
+>
+> Best regards,
+>
+> Rebecca
+>
+> ------------------------------------------------------------------------
+> *Von:* Gerta Ruecker <ruecker at imbi.uni-freiburg.de>
+> *Gesendet:* Freitag, 7. Februar 2020 17:36:16
+> *An:* Rogasch, Rebecca Manuela Madeleine; 
+> r-sig-meta-analysis at r-project.org
+> *Betreff:* Re: [R-meta] [netmeta] Error message in network 
+> meta-analysis: "Problem with multi-arm studies: Studies with 
+> inconsistent treatment estimates"
+>
+> Dear Rebecca,
+>
+> First to the theoretical background of this error message: If you have 
+> a three-arm study, treatment effects within the study must be 
+> consistent. This means that for three arms A, B, C you have mean 
+> values x_A, x_B, x_C of your score. The contrasts (differences) then are
+>
+>   * for A vs B: d_AB = x_A - x_B
+>   * for A vs C: d_AC = x_A - x_C
+>   * for B vs C: d_BC = x_B - x_C
+>
+> That is, you have relations between the three contrasts, e.g., d_AC = 
+> d_AB + d_BC. If the data do not fulfill these relations, an error 
+> message is given.
+>
+> However, I have a problem with understanding your data structure, and 
+> thus I don't fully understand how this can happen in your case. You 
+> say you have three-arm studies, but how are they entered? 
+> Unfortunately, the first three studies in your extract of the data are 
+> all two-arm. How do the three-arm studies look in the data?
+>
+> It would be easier to help if we could see the whole data set or at 
+> least data for a three-arm study.
+>
+> Best,
+>
+> Gerta
+>
+>
+> Am 07.02.2020 um 16:42 schrieb Rogasch, Rebecca Manuela Madeleine:
+>> Dear experts,
+>>
+>> I'm seeking advice regarding an error message in network meta-analysis using the netmeta package.
+>>
+>> To briefly outline the objective and describe the data structure:
+>> I am conducting a network meta-analysis on the effectiveness of PTSD intervention programs.
+>> The primary outcome is the PTSD total symptom score (=continuous outcome).
+>> All studies are randomized-controlled trials. There are 8 three-arm studies in my data set and 64 two-arm studies.
+>> I calculated the SMD (post-post) from means and SDs.
+>>
+>> Here is an example for the data structure:
+>>
+>>
+>>   studlab sampleID  OutcID   TR1   TR2    Mt2TR1  SDt2TR1  Mt2TR2  SDt2TR2  n_TR1 n_TR2 n_total    smd    se
+>>
+>>         1      101 10101     EMDR   WL    22.87    20.27    54.21   16.26    15    14      29    -1.65  0.19
+>>
+>>       100    10001 1000101   NET    WL    55.07    27.01    76.86   17.14    19    19      38    -0.94  0.12
+>>
+>>       104    10401 1040101   NET   PsEd   19.10    11.70    21.20    9.40    17    12      29    -0.19  0.14
+>>
+>>
+>>
+>> When applying the netmeta function I get the following error message:
+>>
+>>> mn1 <- netmeta(smd, se, TR1, TR2, studlab, data=dat3, sm="SMD", comb.random=TRUE)
+>> Error: Problems in multi-arm studies!
+>> - Studies with inconsistent treatment estimates: '107', '121', '130', '15', '22', '34', '36', '87'
+>> - Please check original data used as input to netmeta().
+>> - For more details, re-run netmeta() with argument details.chkmultiarm = TRUE.
+>> - Argument 'tol.multiarm' in netmeta() can be used to relax consistency
+>> assumption for multi-arm studies (if appropriate).
+>>
+>> My questions are as follows:
+>>
+>>    1.  I am not able to make sense of the error message regarding inconsistency within the 3-arm-studies. Can anyone help?
+>>    2.  When setting the argument tol.multiarm = 0.05 it runs without any error message.
+>>
+>> However, I am not sure what the argument does, exactly, and haven't been able to find any detailed information.
+>>
+>> Does anyone know what the argument does or where I can find further information?
+>>
+>> Looking forward to hearing from you!
+>> Best regards,
+>> Rebecca
+>>
+>> 	[[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> -- 
+>
+> Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+>
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+>
+> Phone:    +49/761/203-6673
+> Fax:      +49/761/203-6680
+> Mail:ruecker at imbi.uni-freiburg.de
+> Homepage:https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+	[[alternative HTML version deleted]]
+
+
+From @1rerog@ @end|ng |rom un|-tr|er@de  Sat Feb  8 14:38:23 2020
+From: @1rerog@ @end|ng |rom un|-tr|er@de (Rogasch, Rebecca Manuela Madeleine)
+Date: Sat, 8 Feb 2020 13:38:23 +0000
+Subject: [R-meta] 
+ [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+In-Reply-To: <e557b7db-bca7-6978-4aae-0a6f537206a1@imbi.uni-freiburg.de>
+References: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+ <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>,
+ <e557b7db-bca7-6978-4aae-0a6f537206a1@imbi.uni-freiburg.de>
+Message-ID: <2979e810e3f5410fa50c780eb180079f@uni-trier.de>
+
+Thank you very much for the quick Reply and your advice!
+
+
+That Explanation makes a lot of sense.
+
+I have now tried using pairwise() to calculate the SMDs:
+
+
+paired<- pairwise(list(TR1, TR2),
+               n = list(n_TR1, n_TR2),
+               mean = list(Mt2TR1, Mt2TR2),
+               sd = list(SDt2TR1, SDt2TR2),
+               data = DATA1, studlab = studlab, sm= "SMD")
+
+
+
+This is an exerpt from the data Frame;
+
+3-arm study in Purple:
+
+
+   studlab treat1 treat2 n1 mean1   sd1 n2 mean2   sd2           TE      seTE   age females    severity      income
+1        1   EMDR     WL 15 22.87 20.27 14 54.21 16.26  -1.65116388 0.4387386 36.54    0.76    clinical      lowmid
+44     100    NET     WL 19 55.07 27.01 19 76.86 17.14  -0.94310177 0.3439769 29.40    0.31    clinical high income
+45     104    NET   PsEd 17 19.10 11.70 12 21.20  9.40  -0.18860625 0.3779770 32.85    0.62    clinical      lowmid
+48     107    MBI   PsEd 68 46.90 18.20 66 55.20 15.30  -0.49022797 0.1754460 47.04    0.17    clinical high income
+47     107     PE   PsEd 68 50.60 18.50 66 55.20 15.30  -0.26905282 0.1735963 47.04    0.17    clinical high income
+46     107     PE    MBI 68 50.60 18.50 68 46.90 18.20   0.20049752 0.1719418 47.04    0.17    clinical high income
+78      11    MBI     WL NA    NA    NA NA    NA    NA  -0.48920000 0.2800000 51.80    0.99        <NA> high income
+
+     sample arms        self_exp n_total        tr_size   analysis
+
+1  refugees    2      self-rated      29     very small completers
+44 refugees    2 clinician-rated      38     very small        ITT
+45 refugees    2      self-rated      29     very small        ITT
+48   vetmil    3      self-rated     134          large        ITT
+47   vetmil    3      self-rated     134          large        ITT
+46   vetmil    3      self-rated     136          large        ITT
+78 civilian    2      self-rated      71 small-moderate        ITT
+
+
+
+However, I still get the same error message in the Network meta-Analysis.
+
+A more detailed copy of the Output is available if needed.
+
+
+Any advice is very much appreciated!
+
+Best regards,
+
+Rebecca
+
+________________________________
+Von: Guido Schwarzer <sc at imbi.uni-freiburg.de>
+Gesendet: Freitag, 7. Februar 2020 17:49:50
+An: Rogasch, Rebecca Manuela Madeleine; r-sig-meta-analysis at r-project.org
+Betreff: Re: [R-meta] [netmeta] Error message in network meta-analysis: "Problem with multi-arm studies: Studies with inconsistent treatment estimates"
+
+Hi Rebecca,
+
+I assume the problem is related to calculating SMDs in multi-arm
+studies. Each pairwise comparison (in a multi-arm study) uses a
+different pooled standard deviation to calculate the SMD which leads to
+inconsistent effects.
+
+You could / should use pairwise() to calculate the SMDs which considers
+the same pooled standard deviation to calculate the SMD in multi-arm
+studies.
+
+Best wishes, Guido
+
+--
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200208/edd29916/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: code_output.pdf
+Type: application/pdf
+Size: 50048 bytes
+Desc: code_output.pdf
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200208/edd29916/attachment-0001.pdf>
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Sat Feb  8 19:52:33 2020
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (=?UTF-8?Q?Dr=2e_Gerta_R=c3=bccker?=)
+Date: Sat, 8 Feb 2020 19:52:33 +0100
+Subject: [R-meta] 
+ [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+In-Reply-To: <2979e810e3f5410fa50c780eb180079f@uni-trier.de>
+References: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+ <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>
+ <e557b7db-bca7-6978-4aae-0a6f537206a1@imbi.uni-freiburg.de>
+ <2979e810e3f5410fa50c780eb180079f@uni-trier.de>
+Message-ID: <3296b81e-f142-92d6-666b-8632b27e6f17@imbi.uni-freiburg.de>
+
+Dear Rebecca,
+
+
+The code you used "doesn't know" whether a study is three-arm. You still 
+calculate SMD for each two arms, ignoring the third. Though you have 
+already a netmeta-compatible structure, the structure of your data makes 
+it more difficult in this case because of the problems with the SMDs. 
+Better to start with a different structure and to use pairwise().
+
+
+Function pairwise() expects
+
+- either a format with one row per study and three (say) blocks of 
+columns (studlab, TR1, TR2, TR3, n1, n2, n3, mean1, mean2, mean3, sd1, 
+sd2, sd3, ...);? for an example see help(dietaryfat),
+
+- or an arm-based format with one row per study arm like this (for an 
+example of the second kind, see help(Woods2010)):
+
+
+studlab TR??? n? mean??? sd
+
+107???? MBI? 68 46.90 18.20
+
+107???? PE?? 68 50.60 18.50
+
+107???? PsEd 66 55.20 15.30
+
+...???? ...? .. ..... .....
+
+
+Hope this helps.
+
+
+Best,
+
+Gerta
+
+
+Am 08.02.2020 um 14:38 schrieb Rogasch, Rebecca Manuela Madeleine:
+>
+> Thank you very much for the quick Reply and your advice!
+>
+>
+> That Explanation makes a lot of sense.
+>
+> I have now tried using pairwise() to calculate the SMDs:
+>
+>
+> paired<- pairwise(list(TR1, TR2),
+> n = list(n_TR1, n_TR2),
+> mean = list(Mt2TR1, Mt2TR2),
+> sd = list(SDt2TR1, SDt2TR2),
+> data = DATA1, studlab = studlab, sm= "SMD")
+>
+>
+>
+> This is an exerpt from the data Frame;
+>
+> 3-arm study in Purple:
+>
+>
+> studlab treat1 treat2 n1 mean1?? sd1 n2 mean2?? sd2 TE????? seTE?? age 
+> females??? severity????? income
+> 1 1?? EMDR???? WL 15 22.87 20.27 14 54.21 16.26? -1.65116388 0.4387386 
+> 36.54??? 0.76??? clinical????? lowmid
+> 44 100??? NET???? WL 19 55.07 27.01 19 76.86 17.14 -0.94310177 
+> 0.3439769 29.40??? 0.31??? clinical high income
+> 45 104??? NET?? PsEd 17 19.10 11.70 12 21.20? 9.40 -0.18860625 
+> 0.3779770 32.85??? 0.62??? clinical lowmid
+> 48 107??? MBI?? PsEd 68 46.90 18.20 66 55.20 15.30 -0.49022797 
+> 0.1754460 47.04??? 0.17??? clinical high income
+> 47 107???? PE?? PsEd 68 50.60 18.50 66 55.20 15.30 -0.26905282 
+> 0.1735963 47.04??? 0.17??? clinical high income
+> 46 107???? PE??? MBI 68 50.60 18.50 68 46.90 18.20 0.20049752 
+> 0.1719418 47.04??? 0.17??? clinical high income
+> 78 11??? MBI???? WL NA??? NA??? NA NA??? NA??? NA -0.48920000 
+> 0.2800000 51.80??? 0.99??????? <NA> high income
+>
+> sample arms??????? self_exp n_total??????? tr_size analysis
+>
+> 1 refugees??? 2????? self-rated????? 29???? very small completers
+> 44 refugees??? 2 clinician-rated????? 38???? very small?????? ?ITT
+> 45 refugees??? 2????? self-rated????? 29???? very small??????? ITT
+> 48 vetmil??? 3????? self-rated???? 134 large??????? ITT
+> 47 vetmil??? 3????? self-rated???? 134 large??????? ITT
+> 46 vetmil??? 3????? self-rated???? 136 large??????? ITT
+> 78 civilian??? 2????? self-rated????? 71 small-moderate??????? ITT
+>
+>
+> However, I still get the same error messagein the Network meta-Analysis.
+>
+> A more detailed copy of the Output is available if needed.
+>
+>
+> Any advice is very much appreciated!
+>
+> Best regards,
+>
+> Rebecca
+>
+> ------------------------------------------------------------------------
+> *Von:* Guido Schwarzer <sc at imbi.uni-freiburg.de>
+> *Gesendet:* Freitag, 7. Februar 2020 17:49:50
+> *An:* Rogasch, Rebecca Manuela Madeleine; 
+> r-sig-meta-analysis at r-project.org
+> *Betreff:* Re: [R-meta] [netmeta] Error message in network 
+> meta-analysis: "Problem with multi-arm studies: Studies with 
+> inconsistent treatment estimates"
+> Hi Rebecca,
+>
+> I assume the problem is related to calculating SMDs in multi-arm
+> studies. Each pairwise comparison (in a multi-arm study) uses a
+> different pooled standard deviation to calculate the SMD which leads to
+> inconsistent effects.
+>
+> You could / should use pairwise() to calculate the SMDs which considers
+> the same pooled standard deviation to calculate the SMD in multi-arm
+> studies.
+>
+> Best wishes, Guido
+>
+> -- 
+> Dr. Guido Schwarzer
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+>
+> Phone: +49/761/203-6668
+> Mail: sc at imbi.uni-freiburg.de
+> Homepage: http://www.imbi.uni-freiburg.de
+>
+> ORCID iD: https://orcid.org/0000-0001-6214-9087
+> R-book: https://www.springer.com/gp/book/9783319214153
+>
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Tue Feb 11 18:51:16 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Tue, 11 Feb 2020 17:51:16 +0000
+Subject: [R-meta] Mismatch between output from sub-group analysis and forest
+ plot
+Message-ID: <CAF8zgfYVOEMDSPFCOYuzpaFxxz_LLo_9V1DXWda7Au-=mTDquA@mail.gmail.com>
+
+Dear all,
+
+I am conducting a meta-analysis on prevalence and incidence data. As there
+is plenty of heterogeneity I am doing a sub-group analysis. However I am
+finding the output of the same and forest plots produced to have different
+values for the pooled estimates. I am using the double arcsine
+transformation and then have the data back-transformed to produce the
+estimates. The model is the following:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*iies.da.lcmbi<-ies.da %>%  filter(is.na
+<http://is.na>(lcmbi)==FALSE)subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi,
+mods=~lcmbi, method="DL")pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi,
+mods=~lcmbi=="Records", method="DL")pes.da.records=rma(yi, vi,
+data=ies.da.lcmbi, mods=~lcmbi=="Locomotion Scoring Method",
+method="DL")pes.subg.lcmbi=predict(subganal.lcmbi,transf=transf.ipft.hm
+<http://transf.ipft.hm>,targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))dat.samevar=data.frame(estimate=c((pes.da.lcm$b)[1],
+(pes.da.records$b)[1]),stderror=c((pes.da.lcm$se)[1],
+(pes.da.records$se)[1]),tau2=subganal.lcmbi$tau2)pes.da.lcmbi=rma(estimate,
+sei=stderror,method="DL",data=dat.samevar)pes.lcmbi=predict(pes.da.lcmbi,
+transf=transf.ipft.hm <http://transf.ipft.hm>,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))print(pes.da.lcm,
+digits=3) print(pes.da.records, digits=3) print(subganal.lcmbi,
+digits=3)print(pes.lcmbi, digits=3) *
+
+
+And to produce the forest plot I use the following code:
+
+*subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")*
+*pes.summary=metaprop(*nlameanimal*, *ssizeanimal*, author,
+data=ies.da.lcmbi,*
+*                     sm="PFT",*
+*                     method.tau="DL",*
+*                     method.ci <http://method.ci>="NAsm",*
+*                     byvar=lcmbi,*
+*                     tau.common=TRUE,*
+*                     tau.preset=sqrt(subganal.lcmbi$tau2))*
+*precision=sqrt(ies.da.lcmbi$vi)*
+*jpeg(file="forest_cow_cow_lcmbi.jpeg", width=11, height=12, units="in",
+res=300)*
+*forest(pes.summary,*
+*       xlim=c(0,1),*
+*       pscale=1,*
+*       rightcols=FALSE,*
+*       leftcols=c("studlab", "effect", "ci"),*
+*       leftlabs=c("Study", "Prevalence", "95% C.I."),*
+*       text.random="Prevalence of Lameness in British Dairy Cattle",*
+*       bylab = "Lameness Data Source",*
+*       print.byvar = TRUE,*
+*       xlab="Prevalence of Lameness", smlab="",*
+*       weight.study="random", squaresize=0.5, col.square="navy",*
+*       col.diamond="maroon", col.diamond.lines="maroon",*
+*       pooled.totals=FALSE,*
+*       comb.fixed=FALSE,*
+*       fs.hetstat=10,*
+*       print.tau2=TRUE,*
+*       print.Q=TRUE,*
+*       print.pval.Q=TRUE,*
+*       print.I2=TRUE,*
+*       digits=2,*
+*       sortvar = precision)*
+*dev.off()*
+
+What could I be doing wrong? I will be extremely grateful for any help or
+guidance.
+
+Wishing all a great afternoon,
+
+Joao
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Feb 11 19:03:05 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 11 Feb 2020 18:03:05 +0000
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <CAF8zgfYVOEMDSPFCOYuzpaFxxz_LLo_9V1DXWda7Au-=mTDquA@mail.gmail.com>
+References: <CAF8zgfYVOEMDSPFCOYuzpaFxxz_LLo_9V1DXWda7Au-=mTDquA@mail.gmail.com>
+Message-ID: <7a475924cc7b4b9991c2dd4106eeebaa@UM-MAIL3214.unimaas.nl>
+
+Dear Joao,
+
+Once again, please post in plain text. See below how your post looks on my end. It is very hard to read.
+
+If you are using Gmail directly, you can click on the three dots in the New Message window (at the bottom right, next to the trashcan symbol) and select "Plain text mode" there.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Joao Afonso
+Sent: Tuesday, 11 February, 2020 18:51
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Mismatch between output from sub-group analysis and forest plot
+
+Dear all,
+
+I am conducting a meta-analysis on prevalence and incidence data. As there
+is plenty of heterogeneity I am doing a sub-group analysis. However I am
+finding the output of the same and forest plots produced to have different
+values for the pooled estimates. I am using the double arcsine
+transformation and then have the data back-transformed to produce the
+estimates. The model is the following:
+
+*iies.da.lcmbi<-ies.da %>%  filter(is.na
+<http://is.na>(lcmbi)==FALSE)subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi,
+mods=~lcmbi, method="DL")pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi,
+mods=~lcmbi=="Records", method="DL")pes.da.records=rma(yi, vi,
+data=ies.da.lcmbi, mods=~lcmbi=="Locomotion Scoring Method",
+method="DL")pes.subg.lcmbi=predict(subganal.lcmbi,transf=transf.ipft.hm
+<http://transf.ipft.hm>,targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))dat.samevar=data.frame(estimate=c((pes.da.lcm$b)[1],
+(pes.da.records$b)[1]),stderror=c((pes.da.lcm$se)[1],
+(pes.da.records$se)[1]),tau2=subganal.lcmbi$tau2)pes.da.lcmbi=rma(estimate,
+sei=stderror,method="DL",data=dat.samevar)pes.lcmbi=predict(pes.da.lcmbi,
+transf=transf.ipft.hm <http://transf.ipft.hm>,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))print(pes.da.lcm,
+digits=3) print(pes.da.records, digits=3) print(subganal.lcmbi,
+digits=3)print(pes.lcmbi, digits=3) *
+
+And to produce the forest plot I use the following code:
+
+*subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")*
+*pes.summary=metaprop(*nlameanimal*, *ssizeanimal*, author,
+data=ies.da.lcmbi,*
+*                     sm="PFT",*
+*                     method.tau="DL",*
+*                     method.ci <http://method.ci>="NAsm",*
+*                     byvar=lcmbi,*
+*                     tau.common=TRUE,*
+*                     tau.preset=sqrt(subganal.lcmbi$tau2))*
+*precision=sqrt(ies.da.lcmbi$vi)*
+*jpeg(file="forest_cow_cow_lcmbi.jpeg", width=11, height=12, units="in",
+res=300)*
+*forest(pes.summary,*
+*       xlim=c(0,1),*
+*       pscale=1,*
+*       rightcols=FALSE,*
+*       leftcols=c("studlab", "effect", "ci"),*
+*       leftlabs=c("Study", "Prevalence", "95% C.I."),*
+*       text.random="Prevalence of Lameness in British Dairy Cattle",*
+*       bylab = "Lameness Data Source",*
+*       print.byvar = TRUE,*
+*       xlab="Prevalence of Lameness", smlab="",*
+*       weight.study="random", squaresize=0.5, col.square="navy",*
+*       col.diamond="maroon", col.diamond.lines="maroon",*
+*       pooled.totals=FALSE,*
+*       comb.fixed=FALSE,*
+*       fs.hetstat=10,*
+*       print.tau2=TRUE,*
+*       print.Q=TRUE,*
+*       print.pval.Q=TRUE,*
+*       print.I2=TRUE,*
+*       digits=2,*
+*       sortvar = precision)*
+*dev.off()*
+
+What could I be doing wrong? I will be extremely grateful for any help or
+guidance.
+
+Wishing all a great afternoon,
+
+Joao
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+From jot@|on@o @end|ng |rom gm@||@com  Tue Feb 11 19:20:19 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Tue, 11 Feb 2020 18:20:19 +0000
+Subject: [R-meta] Mismatch between output from sub-group analysis and forest
+ plot
+Message-ID: <CAF8zgfaXrAPBVu4UzB957heuccnhwcoOHGmaN7t1AgaQoRb_jA@mail.gmail.com>
+
+Dear all,
+
+Sorry for the double posting and previous "messy" message. I am
+conducting a meta-analysis on prevalence and incidence data. As there
+is plenty of heterogeneity I am doing a sub-group analysis. However I
+am finding the output of the same and forest plots produced to have
+different values for the pooled estimates. I am using the double
+arcsine transformation and then have the data back-transformed to
+produce the estimates. The model is the following:
+
+iies.da.lcmbi<-ies.da %>%
+  filter(is.na(lcmbi)==FALSE)
+
+subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi=="Records", method="DL")
+pes.da.records=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi=="Locomotion
+Scoring Method", method="DL")
+pes.subg.lcmbi=predict(subganal.lcmbi,
+transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+dat.samevar=data.frame(estimate=c((pes.da.lcm$b)[1], (pes.da.records$b)[1]),
+stderror=c((pes.da.lcm$se)[1], (pes.da.records$se)[1]),
+tau2=subganal.lcmbi$tau2)
+pes.da.lcmbi=rma(estimate, sei=stderror,
+method="DL",
+data=dat.samevar)
+pes.lcmbi=predict(pes.da.lcmbi, transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+print(pes.da.lcm, digits=3)
+print(pes.da.records, digits=3)
+print(subganal.lcmbi, digits=3)
+print(pes.lcmbi, digits=3)
+
+
+And to produce the forest plot I use the following code:
+
+subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+pes.summary=metaprop(nlameanimal, ssizeanimal, author, data=ies.da.lcmbi,
+                     sm="PFT",
+                     method.tau="DL",
+                     method.ci="NAsm",
+                     byvar=lcmbi,
+                     tau.common=TRUE,
+                     tau.preset=sqrt(subganal.lcmbi$tau2))
+precision=sqrt(ies.da.lcmbi$vi)
+jpeg(file="forest_cow_cow_lcmbi.jpeg", width=11, height=12, units="in", res=300)
+forest(pes.summary,
+       xlim=c(0,1),
+       pscale=1,
+       rightcols=FALSE,
+       leftcols=c("studlab", "effect", "ci"),
+       leftlabs=c("Study", "Prevalence", "95% C.I."),
+       text.random="Prevalence of Lameness in British Dairy Cattle",
+       bylab = "Lameness Data Source",
+       print.byvar = TRUE,
+       xlab="Prevalence of Lameness", smlab="",
+       weight.study="random", squaresize=0.5, col.square="navy",
+       col.diamond="maroon", col.diamond.lines="maroon",
+       pooled.totals=FALSE,
+       comb.fixed=FALSE,
+       fs.hetstat=10,
+       print.tau2=TRUE,
+       print.Q=TRUE,
+       print.pval.Q=TRUE,
+       print.I2=TRUE,
+       digits=2,
+       sortvar = precision)
+dev.off()
+
+What could I be doing wrong? I will be extremely grateful for any help
+or guidance.
+
+Wishing all a great afternoon,
+
+Joao
+
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Tue Feb 11 19:30:51 2020
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Tue, 11 Feb 2020 19:30:51 +0100
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <CAF8zgfaXrAPBVu4UzB957heuccnhwcoOHGmaN7t1AgaQoRb_jA@mail.gmail.com>
+References: <CAF8zgfaXrAPBVu4UzB957heuccnhwcoOHGmaN7t1AgaQoRb_jA@mail.gmail.com>
+Message-ID: <04343fe6-da65-c498-3846-d4bfe9866fd5@imbi.uni-freiburg.de>
+
+Dear Joao,
+
+There is another problem. You say that the output and the forest plot 
+"have different values for the pooled estimates", but you've sent us 
+only the code, not the output or the forest plot, at least I didn't find 
+either of them. Thus, if we are expected to see what's wrong here you 
+have to send us your results and, even better, the data to reproduce the 
+results.
+
+One idea is that the results in the output may be transformed, while in 
+the forest plot they are back-transformed, but I don't know.
+
+Best,
+
+Gerta
+
+Am 11.02.2020 um 19:20 schrieb Joao Afonso:
+> Dear all,
+>
+> Sorry for the double posting and previous "messy" message. I am
+> conducting a meta-analysis on prevalence and incidence data. As there
+> is plenty of heterogeneity I am doing a sub-group analysis. However I
+> am finding the output of the same and forest plots produced to have
+> different values for the pooled estimates. I am using the double
+> arcsine transformation and then have the data back-transformed to
+> produce the estimates. The model is the following:
+>
+> iies.da.lcmbi<-ies.da %>%
+>    filter(is.na(lcmbi)==FALSE)
+>
+> subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+> pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi=="Records", method="DL")
+> pes.da.records=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi=="Locomotion
+> Scoring Method", method="DL")
+> pes.subg.lcmbi=predict(subganal.lcmbi,
+> transf=transf.ipft.hm,
+> targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+> dat.samevar=data.frame(estimate=c((pes.da.lcm$b)[1], (pes.da.records$b)[1]),
+> stderror=c((pes.da.lcm$se)[1], (pes.da.records$se)[1]),
+> tau2=subganal.lcmbi$tau2)
+> pes.da.lcmbi=rma(estimate, sei=stderror,
+> method="DL",
+> data=dat.samevar)
+> pes.lcmbi=predict(pes.da.lcmbi, transf=transf.ipft.hm,
+> targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+> print(pes.da.lcm, digits=3)
+> print(pes.da.records, digits=3)
+> print(subganal.lcmbi, digits=3)
+> print(pes.lcmbi, digits=3)
+>
+>
+> And to produce the forest plot I use the following code:
+>
+> subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+> pes.summary=metaprop(nlameanimal, ssizeanimal, author, data=ies.da.lcmbi,
+>                       sm="PFT",
+>                       method.tau="DL",
+>                       method.ci="NAsm",
+>                       byvar=lcmbi,
+>                       tau.common=TRUE,
+>                       tau.preset=sqrt(subganal.lcmbi$tau2))
+> precision=sqrt(ies.da.lcmbi$vi)
+> jpeg(file="forest_cow_cow_lcmbi.jpeg", width=11, height=12, units="in", res=300)
+> forest(pes.summary,
+>         xlim=c(0,1),
+>         pscale=1,
+>         rightcols=FALSE,
+>         leftcols=c("studlab", "effect", "ci"),
+>         leftlabs=c("Study", "Prevalence", "95% C.I."),
+>         text.random="Prevalence of Lameness in British Dairy Cattle",
+>         bylab = "Lameness Data Source",
+>         print.byvar = TRUE,
+>         xlab="Prevalence of Lameness", smlab="",
+>         weight.study="random", squaresize=0.5, col.square="navy",
+>         col.diamond="maroon", col.diamond.lines="maroon",
+>         pooled.totals=FALSE,
+>         comb.fixed=FALSE,
+>         fs.hetstat=10,
+>         print.tau2=TRUE,
+>         print.Q=TRUE,
+>         print.pval.Q=TRUE,
+>         print.I2=TRUE,
+>         digits=2,
+>         sortvar = precision)
+> dev.off()
+>
+> What could I be doing wrong? I will be extremely grateful for any help
+> or guidance.
+>
+> Wishing all a great afternoon,
+>
+> Joao
+>
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Feb 11 21:07:38 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 11 Feb 2020 20:07:38 +0000
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <04343fe6-da65-c498-3846-d4bfe9866fd5@imbi.uni-freiburg.de>
+References: <CAF8zgfaXrAPBVu4UzB957heuccnhwcoOHGmaN7t1AgaQoRb_jA@mail.gmail.com>
+ <04343fe6-da65-c498-3846-d4bfe9866fd5@imbi.uni-freiburg.de>
+Message-ID: <34de507abd94438db77652521b8e6c5e@UM-MAIL3214.unimaas.nl>
+
+First of all, thanks, Joao, for posting in plain text.
+
+I don't know whether this is relevant to the issue, but I can already tell you that the following makes no sense:
+
+pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi=="Records", method="DL")
+
+(I am referring to the 'mods=~lcmbi=="Records"' part). What are you trying to do here? Maybe you were trying to use the 'subset' argument? Something like this:
+
+pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi, subset=lcmbi=="Records", method="DL")
+
+But I am just guessing.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Gerta Ruecker
+Sent: Tuesday, 11 February, 2020 19:31
+To: Joao Afonso; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Mismatch between output from sub-group analysis and forest plot
+
+Dear Joao,
+
+There is another problem. You say that the output and the forest plot 
+"have different values for the pooled estimates", but you've sent us 
+only the code, not the output or the forest plot, at least I didn't find 
+either of them. Thus, if we are expected to see what's wrong here you 
+have to send us your results and, even better, the data to reproduce the 
+results.
+
+One idea is that the results in the output may be transformed, while in 
+the forest plot they are back-transformed, but I don't know.
+
+Best,
+
+Gerta
+
+Am 11.02.2020 um 19:20 schrieb Joao Afonso:
+> Dear all,
+>
+> Sorry for the double posting and previous "messy" message. I am
+> conducting a meta-analysis on prevalence and incidence data. As there
+> is plenty of heterogeneity I am doing a sub-group analysis. However I
+> am finding the output of the same and forest plots produced to have
+> different values for the pooled estimates. I am using the double
+> arcsine transformation and then have the data back-transformed to
+> produce the estimates. The model is the following:
+>
+> iies.da.lcmbi<-ies.da %>%
+>    filter(is.na(lcmbi)==FALSE)
+>
+> subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+> pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi=="Records", method="DL")
+> pes.da.records=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi=="Locomotion
+> Scoring Method", method="DL")
+> pes.subg.lcmbi=predict(subganal.lcmbi,
+> transf=transf.ipft.hm,
+> targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+> dat.samevar=data.frame(estimate=c((pes.da.lcm$b)[1], (pes.da.records$b)[1]),
+> stderror=c((pes.da.lcm$se)[1], (pes.da.records$se)[1]),
+> tau2=subganal.lcmbi$tau2)
+> pes.da.lcmbi=rma(estimate, sei=stderror,
+> method="DL",
+> data=dat.samevar)
+> pes.lcmbi=predict(pes.da.lcmbi, transf=transf.ipft.hm,
+> targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+> print(pes.da.lcm, digits=3)
+> print(pes.da.records, digits=3)
+> print(subganal.lcmbi, digits=3)
+> print(pes.lcmbi, digits=3)
+>
+>
+> And to produce the forest plot I use the following code:
+>
+> subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+> pes.summary=metaprop(nlameanimal, ssizeanimal, author, data=ies.da.lcmbi,
+>                       sm="PFT",
+>                       method.tau="DL",
+>                       method.ci="NAsm",
+>                       byvar=lcmbi,
+>                       tau.common=TRUE,
+>                       tau.preset=sqrt(subganal.lcmbi$tau2))
+> precision=sqrt(ies.da.lcmbi$vi)
+> jpeg(file="forest_cow_cow_lcmbi.jpeg", width=11, height=12, units="in", res=300)
+> forest(pes.summary,
+>         xlim=c(0,1),
+>         pscale=1,
+>         rightcols=FALSE,
+>         leftcols=c("studlab", "effect", "ci"),
+>         leftlabs=c("Study", "Prevalence", "95% C.I."),
+>         text.random="Prevalence of Lameness in British Dairy Cattle",
+>         bylab = "Lameness Data Source",
+>         print.byvar = TRUE,
+>         xlab="Prevalence of Lameness", smlab="",
+>         weight.study="random", squaresize=0.5, col.square="navy",
+>         col.diamond="maroon", col.diamond.lines="maroon",
+>         pooled.totals=FALSE,
+>         comb.fixed=FALSE,
+>         fs.hetstat=10,
+>         print.tau2=TRUE,
+>         print.Q=TRUE,
+>         print.pval.Q=TRUE,
+>         print.I2=TRUE,
+>         digits=2,
+>         sortvar = precision)
+> dev.off()
+>
+> What could I be doing wrong? I will be extremely grateful for any help
+> or guidance.
+>
+> Wishing all a great afternoon,
+>
+> Joao
+
+From jot@|on@o @end|ng |rom gm@||@com  Wed Feb 12 11:47:03 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Wed, 12 Feb 2020 10:47:03 +0000
+Subject: [R-meta] Mismatch between output from sub-group analysis and forest
+ plot
+Message-ID: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+
+Dear all,
+
+Once again I am sorry for posting this message again but I forgot to
+send the outputs.
+
+Again I am conducting a meta-analysis on prevalence and incidence
+data. As there is plenty of heterogeneity I am doing a sub-group
+analysis. However I
+am finding the output of the same and forest plots produced to have
+different values for the pooled estimates. I am using the double
+arcsine transformation and then have the data back-transformed to
+produce the estimates. I have amended the model following Wofgang's
+reply, but the problem still remains.The updated model is the
+following:
+
+ies.da.lcmbi<-ies.da %>%
+  filter(is.na(lcmbi)==FALSE)
+
+subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi, subset = lcmbi=="Records",
+method="DL")
+pes.da.records=rma(yi, vi, data=ies.da.lcmbi, subset =
+lcmbi=="Locomotion Scoring Method", method="DL")
+pes.subg.lcmbi=predict(subganal.lcmbi,
+transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+dat.samevar=data.frame(estimate=c((pes.da.lcm$b)[1], (pes.da.records$b)[1]),
+stderror=c((pes.da.lcm$se)[1], (pes.da.records$se)[1]),
+tau2=subganal.lcmbi$tau2)
+pes.da.lcmbi=rma(estimate, sei=stderror,
+method="DL",
+data=dat.samevar)
+pes.lcmbi=predict(pes.da.lcmbi, transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+print(pes.da.lcm, digits=3) #display subgroup 1 summary effect size
+print(pes.da.records, digits=3) #display subgroup 2 summary effect size
+print(subganal.lcmbi, digits=3) #display subgroup analysis results
+print(pes.lcmbi, digits=3) #display recomputed summary effect size
+
+Which produces the following output:
+
+Random-Effects Model (k = 11; tau^2 estimator: DL)
+
+tau^2 (estimated amount of total heterogeneity): 0.027 (SE = 0.021)
+tau (square root of estimated tau^2 value):      0.164
+I^2 (total heterogeneity / total variability):   99.93%
+H^2 (total variability / sampling variability):  1428.81
+
+Test for Heterogeneity:
+Q(df = 10) = 14288.143, p-val < .001
+
+Model Results:
+
+estimate     se   zval   pval  ci.lb  ci.ub
+   0.506  0.051  9.905  <.001  0.406  0.606  ***
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+> print(pes.da.records, digits=3) #display subgroup 2 summary effect size
+
+Random-Effects Model (k = 22; tau^2 estimator: DL)
+
+tau^2 (estimated amount of total heterogeneity): 0.011 (SE = 0.007)
+tau (square root of estimated tau^2 value):      0.104
+I^2 (total heterogeneity / total variability):   99.23%
+H^2 (total variability / sampling variability):  130.14
+
+Test for Heterogeneity:
+Q(df = 21) = 2732.942, p-val < .001
+
+Model Results:
+
+estimate     se    zval   pval  ci.lb  ci.ub
+   0.600  0.024  25.359  <.001  0.553  0.646  ***
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+> print(subganal.lcmbi, digits=3) #display subgroup analysis results
+
+Mixed-Effects Model (k = 33; tau^2 estimator: DL)
+
+tau^2 (estimated amount of residual heterogeneity):     0.022 (SE = 0.013)
+tau (square root of estimated tau^2 value):             0.148
+I^2 (residual heterogeneity / unaccounted variability): 99.82%
+H^2 (unaccounted variability / sampling variability):   549.07
+R^2 (amount of heterogeneity accounted for):            29.36%
+
+Test for Residual Heterogeneity:
+QE(df = 31) = 17021.085, p-val < .001
+
+Test of Moderators (coefficient 2):
+QM(df = 1) = 2.899, p-val = 0.089
+
+Model Results:
+
+              estimate     se    zval   pval   ci.lb  ci.ub
+intrcpt          0.601  0.033  18.449  <.001   0.537  0.665  ***
+lcmbiRecords    -0.096  0.056  -1.703  0.089  -0.207  0.015    .
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+> print(pes.lcmbi, digits=3) #display recomputed summary effect size
+
+  pred ci.lb ci.ub cr.lb cr.ub
+ 0.283 0.206 0.368 0.168 0.415
+
+
+And to produce the forest plot I use the following code:
+
+subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+pes.summary=metaprop(nlameanimal, ssizeanimal, author, data=ies.da.lcmbi,
+                     sm="PFT",
+                     method.tau="DL",
+                     method.ci="NAsm",
+                     byvar=lcmbi,
+                     tau.common=TRUE,
+                     tau.preset=sqrt(subganal.lcmbi$tau2))
+precision=sqrt(ies.da.lcmbi$vi)
+jpeg(file="forest_cow_cow_lcmbi.jpeg", width=11, height=12, units="in", res=300)
+forest(pes.summary,
+       xlim=c(0,1),
+       pscale=1,
+       rightcols=FALSE,
+       leftcols=c("studlab", "effect", "ci"),
+       leftlabs=c("Study", "Prevalence", "95% C.I."),
+       text.random="Prevalence of Lameness in British Dairy Cattle",
+       bylab = "Lameness Data Source",
+       print.byvar = TRUE,
+       xlab="Prevalence of Lameness", smlab="",
+       weight.study="random", squaresize=0.5, col.square="navy",
+       col.diamond="maroon", col.diamond.lines="maroon",
+       pooled.totals=FALSE,
+       comb.fixed=FALSE,
+       fs.hetstat=10,
+       print.tau2=TRUE,
+       print.Q=TRUE,
+       print.pval.Q=TRUE,
+       print.I2=TRUE,
+       digits=2,
+       sortvar = precision)
+dev.off()
+
+The forest plot follows attached.
+
+Again I will be extremely grateful for any help
+or guidance.
+
+Wishing all a great day,
+
+Joao
+
+-
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: forest_cow_cow_lcmbi_brah.jpeg
+Type: image/jpeg
+Size: 144106 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200212/e06a4297/attachment-0001.jpeg>
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Wed Feb 12 18:00:13 2020
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Wed, 12 Feb 2020 18:00:13 +0100
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+References: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+Message-ID: <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+
+Dear Joao,
+
+This is what I suspected in one of my previous e-mails. It is all right. 
+While metafor gives the results transformed, that is, on the 
+arcsin(sqrt())-scale, the forest plot provides results conveniently on 
+the original probability scale (backtransformed). You can (roughly) 
+switch between both measures by using
+
+  * arcsin(sqrt(x)) (from the forest plot to the text output), or vice versa
+  * sin^2(x) (from the text output to the forest plot).
+
+It is only rough here (1) because the package used the Freeman-Tukey 
+transformation which is more complicated and (2) because of rounding error.
+
+See some calculations inline below.
+
+Best,
+
+Gerta
+
+Am 12.02.2020 um 11:47 schrieb Joao Afonso:
+> Dear all,
+>
+> Once again I am sorry for posting this message again but I forgot to
+> send the outputs.
+>
+> Again I am conducting a meta-analysis on prevalence and incidence
+> data. As there is plenty of heterogeneity I am doing a sub-group
+> analysis. However I
+> am finding the output of the same and forest plots produced to have
+> different values for the pooled estimates. I am using the double
+> arcsine transformation and then have the data back-transformed to
+> produce the estimates.
+[...]
+> Random-Effects Model (k = 11; tau^2 estimator: DL)
+>
+> tau^2 (estimated amount of total heterogeneity): 0.027 (SE = 0.021)
+> tau (square root of estimated tau^2 value):      0.164
+> I^2 (total heterogeneity / total variability):   99.93%
+> H^2 (total variability / sampling variability):  1428.81
+>
+> Test for Heterogeneity:
+> Q(df = 10) = 14288.143, p-val < .001
+>
+> Model Results:
+>
+> estimate     se   zval   pval  ci.lb  ci.ub
+>     0.506  0.051  9.905  <.001  0.406  0.606  ***
+>
+This apparently corresponds to the smaller subgroup where the forest 
+plot shows? 0.23 [0.0.16; 0.31], but gives the untransformed result on 
+the arcsin(sqrt()) scale. In fact:
+
+arcsin(sqrt(0.23 [0.16; 0.31]) = 0.5 [0.41; 0.59]
+
+[...]
+
+>
+> Random-Effects Model (k = 22; tau^2 estimator: DL)
+>
+> tau^2 (estimated amount of total heterogeneity): 0.011 (SE = 0.007)
+> tau (square root of estimated tau^2 value):      0.104
+> I^2 (total heterogeneity / total variability):   99.23%
+> H^2 (total variability / sampling variability):  130.14
+>
+> Test for Heterogeneity:
+> Q(df = 21) = 2732.942, p-val < .001
+>
+> Model Results:
+>
+> estimate     se    zval   pval  ci.lb  ci.ub
+>     0.600  0.024  25.359  <.001  0.553  0.646  ***
+>
+Again: arcsin(sqrt(0.32 [0.26; 0.38]) = 0.60 [0.54; 0.66] (similar to 
+what metafor shows, differences due to rounding and the Freeman-Tukey 
+transformation).
+
+Analogous for the whole group.
+
+[...]
+
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+	[[alternative HTML version deleted]]
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Wed Feb 12 18:05:29 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Wed, 12 Feb 2020 17:05:29 +0000
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+References: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+ <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+Message-ID: <CAF8zgfbT2ts0XZCCCgX9y-X+NXD-eRzFohKgia-as6iB1+-HsQ@mail.gmail.com>
+
+Dear Gerta,
+
+Thank you so much for all the insights and guidance. I was looking at
+the figures and there is still one thing I can't make sense of which
+relates to this part of the code:
+
+> print(pes.lcmbi, digits=3) #display recomputed summary effect size
+
+This hopefully is the part of the code that provide the
+back-transformed pooled estimate of prevalence as it outputs the
+following:
+
+  pred ci.lb ci.ub cr.lb cr.ub
+ 0.283 0.206 0.368 0.168 0.415
+
+I would expect to see this in the forest plot, yet what the plot provides is
+
+ 0.29 (0.24-0.34)
+
+Any thoughts?
+
+Many thanks once again. Have a great evening,
+
+On Wed, Feb 12, 2020 at 5:00 PM Gerta Ruecker
+<ruecker at imbi.uni-freiburg.de> wrote:
+>
+> Dear Joao,
+>
+> This is what I suspected in one of my previous e-mails. It is all right. While metafor gives the results transformed, that is, on the arcsin(sqrt())-scale, the forest plot provides results conveniently on the original probability scale (backtransformed). You can (roughly) switch between both measures by using
+>
+> arcsin(sqrt(x)) (from the forest plot to the text output), or vice versa
+> sin^2(x) (from the text output to the forest plot).
+>
+> It is only rough here (1) because the package used the Freeman-Tukey transformation which is more complicated and (2) because of rounding error.
+>
+> See some calculations inline below.
+>
+> Best,
+>
+> Gerta
+>
+> Am 12.02.2020 um 11:47 schrieb Joao Afonso:
+>
+> Dear all,
+>
+> Once again I am sorry for posting this message again but I forgot to
+> send the outputs.
+>
+> Again I am conducting a meta-analysis on prevalence and incidence
+> data. As there is plenty of heterogeneity I am doing a sub-group
+> analysis. However I
+> am finding the output of the same and forest plots produced to have
+> different values for the pooled estimates. I am using the double
+> arcsine transformation and then have the data back-transformed to
+> produce the estimates.
+>
+> [...]
+>
+> Random-Effects Model (k = 11; tau^2 estimator: DL)
+>
+> tau^2 (estimated amount of total heterogeneity): 0.027 (SE = 0.021)
+> tau (square root of estimated tau^2 value):      0.164
+> I^2 (total heterogeneity / total variability):   99.93%
+> H^2 (total variability / sampling variability):  1428.81
+>
+> Test for Heterogeneity:
+> Q(df = 10) = 14288.143, p-val < .001
+>
+> Model Results:
+>
+> estimate     se   zval   pval  ci.lb  ci.ub
+>    0.506  0.051  9.905  <.001  0.406  0.606  ***
+>
+> This apparently corresponds to the smaller subgroup where the forest plot shows  0.23 [0.0.16; 0.31], but gives the untransformed result on the arcsin(sqrt()) scale. In fact:
+>
+> arcsin(sqrt(0.23 [0.16; 0.31]) = 0.5 [0.41; 0.59]
+>
+> [...]
+>
+>
+> Random-Effects Model (k = 22; tau^2 estimator: DL)
+>
+> tau^2 (estimated amount of total heterogeneity): 0.011 (SE = 0.007)
+> tau (square root of estimated tau^2 value):      0.104
+> I^2 (total heterogeneity / total variability):   99.23%
+> H^2 (total variability / sampling variability):  130.14
+>
+> Test for Heterogeneity:
+> Q(df = 21) = 2732.942, p-val < .001
+>
+> Model Results:
+>
+> estimate     se    zval   pval  ci.lb  ci.ub
+>    0.600  0.024  25.359  <.001  0.553  0.646  ***
+>
+> Again: arcsin(sqrt(0.32 [0.26; 0.38]) = 0.60 [0.54; 0.66] (similar to what metafor shows, differences due to rounding and the Freeman-Tukey transformation).
+>
+> Analogous for the whole group.
+>
+> [...]
+>
+>
+> --
+>
+> Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+>
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+>
+> Phone:    +49/761/203-6673
+> Fax:      +49/761/203-6680
+> Mail:     ruecker at imbi.uni-freiburg.de
+> Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Thu Feb 13 00:02:35 2020
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (=?UTF-8?Q?Dr=2e_Gerta_R=c3=bccker?=)
+Date: Thu, 13 Feb 2020 00:02:35 +0100
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <CAF8zgfbT2ts0XZCCCgX9y-X+NXD-eRzFohKgia-as6iB1+-HsQ@mail.gmail.com>
+References: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+ <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+ <CAF8zgfbT2ts0XZCCCgX9y-X+NXD-eRzFohKgia-as6iB1+-HsQ@mail.gmail.com>
+Message-ID: <5c3b6168-8ba2-c67f-fc6b-66720b3684c9@imbi.uni-freiburg.de>
+
+Dear Joao,
+
+Honestly, I don't know. Comparing the code for the forest plot with the 
+rest of the code, I find it difficult to identify corresponding 
+variables. For example, in the forest plot code the number of events is 
+called nlameanimal, but this variable name occurs nowhere in the rest of 
+the code where you always use yi. Moreover, you have two subsets, 
+"Records" (11 studies) and "Locomotion Scoring Method" (22 studies), but 
+it seems they are confused somewhere. I find the code extremely 
+difficult to understand without knowing the data.
+
+Best,
+
+Gerta
+
+Am 12.02.2020 um 18:05 schrieb Joao Afonso:
+> Dear Gerta,
+>
+> Thank you so much for all the insights and guidance. I was looking at
+> the figures and there is still one thing I can't make sense of which
+> relates to this part of the code:
+>
+>> print(pes.lcmbi, digits=3) #display recomputed summary effect size
+> This hopefully is the part of the code that provide the
+> back-transformed pooled estimate of prevalence as it outputs the
+> following:
+>
+>    pred ci.lb ci.ub cr.lb cr.ub
+>   0.283 0.206 0.368 0.168 0.415
+>
+> I would expect to see this in the forest plot, yet what the plot provides is
+>
+>   0.29 (0.24-0.34)
+>
+> Any thoughts?
+>
+> Many thanks once again. Have a great evening,
+>
+> On Wed, Feb 12, 2020 at 5:00 PM Gerta Ruecker
+> <ruecker at imbi.uni-freiburg.de> wrote:
+>> Dear Joao,
+>>
+>> This is what I suspected in one of my previous e-mails. It is all right. While metafor gives the results transformed, that is, on the arcsin(sqrt())-scale, the forest plot provides results conveniently on the original probability scale (backtransformed). You can (roughly) switch between both measures by using
+>>
+>> arcsin(sqrt(x)) (from the forest plot to the text output), or vice versa
+>> sin^2(x) (from the text output to the forest plot).
+>>
+>> It is only rough here (1) because the package used the Freeman-Tukey transformation which is more complicated and (2) because of rounding error.
+>>
+>> See some calculations inline below.
+>>
+>> Best,
+>>
+>> Gerta
+>>
+>> Am 12.02.2020 um 11:47 schrieb Joao Afonso:
+>>
+>> Dear all,
+>>
+>> Once again I am sorry for posting this message again but I forgot to
+>> send the outputs.
+>>
+>> Again I am conducting a meta-analysis on prevalence and incidence
+>> data. As there is plenty of heterogeneity I am doing a sub-group
+>> analysis. However I
+>> am finding the output of the same and forest plots produced to have
+>> different values for the pooled estimates. I am using the double
+>> arcsine transformation and then have the data back-transformed to
+>> produce the estimates.
+>>
+>> [...]
+>>
+>> Random-Effects Model (k = 11; tau^2 estimator: DL)
+>>
+>> tau^2 (estimated amount of total heterogeneity): 0.027 (SE = 0.021)
+>> tau (square root of estimated tau^2 value):      0.164
+>> I^2 (total heterogeneity / total variability):   99.93%
+>> H^2 (total variability / sampling variability):  1428.81
+>>
+>> Test for Heterogeneity:
+>> Q(df = 10) = 14288.143, p-val < .001
+>>
+>> Model Results:
+>>
+>> estimate     se   zval   pval  ci.lb  ci.ub
+>>     0.506  0.051  9.905  <.001  0.406  0.606  ***
+>>
+>> This apparently corresponds to the smaller subgroup where the forest plot shows  0.23 [0.0.16; 0.31], but gives the untransformed result on the arcsin(sqrt()) scale. In fact:
+>>
+>> arcsin(sqrt(0.23 [0.16; 0.31]) = 0.5 [0.41; 0.59]
+>>
+>> [...]
+>>
+>>
+>> Random-Effects Model (k = 22; tau^2 estimator: DL)
+>>
+>> tau^2 (estimated amount of total heterogeneity): 0.011 (SE = 0.007)
+>> tau (square root of estimated tau^2 value):      0.104
+>> I^2 (total heterogeneity / total variability):   99.23%
+>> H^2 (total variability / sampling variability):  130.14
+>>
+>> Test for Heterogeneity:
+>> Q(df = 21) = 2732.942, p-val < .001
+>>
+>> Model Results:
+>>
+>> estimate     se    zval   pval  ci.lb  ci.ub
+>>     0.600  0.024  25.359  <.001  0.553  0.646  ***
+>>
+>> Again: arcsin(sqrt(0.32 [0.26; 0.38]) = 0.60 [0.54; 0.66] (similar to what metafor shows, differences due to rounding and the Freeman-Tukey transformation).
+>>
+>> Analogous for the whole group.
+>>
+>> [...]
+>>
+>>
+>> --
+>>
+>> Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+>>
+>> Institute of Medical Biometry and Statistics,
+>> Faculty of Medicine and Medical Center - University of Freiburg
+>>
+>> Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+>>
+>> Phone:    +49/761/203-6673
+>> Fax:      +49/761/203-6680
+>> Mail:     ruecker at imbi.uni-freiburg.de
+>> Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+>
+>
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Thu Feb 13 11:47:16 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Thu, 13 Feb 2020 10:47:16 +0000
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <5c3b6168-8ba2-c67f-fc6b-66720b3684c9@imbi.uni-freiburg.de>
+References: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+ <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+ <CAF8zgfbT2ts0XZCCCgX9y-X+NXD-eRzFohKgia-as6iB1+-HsQ@mail.gmail.com>
+ <5c3b6168-8ba2-c67f-fc6b-66720b3684c9@imbi.uni-freiburg.de>
+Message-ID: <CAF8zgfZzGzMRPsipPQ3tncrTrd3C9wqCj-3yTeoRgrY7jtVWyw@mail.gmail.com>
+
+Dear Gerta,
+
+That seems to be again a error from my side as I forgot to provide the
+code for the double arcsine transformation of the data. Once again I
+apologise for all these mistakes (I admit I am new to this platform
+and also to R). Let me one last time try to summarise everything and
+also provide the data. The problem I am finding is a mismatch between
+the pooled estimate when running the sub-group analysis on a moderator
+and the figure displayed in the resulting forest plot.
+
+ The data follows below and attached (.cvs).
+
+author                 ssizeanimal nlameanimal
+   <chr>                        <dbl>       <dbl>
+ 1 Griffiths et al., 2018       14700        4145
+ 2 Phillips, 1990                 162          98
+ 3 Chaplin et al., 2000           178          13
+ 4 Barker et al., 2010          33415       12297
+ 5 Archer et al., 2010           1400         868
+ 6 Amory et al., 2008            1824         636
+ 7 Manning, 2018                  224          73
+ 8 Bell et al., 2013              332          40
+ 9 Walker et al., 2008             36          18
+10 Weaver, 1997                  7700        2310
+# ... with 23 more rows
+
+The data was transformed using the double arcsine method as per code below:
+
+ies.da=escalc(xi=nlameanimal, ni=ssizeanimal,
+data=prevalence_2020_cow_nomv, measure="PFT", add=0)
+pes.da=rma(yi, vi, data=ies.da, method = "DL")
+pes=predict(pes.da, transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+print(pes.da, digits=3)
+confint(pes.da, digits=3)
+print(pes, digits=3)
+
+As heterogeneity was high sub-group analysis followed. For moderator
+"lcmbi" the code used was the following:
+
+ies.da.lcmbi<-ies.da %>%
+  filter(is.na(lcmbi)==FALSE)
+
+subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi, subset = lcmbi=="Records",
+method="DL")
+pes.da.records=rma(yi, vi, data=ies.da.lcmbi, subset =
+lcmbi=="Locomotion Scoring Method", method="DL")
+pes.subg.lcmbi=predict(subganal.lcmbi,
+transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+dat.samevar=data.frame(estimate=c((pes.da.lcm$b)[1], (pes.da.records$b)[1]),
+stderror=c((pes.da.lcm$se)[1], (pes.da.records$se)[1]),
+tau2=subganal.lcmbi$tau2)
+pes.da.lcmbi=rma(estimate, sei=stderror,
+method="DL",
+data=dat.samevar)
+pes.lcmbi=predict(pes.da.lcmbi, transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+print(pes.da.lcm, digits=3) #display subgroup 1 summary effect size
+print(pes.da.records, digits=3) #display subgroup 2 summary effect size
+print(subganal.lcmbi, digits=3) #display subgroup analysis results
+print(pes.lcmbi, digits=3) #display recomputed summary effect size
+
+Which produces the following output:
+
+Random-Effects Model (k = 11; tau^2 estimator: DL)
+
+tau^2 (estimated amount of total heterogeneity): 0.027 (SE = 0.021)
+tau (square root of estimated tau^2 value):      0.164
+I^2 (total heterogeneity / total variability):   99.93%
+H^2 (total variability / sampling variability):  1428.81
+
+Test for Heterogeneity:
+Q(df = 10) = 14288.143, p-val < .001
+
+Model Results:
+
+estimate     se   zval   pval  ci.lb  ci.ub
+   0.506  0.051  9.905  <.001  0.406  0.606  ***
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+> print(pes.da.records, digits=3) #display subgroup 2 summary effect size
+
+Random-Effects Model (k = 22; tau^2 estimator: DL)
+
+tau^2 (estimated amount of total heterogeneity): 0.011 (SE = 0.007)
+tau (square root of estimated tau^2 value):      0.104
+I^2 (total heterogeneity / total variability):   99.23%
+H^2 (total variability / sampling variability):  130.14
+
+Test for Heterogeneity:
+Q(df = 21) = 2732.942, p-val < .001
+
+Model Results:
+
+estimate     se    zval   pval  ci.lb  ci.ub
+   0.600  0.024  25.359  <.001  0.553  0.646  ***
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+> print(subganal.lcmbi, digits=3) #display subgroup analysis results
+
+Mixed-Effects Model (k = 33; tau^2 estimator: DL)
+
+tau^2 (estimated amount of residual heterogeneity):     0.022 (SE = 0.013)
+tau (square root of estimated tau^2 value):             0.148
+I^2 (residual heterogeneity / unaccounted variability): 99.82%
+H^2 (unaccounted variability / sampling variability):   549.07
+R^2 (amount of heterogeneity accounted for):            29.36%
+
+Test for Residual Heterogeneity:
+QE(df = 31) = 17021.085, p-val < .001
+
+Test of Moderators (coefficient 2):
+QM(df = 1) = 2.899, p-val = 0.089
+
+Model Results:
+
+              estimate     se    zval   pval   ci.lb  ci.ub
+intrcpt          0.601  0.033  18.449  <.001   0.537  0.665  ***
+lcmbiRecords    -0.096  0.056  -1.703  0.089  -0.207  0.015    .
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+> print(pes.lcmbi, digits=3) #display recomputed summary effect size
+
+  pred ci.lb ci.ub cr.lb cr.ub
+ 0.283 0.206 0.368 0.168 0.415
+
+
+And to produce the forest plot I use the following code:
+
+subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+pes.summary=metaprop(nlameanimal, ssizeanimal, author, data=ies.da.lcmbi,
+                     sm="PFT",
+                     method.tau="DL",
+                     method.ci="NAsm",
+                     byvar=lcmbi,
+                     tau.common=TRUE,
+                     tau.preset=sqrt(subganal.lcmbi$tau2))
+precision=sqrt(ies.da.lcmbi$vi)
+jpeg(file="forest_cow_cow_lcmbi.jpeg", width=11, height=12, units="in", res=300)
+forest(pes.summary,
+       xlim=c(0,1),
+       pscale=1,
+       rightcols=FALSE,
+       leftcols=c("studlab", "effect", "ci"),
+       leftlabs=c("Study", "Prevalence", "95% C.I."),
+       text.random="Prevalence of Lameness in British Dairy Cattle",
+       bylab = "Lameness Data Source",
+       print.byvar = TRUE,
+       xlab="Prevalence of Lameness", smlab="",
+       weight.study="random", squaresize=0.5, col.square="navy",
+       col.diamond="maroon", col.diamond.lines="maroon",
+       pooled.totals=FALSE,
+       comb.fixed=FALSE,
+       fs.hetstat=10,
+       print.tau2=TRUE,
+       print.Q=TRUE,
+       print.pval.Q=TRUE,
+       print.I2=TRUE,
+       digits=2,
+       sortvar = precision)
+dev.off()
+
+The forest plot follows attached.
+
+Once again I am truly sorry for all this back and forth. I haven't
+made you helping me any easier. But I would be very grateful for any
+inputs solving this issue.
+
+
+On Wed, Feb 12, 2020 at 11:02 PM Dr. Gerta R?cker
+<ruecker at imbi.uni-freiburg.de> wrote:
+>
+> Dear Joao,
+>
+> Honestly, I don't know. Comparing the code for the forest plot with the
+> rest of the code, I find it difficult to identify corresponding
+> variables. For example, in the forest plot code the number of events is
+> called nlameanimal, but this variable name occurs nowhere in the rest of
+> the code where you always use yi. Moreover, you have two subsets,
+> "Records" (11 studies) and "Locomotion Scoring Method" (22 studies), but
+> it seems they are confused somewhere. I find the code extremely
+> difficult to understand without knowing the data.
+>
+> Best,
+>
+> Gerta
+>
+> Am 12.02.2020 um 18:05 schrieb Joao Afonso:
+> > Dear Gerta,
+> >
+> > Thank you so much for all the insights and guidance. I was looking at
+> > the figures and there is still one thing I can't make sense of which
+> > relates to this part of the code:
+> >
+> >> print(pes.lcmbi, digits=3) #display recomputed summary effect size
+> > This hopefully is the part of the code that provide the
+> > back-transformed pooled estimate of prevalence as it outputs the
+> > following:
+> >
+> >    pred ci.lb ci.ub cr.lb cr.ub
+> >   0.283 0.206 0.368 0.168 0.415
+> >
+> > I would expect to see this in the forest plot, yet what the plot provides is
+> >
+> >   0.29 (0.24-0.34)
+> >
+> > Any thoughts?
+> >
+> > Many thanks once again. Have a great evening,
+> >
+> > On Wed, Feb 12, 2020 at 5:00 PM Gerta Ruecker
+> > <ruecker at imbi.uni-freiburg.de> wrote:
+> >> Dear Joao,
+> >>
+> >> This is what I suspected in one of my previous e-mails. It is all right. While metafor gives the results transformed, that is, on the arcsin(sqrt())-scale, the forest plot provides results conveniently on the original probability scale (backtransformed). You can (roughly) switch between both measures by using
+> >>
+> >> arcsin(sqrt(x)) (from the forest plot to the text output), or vice versa
+> >> sin^2(x) (from the text output to the forest plot).
+> >>
+> >> It is only rough here (1) because the package used the Freeman-Tukey transformation which is more complicated and (2) because of rounding error.
+> >>
+> >> See some calculations inline below.
+> >>
+> >> Best,
+> >>
+> >> Gerta
+> >>
+> >> Am 12.02.2020 um 11:47 schrieb Joao Afonso:
+> >>
+> >> Dear all,
+> >>
+> >> Once again I am sorry for posting this message again but I forgot to
+> >> send the outputs.
+> >>
+> >> Again I am conducting a meta-analysis on prevalence and incidence
+> >> data. As there is plenty of heterogeneity I am doing a sub-group
+> >> analysis. However I
+> >> am finding the output of the same and forest plots produced to have
+> >> different values for the pooled estimates. I am using the double
+> >> arcsine transformation and then have the data back-transformed to
+> >> produce the estimates.
+> >>
+> >> [...]
+> >>
+> >> Random-Effects Model (k = 11; tau^2 estimator: DL)
+> >>
+> >> tau^2 (estimated amount of total heterogeneity): 0.027 (SE = 0.021)
+> >> tau (square root of estimated tau^2 value):      0.164
+> >> I^2 (total heterogeneity / total variability):   99.93%
+> >> H^2 (total variability / sampling variability):  1428.81
+> >>
+> >> Test for Heterogeneity:
+> >> Q(df = 10) = 14288.143, p-val < .001
+> >>
+> >> Model Results:
+> >>
+> >> estimate     se   zval   pval  ci.lb  ci.ub
+> >>     0.506  0.051  9.905  <.001  0.406  0.606  ***
+> >>
+> >> This apparently corresponds to the smaller subgroup where the forest plot shows  0.23 [0.0.16; 0.31], but gives the untransformed result on the arcsin(sqrt()) scale. In fact:
+> >>
+> >> arcsin(sqrt(0.23 [0.16; 0.31]) = 0.5 [0.41; 0.59]
+> >>
+> >> [...]
+> >>
+> >>
+> >> Random-Effects Model (k = 22; tau^2 estimator: DL)
+> >>
+> >> tau^2 (estimated amount of total heterogeneity): 0.011 (SE = 0.007)
+> >> tau (square root of estimated tau^2 value):      0.104
+> >> I^2 (total heterogeneity / total variability):   99.23%
+> >> H^2 (total variability / sampling variability):  130.14
+> >>
+> >> Test for Heterogeneity:
+> >> Q(df = 21) = 2732.942, p-val < .001
+> >>
+> >> Model Results:
+> >>
+> >> estimate     se    zval   pval  ci.lb  ci.ub
+> >>     0.600  0.024  25.359  <.001  0.553  0.646  ***
+> >>
+> >> Again: arcsin(sqrt(0.32 [0.26; 0.38]) = 0.60 [0.54; 0.66] (similar to what metafor shows, differences due to rounding and the Freeman-Tukey transformation).
+> >>
+> >> Analogous for the whole group.
+> >>
+> >> [...]
+> >>
+> >>
+> >> --
+> >>
+> >> Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+> >>
+> >> Institute of Medical Biometry and Statistics,
+> >> Faculty of Medicine and Medical Center - University of Freiburg
+> >>
+> >> Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+> >>
+> >> Phone:    +49/761/203-6673
+> >> Fax:      +49/761/203-6680
+> >> Mail:     ruecker at imbi.uni-freiburg.de
+> >> Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+> >
+> >
+
+
+
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: prev_cow.cvs
+Type: application/octet-stream
+Size: 1061 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200213/7ef204e4/attachment-0001.obj>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: forest_cow_cow_lcmbi_brah.jpeg
+Type: image/jpeg
+Size: 144106 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200213/7ef204e4/attachment-0001.jpeg>
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Fri Feb 14 10:37:39 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Fri, 14 Feb 2020 10:37:39 +0100
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <CAF8zgfZzGzMRPsipPQ3tncrTrd3C9wqCj-3yTeoRgrY7jtVWyw@mail.gmail.com>
+References: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+ <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+ <CAF8zgfbT2ts0XZCCCgX9y-X+NXD-eRzFohKgia-as6iB1+-HsQ@mail.gmail.com>
+ <5c3b6168-8ba2-c67f-fc6b-66720b3684c9@imbi.uni-freiburg.de>
+ <CAF8zgfZzGzMRPsipPQ3tncrTrd3C9wqCj-3yTeoRgrY7jtVWyw@mail.gmail.com>
+Message-ID: <78a9bb82-7e00-249e-6f1e-450597d99cd9@imbi.uni-freiburg.de>
+
+Joao,
+
+Your R code does not work as the information on 'lcmbi' is not part of 
+the dataset you sent:
+
+ > ies.da.lcmbi = ies.da %>% filter(is.na(lcmbi) == FALSE)
+Error: object 'lcmbi' not found
+Execution halted
+
+Best wishes, Guido
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200214/7f66c38c/attachment.html>
+
+-------------- next part --------------
+An embedded and charset-unspecified text was scrubbed...
+Name: metaprop04.R
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200214/7f66c38c/attachment.ksh>
+
+From jot@|on@o @end|ng |rom gm@||@com  Fri Feb 14 11:56:49 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Fri, 14 Feb 2020 10:56:49 +0000
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <78a9bb82-7e00-249e-6f1e-450597d99cd9@imbi.uni-freiburg.de>
+References: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+ <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+ <CAF8zgfbT2ts0XZCCCgX9y-X+NXD-eRzFohKgia-as6iB1+-HsQ@mail.gmail.com>
+ <5c3b6168-8ba2-c67f-fc6b-66720b3684c9@imbi.uni-freiburg.de>
+ <CAF8zgfZzGzMRPsipPQ3tncrTrd3C9wqCj-3yTeoRgrY7jtVWyw@mail.gmail.com>
+ <78a9bb82-7e00-249e-6f1e-450597d99cd9@imbi.uni-freiburg.de>
+Message-ID: <CAF8zgfZmM8=TZP5uD1r0bTrQR9rscknbYiBK9qAkvBNBiz85LA@mail.gmail.com>
+
+You are absolutely right Guido. I am sorry for another mistake.
+Attached the new cvs file with all the needed information. I am
+totally lost as to why R is providing such results so I would again me
+extremely grateful for any help or guidance.
+
+Wishing all a great weekend,
+
+Joao
+
+On Fri, Feb 14, 2020 at 9:37 AM Guido Schwarzer <sc at imbi.uni-freiburg.de> wrote:
+>
+> Joao,
+>
+> Your R code does not work as the information on 'lcmbi' is not part of the dataset you sent:
+>
+> > ies.da.lcmbi = ies.da %>% filter(is.na(lcmbi) == FALSE)
+> Error: object 'lcmbi' not found
+> Execution halted
+>
+> Best wishes, Guido
+>
+> --
+> Dr. Guido Schwarzer
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+>
+> Phone: +49/761/203-6668
+> Mail: sc at imbi.uni-freiburg.de
+> Homepage: http://www.imbi.uni-freiburg.de
+>
+> ORCID iD: https://orcid.org/0000-0001-6214-9087
+> R-book: https://www.springer.com/gp/book/9783319214153
+
+
+
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: prev_cow_new
+Type: application/octet-stream
+Size: 1954 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200214/575ba3e9/attachment.obj>
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Fri Feb 14 14:13:37 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Fri, 14 Feb 2020 14:13:37 +0100
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <CAF8zgfZmM8=TZP5uD1r0bTrQR9rscknbYiBK9qAkvBNBiz85LA@mail.gmail.com>
+References: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+ <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+ <CAF8zgfbT2ts0XZCCCgX9y-X+NXD-eRzFohKgia-as6iB1+-HsQ@mail.gmail.com>
+ <5c3b6168-8ba2-c67f-fc6b-66720b3684c9@imbi.uni-freiburg.de>
+ <CAF8zgfZzGzMRPsipPQ3tncrTrd3C9wqCj-3yTeoRgrY7jtVWyw@mail.gmail.com>
+ <78a9bb82-7e00-249e-6f1e-450597d99cd9@imbi.uni-freiburg.de>
+ <CAF8zgfZmM8=TZP5uD1r0bTrQR9rscknbYiBK9qAkvBNBiz85LA@mail.gmail.com>
+Message-ID: <e2a9f872-1229-39f0-af81-5ec322ef7124@imbi.uni-freiburg.de>
+
+Joao,
+
+I can only find a very subtle difference in the results of the 
+Freeman-Tukey method between *meta* and *metafor*. While *meta* uses 
+subgroup-specific harmonic means to back-transform results, *metafor* 
+uses the harmonic mean of all studies for both subgroups. Differences 
+are only visible in the third digit for prevalence estimates and 
+confidence intervals.
+
+Another point to mention is that differences in results of random 
+effects subgroup analyses (i) allowing for different estimates of the 
+between-study variance tau2 and (ii) assuming a common value of tau2 
+have to be expected. It should be clear that subgroup analyses assuming 
+a common value for tau2 of 0.0218 produce different results than two 
+separate subgroup analyses using values of 0.0109 and 0.0269, respectively.
+
+Best wishes, Guido
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200214/450ff38c/attachment-0001.html>
+
+-------------- next part --------------
+An embedded and charset-unspecified text was scrubbed...
+Name: metaprop04.R
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200214/450ff38c/attachment-0001.ksh>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: prev_cow.csv
+Type: text/csv
+Size: 1920 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200214/450ff38c/attachment-0001.csv>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: metaprop04.pdf
+Type: application/pdf
+Size: 11739 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200214/450ff38c/attachment-0001.pdf>
+
+From jot@|on@o @end|ng |rom gm@||@com  Fri Feb 14 17:05:07 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Fri, 14 Feb 2020 16:05:07 +0000
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <e2a9f872-1229-39f0-af81-5ec322ef7124@imbi.uni-freiburg.de>
+References: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+ <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+ <CAF8zgfbT2ts0XZCCCgX9y-X+NXD-eRzFohKgia-as6iB1+-HsQ@mail.gmail.com>
+ <5c3b6168-8ba2-c67f-fc6b-66720b3684c9@imbi.uni-freiburg.de>
+ <CAF8zgfZzGzMRPsipPQ3tncrTrd3C9wqCj-3yTeoRgrY7jtVWyw@mail.gmail.com>
+ <78a9bb82-7e00-249e-6f1e-450597d99cd9@imbi.uni-freiburg.de>
+ <CAF8zgfZmM8=TZP5uD1r0bTrQR9rscknbYiBK9qAkvBNBiz85LA@mail.gmail.com>
+ <e2a9f872-1229-39f0-af81-5ec322ef7124@imbi.uni-freiburg.de>
+Message-ID: <CAF8zgfYdTGMb2J7KQEVQCinm+=oj-=1pOH0O2=0oRDkh=q3C_Q@mail.gmail.com>
+
+Dear Guido,
+
+Thank you so much for your reply and help.
+
+I can see that your forest plot results differ only in the estimates
+for each group (as a result of assuming a common or different tau2
+values). I also see that your code is much simpler than the one I have
+used (which was extracted from How to Conduct a Meta-Analysis of
+Proportions in R: A Comprehensive Tutorial by Naike Wang).
+
+A final question if you don't mind.
+
+I have the same overall pooled estimate ("Prevalence of Lameness in
+British Dairy Cattle") in all forest plots I have produced while
+conducting sub-group analysis on the different moderators. Yet all the
+overall pooled estimates I get in the console are different from the
+corresponding plot. Could it be that the code I have used (below)
+modifies how the overall pooled estimate is calculated (specially
+lines 7 to 9 estimating dat.samevar and then lines 10 to 12 estimating
+the pooled effect size - pes - based on dat.samevar)?  Maybe
+estimating the overall pooled estimate ("Prevalence of Lameness in
+British Dairy Cattle") based on the tau2 of each subgroup? (I can't
+find any difference in our forest plot code, thus it is likely that
+the difference relies on the meta-analysis code...)
+
+
+1. subganal.lcmbi=rma(yi, vi, data=ies.da.lcmbi, mods=~lcmbi, method="DL")
+2. pes.da.lcm=rma(yi, vi, data=ies.da.lcmbi, subset =
+lcmbi=="Records", method="DL")
+3. pes.da.records=rma(yi, vi, data=ies.da.lcmbi, subset =
+lcmbi=="Locomotion Scoring Method", method="DL")
+4. pes.subg.lcmbi=predict(subganal.lcmbi,
+5. transf=transf.ipft.hm,
+6. targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+7. dat.samevar=data.frame(estimate=c((pes.da.lcm$b)[1], (pes.da.records$b)[1]),
+8. stderror=c((pes.da.lcm$se)[1], (pes.da.records$se)[1]),
+9. tau2=subganal.lcmbi$tau2)
+10. pes.da.lcmbi=rma(estimate, sei=stderror,
+11. method="DL",
+12. data=dat.samevar)
+13. pes.lcmbi=predict(pes.da.lcmbi, transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+14. pes.lcm=predict(pes.da.lcm, transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+15. pes.records=predict(pes.da.records, transf=transf.ipft.hm,
+targ=list(ni=prevalence_2020_cow_nomv$ssizeanimal))
+16. print(pes.da.lcm, digits=3) #display subgroup 1 summary effect size
+17. print(pes.da.records, digits=3) #display subgroup 2 summary effect size
+18. print(pes.lcm, digits=3) #display subgroup 1 summary effect size
+19. print(pes.records, digits=3) #display subgroup 2 summary effect size
+20. print(subganal.lcmbi, digits=3) #display subgroup analysis results
+21. print(pes.lcmbi, digits=3) #display recomputed summary effect size
+
+I hope this question isn't too stupid but I am curious to know what
+the code above does differently to result in the overall pooled
+estimate being different between console output and forest plot.
+
+Wishing all a great weekend and once again many thanks for all the help!
+
+Joao
+
+On Fri, Feb 14, 2020 at 1:13 PM Guido Schwarzer <sc at imbi.uni-freiburg.de> wrote:
+>
+> Joao,
+>
+> I can only find a very subtle difference in the results of the Freeman-Tukey method between meta and metafor. While meta uses subgroup-specific harmonic means to back-transform results, metafor uses the harmonic mean of all studies for both subgroups. Differences are only visible in the third digit for prevalence estimates and confidence intervals.
+>
+> Another point to mention is that differences in results of random effects subgroup analyses (i) allowing for different estimates of the between-study variance tau2 and (ii) assuming a common value of tau2 have to be expected. It should be clear that subgroup analyses assuming a common value for tau2 of 0.0218 produce different results than two separate subgroup analyses using values of 0.0109 and 0.0269, respectively.
+>
+> Best wishes, Guido
+
+
+
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Fri Feb 14 18:12:50 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Fri, 14 Feb 2020 18:12:50 +0100
+Subject: [R-meta] 
+ Mismatch between output from sub-group analysis and forest plot
+In-Reply-To: <CAF8zgfYdTGMb2J7KQEVQCinm+=oj-=1pOH0O2=0oRDkh=q3C_Q@mail.gmail.com>
+References: <CAF8zgfbpAJ-01_6+CxBo12iQ2=887SwAmY35MS7Zcwhre=wedQ@mail.gmail.com>
+ <4fcfc985-1868-6590-1716-d43b82cb3248@imbi.uni-freiburg.de>
+ <CAF8zgfbT2ts0XZCCCgX9y-X+NXD-eRzFohKgia-as6iB1+-HsQ@mail.gmail.com>
+ <5c3b6168-8ba2-c67f-fc6b-66720b3684c9@imbi.uni-freiburg.de>
+ <CAF8zgfZzGzMRPsipPQ3tncrTrd3C9wqCj-3yTeoRgrY7jtVWyw@mail.gmail.com>
+ <78a9bb82-7e00-249e-6f1e-450597d99cd9@imbi.uni-freiburg.de>
+ <CAF8zgfZmM8=TZP5uD1r0bTrQR9rscknbYiBK9qAkvBNBiz85LA@mail.gmail.com>
+ <e2a9f872-1229-39f0-af81-5ec322ef7124@imbi.uni-freiburg.de>
+ <CAF8zgfYdTGMb2J7KQEVQCinm+=oj-=1pOH0O2=0oRDkh=q3C_Q@mail.gmail.com>
+Message-ID: <7e9e7dfa-cd27-f390-8e08-a87b9589be3d@imbi.uni-freiburg.de>
+
+Am 14.02.20 um 17:05 schrieb Joao Afonso:
+> [...]
+> A final question if you don't mind.
+>
+> I have the same overall pooled estimate ("Prevalence of Lameness in
+> British Dairy Cattle") in all forest plots I have produced while
+> conducting sub-group analysis on the different moderators. Yet all the
+> overall pooled estimates I get in the console are different from the
+> corresponding plot. [...]
+
+In R package *meta* the overall pooled estimate in a meta-analysis with 
+subgroups always comes from the (same) meta-analysis including all 
+studies, i.e.,
+
+m4 = rma(yi, vi, data = ies.da, method = "DL")
+predict(m4, transf = transf.ipft.hm,
+ ??????? targ = list(ni = prevalence_2020_cow_nomv$ssizeanimal))
+
+Best wishes, Guido
+
+
+	[[alternative HTML version deleted]]
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Mon Feb 17 13:47:01 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Mon, 17 Feb 2020 12:47:01 +0000
+Subject: [R-meta] Meta-analysis with GLMM
+Message-ID: <CAF8zgfZkyRLCU=RcQo62au_iFNPtaJMG2620SNUh2_u495UEXg@mail.gmail.com>
+
+Dear all,
+
+I hope you all had a great weekend.
+
+I have been sending some questions to the r-project because of my
+meta-analysis on prevalence data. Recently I can across a paper
+calling attention to the eventual misleading results from a
+meta-analysis using the double arcsine method as a results of a
+substantial range of sample sizes across the different included
+studies (Schwarzer al. 2019). This seems to be the case with the
+studies for my meta-analysis which made my alarms sound. After reading
+the paper I am not confident I want to use the double arcsine method
+and would rather go for the suggested GLMM.
+
+I am creating the code using the rma.glmm function but am unsure if
+this would be the way to build it. From reading the paper I understood
+that the GLMM uses the logit transformation. If so the code for
+generating the meta-analysis (and forest plot) would be something as
+per below?
+
+pes.glmm=rma.glmm(xi=nlameanimal, ni=ssizeanimal,
+data=prevalence_2020_nomv, method = "ML", measure = "PLO")
+pes=predict(pes.glmm, transf=transf.ilogit)
+print(pes.glmm, digits=4)
+confint(pes.glmm, digits=4)
+print(pes, digits=4)
+
+When using it I got the following output (the confint function doesn't
+seem to accept a glm object):
+
+Random-Effects Model (k = 33; tau^2 estimator: ML)
+
+tau^2 (estimated amount of total heterogeneity): 0.9006
+tau (square root of estimated tau^2 value):      0.9490
+I^2 (total heterogeneity / total variability):   99.8914%
+H^2 (total variability / sampling variability):  921.2084
+
+Tests for Heterogeneity:
+Wld(df = 32) = 17471.1364, p-val < .0001
+LRT(df = 32) = 24922.9943, p-val < .0001
+
+Model Results:
+
+estimate      se     zval    pval    ci.lb    ci.ub
+ -0.9838  0.1692  -5.8145  <.0001  -1.3154  -0.6522  ***
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+> confint(pes.glmm, digits=4)
+Error in confint.rma.glmm(pes.glmm, digits = 4) :
+  Method not available for objects of class "rma.glmm".
+> print(pes, digits=4)
+
+   pred  ci.lb  ci.ub  cr.lb  cr.ub
+ 0.2721 0.2116 0.3425 0.0535 0.7121
+
+I have also produced the corresponding forest plot based on the
+metaprop function:
+
+pes.summary=metaprop(nlameanimal, ssizeanimal, author,
+data=prevalence_2020_nomv, sm="PLOGIT", method = "GLMM",
+method.tau="ML", method.ci="NAsm")
+pes.summary
+forest(pes.summary, xlim=c(0,1), pscale=1,
+       rightcols=FALSE,
+       leftcols=c("studlab", "event", "n", "effect", "ci"),
+       leftlabs=c("Study", "Cases", "Total", "Prevalence", "95% C.I."),
+       xlab="Prevalence of Lameness in British Dairy Cattle", smlab="",
+       weight.study="random", squaresize=0.5, col.square="navy",
+       col.square.lines="navy",
+       col.diamond="maroon", col.diamond.lines="maroon",pooled.totals=FALSE,
+       comb.fixed=FALSE,
+       fs.hetstat=10,
+       print.tau2=TRUE,
+       print.Q=TRUE,
+       print.pval.Q=TRUE,
+       print.I2=TRUE,
+       digits=2,
+       sortvar=precision)
+dev.off()
+
+Many thanks for all the help. Wishing all a great week,
+
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Mon Feb 17 16:14:17 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Mon, 17 Feb 2020 15:14:17 +0000
+Subject: [R-meta] Outlier and influential case diagnostics using generalized
+ linear mixed models approach
+Message-ID: <CAF8zgfbJL385Zs1VG3QDtQ4p-+szufe4qw-yDR-qk0i+VL2NKQ@mail.gmail.com>
+
+Dear all,
+
+I am developing a generalized linear mixed model for my meta-analysis
+on lameness prevalence in British Dairy Cattle. Everything seems to be
+working fine however when I try to identify outlier using functions
+rstudent, leave1out and influence R informs that "no applicable method
+... applied to an object of class "c('metaprop', 'meta')". Is there a
+way to do the diagnostic of influential cases with a rma.glmm object?
+
+Thank you so much for all the help. Wishing all a great week,
+
+Jo?o
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+
+From G@Gr@m @end|ng |rom cg|@r@org  Tue Feb 18 12:12:34 2020
+From: G@Gr@m @end|ng |rom cg|@r@org (Gram, Gil (IITA))
+Date: Tue, 18 Feb 2020 11:12:34 +0000
+Subject: [R-meta] Co-variances of the random structure
+In-Reply-To: <937E2BEB-19B2-435D-90BD-3DCE0350D76C@cgiar.org>
+References: <937E2BEB-19B2-435D-90BD-3DCE0350D76C@cgiar.org>
+Message-ID: <4392767E-4D6B-43DE-93FD-CC64CD7D00BF@cgiar.org>
+
+Dear all,
+
+I have the following question: is it possible to extract the covariances from random variance components of a rma.mv model? For example, from my model below this email.
+
+Thanks in advance you for your help,
+
+Gil
+
+---
+
+My model design:
+
+MOD = rma.mv(sqrt(yi), vi, method = 'REML', struct="HCS", sparse=TRUE, data=dat,
+                              mods = ~ rateORone + rateORtwo + rateORthree + rateORManure + kgMN
+                              + I(rateORone^2) + I(rateORtwo^2) + I(rateORthree^2) + I(rateORManure^2) + I(kgMN^2)
+                              + rateORone:kgMN + rateORtwo:kgMN + rateORthree:kgMN + rateORManure:kgMN
+                              + I(rateORone^2):I(kgMN^2) + I(rateORtwo^2):I(kgMN^2) + I(rateORthree^2):I(kgMN^2) + I(rateORManure^2):I(kgMN^2)
+                              + cropSys + idF,
+                              random = list(~1|ref, ~1|idRow, ~ treatment|idSite, ~ treatment|idSite.time))
+
+Where ?treatment? in the random structure has 4 levels, Control, OR, MR and ORMR. 
+I wish to evaluate the variances of the responses of the 3 last levels with the first. For instance with OR: Var_response = Var_OR + Var_control ? 2 * Cov_OR:control.
+
+My model output yields the following:
+
+Multivariate Meta-Analysis Model (k = 2695; method: REML)
+
+Variance Components:
+
+           estim    sqrt  nlvls  fixed  factor 
+sigma^2.1  0.0513  0.2264     34     no     ref 
+sigma^2.2  0.0139  0.1178   2625     no   idRow 
+
+outer factor: idSite    (nlvls = 62)
+inner factor: treatment (nlvls = 4)
+
+           estim    sqrt  k.lvl  fixed    level 
+tau^2.1    0.1683  0.4103    255     no  Control 
+tau^2.2    0.1403  0.3745    324     no       MR 
+tau^2.3    0.1305  0.3612    993     no       OR 
+tau^2.4    0.1094  0.3308   1123     no     ORMR 
+rho        0.8343                    no          
+
+outer factor: idSite.time (nlvls = 230)
+inner factor: treatment   (nlvls = 4)
+
+             estim    sqrt  k.lvl  fixed    level 
+gamma^2.1    0.1061  0.3258    255     no  Control 
+gamma^2.2    0.1272  0.3566    324     no       MR 
+gamma^2.3    0.1052  0.3243    993     no       OR 
+gamma^2.4    0.1344  0.3666   1123     no     ORMR 
+phi          0.9229                    no          
+
+Test for Residual Heterogeneity:
+QE(df = 2673) = 115058.0204, p-val < .0001
+
+Test of Moderators (coefficients 2:22):
+QM(df = 21) = 754.8078, p-val < .0001
+
+
+
+
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Feb 18 13:00:28 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 18 Feb 2020 12:00:28 +0000
+Subject: [R-meta] Co-variances of the random structure
+In-Reply-To: <4392767E-4D6B-43DE-93FD-CC64CD7D00BF@cgiar.org>
+References: <937E2BEB-19B2-435D-90BD-3DCE0350D76C@cgiar.org>
+ <4392767E-4D6B-43DE-93FD-CC64CD7D00BF@cgiar.org>
+Message-ID: <bb23ab58bf1e4c28ba08a6454b407742@UM-MAIL3213.unimaas.nl>
+
+Hi Gil,
+
+Not sure if I understand.
+
+MOD$G and MOD$H contain the var-cov matrices for the ~ treatment|idSite and ~ treatment|idSite.time random effects.
+
+Or are you looking for var-cov matrices of the variance components (and covariances) themselves?
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Gram, Gil (IITA)
+Sent: Tuesday, 18 February, 2020 12:13
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Co-variances of the random structure
+
+Dear all,
+
+I have the following question: is it possible to extract the covariances from random variance components of a rma.mv model? For example, from my model below this email.
+
+Thanks in advance you for your help,
+
+Gil
+
+---
+
+My model design:
+
+MOD = rma.mv(sqrt(yi), vi, method = 'REML', struct="HCS", sparse=TRUE, data=dat,
+                              mods = ~ rateORone + rateORtwo + rateORthree + rateORManure + kgMN
+                              + I(rateORone^2) + I(rateORtwo^2) + I(rateORthree^2) + I(rateORManure^2) + I(kgMN^2)
+                              + rateORone:kgMN + rateORtwo:kgMN + rateORthree:kgMN + rateORManure:kgMN
+                              + I(rateORone^2):I(kgMN^2) + I(rateORtwo^2):I(kgMN^2) + I(rateORthree^2):I(kgMN^2) + I(rateORManure^2):I(kgMN^2)
+                              + cropSys + idF,
+                              random = list(~1|ref, ~1|idRow, ~ treatment|idSite, ~ treatment|idSite.time))
+
+Where ?treatment? in the random structure has 4 levels, Control, OR, MR and ORMR. 
+I wish to evaluate the variances of the responses of the 3 last levels with the first. For instance with OR: Var_response = Var_OR + Var_control ? 2 * Cov_OR:control.
+
+My model output yields the following:
+
+Multivariate Meta-Analysis Model (k = 2695; method: REML)
+
+Variance Components:
+
+           estim    sqrt  nlvls  fixed  factor 
+sigma^2.1  0.0513  0.2264     34     no     ref 
+sigma^2.2  0.0139  0.1178   2625     no   idRow 
+
+outer factor: idSite    (nlvls = 62)
+inner factor: treatment (nlvls = 4)
+
+           estim    sqrt  k.lvl  fixed    level 
+tau^2.1    0.1683  0.4103    255     no  Control 
+tau^2.2    0.1403  0.3745    324     no       MR 
+tau^2.3    0.1305  0.3612    993     no       OR 
+tau^2.4    0.1094  0.3308   1123     no     ORMR 
+rho        0.8343                    no          
+
+outer factor: idSite.time (nlvls = 230)
+inner factor: treatment   (nlvls = 4)
+
+             estim    sqrt  k.lvl  fixed    level 
+gamma^2.1    0.1061  0.3258    255     no  Control 
+gamma^2.2    0.1272  0.3566    324     no       MR 
+gamma^2.3    0.1052  0.3243    993     no       OR 
+gamma^2.4    0.1344  0.3666   1123     no     ORMR 
+phi          0.9229                    no          
+
+Test for Residual Heterogeneity:
+QE(df = 2673) = 115058.0204, p-val < .0001
+
+Test of Moderators (coefficients 2:22):
+QM(df = 21) = 754.8078, p-val < .0001
+
+From jot@|on@o @end|ng |rom gm@||@com  Tue Feb 18 16:25:21 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Tue, 18 Feb 2020 15:25:21 +0000
+Subject: [R-meta] Meta vs Metafor - trapped in a loop
+Message-ID: <CAF8zgfbVDtrtMcVYD615zu46_R-1YsY3h=x2KAhJE7EULFwTTA@mail.gmail.com>
+
+Dear all,
+
+I am sorry to come to you once again with my questions about the
+meta-analysis results. I thank all the help provided so far but sadly
+it seems that can't get robust result. I will try to explain the
+problem as thoroughly as possible. My meta-analysis follows the steps
+below:
+
+1. meta-analysis with the whole set of studies
+2. outliers and influential case diagnostic
+3. removal of studies identified in point 2. and re-run the meta-analysis
+4. sub-group analysis and meta-regression
+
+As explained before I am having mismatching results when comparing the
+output produced by the code I am using when running the meta-analysis
+(metafor) and the code I am using when producing the forest plot
+(meta).
+
+As explained by Guido these packages use different harmonic means to
+back-transform the proportions. I thought the problem could be there
+and thus tried to be consistent using the meta package to run the
+meta-analysis. Unfortunately I couldn't do the outliers and
+influential case diagnostic as "no applicable method for 'influence'
+applied to an object of class "c('metaprop', 'meta')"".
+
+Is there a way to convert a metaprop object into an object that can be
+used in a influential analysis? Any other routes I should consider for
+solving this problem?
+
+I am desperate for help.
+
+Wishing all a great afternoon,
+
+Joao
+
+
+
+
+
+
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Wed Feb 19 11:58:19 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Wed, 19 Feb 2020 10:58:19 +0000
+Subject: [R-meta] Quick question on metaprop output
+Message-ID: <CAF8zgfZ5vJmYqip9Ufom9sQMPP8kyc9yd4G7JRvexbi2fJJYLQ@mail.gmail.com>
+
+Dear all,
+
+I think I have managed to set the model for running the meta-analysis
+using metaprop function and run the outlier and influential case
+diagnostic using the InfluenceAnalysis function.
+
+I have a question regarding the output of my subgroup analysis. After
+running the code below:
+
+metaprop(nlameanimal, ssizeanimal, author, data=prevalence_2020_noout,
+method="inverse", sm="PLOGIT", method.tau="DL", method.ci="NAsm",
+byvar=lcmbi, tau.common=TRUE,prediction = TRUE)
+
+I get
+
+Number of studies combined: k = 40
+
+                     proportion           95%-CI  z p-value
+Fixed effect model       0.1934 [0.1920; 0.1949] --      --
+Random effects model     0.2526 [0.1991; 0.3150] --      --
+Prediction interval             [0.0445; 0.7104]
+
+Quantifying heterogeneity:
+tau^2 = 0.9339; H = 30.19 [29.42; 30.98]; I^2 = 99.9% [99.9%; 99.9%]
+
+Quantifying residual heterogeneity:
+tau^2 = 0.7064; H = 24.86 [24.12; 25.62]; I^2 = 99.8% [99.8%; 99.8%]
+
+Test of heterogeneity:
+        Q d.f. p-value
+ 35545.91   39       0
+
+Results for subgroups (fixed effect model):
+                                    k proportion           95%-CI
+  Q  tau^2
+lcmbi = Records                    12     0.1351 [0.1337; 0.1366]
+20819.72 0.7064
+lcmbi = Locomotion Scoring Method  28     0.3157 [0.3124; 0.3189]
+2661.60 0.7064
+                                    I^2
+lcmbi = Records                   99.9%
+lcmbi = Locomotion Scoring Method 99.0%
+
+Test for subgroup differences (fixed effect model):
+                      Q d.f. p-value
+Between groups 12064.59    1       0
+Within groups  23481.32   38       0
+
+Results for subgroups (random effects model):
+                                    k proportion           95%-CI
+  Q  tau^2
+lcmbi = Records                    12     0.1834 [0.1207; 0.2687]
+20819.72 0.7064
+lcmbi = Locomotion Scoring Method  28     0.2877 [0.2265; 0.3578]
+2661.60 0.7064
+                                    I^2
+lcmbi = Records                   99.9%
+lcmbi = Locomotion Scoring Method 99.0%
+
+Test for subgroup differences (random effects model):
+                      Q d.f. p-value
+Between groups     3.83    1  0.0505
+Within groups  23481.32   38       0
+
+Details on meta-analytical method:
+- Inverse variance method
+- DerSimonian-Laird estimator for tau^2 (assuming common tau^2 in subgroups)
+- Logit transformation
+- Normal approximation confidence interval for individual studies
+
+Previously I would get the amount of heterogeneity explain by the
+moderator with r^2. However I can't find this parameter in the output
+above. Am I missing something in my code to generate this parameter?
+
+Many thank and sorry for flooding your email box with so many messages.
+
+Wishing all a great day,
+
+Joao
+-- 
+Jo?o Afonso
+DVM, MSc Veterinary Epidemiology
+PhD Student
+Department of Infection and Global Health
+University of Liverpool
++351914812305
+
+
+From yykj|y|@u|p|@n @end|ng |rom gm@||@com  Thu Feb 20 09:59:46 2020
+From: yykj|y|@u|p|@n @end|ng |rom gm@||@com (Yingkai)
+Date: Thu, 20 Feb 2020 16:59:46 +0800
+Subject: [R-meta] zero-order bivariate correlations and partial correlations
+Message-ID: <CAN4zT8GdpiGxyGxO+ycbxASrT07PCshO+0hg7WZHv6E7V1ZYNg@mail.gmail.com>
+
+Dear all,
+
+   Greetings!  I have one question about correlations. When doing
+meta-analysis using correlations, can we include both zero-order bivariate
+correlations and partial correlations? Or one can just use one of them but
+not mix them together?
+
+best regards
+-- 
+Yingkai, Ph.D Candidate
+Southwest University, ChongQing, CHINA.
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Feb 20 10:38:03 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 20 Feb 2020 09:38:03 +0000
+Subject: [R-meta] 
+ zero-order bivariate correlations and partial correlations
+In-Reply-To: <CAN4zT8GdpiGxyGxO+ycbxASrT07PCshO+0hg7WZHv6E7V1ZYNg@mail.gmail.com>
+References: <CAN4zT8GdpiGxyGxO+ycbxASrT07PCshO+0hg7WZHv6E7V1ZYNg@mail.gmail.com>
+Message-ID: <9556f6d2296242918de783b957cacb12@UM-MAIL3213.unimaas.nl>
+
+Dear Yingkai,
+
+Opinions are likely to differ on this one. I would personally be okay with that. They are both correlations, so they both measure the degree of association on the same scale. Of course, partial correlations reflect the association when 'adjusting for' one or multiple other variables, so in that sense, they are different. I would therefore code a variable that reflects the correlation type and then examine if this is an important moderator.
+
+Note that the sampling variances are calculated in slightly different ways for zero-order and partial correlations (see the work by Ariel Aloe).
+
+One can (and in my opinion should) apply the r-to-z variance-stabilizing transformation for both types of correlations (luckily, the transformation is the same for both types). But again, note that the sampling variance for an r-to-z transformed partial correlation is computed in a slightly different way than for zero-order correlations. The escalc() function in metafor has measures "PCOR" and "ZPCOR" for these purposes.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Yingkai
+Sent: Thursday, 20 February, 2020 10:00
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] zero-order bivariate correlations and partial correlations
+
+Dear all,
+
+   Greetings!  I have one question about correlations. When doing
+meta-analysis using correlations, can we include both zero-order bivariate
+correlations and partial correlations? Or one can just use one of them but
+not mix them together?
+
+best regards
+-- 
+Yingkai, Ph.D Candidate
+Southwest University, ChongQing, CHINA.
+
+
+From yykj|y|@u|p|@n @end|ng |rom gm@||@com  Fri Feb 21 07:41:41 2020
+From: yykj|y|@u|p|@n @end|ng |rom gm@||@com (Yingkai)
+Date: Fri, 21 Feb 2020 14:41:41 +0800
+Subject: [R-meta] standardized betas transformed to correlation coefficients
+Message-ID: <CAN4zT8H7t6Ps_VcBMNh8YrhB9FyF4czJz1jicjtHyu2wOvfNkg@mail.gmail.com>
+
+Dear all,
+
+I am confused about how to transform standardized betas  to correlation
+coefficients.
+Can I used the simple imputation formula proposed by Peterson and Brown
+(2005) where r = ? + 0.05 ? ?  ? is an indicator variable that equals 1
+when ? is nonnegative and 0 when ? is negative. Is this correct? or
+acceptable ?
+
+
+best,
+-- 
+Yingkai, Ph.D Candidate
+Southwest University, ChongQing, CHINA.
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Feb 21 09:36:15 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Fri, 21 Feb 2020 08:36:15 +0000
+Subject: [R-meta] 
+ standardized betas transformed to correlation coefficients
+In-Reply-To: <CAN4zT8H7t6Ps_VcBMNh8YrhB9FyF4czJz1jicjtHyu2wOvfNkg@mail.gmail.com>
+References: <CAN4zT8H7t6Ps_VcBMNh8YrhB9FyF4czJz1jicjtHyu2wOvfNkg@mail.gmail.com>
+Message-ID: <4a2254ab2c754542b161b14598ca06cb@UM-MAIL3213.unimaas.nl>
+
+Dear Yingkai,
+
+I would strongly caution against using this formula. It was empirically derived and has no proper statistical grounding. In general, one cannot transform a standardized regression coefficient into a correlation coefficient (without any further information about how the x and y variables of interest correlate with all of the other predictors in the model). The one exception is the case where there are are no other predictors in the model, in which case the standardized regression coefficient is exactly equal to the correlation coefficient (and which illustrates that at least in this scenario, the transformation equation would be incorrect as it would incorrectly inflate the 'estimated correlation' when the association is positive).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Yingkai
+Sent: Friday, 21 February, 2020 7:42
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] standardized betas transformed to correlation coefficients
+
+Dear all,
+
+I am confused about how to transform standardized betas  to correlation
+coefficients.
+Can I used the simple imputation formula proposed by Peterson and Brown
+(2005) where r = ? + 0.05 ? ?  ? is an indicator variable that equals 1
+when ? is nonnegative and 0 when ? is negative. Is this correct? or
+acceptable ?
+
+best,
+-- 
+Yingkai, Ph.D Candidate
+Southwest University, ChongQing, CHINA.
+
+From cort@rudo|ph @end|ng |rom he@|th@@|u@edu  Fri Feb 21 13:27:30 2020
+From: cort@rudo|ph @end|ng |rom he@|th@@|u@edu (Cort Rudolph)
+Date: Fri, 21 Feb 2020 12:27:30 +0000
+Subject: [R-meta] 
+ [External] R-sig-meta-analysis Digest, Vol 33, Issue 16
+In-Reply-To: <mailman.1945.15.1582282802.14276.r-sig-meta-analysis@r-project.org>
+References: <mailman.1945.15.1582282802.14276.r-sig-meta-analysis@r-project.org>
+Message-ID: <138D4919-D41F-4CF2-BE12-ED96BA56F958@health.slu.edu>
+
+Hi,
+
+I did a small simulation study on this once. Including even small numbers of regression coefficients in a MA model will really bias the estimate. https://psyarxiv.com/jacdy/
+
+Cheers,
+Cort.
+
+Cort W. Rudolph, Ph.D.
+Associate Professor
+Industrial and Organizational Psychology
+Saint Louis University
+Morrissey Hall 2827
+St. Louis, MO, 63103
+rudolphc at slu.edu 
+Office:  +1(314) 977-7299
+Mobile: +1(313) 720-7082
+www.cortrudolph.com <http://www.cortrudolph.com/>
+www.sustainableemployabilitylab.com <http://www.sustainableemployabilitylab.com/>
+ 
+
+?On 2/21/20, 5:03 AM, "R-sig-meta-analysis on behalf of r-sig-meta-analysis-request at r-project.org" <r-sig-meta-analysis-bounces at r-project.org on behalf of r-sig-meta-analysis-request at r-project.org> wrote:
+
+    Send R-sig-meta-analysis mailing list submissions to
+    	r-sig-meta-analysis at r-project.org
+    
+    To subscribe or unsubscribe via the World Wide Web, visit
+    	https://urldefense.com/v3/__https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis__;!!K543PA!dLjys-J8y3Xa3zmXC8C1tBsF8GtrCbcK4a5wjLYUPZAuP7UDFd19il9tpMKYyEI$ 
+    or, via email, send a message with subject or body 'help' to
+    	r-sig-meta-analysis-request at r-project.org
+    
+    You can reach the person managing the list at
+    	r-sig-meta-analysis-owner at r-project.org
+    
+    When replying, please edit your Subject line so it is more specific
+    than "Re: Contents of R-sig-meta-analysis digest..."
+    
+    
+    Today's Topics:
+    
+       1. standardized betas transformed to correlation coefficients
+          (Yingkai)
+       2. Re:  standardized betas transformed to correlation
+          coefficients (Viechtbauer, Wolfgang (SP))
+    
+    ----------------------------------------------------------------------
+    
+    Message: 1
+    Date: Fri, 21 Feb 2020 14:41:41 +0800
+    From: Yingkai <yykjiyisuipian at gmail.com>
+    To: r-sig-meta-analysis at r-project.org
+    Subject: [R-meta] standardized betas transformed to correlation
+    	coefficients
+    Message-ID:
+    	<CAN4zT8H7t6Ps_VcBMNh8YrhB9FyF4czJz1jicjtHyu2wOvfNkg at mail.gmail.com>
+    Content-Type: text/plain; charset="utf-8"
+    
+    Dear all,
+    
+    I am confused about how to transform standardized betas  to correlation
+    coefficients.
+    Can I used the simple imputation formula proposed by Peterson and Brown
+    (2005) where r = ? + 0.05 ? ?  ? is an indicator variable that equals 1
+    when ? is nonnegative and 0 when ? is negative. Is this correct? or
+    acceptable ?
+    
+    
+    best,
+    -- 
+    Yingkai, Ph.D Candidate
+    Southwest University, ChongQing, CHINA.
+    
+    	[[alternative HTML version deleted]]
+    
+    
+    
+    
+    ------------------------------
+    
+    Message: 2
+    Date: Fri, 21 Feb 2020 08:36:15 +0000
+    From: "Viechtbauer, Wolfgang (SP)"
+    	<wolfgang.viechtbauer at maastrichtuniversity.nl>
+    To: Yingkai <yykjiyisuipian at gmail.com>,
+    	"r-sig-meta-analysis at r-project.org"
+    	<r-sig-meta-analysis at r-project.org>
+    Subject: Re: [R-meta]  standardized betas transformed to correlation
+    	coefficients
+    Message-ID: <4a2254ab2c754542b161b14598ca06cb at UM-MAIL3213.unimaas.nl>
+    Content-Type: text/plain; charset="utf-8"
+    
+    Dear Yingkai,
+    
+    I would strongly caution against using this formula. It was empirically derived and has no proper statistical grounding. In general, one cannot transform a standardized regression coefficient into a correlation coefficient (without any further information about how the x and y variables of interest correlate with all of the other predictors in the model). The one exception is the case where there are are no other predictors in the model, in which case the standardized regression coefficient is exactly equal to the correlation coefficient (and which illustrates that at least in this scenario, the transformation equation would be incorrect as it would incorrectly inflate the 'estimated correlation' when the association is positive).
+    
+    Best,
+    Wolfgang
+    
+    -----Original Message-----
+    From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Yingkai
+    Sent: Friday, 21 February, 2020 7:42
+    To: r-sig-meta-analysis at r-project.org
+    Subject: [R-meta] standardized betas transformed to correlation coefficients
+    
+    Dear all,
+    
+    I am confused about how to transform standardized betas  to correlation
+    coefficients.
+    Can I used the simple imputation formula proposed by Peterson and Brown
+    (2005) where r = ? + 0.05 ? ?  ? is an indicator variable that equals 1
+    when ? is nonnegative and 0 when ? is negative. Is this correct? or
+    acceptable ?
+    
+    best,
+    -- 
+    Yingkai, Ph.D Candidate
+    Southwest University, ChongQing, CHINA.
+    
+    
+    ------------------------------
+    
+    Subject: Digest Footer
+    
+    _______________________________________________
+    R-sig-meta-analysis mailing list
+    R-sig-meta-analysis at r-project.org
+    https://urldefense.com/v3/__https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis__;!!K543PA!dLjys-J8y3Xa3zmXC8C1tBsF8GtrCbcK4a5wjLYUPZAuP7UDFd19il9tpMKYyEI$ 
+    
+    
+    ------------------------------
+    
+    End of R-sig-meta-analysis Digest, Vol 33, Issue 16
+    ***************************************************
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Feb 21 13:36:50 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Fri, 21 Feb 2020 12:36:50 +0000
+Subject: [R-meta] 
+ [External] R-sig-meta-analysis Digest, Vol 33, Issue 16
+In-Reply-To: <138D4919-D41F-4CF2-BE12-ED96BA56F958@health.slu.edu>
+References: <mailman.1945.15.1582282802.14276.r-sig-meta-analysis@r-project.org>
+ <138D4919-D41F-4CF2-BE12-ED96BA56F958@health.slu.edu>
+Message-ID: <70a5b4f34f00463892be9939758d9fe9@UM-MAIL3213.unimaas.nl>
+
+Interesting -- will take a look.
+
+There is also:
+
+Aloe, A. M. (2015). Inaccuracy of regression results in replacing bivariate correlations. Research Synthesis Methods, 6(1), 21-27.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Cort Rudolph
+>Sent: Friday, 21 February, 2020 13:28
+>To: r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] [External] R-sig-meta-analysis Digest, Vol 33, Issue
+>16
+>
+>Hi,
+>
+>I did a small simulation study on this once. Including even small numbers of
+>regression coefficients in a MA model will really bias the estimate.
+>https://psyarxiv.com/jacdy/
+>
+>Cheers,
+>Cort.
+>
+>Cort W. Rudolph, Ph.D.
+>Associate Professor
+>Industrial and Organizational Psychology
+>Saint Louis University
+>Morrissey Hall 2827
+>St. Louis, MO, 63103
+>rudolphc at slu.edu
+>Office:  +1(314) 977-7299
+>Mobile: +1(313) 720-7082
+>www.cortrudolph.com <http://www.cortrudolph.com/>
+>www.sustainableemployabilitylab.com
+><http://www.sustainableemployabilitylab.com/>
+>
+>    Message: 2
+>    Date: Fri, 21 Feb 2020 08:36:15 +0000
+>    From: "Viechtbauer, Wolfgang (SP)"
+>    	<wolfgang.viechtbauer at maastrichtuniversity.nl>
+>    To: Yingkai <yykjiyisuipian at gmail.com>,
+>    	"r-sig-meta-analysis at r-project.org"
+>    	<r-sig-meta-analysis at r-project.org>
+>    Subject: Re: [R-meta]  standardized betas transformed to correlation
+>    	coefficients
+>    Message-ID: <4a2254ab2c754542b161b14598ca06cb at UM-MAIL3213.unimaas.nl>
+>    Content-Type: text/plain; charset="utf-8"
+>
+>    Dear Yingkai,
+>
+>    I would strongly caution against using this formula. It was empirically
+>derived and has no proper statistical grounding. In general, one cannot
+>transform a standardized regression coefficient into a correlation
+>coefficient (without any further information about how the x and y variables
+>of interest correlate with all of the other predictors in the model). The
+>one exception is the case where there are are no other predictors in the
+>model, in which case the standardized regression coefficient is exactly
+>equal to the correlation coefficient (and which illustrates that at least in
+>this scenario, the transformation equation would be incorrect as it would
+>incorrectly inflate the 'estimated correlation' when the association is
+>positive).
+>
+>    Best,
+>    Wolfgang
+>
+>    -----Original Message-----
+>    From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>project.org] On Behalf Of Yingkai
+>    Sent: Friday, 21 February, 2020 7:42
+>    To: r-sig-meta-analysis at r-project.org
+>    Subject: [R-meta] standardized betas transformed to correlation
+>coefficients
+>
+>    Dear all,
+>
+>    I am confused about how to transform standardized betas  to correlation
+>    coefficients.
+>    Can I used the simple imputation formula proposed by Peterson and Brown
+>    (2005) where r = ? + 0.05 ? ?  ? is an indicator variable that equals 1
+>    when ? is nonnegative and 0 when ? is negative. Is this correct? or
+>    acceptable ?
+>
+>    best,
+>    --
+>    Yingkai, Ph.D Candidate
+>    Southwest University, ChongQing, CHINA.
+
+From bern@rd@|ernou @end|ng |rom gm@||@com  Fri Feb 21 16:05:24 2020
+From: bern@rd@|ernou @end|ng |rom gm@||@com (Bernard Fernou)
+Date: Fri, 21 Feb 2020 16:05:24 +0100
+Subject: [R-meta] From Risk Difference to Odds Ratio
+Message-ID: <CA+zsPoQjDbNbrJvhdY6MaaNL04hWdOWQD3=G92HzKrs0QhNuhw@mail.gmail.com>
+
+Hi everyone
+I am conducting a meta analysis regarding the relationship between the
+presence of organophosphates and obesity in metafor. Our IV is mostly
+reported as dichotomous so, as obesity is also dichotomous, we have decided
+to perform a meta-analysis of odds ratio.
+
+However, some authors reported adjusted associations using risk difference.
+We have contacted these authors to access raw data but we have not received
+any response yet. Therefore, our plan was to try to convert this risk
+difference in odds ratio.
+
+To do so,  we started from the fact that risk difference is equal to 1/NNT.
+Then, we convert this NNT in odds ratio using the formula provided in the
+Cochrane Handbook (link is provided below). The assumed control risk was
+estimated using the proportion of cases with obesity in the "control" group
+(we believe this is feasible since the study is cross sectional). We plan
+to perform sensitivity analyses with different assumed control risk.
+
+Would it make sense or should we simply exclude this study?
+
+Thank you for your help
+
+BF
+
+https://handbook-5-1.cochrane.org/chapter_12/12_5_4_3_computing_absolute_risk_reduction_or_nnt_from_an_odds.htm
+
+	[[alternative HTML version deleted]]
+
+
+From @1rerog@ @end|ng |rom un|-tr|er@de  Fri Feb 21 19:54:24 2020
+From: @1rerog@ @end|ng |rom un|-tr|er@de (Rogasch, Rebecca Manuela Madeleine)
+Date: Fri, 21 Feb 2020 18:54:24 +0000
+Subject: [R-meta] 
+ [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+In-Reply-To: <2979e810e3f5410fa50c780eb180079f@uni-trier.de>
+References: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+ <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>,
+ <e557b7db-bca7-6978-4aae-0a6f537206a1@imbi.uni-freiburg.de>,
+ <2979e810e3f5410fa50c780eb180079f@uni-trier.de>
+Message-ID: <7ca82c50587b40e9b5727e454f6ae765@uni-trier.de>
+
+Dear experts,
+
+
+first of all, I want to thank you again for your help!
+
+I am very thankful and really appreciate that you took time to answer my Questions.
+
+Dear Gerta R?cker, I apologize for the late Response, your Reply in the Mailing list hadn't reached me for some reason
+
+but was forwarded to me now.
+
+
+The Problem is Pretty much solved after entering the data in the Format you suggested.
+
+
+I no longer get an error for any of the nine 3-arm-studies, except for one - study "34".
+
+
+Output when applying "details.chkmultiarm":
+
+
+Multi-arm studies with inconsistent treatment effects:
+studlab treat1 treat2        TE        resid
+       34     PE    SIT -0.144613  0.00143599
+       34     PE     WL -1.855309 -0.00143599
+       34    SIT     WL -1.706388  0.00143599
+Legend:
+resid - residual deviation (observed minus expected)
+TE - treatment estimate
+
+I checked the data that I entered many, many times and compared it to the values in the paper.
+
+The values are correct, the data structure should be correct now.
+
+
+I am puzzled  - and feeling a bit uncomfortable asking this last Question.
+
+But I am hoping that someone has an Explanation?
+
+
+Best regards,
+
+Rebecca
+
+
+________________________________
+Von: Rogasch, Rebecca Manuela Madeleine
+Gesendet: Samstag, 8. Februar 2020 14:38:23
+An: Guido Schwarzer; r-sig-meta-analysis at r-project.org
+Betreff: AW: [R-meta] [netmeta] Error message in network meta-analysis: "Problem with multi-arm studies: Studies with inconsistent treatment estimates"
+
+
+Thank you very much for the quick Reply and your advice!
+
+
+That Explanation makes a lot of sense.
+
+I have now tried using pairwise() to calculate the SMDs:
+
+
+paired<- pairwise(list(TR1, TR2),
+               n = list(n_TR1, n_TR2),
+               mean = list(Mt2TR1, Mt2TR2),
+               sd = list(SDt2TR1, SDt2TR2),
+               data = DATA1, studlab = studlab, sm= "SMD")
+
+
+
+This is an exerpt from the data Frame;
+
+3-arm study in Purple:
+
+
+   studlab treat1 treat2 n1 mean1   sd1 n2 mean2   sd2           TE      seTE   age females    severity      income
+1        1   EMDR     WL 15 22.87 20.27 14 54.21 16.26  -1.65116388 0.4387386 36.54    0.76    clinical      lowmid
+44     100    NET     WL 19 55.07 27.01 19 76.86 17.14  -0.94310177 0.3439769 29.40    0.31    clinical high income
+45     104    NET   PsEd 17 19.10 11.70 12 21.20  9.40  -0.18860625 0.3779770 32.85    0.62    clinical      lowmid
+48     107    MBI   PsEd 68 46.90 18.20 66 55.20 15.30  -0.49022797 0.1754460 47.04    0.17    clinical high income
+47     107     PE   PsEd 68 50.60 18.50 66 55.20 15.30  -0.26905282 0.1735963 47.04    0.17    clinical high income
+46     107     PE    MBI 68 50.60 18.50 68 46.90 18.20   0.20049752 0.1719418 47.04    0.17    clinical high income
+78      11    MBI     WL NA    NA    NA NA    NA    NA  -0.48920000 0.2800000 51.80    0.99        <NA> high income
+
+     sample arms        self_exp n_total        tr_size   analysis
+
+1  refugees    2      self-rated      29     very small completers
+44 refugees    2 clinician-rated      38     very small        ITT
+45 refugees    2      self-rated      29     very small        ITT
+48   vetmil    3      self-rated     134          large        ITT
+47   vetmil    3      self-rated     134          large        ITT
+46   vetmil    3      self-rated     136          large        ITT
+78 civilian    2      self-rated      71 small-moderate        ITT
+
+
+
+However, I still get the same error message in the Network meta-Analysis.
+
+A more detailed copy of the Output is available if needed.
+
+
+Any advice is very much appreciated!
+
+Best regards,
+
+Rebecca
+
+________________________________
+Von: Guido Schwarzer <sc at imbi.uni-freiburg.de>
+Gesendet: Freitag, 7. Februar 2020 17:49:50
+An: Rogasch, Rebecca Manuela Madeleine; r-sig-meta-analysis at r-project.org
+Betreff: Re: [R-meta] [netmeta] Error message in network meta-analysis: "Problem with multi-arm studies: Studies with inconsistent treatment estimates"
+
+Hi Rebecca,
+
+I assume the problem is related to calculating SMDs in multi-arm
+studies. Each pairwise comparison (in a multi-arm study) uses a
+different pooled standard deviation to calculate the SMD which leads to
+inconsistent effects.
+
+You could / should use pairwise() to calculate the SMDs which considers
+the same pooled standard deviation to calculate the SMD in multi-arm
+studies.
+
+Best wishes, Guido
+
+--
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Feb 21 20:03:22 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Fri, 21 Feb 2020 19:03:22 +0000
+Subject: [R-meta] From Risk Difference to Odds Ratio
+In-Reply-To: <CA+zsPoQjDbNbrJvhdY6MaaNL04hWdOWQD3=G92HzKrs0QhNuhw@mail.gmail.com>
+References: <CA+zsPoQjDbNbrJvhdY6MaaNL04hWdOWQD3=G92HzKrs0QhNuhw@mail.gmail.com>
+Message-ID: <62aa194d71ab41fe885dbfcb56c7c45d@UM-MAIL3213.unimaas.nl>
+
+Dear Bernard,
+
+If you have a risk difference (RD = pT - pC) and then assume a base risk for the control group (i.e., pC), then pT = RD + pC. Then you have pT and pC from which you can directly compute the OR. Doing this via the NNT seems like an unnecessary complication to me.
+
+And yes, if you do this, then I would do a sensitivity analysis with varying values of pC.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Bernard Fernou
+>Sent: Friday, 21 February, 2020 16:05
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] From Risk Difference to Odds Ratio
+>
+>Hi everyone
+>I am conducting a meta analysis regarding the relationship between the
+>presence of organophosphates and obesity in metafor. Our IV is mostly
+>reported as dichotomous so, as obesity is also dichotomous, we have decided
+>to perform a meta-analysis of odds ratio.
+>
+>However, some authors reported adjusted associations using risk difference.
+>We have contacted these authors to access raw data but we have not received
+>any response yet. Therefore, our plan was to try to convert this risk
+>difference in odds ratio.
+>
+>To do so,  we started from the fact that risk difference is equal to 1/NNT.
+>Then, we convert this NNT in odds ratio using the formula provided in the
+>Cochrane Handbook (link is provided below). The assumed control risk was
+>estimated using the proportion of cases with obesity in the "control" group
+>(we believe this is feasible since the study is cross sectional). We plan
+>to perform sensitivity analyses with different assumed control risk.
+>
+>Would it make sense or should we simply exclude this study?
+>
+>Thank you for your help
+>
+>BF
+>
+>https://handbook-5-
+>1.cochrane.org/chapter_12/12_5_4_3_computing_absolute_risk_reduction_or_nnt_
+>from_an_odds.htm
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Feb 21 20:10:01 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Fri, 21 Feb 2020 19:10:01 +0000
+Subject: [R-meta] 
+ [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+In-Reply-To: <7ca82c50587b40e9b5727e454f6ae765@uni-trier.de>
+References: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+ <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>,
+ <e557b7db-bca7-6978-4aae-0a6f537206a1@imbi.uni-freiburg.de>,
+ <2979e810e3f5410fa50c780eb180079f@uni-trier.de>
+ <7ca82c50587b40e9b5727e454f6ae765@uni-trier.de>
+Message-ID: <206fa41e243d464b8523ccbb42426eb0@UM-MAIL3213.unimaas.nl>
+
+Dear Rebecca,
+
+studlab treat1 treat2        TE        resid
+       34     PE    SIT -0.144613  0.00143599
+       34     PE     WL -1.855309 -0.00143599
+       34    SIT     WL -1.706388  0.00143599
+
+If  PE - WL = -1.855309
+and
+if SIT - WL = -1.706388
+then PE - SIT = -1.855309 - -1.706388 = -0.148921, but you have -0.144613, which is off by -0.004308. Since the default value for argument 'tol.multiarm' is 0.001, you will get an error.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Rogasch, Rebecca Manuela Madeleine
+>Sent: Friday, 21 February, 2020 19:54
+>To: Guido Schwarzer; r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] [netmeta] Error message in network meta-analysis:
+>"Problem with multi-arm studies: Studies with inconsistent treatment
+>estimates"
+>
+>Dear experts,
+>
+>first of all, I want to thank you again for your help!
+>
+>I am very thankful and really appreciate that you took time to answer my
+>Questions.
+>
+>Dear Gerta R?cker, I apologize for the late Response, your Reply in the
+>Mailing list hadn't reached me for some reason
+>
+>but was forwarded to me now.
+>
+>The Problem is Pretty much solved after entering the data in the Format you
+>suggested.
+>
+>I no longer get an error for any of the nine 3-arm-studies, except for one -
+>study "34".
+>
+>Output when applying "details.chkmultiarm":
+>
+>Multi-arm studies with inconsistent treatment effects:
+>studlab treat1 treat2        TE        resid
+>       34     PE    SIT -0.144613  0.00143599
+>       34     PE     WL -1.855309 -0.00143599
+>       34    SIT     WL -1.706388  0.00143599
+>Legend:
+>resid - residual deviation (observed minus expected)
+>TE - treatment estimate
+>
+>I checked the data that I entered many, many times and compared it to the
+>values in the paper.
+>
+>The values are correct, the data structure should be correct now.
+>
+>I am puzzled  - and feeling a bit uncomfortable asking this last Question.
+>
+>But I am hoping that someone has an Explanation?
+>
+>Best regards,
+>
+>Rebecca
+
+From bern@rd@|ernou @end|ng |rom gm@||@com  Fri Feb 21 21:42:39 2020
+From: bern@rd@|ernou @end|ng |rom gm@||@com (Bernard Fernou)
+Date: Fri, 21 Feb 2020 21:42:39 +0100
+Subject: [R-meta] From Risk Difference to Odds Ratio
+In-Reply-To: <62aa194d71ab41fe885dbfcb56c7c45d@UM-MAIL3213.unimaas.nl>
+References: <CA+zsPoQjDbNbrJvhdY6MaaNL04hWdOWQD3=G92HzKrs0QhNuhw@mail.gmail.com>
+ <62aa194d71ab41fe885dbfcb56c7c45d@UM-MAIL3213.unimaas.nl>
+Message-ID: <CA+zsPoQJ9woNOhf8bCua=zy_KWm3aMb9mN45PRZf2_1ey0v=qw@mail.gmail.com>
+
+Dear Wolfgang,
+
+As the old axiom goes, the best solutions are always the simplest.. I feel
+stupid for not having seen it but thank you very much for the very clear
+answer!
+
+Best
+BF
+
+Le ven. 21 f?vr. 2020 ? 20:03, Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> a ?crit :
+
+> Dear Bernard,
+>
+> If you have a risk difference (RD = pT - pC) and then assume a base risk
+> for the control group (i.e., pC), then pT = RD + pC. Then you have pT and
+> pC from which you can directly compute the OR. Doing this via the NNT seems
+> like an unnecessary complication to me.
+>
+> And yes, if you do this, then I would do a sensitivity analysis with
+> varying values of pC.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org]
+> >On Behalf Of Bernard Fernou
+> >Sent: Friday, 21 February, 2020 16:05
+> >To: r-sig-meta-analysis at r-project.org
+> >Subject: [R-meta] From Risk Difference to Odds Ratio
+> >
+> >Hi everyone
+> >I am conducting a meta analysis regarding the relationship between the
+> >presence of organophosphates and obesity in metafor. Our IV is mostly
+> >reported as dichotomous so, as obesity is also dichotomous, we have
+> decided
+> >to perform a meta-analysis of odds ratio.
+> >
+> >However, some authors reported adjusted associations using risk
+> difference.
+> >We have contacted these authors to access raw data but we have not
+> received
+> >any response yet. Therefore, our plan was to try to convert this risk
+> >difference in odds ratio.
+> >
+> >To do so,  we started from the fact that risk difference is equal to
+> 1/NNT.
+> >Then, we convert this NNT in odds ratio using the formula provided in the
+> >Cochrane Handbook (link is provided below). The assumed control risk was
+> >estimated using the proportion of cases with obesity in the "control"
+> group
+> >(we believe this is feasible since the study is cross sectional). We plan
+> >to perform sensitivity analyses with different assumed control risk.
+> >
+> >Would it make sense or should we simply exclude this study?
+> >
+> >Thank you for your help
+> >
+> >BF
+> >
+> >https://handbook-5-
+> >
+> 1.cochrane.org/chapter_12/12_5_4_3_computing_absolute_risk_reduction_or_nnt_
+> >from_an_odds.htm
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Sat Feb 22 17:24:36 2020
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Sat, 22 Feb 2020 16:24:36 +0000
+Subject: [R-meta] 
+ [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+In-Reply-To: <7ca82c50587b40e9b5727e454f6ae765@uni-trier.de>
+References: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+ <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>
+ <e557b7db-bca7-6978-4aae-0a6f537206a1@imbi.uni-freiburg.de>
+ <2979e810e3f5410fa50c780eb180079f@uni-trier.de>
+ <7ca82c50587b40e9b5727e454f6ae765@uni-trier.de>
+Message-ID: <7939ea9f-43b9-d5dd-f83c-0cc4770db583@dewey.myzen.co.uk>
+
+Dear Rebecca
+
+If the values you have transcribed are what it published then that 
+suggests, not for the first time, that a typo crept into the published 
+version. If you cannot contact the authors to clarify I would suggest 
+the error here is small and it is unlikely to makea substantive 
+difference if you increase the tolerance so that trial passes the check.
+
+Michael
+
+On 21/02/2020 18:54, Rogasch, Rebecca Manuela Madeleine wrote:
+> Dear experts,
+> 
+> 
+> first of all, I want to thank you again for your help!
+> 
+> I am very thankful and really appreciate that you took time to answer my Questions.
+> 
+> Dear Gerta R?cker, I apologize for the late Response, your Reply in the Mailing list hadn't reached me for some reason
+> 
+> but was forwarded to me now.
+> 
+> 
+> The Problem is Pretty much solved after entering the data in the Format you suggested.
+> 
+> 
+> I no longer get an error for any of the nine 3-arm-studies, except for one - study "34".
+> 
+> 
+> Output when applying "details.chkmultiarm":
+> 
+> 
+> Multi-arm studies with inconsistent treatment effects:
+> studlab treat1 treat2        TE        resid
+>         34     PE    SIT -0.144613  0.00143599
+>         34     PE     WL -1.855309 -0.00143599
+>         34    SIT     WL -1.706388  0.00143599
+> Legend:
+> resid - residual deviation (observed minus expected)
+> TE - treatment estimate
+> 
+> I checked the data that I entered many, many times and compared it to the values in the paper.
+> 
+> The values are correct, the data structure should be correct now.
+> 
+> 
+> I am puzzled  - and feeling a bit uncomfortable asking this last Question.
+> 
+> But I am hoping that someone has an Explanation?
+> 
+> 
+> Best regards,
+> 
+> Rebecca
+> 
+> 
+> ________________________________
+> Von: Rogasch, Rebecca Manuela Madeleine
+> Gesendet: Samstag, 8. Februar 2020 14:38:23
+> An: Guido Schwarzer; r-sig-meta-analysis at r-project.org
+> Betreff: AW: [R-meta] [netmeta] Error message in network meta-analysis: "Problem with multi-arm studies: Studies with inconsistent treatment estimates"
+> 
+> 
+> Thank you very much for the quick Reply and your advice!
+> 
+> 
+> That Explanation makes a lot of sense.
+> 
+> I have now tried using pairwise() to calculate the SMDs:
+> 
+> 
+> paired<- pairwise(list(TR1, TR2),
+>                 n = list(n_TR1, n_TR2),
+>                 mean = list(Mt2TR1, Mt2TR2),
+>                 sd = list(SDt2TR1, SDt2TR2),
+>                 data = DATA1, studlab = studlab, sm= "SMD")
+> 
+> 
+> 
+> This is an exerpt from the data Frame;
+> 
+> 3-arm study in Purple:
+> 
+> 
+>     studlab treat1 treat2 n1 mean1   sd1 n2 mean2   sd2           TE      seTE   age females    severity      income
+> 1        1   EMDR     WL 15 22.87 20.27 14 54.21 16.26  -1.65116388 0.4387386 36.54    0.76    clinical      lowmid
+> 44     100    NET     WL 19 55.07 27.01 19 76.86 17.14  -0.94310177 0.3439769 29.40    0.31    clinical high income
+> 45     104    NET   PsEd 17 19.10 11.70 12 21.20  9.40  -0.18860625 0.3779770 32.85    0.62    clinical      lowmid
+> 48     107    MBI   PsEd 68 46.90 18.20 66 55.20 15.30  -0.49022797 0.1754460 47.04    0.17    clinical high income
+> 47     107     PE   PsEd 68 50.60 18.50 66 55.20 15.30  -0.26905282 0.1735963 47.04    0.17    clinical high income
+> 46     107     PE    MBI 68 50.60 18.50 68 46.90 18.20   0.20049752 0.1719418 47.04    0.17    clinical high income
+> 78      11    MBI     WL NA    NA    NA NA    NA    NA  -0.48920000 0.2800000 51.80    0.99        <NA> high income
+> 
+>       sample arms        self_exp n_total        tr_size   analysis
+> 
+> 1  refugees    2      self-rated      29     very small completers
+> 44 refugees    2 clinician-rated      38     very small        ITT
+> 45 refugees    2      self-rated      29     very small        ITT
+> 48   vetmil    3      self-rated     134          large        ITT
+> 47   vetmil    3      self-rated     134          large        ITT
+> 46   vetmil    3      self-rated     136          large        ITT
+> 78 civilian    2      self-rated      71 small-moderate        ITT
+> 
+> 
+> 
+> However, I still get the same error message in the Network meta-Analysis.
+> 
+> A more detailed copy of the Output is available if needed.
+> 
+> 
+> Any advice is very much appreciated!
+> 
+> Best regards,
+> 
+> Rebecca
+> 
+> ________________________________
+> Von: Guido Schwarzer <sc at imbi.uni-freiburg.de>
+> Gesendet: Freitag, 7. Februar 2020 17:49:50
+> An: Rogasch, Rebecca Manuela Madeleine; r-sig-meta-analysis at r-project.org
+> Betreff: Re: [R-meta] [netmeta] Error message in network meta-analysis: "Problem with multi-arm studies: Studies with inconsistent treatment estimates"
+> 
+> Hi Rebecca,
+> 
+> I assume the problem is related to calculating SMDs in multi-arm
+> studies. Each pairwise comparison (in a multi-arm study) uses a
+> different pooled standard deviation to calculate the SMD which leads to
+> inconsistent effects.
+> 
+> You could / should use pairwise() to calculate the SMDs which considers
+> the same pooled standard deviation to calculate the SMD in multi-arm
+> studies.
+> 
+> Best wishes, Guido
+> 
+> --
+> Dr. Guido Schwarzer
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+> 
+> Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+> 
+> Phone: +49/761/203-6668
+> Mail: sc at imbi.uni-freiburg.de
+> Homepage: http://www.imbi.uni-freiburg.de
+> 
+> ORCID iD: https://orcid.org/0000-0001-6214-9087
+> R-book: https://www.springer.com/gp/book/9783319214153
+> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> 
+> 
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From @1rerog@ @end|ng |rom un|-tr|er@de  Sat Feb 22 18:22:49 2020
+From: @1rerog@ @end|ng |rom un|-tr|er@de (Rogasch, Rebecca Manuela Madeleine)
+Date: Sat, 22 Feb 2020 17:22:49 +0000
+Subject: [R-meta] 
+ [netmeta] Error message in network meta-analysis: "Problem
+ with multi-arm studies: Studies with inconsistent treatment estimates"
+In-Reply-To: <7939ea9f-43b9-d5dd-f83c-0cc4770db583@dewey.myzen.co.uk>
+References: <ce1e13e134b14bebadae11a67965ddd4@uni-trier.de>
+ <6e5bf422-40cd-9461-6710-29c557b463ae@imbi.uni-freiburg.de>
+ <e557b7db-bca7-6978-4aae-0a6f537206a1@imbi.uni-freiburg.de>
+ <2979e810e3f5410fa50c780eb180079f@uni-trier.de>
+ <7ca82c50587b40e9b5727e454f6ae765@uni-trier.de>,
+ <7939ea9f-43b9-d5dd-f83c-0cc4770db583@dewey.myzen.co.uk>
+Message-ID: <c614c50fb2c44f07aea32cf56abc91e1@uni-trier.de>
+
+Dear Wolfgang, dear Michael,
+
+
+thanks so much for answering my question.
+
+That helps a lot.
+
+I really appreciate the kind Responses and clear explanations!
+
+
+Thank you, Michael, for your advice on how to proceed!
+
+I will follow your recommendations, thank you.
+
+
+Best,
+
+Rebecca
+
+
+________________________________
+Von: Michael Dewey <lists at dewey.myzen.co.uk>
+Gesendet: Samstag, 22. Februar 2020 17:24:36
+An: Rogasch, Rebecca Manuela Madeleine; Guido Schwarzer; r-sig-meta-analysis at r-project.org
+Betreff: Re: [R-meta] [netmeta] Error message in network meta-analysis: "Problem with multi-arm studies: Studies with inconsistent treatment estimates"
+
+Dear Rebecca
+
+If the values you have transcribed are what it published then that
+suggests, not for the first time, that a typo crept into the published
+version. If you cannot contact the authors to clarify I would suggest
+the error here is small and it is unlikely to makea substantive
+difference if you increase the tolerance so that trial passes the check.
+
+Michael
+
+On 21/02/2020 18:54, Rogasch, Rebecca Manuela Madeleine wrote:
+> Dear experts,
+>
+>
+> first of all, I want to thank you again for your help!
+>
+> I am very thankful and really appreciate that you took time to answer my Questions.
+>
+> Dear Gerta R?cker, I apologize for the late Response, your Reply in the Mailing list hadn't reached me for some reason
+>
+> but was forwarded to me now.
+>
+>
+> The Problem is Pretty much solved after entering the data in the Format you suggested.
+>
+>
+> I no longer get an error for any of the nine 3-arm-studies, except for one - study "34".
+>
+>
+> Output when applying "details.chkmultiarm":
+>
+>
+> Multi-arm studies with inconsistent treatment effects:
+> studlab treat1 treat2        TE        resid
+>         34     PE    SIT -0.144613  0.00143599
+>         34     PE     WL -1.855309 -0.00143599
+>         34    SIT     WL -1.706388  0.00143599
+> Legend:
+> resid - residual deviation (observed minus expected)
+> TE - treatment estimate
+>
+> I checked the data that I entered many, many times and compared it to the values in the paper.
+>
+> The values are correct, the data structure should be correct now.
+>
+>
+> I am puzzled  - and feeling a bit uncomfortable asking this last Question.
+>
+> But I am hoping that someone has an Explanation?
+>
+>
+> Best regards,
+>
+> Rebecca
+>
+>
+> ________________________________
+> Von: Rogasch, Rebecca Manuela Madeleine
+> Gesendet: Samstag, 8. Februar 2020 14:38:23
+> An: Guido Schwarzer; r-sig-meta-analysis at r-project.org
+> Betreff: AW: [R-meta] [netmeta] Error message in network meta-analysis: "Problem with multi-arm studies: Studies with inconsistent treatment estimates"
+>
+>
+> Thank you very much for the quick Reply and your advice!
+>
+>
+> That Explanation makes a lot of sense.
+>
+> I have now tried using pairwise() to calculate the SMDs:
+>
+>
+> paired<- pairwise(list(TR1, TR2),
+>                 n = list(n_TR1, n_TR2),
+>                 mean = list(Mt2TR1, Mt2TR2),
+>                 sd = list(SDt2TR1, SDt2TR2),
+>                 data = DATA1, studlab = studlab, sm= "SMD")
+>
+>
+>
+> This is an exerpt from the data Frame;
+>
+> 3-arm study in Purple:
+>
+>
+>     studlab treat1 treat2 n1 mean1   sd1 n2 mean2   sd2           TE      seTE   age females    severity      income
+> 1        1   EMDR     WL 15 22.87 20.27 14 54.21 16.26  -1.65116388 0.4387386 36.54    0.76    clinical      lowmid
+> 44     100    NET     WL 19 55.07 27.01 19 76.86 17.14  -0.94310177 0.3439769 29.40    0.31    clinical high income
+> 45     104    NET   PsEd 17 19.10 11.70 12 21.20  9.40  -0.18860625 0.3779770 32.85    0.62    clinical      lowmid
+> 48     107    MBI   PsEd 68 46.90 18.20 66 55.20 15.30  -0.49022797 0.1754460 47.04    0.17    clinical high income
+> 47     107     PE   PsEd 68 50.60 18.50 66 55.20 15.30  -0.26905282 0.1735963 47.04    0.17    clinical high income
+> 46     107     PE    MBI 68 50.60 18.50 68 46.90 18.20   0.20049752 0.1719418 47.04    0.17    clinical high income
+> 78      11    MBI     WL NA    NA    NA NA    NA    NA  -0.48920000 0.2800000 51.80    0.99        <NA> high income
+>
+>       sample arms        self_exp n_total        tr_size   analysis
+>
+> 1  refugees    2      self-rated      29     very small completers
+> 44 refugees    2 clinician-rated      38     very small        ITT
+> 45 refugees    2      self-rated      29     very small        ITT
+> 48   vetmil    3      self-rated     134          large        ITT
+> 47   vetmil    3      self-rated     134          large        ITT
+> 46   vetmil    3      self-rated     136          large        ITT
+> 78 civilian    2      self-rated      71 small-moderate        ITT
+>
+>
+>
+> However, I still get the same error message in the Network meta-Analysis.
+>
+> A more detailed copy of the Output is available if needed.
+>
+>
+> Any advice is very much appreciated!
+>
+> Best regards,
+>
+> Rebecca
+>
+> ________________________________
+> Von: Guido Schwarzer <sc at imbi.uni-freiburg.de>
+> Gesendet: Freitag, 7. Februar 2020 17:49:50
+> An: Rogasch, Rebecca Manuela Madeleine; r-sig-meta-analysis at r-project.org
+> Betreff: Re: [R-meta] [netmeta] Error message in network meta-analysis: "Problem with multi-arm studies: Studies with inconsistent treatment estimates"
+>
+> Hi Rebecca,
+>
+> I assume the problem is related to calculating SMDs in multi-arm
+> studies. Each pairwise comparison (in a multi-arm study) uses a
+> different pooled standard deviation to calculate the SMD which leads to
+> inconsistent effects.
+>
+> You could / should use pairwise() to calculate the SMDs which considers
+> the same pooled standard deviation to calculate the SMD in multi-arm
+> studies.
+>
+> Best wishes, Guido
+>
+> --
+> Dr. Guido Schwarzer
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+>
+> Phone: +49/761/203-6668
+> Mail: sc at imbi.uni-freiburg.de
+> Homepage: http://www.imbi.uni-freiburg.de
+>
+> ORCID iD: https://orcid.org/0000-0001-6214-9087
+> R-book: https://www.springer.com/gp/book/9783319214153
+>
+>
+>        [[alternative HTML version deleted]]
+>
+>
+>
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+--
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+	[[alternative HTML version deleted]]
+
+
+From G@Gr@m @end|ng |rom cg|@r@org  Fri Feb 28 16:59:46 2020
+From: G@Gr@m @end|ng |rom cg|@r@org (Gram, Gil (IITA))
+Date: Fri, 28 Feb 2020 15:59:46 +0000
+Subject: [R-meta] Co-variances of the random structure
+In-Reply-To: <bb23ab58bf1e4c28ba08a6454b407742@UM-MAIL3213.unimaas.nl>
+References: <937E2BEB-19B2-435D-90BD-3DCE0350D76C@cgiar.org>
+ <4392767E-4D6B-43DE-93FD-CC64CD7D00BF@cgiar.org>
+ <bb23ab58bf1e4c28ba08a6454b407742@UM-MAIL3213.unimaas.nl>
+Message-ID: <BB1342B7-BA2D-4D13-A156-5035A4A7C672@cgiar.org>
+
+Dear Wolfgang,
+
+Thanks for your response. Yes that is what I meant. This brings me to my second question:
+
+As you can see in my model design, I sqrt transformed my data so I am modeling sqrt(yi). I should therefore back-transform yield estimates with ^2. But at what point do I back-transform the variances when I?m interested in computing variance responses with:
+varTREATMENTresponse = varTREATMENT + varControl - 2*covar(TREATMENT, Control)
+
+The matrices MOD$G and MOD$H are thus the var-cov matrices of a sqrt transformed data, and are in fact standard deviations, right? So 
+- do I first back-transform the SDs into VAR by (MOD$G)^2 and (MOD$H)^2, and then use the above formula?
+or
+- do I first use the above formula and then back-transform the resulting VAR response by (varTREATMENTresponse)^2?
+or
+- is there a way to adapt the above formula for SDs?
+
+
+Thanks for your help,
+Gil
+
+> On 18 Feb 2020, at 13:00, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> Hi Gil,
+> 
+> Not sure if I understand.
+> 
+> MOD$G and MOD$H contain the var-cov matrices for the ~ treatment|idSite and ~ treatment|idSite.time random effects.
+> 
+> Or are you looking for var-cov matrices of the variance components (and covariances) themselves?
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Gram, Gil (IITA)
+> Sent: Tuesday, 18 February, 2020 12:13
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Co-variances of the random structure
+> 
+> Dear all,
+> 
+> I have the following question: is it possible to extract the covariances from random variance components of a rma.mv model? For example, from my model below this email.
+> 
+> Thanks in advance you for your help,
+> 
+> Gil
+> 
+> ---
+> 
+> My model design:
+> 
+> MOD = rma.mv(sqrt(yi), vi, method = 'REML', struct="HCS", sparse=TRUE, data=dat,
+>                              mods = ~ rateORone + rateORtwo + rateORthree + rateORManure + kgMN
+>                              + I(rateORone^2) + I(rateORtwo^2) + I(rateORthree^2) + I(rateORManure^2) + I(kgMN^2)
+>                              + rateORone:kgMN + rateORtwo:kgMN + rateORthree:kgMN + rateORManure:kgMN
+>                              + I(rateORone^2):I(kgMN^2) + I(rateORtwo^2):I(kgMN^2) + I(rateORthree^2):I(kgMN^2) + I(rateORManure^2):I(kgMN^2)
+>                              + cropSys + idF,
+>                              random = list(~1|ref, ~1|idRow, ~ treatment|idSite, ~ treatment|idSite.time))
+> 
+> Where ?treatment? in the random structure has 4 levels, Control, OR, MR and ORMR. 
+> I wish to evaluate the variances of the responses of the 3 last levels with the first. For instance with OR: Var_response = Var_OR + Var_control ? 2 * Cov_OR:control.
+> 
+> My model output yields the following:
+> 
+> Multivariate Meta-Analysis Model (k = 2695; method: REML)
+> 
+> Variance Components:
+> 
+>           estim    sqrt  nlvls  fixed  factor 
+> sigma^2.1  0.0513  0.2264     34     no     ref 
+> sigma^2.2  0.0139  0.1178   2625     no   idRow 
+> 
+> outer factor: idSite    (nlvls = 62)
+> inner factor: treatment (nlvls = 4)
+> 
+>           estim    sqrt  k.lvl  fixed    level 
+> tau^2.1    0.1683  0.4103    255     no  Control 
+> tau^2.2    0.1403  0.3745    324     no       MR 
+> tau^2.3    0.1305  0.3612    993     no       OR 
+> tau^2.4    0.1094  0.3308   1123     no     ORMR 
+> rho        0.8343                    no          
+> 
+> outer factor: idSite.time (nlvls = 230)
+> inner factor: treatment   (nlvls = 4)
+> 
+>             estim    sqrt  k.lvl  fixed    level 
+> gamma^2.1    0.1061  0.3258    255     no  Control 
+> gamma^2.2    0.1272  0.3566    324     no       MR 
+> gamma^2.3    0.1052  0.3243    993     no       OR 
+> gamma^2.4    0.1344  0.3666   1123     no     ORMR 
+> phi          0.9229                    no          
+> 
+> Test for Residual Heterogeneity:
+> QE(df = 2673) = 115058.0204, p-val < .0001
+> 
+> Test of Moderators (coefficients 2:22):
+> QM(df = 21) = 754.8078, p-val < .0001
+
+

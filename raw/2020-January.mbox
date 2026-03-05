@@ -1,0 +1,987 @@
+From robertob@kker @end|ng |rom gm@||@com  Mon Jan  6 10:27:57 2020
+From: robertob@kker @end|ng |rom gm@||@com (P. Roberto Bakker)
+Date: Mon, 6 Jan 2020 10:27:57 +0100
+Subject: [R-meta] meta-regression: categorical
+In-Reply-To: <CAKDq9_MfC7EEddZxtdJtRYj5iw26yMMhjQ2Y=q7SsvaYQHdtdQ@mail.gmail.com>
+References: <CAKDq9_Pm-F+VQVsPhYeTswQNiUvNBMv4kvH_xiEySCvc9zrGcg@mail.gmail.com>
+ <d3ec3f21334a4864b1cd0d126225ef61@UM-MAIL3214.unimaas.nl>
+ <CAKDq9_MfC7EEddZxtdJtRYj5iw26yMMhjQ2Y=q7SsvaYQHdtdQ@mail.gmail.com>
+Message-ID: <CAKDq9_MsG4dyyZrkT9+gC_Hnrizj5VPFjGvJ5qM19UMy-m-inw@mail.gmail.com>
+
+Hi Everybody,
+
+I have a new question about meta-regression.
+My database consists only of factors (no characters), so I suppose I do not
+need 'factor()' in 'mods', i.e. 'mods = ~ factor-var'. I also tried 'mods =
+~ factor(factor-var)' and I receive the same results as expected.
+Only, there is one difference, 'mods = ~ factor-var' gives a warning
+message:
+*"In rma(measure = "SMCC", yi = yi, vi = vi, data = datsub, digits = 2,  :*
+*  Redundant predictors dropped from the model."*
+Whereas 'mods = ~ factor(factor-var)' does not give this message. What is
+the reason for this?
+
+So, my question is not why I receive this message, but why the difference:
+with/out warning message.
+
+Best regards,
+Roberto
+PS the same happens with a character variable: i.e. 'mods = ~ chr-var' as
+well as 'mods = ~ factor(chr-var)'.
+
+Op do 26 apr. 2018 om 07:42 schreef P. Roberto Bakker <
+robertobakker at gmail.com>:
+
+> Hi Wolfgang,
+>
+> Thank you for your information and explanation.
+>
+> Bw Roberto
+>
+> 2018-04-24 12:25 GMT+02:00 Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>:
+>
+>> Hi Roberto,
+>>
+>> If you put a character variable (or a factor) into a formula, it is
+>> automatically dummy coded. Actually, the type of coding depends on:
+>>
+>> options("contrasts")
+>>
+>> But the default for that is:
+>>
+>>         unordered           ordered
+>> "contr.treatment"      "contr.poly"
+>>
+>> And help(contr.treatment) explains what kind of coding this is, namely
+>> the 'usual' dummy coding where one level is the 'reference' level (and
+>> whose dummy gets omitted).
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:
+>> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of P. Roberto Bakker
+>> Sent: Tuesday, 24 April, 2018 11:14
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] meta-regression: categorical
+>>
+>> Hi everybody,
+>>
+>> In:
+>> http://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+>> 'allocation' is put in syntax without dummy coding
+>>
+>> rma <http://finzi.psych.upenn.edu/library/metafor/html/rma.uni.html>(yi,
+>> vi, mods = ~ alloc, data
+>> <http://stat.ethz.ch/R-manual/R-devel/library/utils/html/data.html>=dat,
+>> method="ML")
+>>
+>> If I am not wrong, 'allocation' is a catergorical variabel, and I suppose
+>> the R handles the coding of dummy automatically.
+>> Correct?
+>>
+>> I found this information in:
+>> https://cran.r-project.org/web/packages/metafor/metafor.pdf
+>> *Categorical moderator variables can be included in the model via the mods
+>> argument in the same way that appropriately (dummy) coded categorical
+>> independent variables can be included in linear models. One can either do
+>> the dummy coding manually or use a model formula together with the factor
+>> function to let R handle the coding automatically.   *
+>>
+>> *Best wishes and thank you in advance*
+>> *Roberto*
+>>
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Mon Jan  6 17:37:46 2020
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 6 Jan 2020 16:37:46 +0000
+Subject: [R-meta] meta-regression: categorical
+In-Reply-To: <CAKDq9_MsG4dyyZrkT9+gC_Hnrizj5VPFjGvJ5qM19UMy-m-inw@mail.gmail.com>
+References: <CAKDq9_Pm-F+VQVsPhYeTswQNiUvNBMv4kvH_xiEySCvc9zrGcg@mail.gmail.com>
+ <d3ec3f21334a4864b1cd0d126225ef61@UM-MAIL3214.unimaas.nl>
+ <CAKDq9_MfC7EEddZxtdJtRYj5iw26yMMhjQ2Y=q7SsvaYQHdtdQ@mail.gmail.com>
+ <CAKDq9_MsG4dyyZrkT9+gC_Hnrizj5VPFjGvJ5qM19UMy-m-inw@mail.gmail.com>
+Message-ID: <05ed2cde-7805-21e6-3f2b-b46a80630c60@dewey.myzen.co.uk>
+
+Dear Roberto
+
+I suspect the answer is that your original factor variable has levels 
+which do not appear in your data-set so they are dropped when the model 
+matrix is formed.
+
+If you do factor(already_existing_factor) it silently drops the levels. 
+This is rather hidden in the documentation as the second paragraph of Value
+
+Michael
+
+On 06/01/2020 09:27, P. Roberto Bakker wrote:
+> Hi Everybody,
+> 
+> I have a new question about meta-regression.
+> My database consists only of factors (no characters), so I suppose I do not
+> need 'factor()' in 'mods', i.e. 'mods = ~ factor-var'. I also tried 'mods =
+> ~ factor(factor-var)' and I receive the same results as expected.
+> Only, there is one difference, 'mods = ~ factor-var' gives a warning
+> message:
+> *"In rma(measure = "SMCC", yi = yi, vi = vi, data = datsub, digits = 2,  :*
+> *  Redundant predictors dropped from the model."*
+> Whereas 'mods = ~ factor(factor-var)' does not give this message. What is
+> the reason for this?
+> 
+> So, my question is not why I receive this message, but why the difference:
+> with/out warning message.
+> 
+> Best regards,
+> Roberto
+> PS the same happens with a character variable: i.e. 'mods = ~ chr-var' as
+> well as 'mods = ~ factor(chr-var)'.
+> 
+> Op do 26 apr. 2018 om 07:42 schreef P. Roberto Bakker <
+> robertobakker at gmail.com>:
+> 
+>> Hi Wolfgang,
+>>
+>> Thank you for your information and explanation.
+>>
+>> Bw Roberto
+>>
+>> 2018-04-24 12:25 GMT+02:00 Viechtbauer, Wolfgang (SP) <
+>> wolfgang.viechtbauer at maastrichtuniversity.nl>:
+>>
+>>> Hi Roberto,
+>>>
+>>> If you put a character variable (or a factor) into a formula, it is
+>>> automatically dummy coded. Actually, the type of coding depends on:
+>>>
+>>> options("contrasts")
+>>>
+>>> But the default for that is:
+>>>
+>>>          unordered           ordered
+>>> "contr.treatment"      "contr.poly"
+>>>
+>>> And help(contr.treatment) explains what kind of coding this is, namely
+>>> the 'usual' dummy coding where one level is the 'reference' level (and
+>>> whose dummy gets omitted).
+>>>
+>>> Best,
+>>> Wolfgang
+>>>
+>>> -----Original Message-----
+>>> From: R-sig-meta-analysis [mailto:
+>>> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of P. Roberto Bakker
+>>> Sent: Tuesday, 24 April, 2018 11:14
+>>> To: r-sig-meta-analysis at r-project.org
+>>> Subject: [R-meta] meta-regression: categorical
+>>>
+>>> Hi everybody,
+>>>
+>>> In:
+>>> http://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+>>> 'allocation' is put in syntax without dummy coding
+>>>
+>>> rma <http://finzi.psych.upenn.edu/library/metafor/html/rma.uni.html>(yi,
+>>> vi, mods = ~ alloc, data
+>>> <http://stat.ethz.ch/R-manual/R-devel/library/utils/html/data.html>=dat,
+>>> method="ML")
+>>>
+>>> If I am not wrong, 'allocation' is a catergorical variabel, and I suppose
+>>> the R handles the coding of dummy automatically.
+>>> Correct?
+>>>
+>>> I found this information in:
+>>> https://cran.r-project.org/web/packages/metafor/metafor.pdf
+>>> *Categorical moderator variables can be included in the model via the mods
+>>> argument in the same way that appropriately (dummy) coded categorical
+>>> independent variables can be included in linear models. One can either do
+>>> the dummy coding manually or use a model formula together with the factor
+>>> function to let R handle the coding automatically.   *
+>>>
+>>> *Best wishes and thank you in advance*
+>>> *Roberto*
+>>>
+>>
+>>
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Thu Jan  9 14:36:57 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Thu, 9 Jan 2020 13:36:57 +0000
+Subject: [R-meta] Subgroup analysis output using metafor - interpretation
+Message-ID: <CAF8zgfZfcuDxr_z_B4CYLkCNL+iPsoTsXqnX7=E0MVkVm1Ei3A@mail.gmail.com>
+
+Dear all,
+
+I am running a meta-analysis on the prevalence of lameness (binary) in
+British dairy cattle and have used the *metaprop* from the *metafor* package.
+I have set the model to run with random effects, using the DL method, and
+have taken the following approach:
+
+   1. log-transform the data as it is not normally distributed
+   2. identify outliers using influential analysis (only ran this once)
+   3. remove outliers and rerun the model
+   4. deal with remaining heterogeneity with subgroup analysis and
+   meta-regression
+
+I have ran the model and am getting what I believe conflicting evidences on
+different output indicators. As an example, after running subgroup analysis
+with one moderator, the output tells me that the moderator explains around
+50% of the heterogeneity (R^2), and yet the p-value for the test of
+moderators is substantially higher than 0.05 telling me that the pooled
+estimates of the subgroups aren't actually different.
+
+
+
+I was hoping you could shed a light as to what could justify this happening
+(if it makes sense), and possibly provide some guidance as to what I could
+do to improve the statistical evidences of my study.
+
+
+Many thanks and happy 2020 to everyone
+
+-- 
+Jo?o Afonso
+*DVM, MSc Veterinary Epidemiology*
+*PhD Student *
+*Department of Infection and Global Health*
+*University of Liverpool*
+*+351914812305*
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Thu Jan  9 14:57:44 2020
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 9 Jan 2020 13:57:44 +0000
+Subject: [R-meta] 
+ Subgroup analysis output using metafor - interpretation
+In-Reply-To: <CAF8zgfZfcuDxr_z_B4CYLkCNL+iPsoTsXqnX7=E0MVkVm1Ei3A@mail.gmail.com>
+References: <CAF8zgfZfcuDxr_z_B4CYLkCNL+iPsoTsXqnX7=E0MVkVm1Ei3A@mail.gmail.com>
+Message-ID: <8dfb9262-17d3-b408-8667-c923e0ffb607@dewey.myzen.co.uk>
+
+Dear Joao
+
+I hink we may need some clarification before we can answer this. 
+Comments in-line below
+
+On 09/01/2020 13:36, Joao Afonso wrote:
+> Dear all,
+> 
+> I am running a meta-analysis on the prevalence of lameness (binary) in
+> British dairy cattle and have used the *metaprop* from the *metafor* package.
+
+I think metaprop comes from meta, not metafor?
+
+> I have set the model to run with random effects, using the DL method, and
+> have taken the following approach:
+> 
+>     1. log-transform the data as it is not normally distributed
+
+If it is binary data I would not have expected that anyway so what 
+exactly did you transform?
+
+>     2. identify outliers using influential analysis (only ran this once)
+>     3. remove outliers and rerun the model
+
+In general that seems a bad idea as it removes the most interesting 
+observations but you may have reasons to doubt the observations.
+
+>     4. deal with remaining heterogeneity with subgroup analysis and
+>     meta-regression
+> 
+> I have ran the model and am getting what I believe conflicting evidences on
+> different output indicators. As an example, after running subgroup analysis
+> with one moderator, the output tells me that the moderator explains around
+> 50% of the heterogeneity (R^2), and yet the p-value for the test of
+> moderators is substantially higher than 0.05 telling me that the pooled
+> estimates of the subgroups aren't actually different.
+
+Can you share the output from the analysis to give us a clue?
+
+
+> 
+> 
+> 
+> I was hoping you could shed a light as to what could justify this happening
+> (if it makes sense), and possibly provide some guidance as to what I could
+> do to improve the statistical evidences of my study.
+> 
+> 
+> Many thanks and happy 2020 to everyone
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From jot@|on@o @end|ng |rom gm@||@com  Thu Jan  9 15:26:22 2020
+From: jot@|on@o @end|ng |rom gm@||@com (Joao Afonso)
+Date: Thu, 9 Jan 2020 14:26:22 +0000
+Subject: [R-meta] 
+ Subgroup analysis output using metafor - interpretation
+In-Reply-To: <8dfb9262-17d3-b408-8667-c923e0ffb607@dewey.myzen.co.uk>
+References: <CAF8zgfZfcuDxr_z_B4CYLkCNL+iPsoTsXqnX7=E0MVkVm1Ei3A@mail.gmail.com>
+ <8dfb9262-17d3-b408-8667-c923e0ffb607@dewey.myzen.co.uk>
+Message-ID: <CAF8zgfZJHr0Y0U_v_Cn0uTwP4ofVCUMEHEBgynbvFR+uc0ApkA@mail.gmail.com>
+
+Dear Michael,
+
+Thank you for your prompt reply. Sorry for my eventual mistake with
+the *metaprop
+*command. It is likely that it comes from the *meta* package. I had to
+install it as well as the *metafor* package, to run model.
+
+I have log-transformed the number of *events *and *n *using logit
+transformed proportion:
+
+*ies.logit=escalc(xi=nlameanimal, ni=ssizeanimal,
+data=prevalence_2020_nomv, measure="PLO")*
+*pes.logit=rma(yi, vi, data=ies.logit, method = "DL")*
+*pes=predict(pes.logit, transf=transf.ilogit)*
+*print(pes.logit, digits=4)*
+
+As for the outliers I could take a step back and instead of removing them
+leave them in the data-set and see what happens when conducting the
+sub-group analysis. Is this best practice when conducing a meta-analysis?
+
+Outputs below
+
+
+   - Output from meta-analysis after removing outliers
+
+
+* Random-Effects Model (k = 42; tau^2 estimator: DL)*
+
+
+
+* tau^2 (estimated amount of total heterogeneity): 0.2307 (SE = 0.1768)*
+
+* tau (square root of estimated tau^2 value): 0.4803*
+
+* I^2 (total heterogeneity / total variability): 99.73%*
+
+* H^2 (total variability / sampling variability): 372.29*
+
+
+
+* Test for Heterogeneity:*
+
+* Q(df = 41) = 15263.8748, p-val < .0001*
+
+
+
+* Model Results:*
+
+
+
+* estimate se zval pval ci.lb <http://ci.lb> ci.ub*
+
+* -0.8445 0.0802 -10.5351 <.0001 -1.0016 -0.6874 ****
+
+
+
+* ---*
+
+* Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1*
+
+*confint(pes.logit, digits=2)*
+
+
+
+* estimate ci.lb <http://ci.lb> ci.ub*
+
+* tau^2 0.23 0.60 1.68*
+
+* tau 0.48 0.77 1.30*
+
+* I^2(%) 99.73 99.90 99.96*
+
+* H^2 372.29 963.40 2707.90*
+
+*print(pes, digits=4)*
+
+
+
+* pred ci.lb <http://ci.lb> ci.ub cr.lb <http://cr.lb> cr.ub*
+
+* 0.3006 0.2686 0.3346 0.1420 0.5274*
+
+
+
+
+   - Output from subgroup analysis with lcmbi as moderator:
+
+
+ *Mixed-Effects Model (k = 42; tau^2 estimator: DL)*
+
+
+
+* tau^2 (estimated amount of residual heterogeneity): 0.0977 (SE = 0.0677)*
+
+* tau (square root of estimated tau^2 value): 0.3125*
+
+* I^2 (residual heterogeneity / unaccounted variability): 99.17%*
+
+* H^2 (unaccounted variability / sampling variability): 120.25*
+
+* R^2 (amount of heterogeneity accounted for): 57.67%*
+
+
+
+* Test for Residual Heterogeneity:*
+
+* QE(df = 40) = 4809.8552, p-val < .0001*
+
+
+
+* Test of Moderators (coefficient 2):*
+
+* QM(df = 1) = 1.5762, p-val = 0.2093*
+
+
+
+* Model Results:*
+
+
+
+* estimate se zval pval ci.lb <http://ci.lb> ci.ub*
+
+* intrcpt -0.8191 0.0625 -13.1124 <.0001 -0.9416 -0.6967 ****
+
+* lcmbiRecords -0.1653 0.1317 -1.2555 0.2093 -0.4234 0.0928*
+
+
+
+* ---*
+
+* Signif. codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1*
+
+*print(pes.subg.lcmbi[1], digits=6)*
+
+
+
+* pred ci.lb <http://ci.lb> ci.ub cr.lb <http://cr.lb> cr.ub*
+
+* 1 0.305946 0.280581 0.332544 0.190968 0.451515*
+
+*print(pes.subg.lcmbi[17], digits=6)*
+
+
+
+* pred ci.lb <http://ci.lb> ci.ub cr.lb <http://cr.lb> cr.ub*
+
+* 17 0.305946 0.280581 0.332544 0.190968 0.451515*
+
+*print(pes.lcmbi, digits=6)*
+
+
+
+* pred ci.lb <http://ci.lb> ci.ub cr.lb <http://cr.lb> cr.ub*
+
+* 0.294637 0.264094 0.327143 0.253791 0.339071*
+
+
+
+
+
+Many thanks for all the help Michael
+
+
+
+On Thu, Jan 9, 2020 at 1:57 PM Michael Dewey <lists at dewey.myzen.co.uk>
+wrote:
+
+> Dear Joao
+>
+> I hink we may need some clarification before we can answer this.
+> Comments in-line below
+>
+> On 09/01/2020 13:36, Joao Afonso wrote:
+> > Dear all,
+> >
+> > I am running a meta-analysis on the prevalence of lameness (binary) in
+> > British dairy cattle and have used the *metaprop* from the *metafor*
+> package.
+>
+> I think metaprop comes from meta, not metafor?
+>
+> > I have set the model to run with random effects, using the DL method, and
+> > have taken the following approach:
+> >
+> >     1. log-transform the data as it is not normally distributed
+>
+> If it is binary data I would not have expected that anyway so what
+> exactly did you transform?
+>
+> >     2. identify outliers using influential analysis (only ran this once)
+> >     3. remove outliers and rerun the model
+>
+> In general that seems a bad idea as it removes the most interesting
+> observations but you may have reasons to doubt the observations.
+>
+> >     4. deal with remaining heterogeneity with subgroup analysis and
+> >     meta-regression
+> >
+> > I have ran the model and am getting what I believe conflicting evidences
+> on
+> > different output indicators. As an example, after running subgroup
+> analysis
+> > with one moderator, the output tells me that the moderator explains
+> around
+> > 50% of the heterogeneity (R^2), and yet the p-value for the test of
+> > moderators is substantially higher than 0.05 telling me that the pooled
+> > estimates of the subgroups aren't actually different.
+>
+> Can you share the output from the analysis to give us a clue?
+>
+>
+> >
+> >
+> >
+> > I was hoping you could shed a light as to what could justify this
+> happening
+> > (if it makes sense), and possibly provide some guidance as to what I
+> could
+> > do to improve the statistical evidences of my study.
+> >
+> >
+> > Many thanks and happy 2020 to everyone
+> >
+>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+>
+
+
+-- 
+Jo?o Afonso
+*DVM, MSc Veterinary Epidemiology*
+*PhD Student *
+*Department of Infection and Global Health*
+*University of Liverpool*
+*+351914812305*
+
+	[[alternative HTML version deleted]]
+
+
+From robertob@kker @end|ng |rom gm@||@com  Thu Jan  9 16:26:48 2020
+From: robertob@kker @end|ng |rom gm@||@com (P. Roberto Bakker)
+Date: Thu, 9 Jan 2020 16:26:48 +0100
+Subject: [R-meta] meta-regression: categorical
+In-Reply-To: <05ed2cde-7805-21e6-3f2b-b46a80630c60@dewey.myzen.co.uk>
+References: <CAKDq9_Pm-F+VQVsPhYeTswQNiUvNBMv4kvH_xiEySCvc9zrGcg@mail.gmail.com>
+ <d3ec3f21334a4864b1cd0d126225ef61@UM-MAIL3214.unimaas.nl>
+ <CAKDq9_MfC7EEddZxtdJtRYj5iw26yMMhjQ2Y=q7SsvaYQHdtdQ@mail.gmail.com>
+ <CAKDq9_MsG4dyyZrkT9+gC_Hnrizj5VPFjGvJ5qM19UMy-m-inw@mail.gmail.com>
+ <05ed2cde-7805-21e6-3f2b-b46a80630c60@dewey.myzen.co.uk>
+Message-ID: <CAKDq9_OrVq3sWV9dy44G_+0uVz5PY3TfLoCtrA84B8kH06wKqw@mail.gmail.com>
+
+Dear Michael,
+
+Thank you for you explanation.
+
+Best wishes,
+Roberto
+
+
+Op ma 6 jan. 2020 om 17:37 schreef Michael Dewey <lists at dewey.myzen.co.uk>:
+
+> Dear Roberto
+>
+> I suspect the answer is that your original factor variable has levels
+> which do not appear in your data-set so they are dropped when the model
+> matrix is formed.
+>
+> If you do factor(already_existing_factor) it silently drops the levels.
+> This is rather hidden in the documentation as the second paragraph of Value
+>
+> Michael
+>
+> On 06/01/2020 09:27, P. Roberto Bakker wrote:
+> > Hi Everybody,
+> >
+> > I have a new question about meta-regression.
+> > My database consists only of factors (no characters), so I suppose I do
+> not
+> > need 'factor()' in 'mods', i.e. 'mods = ~ factor-var'. I also tried
+> 'mods =
+> > ~ factor(factor-var)' and I receive the same results as expected.
+> > Only, there is one difference, 'mods = ~ factor-var' gives a warning
+> > message:
+> > *"In rma(measure = "SMCC", yi = yi, vi = vi, data = datsub, digits = 2,
+> :*
+> > *  Redundant predictors dropped from the model."*
+> > Whereas 'mods = ~ factor(factor-var)' does not give this message. What is
+> > the reason for this?
+> >
+> > So, my question is not why I receive this message, but why the
+> difference:
+> > with/out warning message.
+> >
+> > Best regards,
+> > Roberto
+> > PS the same happens with a character variable: i.e. 'mods = ~ chr-var' as
+> > well as 'mods = ~ factor(chr-var)'.
+> >
+> > Op do 26 apr. 2018 om 07:42 schreef P. Roberto Bakker <
+> > robertobakker at gmail.com>:
+> >
+> >> Hi Wolfgang,
+> >>
+> >> Thank you for your information and explanation.
+> >>
+> >> Bw Roberto
+> >>
+> >> 2018-04-24 12:25 GMT+02:00 Viechtbauer, Wolfgang (SP) <
+> >> wolfgang.viechtbauer at maastrichtuniversity.nl>:
+> >>
+> >>> Hi Roberto,
+> >>>
+> >>> If you put a character variable (or a factor) into a formula, it is
+> >>> automatically dummy coded. Actually, the type of coding depends on:
+> >>>
+> >>> options("contrasts")
+> >>>
+> >>> But the default for that is:
+> >>>
+> >>>          unordered           ordered
+> >>> "contr.treatment"      "contr.poly"
+> >>>
+> >>> And help(contr.treatment) explains what kind of coding this is, namely
+> >>> the 'usual' dummy coding where one level is the 'reference' level (and
+> >>> whose dummy gets omitted).
+> >>>
+> >>> Best,
+> >>> Wolfgang
+> >>>
+> >>> -----Original Message-----
+> >>> From: R-sig-meta-analysis [mailto:
+> >>> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of P. Roberto
+> Bakker
+> >>> Sent: Tuesday, 24 April, 2018 11:14
+> >>> To: r-sig-meta-analysis at r-project.org
+> >>> Subject: [R-meta] meta-regression: categorical
+> >>>
+> >>> Hi everybody,
+> >>>
+> >>> In:
+> >>> http://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+> >>> 'allocation' is put in syntax without dummy coding
+> >>>
+> >>> rma <http://finzi.psych.upenn.edu/library/metafor/html/rma.uni.html
+> >(yi,
+> >>> vi, mods = ~ alloc, data
+> >>> <http://stat.ethz.ch/R-manual/R-devel/library/utils/html/data.html
+> >=dat,
+> >>> method="ML")
+> >>>
+> >>> If I am not wrong, 'allocation' is a catergorical variabel, and I
+> suppose
+> >>> the R handles the coding of dummy automatically.
+> >>> Correct?
+> >>>
+> >>> I found this information in:
+> >>> https://cran.r-project.org/web/packages/metafor/metafor.pdf
+> >>> *Categorical moderator variables can be included in the model via the
+> mods
+> >>> argument in the same way that appropriately (dummy) coded categorical
+> >>> independent variables can be included in linear models. One can either
+> do
+> >>> the dummy coding manually or use a model formula together with the
+> factor
+> >>> function to let R handle the coding automatically.   *
+> >>>
+> >>> *Best wishes and thank you in advance*
+> >>> *Roberto*
+> >>>
+> >>
+> >>
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list
+> > R-sig-meta-analysis at r-project.org
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Thu Jan  9 19:31:13 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Thu, 9 Jan 2020 19:31:13 +0100
+Subject: [R-meta] 
+ Subgroup analysis output using metafor - interpretation
+In-Reply-To: <CAF8zgfZJHr0Y0U_v_Cn0uTwP4ofVCUMEHEBgynbvFR+uc0ApkA@mail.gmail.com>
+References: <CAF8zgfZfcuDxr_z_B4CYLkCNL+iPsoTsXqnX7=E0MVkVm1Ei3A@mail.gmail.com>
+ <8dfb9262-17d3-b408-8667-c923e0ffb607@dewey.myzen.co.uk>
+ <CAF8zgfZJHr0Y0U_v_Cn0uTwP4ofVCUMEHEBgynbvFR+uc0ApkA@mail.gmail.com>
+Message-ID: <7d2a311e-3029-9b07-a718-842bd462e909@imbi.uni-freiburg.de>
+
+Am 09.01.20 um 15:26 schrieb Joao Afonso:
+> [...]
+> As for the outliers I could take a step back and instead of removing them
+> leave them in the data-set and see what happens when conducting the
+> sub-group analysis. Is this best practice when conducing a meta-analysis?
+
+I am no expert on outlier detection (in meta-analysis), however, I would 
+say that it is in general a good idea to try to explain between-study 
+heterogeneity using subgroup analysis or meta-regression first.
+
+An intrinsic feature / problem of the meta-analysis of prevalences is 
+typically the substantial between-study heterogeneity (which is clearly 
+visible in your meta-analysis with an I2 of 99.7%). In my view, the main 
+aim of a prevalence meta-analysis is actually to describe this 
+heterogeneity. Removing outliers would reduce this heterogeneity and 
+paint a different picture. I assume that there will be still substantial 
+heterogeneity after conducting subgroup analyses. Prediction intervals 
+can help to properly describe the between-study heterogeneity.
+
+Best wishes, Guido
+
+
+From dy|ew@k|91 @end|ng |rom gm@||@com  Wed Jan 15 22:43:31 2020
+From: dy|ew@k|91 @end|ng |rom gm@||@com (Lukas Dylewski)
+Date: Wed, 15 Jan 2020 14:43:31 -0700
+Subject: [R-meta] missing SD
+Message-ID: <CAHsioX_0Ua0nhq2CNAry9y-jAG+voO66uyMTh1nqU+pLCuC3aw-8704@mail.gmail.com>
+
+Hi,
+
+I have a question about, how I can replace or estimate the missing SD
+values for one extraction or replace missing yi and vi in the database?
+Does metafor have some function to deal with it?
+
+Regards
+Dylewski
+-- 
+?ukasz Dylewski, M. Sc.
+
+Institute of Dendrology,
+
+Polish Academy of Sciences,
+
+Parkowa 5, 62-035 K?rnik, Poland
+
+
+http://ecology1.wixsite.com/farmlandecology
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sun Jan 26 16:45:36 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sun, 26 Jan 2020 15:45:36 +0000
+Subject: [R-meta] missing SD
+In-Reply-To: <CAHsioX_0Ua0nhq2CNAry9y-jAG+voO66uyMTh1nqU+pLCuC3aw-8704@mail.gmail.com>
+References: <CAHsioX_0Ua0nhq2CNAry9y-jAG+voO66uyMTh1nqU+pLCuC3aw-8704@mail.gmail.com>
+Message-ID: <1fdaedb20baf4a6895675494c211a4f4@UM-MAIL3213.unimaas.nl>
+
+Dear ?ukasz,
+
+There is nothing automated in metafor that does this. There is replmiss(), which is just a convenience function for replacing missing values in a vector with the values from another vector (or some constant), but you have to tell the function what to replace the missing values with.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Lukas Dylewski
+Sent: Wednesday, 15 January, 2020 22:44
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] missing SD
+
+Hi,
+
+I have a question about, how I can replace or estimate the missing SD
+values for one extraction or replace missing yi and vi in the database?
+Does metafor have some function to deal with it?
+
+Regards
+Dylewski
+-- 
+?ukasz Dylewski, M. Sc.
+
+Institute of Dendrology,
+
+Polish Academy of Sciences,
+
+Parkowa 5, 62-035 K?rnik, Poland
+
+http://ecology1.wixsite.com/farmlandecology
+
+From meyer@j@me@ @end|ng |rom u@@@net  Wed Jan 29 02:15:51 2020
+From: meyer@j@me@ @end|ng |rom u@@@net (james meyer)
+Date: Tue, 28 Jan 2020 20:15:51 -0500
+Subject: [R-meta] double arcsine transformation
+Message-ID: <062yaCBoz5888Set.1580260551@web02.cms.usa.net>
+
+I am performing a univariate meta-analysis on sensitivity and specificity.   I
+fit the model in metafor and when trying to transform the double-arcsine I get
+the following error:
+
+ pes<-predict(pes.dat,transf.ipft.hm,targ=list(ni=dat$total))
+Error in predict.rma(pes.dat, transf.ipft.hm, targ = list(ni = dat$total)) : 
+  Cannot specify new moderator values for models without moderators.
+
+Is this fixable or do you need more information.
+
+James C Meyer DVM DACVIM
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Jan 29 08:41:14 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 29 Jan 2020 07:41:14 +0000
+Subject: [R-meta] double arcsine transformation
+In-Reply-To: <062yaCBoz5888Set.1580260551@web02.cms.usa.net>
+References: <062yaCBoz5888Set.1580260551@web02.cms.usa.net>
+Message-ID: <e20a9ae4f9d44e21b1488b4b919fe473@UM-MAIL3214.unimaas.nl>
+
+Hi James,
+
+You are passing 'transf.ipft.hm' to the second argument of predict.rma():
+
+> args(predict.rma)
+function (object, newmods, intercept, tau2.levels, gamma2.levels, 
+    addx = FALSE, level, digits, transf, targs, vcov = FALSE, ...)
+
+So, you are setting 'newsmods = transf.ipft.hm' which doesn't make sense. It should be:
+
+pes <- predict(pes.dat, transf=transf.ipft.hm, targ=list(ni=dat$total))
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of james meyer
+Sent: Wednesday, 29 January, 2020 2:16
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] double arcsine transformation
+
+I am performing a univariate meta-analysis on sensitivity and specificity.   I
+fit the model in metafor and when trying to transform the double-arcsine I get
+the following error:
+
+ pes<-predict(pes.dat,transf.ipft.hm,targ=list(ni=dat$total))
+Error in predict.rma(pes.dat, transf.ipft.hm, targ = list(ni = dat$total)) : 
+  Cannot specify new moderator values for models without moderators.
+
+Is this fixable or do you need more information.
+
+James C Meyer DVM DACVIM
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Jan 29 10:35:52 2020
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 29 Jan 2020 09:35:52 +0000
+Subject: [R-meta] double arcsine transformation
+In-Reply-To: <062yaCBoz5888Set.1580260551@web02.cms.usa.net>
+References: <062yaCBoz5888Set.1580260551@web02.cms.usa.net>
+Message-ID: <4bef1038-bb40-9fb3-1686-03e8681b5068@dewey.myzen.co.uk>
+
+Dear James
+
+I know this is not what you asked but are you sure you want to do 
+univariate analyses here? Although sensitivity and specificity are 
+independent within study in general they are not independent between 
+study. It may be that you have too few studies to do the bivariate 
+analysis of course.
+
+Michael
+
+On 29/01/2020 01:15, james meyer wrote:
+> I am performing a univariate meta-analysis on sensitivity and specificity.   I
+> fit the model in metafor and when trying to transform the double-arcsine I get
+> the following error:
+> 
+>   pes<-predict(pes.dat,transf.ipft.hm,targ=list(ni=dat$total))
+> Error in predict.rma(pes.dat, transf.ipft.hm, targ = list(ni = dat$total)) :
+>    Cannot specify new moderator values for models without moderators.
+> 
+> Is this fixable or do you need more information.
+> 
+> James C Meyer DVM DACVIM
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Jan 29 12:09:16 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 29 Jan 2020 11:09:16 +0000
+Subject: [R-meta] double arcsine transformation
+In-Reply-To: <4bef1038-bb40-9fb3-1686-03e8681b5068@dewey.myzen.co.uk>
+References: <062yaCBoz5888Set.1580260551@web02.cms.usa.net>
+ <4bef1038-bb40-9fb3-1686-03e8681b5068@dewey.myzen.co.uk>
+Message-ID: <4332fcf447514a1282d25d436519c16c@UM-MAIL3214.unimaas.nl>
+
+Good point. And speaking of unsolicited advice -- concerns can be raised about the back-transformation itself:
+
+https://onlinelibrary.wiley.com/doi/abs/10.1002/jrsm.1348
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Michael Dewey
+Sent: Wednesday, 29 January, 2020 10:36
+To: james meyer; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] double arcsine transformation
+
+Dear James
+
+I know this is not what you asked but are you sure you want to do 
+univariate analyses here? Although sensitivity and specificity are 
+independent within study in general they are not independent between 
+study. It may be that you have too few studies to do the bivariate 
+analysis of course.
+
+Michael
+
+On 29/01/2020 01:15, james meyer wrote:
+> I am performing a univariate meta-analysis on sensitivity and specificity.   I
+> fit the model in metafor and when trying to transform the double-arcsine I get
+> the following error:
+> 
+>   pes<-predict(pes.dat,transf.ipft.hm,targ=list(ni=dat$total))
+> Error in predict.rma(pes.dat, transf.ipft.hm, targ = list(ni = dat$total)) :
+>    Cannot specify new moderator values for models without moderators.
+> 
+> Is this fixable or do you need more information.
+> 
+> James C Meyer DVM DACVIM
+
+

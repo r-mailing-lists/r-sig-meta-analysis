@@ -1,0 +1,4562 @@
+From |||@c|uo @end|ng |rom gm@||@com  Tue Oct  1 08:58:50 2019
+From: |||@c|uo @end|ng |rom gm@||@com (Yan LUO)
+Date: Tue, 1 Oct 2019 15:58:50 +0900
+Subject: [R-meta] 
+ May I ask a question about how to extract specific values
+ from summary(netmeta) output?
+In-Reply-To: <53e9bfc0-65d4-231f-13ad-933a7de74c9a@imbi.uni-freiburg.de>
+References: <CAN0jsH8zn-VPGvY6rjHrP4h3RMSxejgZcqGcMxOTMo=WdKERRw@mail.gmail.com>
+ <53e9bfc0-65d4-231f-13ad-933a7de74c9a@imbi.uni-freiburg.de>
+Message-ID: <CAN0jsH8RPB2rVAEjyap4=XbxjtNLmsU_nTFHFXJmZH=2Ww0ohA@mail.gmail.com>
+
+Dear Guido,
+
+Thank you so much for your detailed explanations.
+
+I have tried them all, and all solved my problem perfectly. It is really
+very helpful.
+With the reference to your codes, I will try to create and decorate my
+plots based on my needs, as a way of studying. At the same time waiting for
+your update of netmeta package!
+
+Thanks again for the great work of your group, for this netmeta package :)
+
+Best wishes,
+Yan
+
+Guido Schwarzer <sc at imbi.uni-freiburg.de> ?2019?9?30??? ??9:06???
+
+> Am 27.09.19 um 17:26 schrieb Yan LUO:
+>
+> [...]
+> I am considering of constructing a "2-dimensional figure" to show the
+> results of a network meta-analysis, which means using the x-axis to the
+> indicate efficacy ORs for a group of drugs and y-axis to indicate safety
+> ORs for the same group of drugs. I selected drug A as conference for both
+> efficacy and safety networks. In order to draw the scatter plot, I need to
+> extract information from 2 network meta-analyses. The output of
+> summary(netmeta)  function (if set ref=drug A) displays all the ORs
+> compared to drug A (which I need), however this result is not included in
+> the returned list. If it were in the returned list then it would be not
+> hard to extract, but since it cannot be found there, how can I extract
+> these ORs values from the output? Besides, I am wondering why the displayed
+> results are different from the returned list?
+>
+> Dear Yan,
+>
+> You do not directly find the odds ratios in an R object created with
+> netmeta() as the log odds ratio is stored. Furthermore, instead of only
+> containing comparisons with the reference treatment, all network estimates
+> are stored in the list elements 'TE.fixed' and 'TE.random'.
+> These matrices contain the network estimates comparing the treatment in
+> the row with the treatment in the column. For a netmeta object net1, for
+> example, you can extract the log odds ratio of treatment comparisons with
+> the reference treatment using the following commands:
+> net1$TE.fixed[, net1$reference.group]
+> net1$TE.random[, net1$reference.group]
+>
+> Similar matrices are stored in a netmeta object containing the standard
+> errors, lower and upper confidence limits as well as z- and p-values (see
+> help page of netmeta).
+>
+> Concerning a scatter plot of an efficacy and safety outcome, I wrote some
+> R code (see attached file) which does the job. This will probably be the
+> basis for a new plotting function in R package *netmeta* to easily create
+> such scatter plots.
+>
+>
+> By the way, I have another question about the netgraph function. It seems
+> not to be a defaulted selection of drawing a netgraph with the size of
+> nodes proportional to the randomized number of patients (sample size), but
+> can I manage to do it by some ways?
+>
+> The number of randomized patients per treatment is stored in list element
+> 'n.trts' which can be used to determine the node size in a network graph.
+> E.g.,
+>
+> example(smokingcessation)
+> netgraph(net1, plastic = FALSE, points = TRUE, adj = 0.5,
+>          cex.points = 15 * sqrt(n.trts / max(n.trts)))
+>
+> Best wishes, Guido
+>
+> P.S. Some additional remarks:
+>
+> - R function netleague() can be used to create a league table for an
+> efficacy and safety outcome. E.g., netleague(net.efficacy, net.safety)
+>
+> - R functions netbind() and forest.netbind() can be used to combine / bind
+> results of several networks and to generate a corresponding forest plot
+>
+> - R functions netposet() and plot.netposet() can be used to generate a
+> scatter plot of P-scores for two outcomes (to partially order / rank
+> treatments based on two outcomes)
+>
+> --
+> Dr. Guido Schwarzer
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+>
+> Phone: +49/761/203-6668
+> Mail: sc at imbi.uni-freiburg.de
+> Homepage: http://www.imbi.uni-freiburg.de
+>
+> ORCID iD: https://orcid.org/0000-0001-6214-9087
+> R-book: https://www.springer.com/gp/book/9783319214153
+>
+>
+
+-- 
+Yan LUO, M.D., PhD candidate
+Department of Health Promotion and Human Behavior
+School of Public Health, Graduate School of Medicine
+Kyoto University
+Email: luo.yan.66a at kyoto-u.jp, lilacluo at gmail.com
+
+	[[alternative HTML version deleted]]
+
+
+From t|n@@dudenhoe||er @end|ng |rom gm@||@com  Wed Oct  2 13:47:35 2019
+From: t|n@@dudenhoe||er @end|ng |rom gm@||@com (=?utf-8?Q?Tina_Dudenh=C3=B6ffer?=)
+Date: Wed, 2 Oct 2019 13:47:35 +0200
+Subject: [R-meta] Weight argument in rma.uni models
+Message-ID: <45C1A6A3-DC6A-4059-9239-33B2BF6AEB73@gmail.com>
+
+Dear all,
+
+I am working with the rma.uni function to fit a multivariate random effects model.
+
+I see that the W argument is an optional argument to specify a user-defined weight matrix. I was curious if any weight is applied if I don?t specify this argument. 
+Specifically, I am wondering if the inverse variance weight is applied ?automatically?, considering I am specifying the V argument in the model itself.
+
+In terms of my model, I am wondering about the difference between these:
+
+res5 <- rma.mv(EffectSize_NEW, Variance_New, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+res5
+
+res6 <- rma.mv(EffectSize_NEW, Variance_New, W=weight, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+res6
+
+Note: the argument weight in my dataset is simply: 1/Variance_New
+
+Hope this is all clear.
+
+Many thanks and kind regards,
+Tina
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Oct  2 14:49:55 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 2 Oct 2019 12:49:55 +0000
+Subject: [R-meta] Weight argument in rma.uni models
+In-Reply-To: <45C1A6A3-DC6A-4059-9239-33B2BF6AEB73@gmail.com>
+References: <45C1A6A3-DC6A-4059-9239-33B2BF6AEB73@gmail.com>
+Message-ID: <49ac6b623102423f8cb808546c086ac9@UM-MAIL3214.unimaas.nl>
+
+Dear Tina,
+
+I assume you mean the rma.mv() function, not rma.uni().
+
+If you don't specify W, then weights are applied automatically. See:
+
+https://wviechtb.github.io/metafor/reference/rma.mv.html
+
+and search for "Together with the variance-covariance matrix of the sampling errors". However, for the model you show, the model implied marginal variance-covariance matrix of the observed outcomes (M) is not diagonal, but also has off-diagonal elements. So, there is actually an entire weight matrix.
+
+Also, in 'res5', M (and hence the weight matrix W = M^(-1)) will incorporate the estimates of the two variance components (for EffectSize_ID_NEW and Study), while 'res6' only uses 1/Variance_New as the weights and doesn't consider the two variance components.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Tina Dudenh?ffer
+Sent: Wednesday, 02 October, 2019 13:48
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Weight argument in rma.uni models
+
+Dear all,
+
+I am working with the rma.uni function to fit a multivariate random effects model.
+
+I see that the W argument is an optional argument to specify a user-defined weight matrix. I was curious if any weight is applied if I don?t specify this argument. 
+Specifically, I am wondering if the inverse variance weight is applied ?automatically?, considering I am specifying the V argument in the model itself.
+
+In terms of my model, I am wondering about the difference between these:
+
+res5 <- rma.mv(EffectSize_NEW, Variance_New, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+res5
+
+res6 <- rma.mv(EffectSize_NEW, Variance_New, W=weight, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+res6
+
+Note: the argument weight in my dataset is simply: 1/Variance_New
+
+Hope this is all clear.
+
+Many thanks and kind regards,
+Tina
+
+From t|n@@dudenhoe||er @end|ng |rom gm@||@com  Wed Oct  2 15:00:20 2019
+From: t|n@@dudenhoe||er @end|ng |rom gm@||@com (=?utf-8?Q?Tina_Dudenh=C3=B6ffer?=)
+Date: Wed, 2 Oct 2019 15:00:20 +0200
+Subject: [R-meta] Weight argument in rma.uni models
+In-Reply-To: <49ac6b623102423f8cb808546c086ac9@UM-MAIL3214.unimaas.nl>
+References: <45C1A6A3-DC6A-4059-9239-33B2BF6AEB73@gmail.com>
+ <49ac6b623102423f8cb808546c086ac9@UM-MAIL3214.unimaas.nl>
+Message-ID: <5F43810A-3928-417D-AA53-4DE82C9AC9D5@gmail.com>
+
+Dear Wolfgang,
+
+thanks for your quick response.  I, indeed, mean rma.mv()! 
+
+Considering the default is the inverse variance weight, would you suggest I stick to my res5 version? 
+> res5 <- rma.mv(EffectSize_NEW, Variance_New, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+> res5
+
+
+I saw somewhere else the argument ?weighted=TRUE? added - but when looking the documentation, I don?t see it. I suppose it?s not necessary or at least not in my case?
+
+
+Thank you so much!
+
+Tina
+
+
+
+> On Oct 2, 2019, at 2:49 PM, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> Dear Tina,
+> 
+> I assume you mean the rma.mv() function, not rma.uni().
+> 
+> If you don't specify W, then weights are applied automatically. See:
+> 
+> https://wviechtb.github.io/metafor/reference/rma.mv.html
+> 
+> and search for "Together with the variance-covariance matrix of the sampling errors". However, for the model you show, the model implied marginal variance-covariance matrix of the observed outcomes (M) is not diagonal, but also has off-diagonal elements. So, there is actually an entire weight matrix.
+> 
+> Also, in 'res5', M (and hence the weight matrix W = M^(-1)) will incorporate the estimates of the two variance components (for EffectSize_ID_NEW and Study), while 'res6' only uses 1/Variance_New as the weights and doesn't consider the two variance components.
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Tina Dudenh?ffer
+> Sent: Wednesday, 02 October, 2019 13:48
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Weight argument in rma.uni models
+> 
+> Dear all,
+> 
+> I am working with the rma.uni function to fit a multivariate random effects model.
+> 
+> I see that the W argument is an optional argument to specify a user-defined weight matrix. I was curious if any weight is applied if I don?t specify this argument. 
+> Specifically, I am wondering if the inverse variance weight is applied ?automatically?, considering I am specifying the V argument in the model itself.
+> 
+> In terms of my model, I am wondering about the difference between these:
+> 
+> res5 <- rma.mv(EffectSize_NEW, Variance_New, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+> res5
+> 
+> res6 <- rma.mv(EffectSize_NEW, Variance_New, W=weight, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+> res6
+> 
+> Note: the argument weight in my dataset is simply: 1/Variance_New
+> 
+> Hope this is all clear.
+> 
+> Many thanks and kind regards,
+> Tina
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Oct  2 15:29:13 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 2 Oct 2019 13:29:13 +0000
+Subject: [R-meta] Weight argument in rma.uni models
+In-Reply-To: <5F43810A-3928-417D-AA53-4DE82C9AC9D5@gmail.com>
+References: <45C1A6A3-DC6A-4059-9239-33B2BF6AEB73@gmail.com>
+ <49ac6b623102423f8cb808546c086ac9@UM-MAIL3214.unimaas.nl>
+ <5F43810A-3928-417D-AA53-4DE82C9AC9D5@gmail.com>
+Message-ID: <65310e72cb70464898d5c18988abb255@UM-MAIL3214.unimaas.nl>
+
+rma.uni() has a 'weighted' argument (which is TRUE by default):
+
+https://wviechtb.github.io/metafor/reference/rma.uni.html
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Tina Dudenh?ffer [mailto:tina.dudenhoeffer at gmail.com] 
+Sent: Wednesday, 02 October, 2019 15:00
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Weight argument in rma.uni models
+
+Dear Wolfgang,
+
+thanks for your quick response.  I, indeed, mean rma.mv()! 
+
+Considering the default is the inverse variance weight, would you suggest I stick to my res5 version? 
+> res5 <- rma.mv(EffectSize_NEW, Variance_New, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+> res5
+
+I saw somewhere else the argument ?weighted=TRUE? added - but when looking the documentation, I don?t see it. I suppose it?s not necessary or at least not in my case?
+
+Thank you so much!
+
+Tina
+
+> On Oct 2, 2019, at 2:49 PM, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> Dear Tina,
+> 
+> I assume you mean the rma.mv() function, not rma.uni().
+> 
+> If you don't specify W, then weights are applied automatically. See:
+> 
+> https://wviechtb.github.io/metafor/reference/rma.mv.html
+> 
+> and search for "Together with the variance-covariance matrix of the sampling errors". However, for the model you show, the model implied marginal variance-covariance matrix of the observed outcomes (M) is not diagonal, but also has off-diagonal elements. So, there is actually an entire weight matrix.
+> 
+> Also, in 'res5', M (and hence the weight matrix W = M^(-1)) will incorporate the estimates of the two variance components (for EffectSize_ID_NEW and Study), while 'res6' only uses 1/Variance_New as the weights and doesn't consider the two variance components.
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Tina Dudenh?ffer
+> Sent: Wednesday, 02 October, 2019 13:48
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Weight argument in rma.uni models
+> 
+> Dear all,
+> 
+> I am working with the rma.uni function to fit a multivariate random effects model.
+> 
+> I see that the W argument is an optional argument to specify a user-defined weight matrix. I was curious if any weight is applied if I don?t specify this argument. 
+> Specifically, I am wondering if the inverse variance weight is applied ?automatically?, considering I am specifying the V argument in the model itself.
+> 
+> In terms of my model, I am wondering about the difference between these:
+> 
+> res5 <- rma.mv(EffectSize_NEW, Variance_New, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+> res5
+> 
+> res6 <- rma.mv(EffectSize_NEW, Variance_New, W=weight, method="REML",random = list(~ 1 | EffectSize_ID_NEW, ~ 1 | Study), data=Data)
+> res6
+> 
+> Note: the argument weight in my dataset is simply: 1/Variance_New
+> 
+> Hope this is all clear.
+> 
+> Many thanks and kind regards,
+> Tina
+
+From dm@h@b@n @end|ng |rom gm@||@com  Fri Oct  4 10:47:24 2019
+From: dm@h@b@n @end|ng |rom gm@||@com (=?UTF-8?Q?Daniel_M=C3=B8nsted_Shabanzadeh?=)
+Date: Fri, 4 Oct 2019 10:47:24 +0200
+Subject: [R-meta] Back transformation of double arscine transformed
+ estimates in metafor
+Message-ID: <CABgeOtOTK8-6vu_w4eT6tNgzyF13MCbDm+RA6TtEa5w6kKM=TA@mail.gmail.com>
+
+Hey
+
+I am performing a meta-regression of multiple single arm
+studies. The outcome is proportions of complications following a specific
+surgical treatment which is the same for all included studies. I want to
+explore if variables such as age, continent or medications have an impact
+on the outcome. Since some of the identified studies have 0 complications
+events I have performed Freeman-Tuckey double arscine transformation of
+data.
+
+Data transformation
+b<-escalc(xi=compl, ni=total, data=a, measure="PFT", add=0)
+
+Meta-regression of multiple identified studies
+metareg<-rma(yi, vi, data=b, mods=~continent+age+pm)
+print(metareg)
+
+
+Mixed-Effects Model (k = 11; tau^2 estimator: REML)
+
+tau^2 (estimated amount of residual heterogeneity):     0.0091 (SE = 0.0060)
+tau (square root of estimated tau^2 value):             0.0952
+I^2 (residual heterogeneity / unaccounted variability): 91.15%
+H^2 (unaccounted variability / sampling variability):   11.30
+R^2 (amount of heterogeneity accounted for):            28.85%
+
+Test for Residual Heterogeneity:
+QE(df = 6) = 78.3204, p-val < .0001
+
+Test of Moderators (coefficient(s) 2:5):
+QM(df = 4) = 7.6936, p-val = 0.1035
+
+Model Results:
+
+                        estimate      se     zval    pval    ci.lb   ci.ub
+intrcpt                   0.3197  0.1079   2.9640  0.0030   0.1083  0.5311  **
+continentAsia            -0.1666  0.1062  -1.5685  0.1168  -0.3747  0.0416
+continentNorth America   -0.1755  0.1067  -1.6452  0.0999  -0.3845  0.0336   .
+ageinfant                 0.1824  0.0741   2.4616  0.0138   0.0372  0.3277   *
+pmTA                     -0.1484  0.0973  -1.5252  0.1272  -0.3392  0.0423
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+
+
+These estimates and CI are transformed. Usually I would transform them back
+to proportions with predict in presence of simple models. But I am not sure
+hos to do it in multiple models.
+
+predict(metareg, transf=transf.ipft.hm, targ=list(ni=a$total)). This gives
+us multiple lines of estimates which I cannot interpretate:
+
+     pred  ci.lb  ci.ub  cr.lb  cr.ub
+1  0.0259 0.0017 0.0715 0.0000 0.1388
+2  0.0202 0.0005 0.0594 0.0000 0.1245
+3  0.0000 0.0000 0.0348 0.0000 0.0692
+4  0.0202 0.0005 0.0594 0.0000 0.1245
+5  0.1058 0.0290 0.2206 0.0056 0.2976
+6  0.0175 0.0000 0.0940 0.0000 0.1478
+7  0.1174 0.0380 0.2310 0.0100 0.3110
+8  0.0202 0.0005 0.0594 0.0000 0.1245
+9  0.0283 0.0000 0.1236 0.0000 0.1799
+10 0.0259 0.0017 0.0715 0.0000 0.1388
+11 0.0259 0.0017 0.0715 0.0000 0.1388
+
+
+How do I obtain estimates of proportions for the impact of each variable
+explored in the model?
+
+Regards,
+Daniel
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Oct  4 11:35:23 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Fri, 4 Oct 2019 09:35:23 +0000
+Subject: [R-meta] Back transformation of double arscine transformed
+ estimates in metafor
+In-Reply-To: <CABgeOtOTK8-6vu_w4eT6tNgzyF13MCbDm+RA6TtEa5w6kKM=TA@mail.gmail.com>
+References: <CABgeOtOTK8-6vu_w4eT6tNgzyF13MCbDm+RA6TtEa5w6kKM=TA@mail.gmail.com>
+Message-ID: <e46a7ba0c3b14cfa8060b798af6fd294@UM-MAIL3214.unimaas.nl>
+
+Dear Daniel,
+
+predict(metareg, transf=transf.ipft.hm, targ=list(ni=a$total)) gives you the fitted values (proportions) for the 11 studies. So these are the predicted values (based on the model) for whatever values these studies take on for the moderator variables. If you want to compute predicted values for other combinations of moderator values, you need to use the 'newmods' argument. For example:
+
+predict(metareg, newmods = c(0,1,1,0), 
+        transf=transf.ipft.hm, targ=list(ni=a$total))
+
+will give the predicted value (proportion) for continent = North America, age = infant, and pm = LA (based on your post on Stack Overflow -- https://stackoverflow.com/questions/58203464/reverse-transformation-of-double-arscine-transformed-estimates-when-doing-meta-r -- I can see that pm has two levels, LA (reference level) and TA).
+
+By varying one moderator and holding the other moderators constant, you can illustrate how a moderator affects the results (you cannot just take the model coefficients and transform them).
+
+But: The back-transformation for the FT transformation is problematic. Please take a look at:
+
+https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1348
+
+Even though the FT transformation has some nice properties, I would therefore avoid it (because we typically do want to back-transform in the end). You could either just use the 'standard' arcsine square root transformation (measure="PAS") or maybe even better switch to a logistic mixed-effects model, which you can fit with rma.glmm():
+
+metareg <- rma.glmm(measure="PLO", ai=compl, nu=total, data=a,
+                    mods = ~ continent + age + pm)
+
+The results are then analyzed on the logit (log odds) scale. So, the back-transformation to odds would be:
+
+predict(metareg, newmods = c(0,1,1,0), transf=exp)
+
+In fact, here, you can exponentiate the coefficients themselves, which then reflect odds ratios:
+
+round(exp(coef(summary(metareg))[,c("estimtate", "ci.lb", "ci.ub")]), 3)
+
+The back-transformation to proportions would be:
+
+predict(metareg, newmods = c(0,1,1,0), transf=transf.ilogit)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Daniel M?nsted Shabanzadeh
+Sent: Friday, 04 October, 2019 10:47
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Back transformation of double arscine transformed estimates in metafor
+
+Hey
+
+I am performing a meta-regression of multiple single arm
+studies. The outcome is proportions of complications following a specific
+surgical treatment which is the same for all included studies. I want to
+explore if variables such as age, continent or medications have an impact
+on the outcome. Since some of the identified studies have 0 complications
+events I have performed Freeman-Tuckey double arscine transformation of
+data.
+
+Data transformation
+b<-escalc(xi=compl, ni=total, data=a, measure="PFT", add=0)
+
+Meta-regression of multiple identified studies
+metareg<-rma(yi, vi, data=b, mods=~continent+age+pm)
+print(metareg)
+
+Mixed-Effects Model (k = 11; tau^2 estimator: REML)
+
+tau^2 (estimated amount of residual heterogeneity):     0.0091 (SE = 0.0060)
+tau (square root of estimated tau^2 value):             0.0952
+I^2 (residual heterogeneity / unaccounted variability): 91.15%
+H^2 (unaccounted variability / sampling variability):   11.30
+R^2 (amount of heterogeneity accounted for):            28.85%
+
+Test for Residual Heterogeneity:
+QE(df = 6) = 78.3204, p-val < .0001
+
+Test of Moderators (coefficient(s) 2:5):
+QM(df = 4) = 7.6936, p-val = 0.1035
+
+Model Results:
+
+                        estimate      se     zval    pval    ci.lb   ci.ub
+intrcpt                   0.3197  0.1079   2.9640  0.0030   0.1083  0.5311  **
+continentAsia            -0.1666  0.1062  -1.5685  0.1168  -0.3747  0.0416
+continentNorth America   -0.1755  0.1067  -1.6452  0.0999  -0.3845  0.0336   .
+ageinfant                 0.1824  0.0741   2.4616  0.0138   0.0372  0.3277   *
+pmTA                     -0.1484  0.0973  -1.5252  0.1272  -0.3392  0.0423
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+These estimates and CI are transformed. Usually I would transform them back
+to proportions with predict in presence of simple models. But I am not sure
+hos to do it in multiple models.
+
+predict(metareg, transf=transf.ipft.hm, targ=list(ni=a$total)). This gives
+us multiple lines of estimates which I cannot interpretate:
+
+     pred  ci.lb  ci.ub  cr.lb  cr.ub
+1  0.0259 0.0017 0.0715 0.0000 0.1388
+2  0.0202 0.0005 0.0594 0.0000 0.1245
+3  0.0000 0.0000 0.0348 0.0000 0.0692
+4  0.0202 0.0005 0.0594 0.0000 0.1245
+5  0.1058 0.0290 0.2206 0.0056 0.2976
+6  0.0175 0.0000 0.0940 0.0000 0.1478
+7  0.1174 0.0380 0.2310 0.0100 0.3110
+8  0.0202 0.0005 0.0594 0.0000 0.1245
+9  0.0283 0.0000 0.1236 0.0000 0.1799
+10 0.0259 0.0017 0.0715 0.0000 0.1388
+11 0.0259 0.0017 0.0715 0.0000 0.1388
+
+How do I obtain estimates of proportions for the impact of each variable
+explored in the model?
+
+Regards,
+Daniel
+
+From dm@h@b@n @end|ng |rom gm@||@com  Fri Oct  4 12:05:49 2019
+From: dm@h@b@n @end|ng |rom gm@||@com (=?UTF-8?Q?Daniel_M=C3=B8nsted_Shabanzadeh?=)
+Date: Fri, 4 Oct 2019 12:05:49 +0200
+Subject: [R-meta] Back transformation of double arscine transformed
+ estimates in metafor
+In-Reply-To: <e46a7ba0c3b14cfa8060b798af6fd294@UM-MAIL3214.unimaas.nl>
+References: <CABgeOtOTK8-6vu_w4eT6tNgzyF13MCbDm+RA6TtEa5w6kKM=TA@mail.gmail.com>
+ <e46a7ba0c3b14cfa8060b798af6fd294@UM-MAIL3214.unimaas.nl>
+Message-ID: <CABgeOtN5FhJMwdDj5bS9-jnQ6ZVNs-FnyEk4A-gkQ2KXuvQWZQ@mail.gmail.com>
+
+Thank you for your reply!
+A few questions remain:
+1. The reason for using FT transformation was due to many outcomes being
+equal to 0 in proportions and thereby to avoid adding numbers that distort
+the estimates. Would the PAS or PLO have the same advantages as the FT
+transformation in this regard?
+2. The meta-regression is performed on proportions and not on relative
+risks or odds. Can a meta-regression on proportions be performed in PAS or
+PLO?
+
+Regards,
+Daniel
+
+fre. 4. okt. 2019 11.35 skrev Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl>:
+
+> Dear Daniel,
+>
+> predict(metareg, transf=transf.ipft.hm, targ=list(ni=a$total)) gives you
+> the fitted values (proportions) for the 11 studies. So these are the
+> predicted values (based on the model) for whatever values these studies
+> take on for the moderator variables. If you want to compute predicted
+> values for other combinations of moderator values, you need to use the
+> 'newmods' argument. For example:
+>
+> predict(metareg, newmods = c(0,1,1,0),
+>         transf=transf.ipft.hm, targ=list(ni=a$total))
+>
+> will give the predicted value (proportion) for continent = North America,
+> age = infant, and pm = LA (based on your post on Stack Overflow --
+> https://stackoverflow.com/questions/58203464/reverse-transformation-of-double-arscine-transformed-estimates-when-doing-meta-r
+> -- I can see that pm has two levels, LA (reference level) and TA).
+>
+> By varying one moderator and holding the other moderators constant, you
+> can illustrate how a moderator affects the results (you cannot just take
+> the model coefficients and transform them).
+>
+> But: The back-transformation for the FT transformation is problematic.
+> Please take a look at:
+>
+> https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1348
+>
+> Even though the FT transformation has some nice properties, I would
+> therefore avoid it (because we typically do want to back-transform in the
+> end). You could either just use the 'standard' arcsine square root
+> transformation (measure="PAS") or maybe even better switch to a logistic
+> mixed-effects model, which you can fit with rma.glmm():
+>
+> metareg <- rma.glmm(measure="PLO", ai=compl, nu=total, data=a,
+>                     mods = ~ continent + age + pm)
+>
+> The results are then analyzed on the logit (log odds) scale. So, the
+> back-transformation to odds would be:
+>
+> predict(metareg, newmods = c(0,1,1,0), transf=exp)
+>
+> In fact, here, you can exponentiate the coefficients themselves, which
+> then reflect odds ratios:
+>
+> round(exp(coef(summary(metareg))[,c("estimtate", "ci.lb", "ci.ub")]), 3)
+>
+> The back-transformation to proportions would be:
+>
+> predict(metareg, newmods = c(0,1,1,0), transf=transf.ilogit)
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Daniel M?nsted
+> Shabanzadeh
+> Sent: Friday, 04 October, 2019 10:47
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Back transformation of double arscine transformed
+> estimates in metafor
+>
+> Hey
+>
+> I am performing a meta-regression of multiple single arm
+> studies. The outcome is proportions of complications following a specific
+> surgical treatment which is the same for all included studies. I want to
+> explore if variables such as age, continent or medications have an impact
+> on the outcome. Since some of the identified studies have 0 complications
+> events I have performed Freeman-Tuckey double arscine transformation of
+> data.
+>
+> Data transformation
+> b<-escalc(xi=compl, ni=total, data=a, measure="PFT", add=0)
+>
+> Meta-regression of multiple identified studies
+> metareg<-rma(yi, vi, data=b, mods=~continent+age+pm)
+> print(metareg)
+>
+> Mixed-Effects Model (k = 11; tau^2 estimator: REML)
+>
+> tau^2 (estimated amount of residual heterogeneity):     0.0091 (SE =
+> 0.0060)
+> tau (square root of estimated tau^2 value):             0.0952
+> I^2 (residual heterogeneity / unaccounted variability): 91.15%
+> H^2 (unaccounted variability / sampling variability):   11.30
+> R^2 (amount of heterogeneity accounted for):            28.85%
+>
+> Test for Residual Heterogeneity:
+> QE(df = 6) = 78.3204, p-val < .0001
+>
+> Test of Moderators (coefficient(s) 2:5):
+> QM(df = 4) = 7.6936, p-val = 0.1035
+>
+> Model Results:
+>
+>                         estimate      se     zval    pval    ci.lb   ci.ub
+> intrcpt                   0.3197  0.1079   2.9640  0.0030   0.1083
+> 0.5311  **
+> continentAsia            -0.1666  0.1062  -1.5685  0.1168  -0.3747  0.0416
+> continentNorth America   -0.1755  0.1067  -1.6452  0.0999  -0.3845
+> 0.0336   .
+> ageinfant                 0.1824  0.0741   2.4616  0.0138   0.0372
+> 0.3277   *
+> pmTA                     -0.1484  0.0973  -1.5252  0.1272  -0.3392  0.0423
+>
+> ---
+> Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+>
+> These estimates and CI are transformed. Usually I would transform them back
+> to proportions with predict in presence of simple models. But I am not sure
+> hos to do it in multiple models.
+>
+> predict(metareg, transf=transf.ipft.hm, targ=list(ni=a$total)). This gives
+> us multiple lines of estimates which I cannot interpretate:
+>
+>      pred  ci.lb  ci.ub  cr.lb  cr.ub
+> 1  0.0259 0.0017 0.0715 0.0000 0.1388
+> 2  0.0202 0.0005 0.0594 0.0000 0.1245
+> 3  0.0000 0.0000 0.0348 0.0000 0.0692
+> 4  0.0202 0.0005 0.0594 0.0000 0.1245
+> 5  0.1058 0.0290 0.2206 0.0056 0.2976
+> 6  0.0175 0.0000 0.0940 0.0000 0.1478
+> 7  0.1174 0.0380 0.2310 0.0100 0.3110
+> 8  0.0202 0.0005 0.0594 0.0000 0.1245
+> 9  0.0283 0.0000 0.1236 0.0000 0.1799
+> 10 0.0259 0.0017 0.0715 0.0000 0.1388
+> 11 0.0259 0.0017 0.0715 0.0000 0.1388
+>
+> How do I obtain estimates of proportions for the impact of each variable
+> explored in the model?
+>
+> Regards,
+> Daniel
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Oct  4 13:30:39 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Wolfgang Viechtbauer)
+Date: Fri, 4 Oct 2019 13:30:39 +0200 (CEST)
+Subject: [R-meta] Back transformation of double arscine transformed
+ estimates in metafor
+In-Reply-To: <CABgeOtN5FhJMwdDj5bS9-jnQ6ZVNs-FnyEk4A-gkQ2KXuvQWZQ@mail.gmail.com>
+References: <CABgeOtOTK8-6vu_w4eT6tNgzyF13MCbDm+RA6TtEa5w6kKM=TA@mail.gmail.com>
+ <e46a7ba0c3b14cfa8060b798af6fd294@UM-MAIL3214.unimaas.nl>
+ <CABgeOtN5FhJMwdDj5bS9-jnQ6ZVNs-FnyEk4A-gkQ2KXuvQWZQ@mail.gmail.com>
+Message-ID: <alpine.DEB.2.20.1910041328050.27430@wv-x1>
+
+1) The logistic model also doesn't require adjustments to the counts, so 
+yes, it has the same advantage as the PFT (and PAS) transformation.
+
+2) You are doing a meta-analysis of proportions, but the analysis is 
+carried out on a transformed scale (like with PFT). When you use a 
+logistic model, you are (implicitly) doing the analysis on a logit scale. 
+For easier interpretation, we then typically transform the results back to 
+odds or directly to proportions.
+
+
+Best,
+Wolfgang
+
+> Thank you for your reply!
+> A few questions remain:
+> 1. The reason for using FT transformation was due to many outcomes being
+> equal to 0 in proportions and thereby to avoid adding numbers that distort
+> the estimates. Would the PAS or PLO have the same advantages as the FT
+> transformation in this regard?
+> 2. The meta-regression is performed on proportions and not on relative
+> risks or odds. Can a meta-regression on proportions be performed in PAS or
+> PLO?
+>
+> Regards,
+> Daniel
+>
+> fre. 4. okt. 2019 11.35 skrev Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>:
+>
+>> Dear Daniel,
+>>
+>> predict(metareg, transf=transf.ipft.hm, targ=list(ni=a$total)) gives you
+>> the fitted values (proportions) for the 11 studies. So these are the
+>> predicted values (based on the model) for whatever values these studies
+>> take on for the moderator variables. If you want to compute predicted
+>> values for other combinations of moderator values, you need to use the
+>> 'newmods' argument. For example:
+>>
+>> predict(metareg, newmods = c(0,1,1,0),
+>>         transf=transf.ipft.hm, targ=list(ni=a$total))
+>>
+>> will give the predicted value (proportion) for continent = North America,
+>> age = infant, and pm = LA (based on your post on Stack Overflow --
+>> https://stackoverflow.com/questions/58203464/reverse-transformation-of-double-arscine-transformed-estimates-when-doing-meta-r
+>> -- I can see that pm has two levels, LA (reference level) and TA).
+>>
+>> By varying one moderator and holding the other moderators constant, you
+>> can illustrate how a moderator affects the results (you cannot just take
+>> the model coefficients and transform them).
+>>
+>> But: The back-transformation for the FT transformation is problematic.
+>> Please take a look at:
+>>
+>> https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1348
+>>
+>> Even though the FT transformation has some nice properties, I would
+>> therefore avoid it (because we typically do want to back-transform in the
+>> end). You could either just use the 'standard' arcsine square root
+>> transformation (measure="PAS") or maybe even better switch to a logistic
+>> mixed-effects model, which you can fit with rma.glmm():
+>>
+>> metareg <- rma.glmm(measure="PLO", ai=compl, nu=total, data=a,
+>>                     mods = ~ continent + age + pm)
+>>
+>> The results are then analyzed on the logit (log odds) scale. So, the
+>> back-transformation to odds would be:
+>>
+>> predict(metareg, newmods = c(0,1,1,0), transf=exp)
+>>
+>> In fact, here, you can exponentiate the coefficients themselves, which
+>> then reflect odds ratios:
+>>
+>> round(exp(coef(summary(metareg))[,c("estimtate", "ci.lb", "ci.ub")]), 3)
+>>
+>> The back-transformation to proportions would be:
+>>
+>> predict(metareg, newmods = c(0,1,1,0), transf=transf.ilogit)
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:
+>> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Daniel M?nsted
+>> Shabanzadeh
+>> Sent: Friday, 04 October, 2019 10:47
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Back transformation of double arscine transformed
+>> estimates in metafor
+>>
+>> Hey
+>>
+>> I am performing a meta-regression of multiple single arm
+>> studies. The outcome is proportions of complications following a specific
+>> surgical treatment which is the same for all included studies. I want to
+>> explore if variables such as age, continent or medications have an impact
+>> on the outcome. Since some of the identified studies have 0 complications
+>> events I have performed Freeman-Tuckey double arscine transformation of
+>> data.
+>>
+>> Data transformation
+>> b<-escalc(xi=compl, ni=total, data=a, measure="PFT", add=0)
+>>
+>> Meta-regression of multiple identified studies
+>> metareg<-rma(yi, vi, data=b, mods=~continent+age+pm)
+>> print(metareg)
+>>
+>> Mixed-Effects Model (k = 11; tau^2 estimator: REML)
+>>
+>> tau^2 (estimated amount of residual heterogeneity):     0.0091 (SE =
+>> 0.0060)
+>> tau (square root of estimated tau^2 value):             0.0952
+>> I^2 (residual heterogeneity / unaccounted variability): 91.15%
+>> H^2 (unaccounted variability / sampling variability):   11.30
+>> R^2 (amount of heterogeneity accounted for):            28.85%
+>>
+>> Test for Residual Heterogeneity:
+>> QE(df = 6) = 78.3204, p-val < .0001
+>>
+>> Test of Moderators (coefficient(s) 2:5):
+>> QM(df = 4) = 7.6936, p-val = 0.1035
+>>
+>> Model Results:
+>>
+>>                         estimate      se     zval    pval    ci.lb   ci.ub
+>> intrcpt                   0.3197  0.1079   2.9640  0.0030   0.1083
+>> 0.5311  **
+>> continentAsia            -0.1666  0.1062  -1.5685  0.1168  -0.3747  0.0416
+>> continentNorth America   -0.1755  0.1067  -1.6452  0.0999  -0.3845
+>> 0.0336   .
+>> ageinfant                 0.1824  0.0741   2.4616  0.0138   0.0372
+>> 0.3277   *
+>> pmTA                     -0.1484  0.0973  -1.5252  0.1272  -0.3392  0.0423
+>>
+>> ---
+>> Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+>>
+>> These estimates and CI are transformed. Usually I would transform them back
+>> to proportions with predict in presence of simple models. But I am not sure
+>> hos to do it in multiple models.
+>>
+>> predict(metareg, transf=transf.ipft.hm, targ=list(ni=a$total)). This gives
+>> us multiple lines of estimates which I cannot interpretate:
+>>
+>>      pred  ci.lb  ci.ub  cr.lb  cr.ub
+>> 1  0.0259 0.0017 0.0715 0.0000 0.1388
+>> 2  0.0202 0.0005 0.0594 0.0000 0.1245
+>> 3  0.0000 0.0000 0.0348 0.0000 0.0692
+>> 4  0.0202 0.0005 0.0594 0.0000 0.1245
+>> 5  0.1058 0.0290 0.2206 0.0056 0.2976
+>> 6  0.0175 0.0000 0.0940 0.0000 0.1478
+>> 7  0.1174 0.0380 0.2310 0.0100 0.3110
+>> 8  0.0202 0.0005 0.0594 0.0000 0.1245
+>> 9  0.0283 0.0000 0.1236 0.0000 0.1799
+>> 10 0.0259 0.0017 0.0715 0.0000 0.1388
+>> 11 0.0259 0.0017 0.0715 0.0000 0.1388
+>>
+>> How do I obtain estimates of proportions for the impact of each variable
+>> explored in the model?
+>>
+>> Regards,
+>> Daniel
+
+From |eom@rt| @end|ng |rom @t@n|ord@edu  Sat Oct  5 00:27:51 2019
+From: |eom@rt| @end|ng |rom @t@n|ord@edu (Leo Martinez)
+Date: Fri, 4 Oct 2019 15:27:51 -0700
+Subject: [R-meta] metafor package in R - Risk ratios using rma.mv()
+In-Reply-To: <464e235a51e048fca1098126ecf51c36@UM-MAIL3214.unimaas.nl>
+References: <CAAkeBhmrQGOiW9FJr+9P9nPePcAk3YPUDU5NDFxEr0jcmuJdOA@mail.gmail.com>
+ <f737ae70ee254206a55c3982b2bd8513@UM-MAIL3214.unimaas.nl>
+ <CAAkeBh=j=OOiEN-kwR4Y6z4E=8SOQDm5KUsdYUeHJ8MryYVUVw@mail.gmail.com>
+ <18c3e033-a198-301f-ab44-bdbe450df393@dewey.myzen.co.uk>
+ <CAAkeBhkdvSmrLZanH6sQgCxnB+HYg_FVji7=OyYysLrfMBRy+Q@mail.gmail.com>
+ <CA+N-+=e-4GJbxBQV+72LoBu+ixupjirTYUnV1MzNupi1ctbdKw@mail.gmail.com>
+ <464e235a51e048fca1098126ecf51c36@UM-MAIL3214.unimaas.nl>
+Message-ID: <CA+N-+=cpjGa7t1_YKRRze_V4xkcrhurkoVxQJhXrWJsNzENMcw@mail.gmail.com>
+
+Dear Wolfgang and All,
+
+Thanks so much for your prior help.
+We have calculated incidence and prevalence rates from a mixed-effects
+model using the rma.mv command. We are attaching the results below.
+
+*Variable*
+
+*Cohorts (n)*
+
+*Incidence Rate/100k*
+
+*Lower 95% CI*
+
+*Upper 95% CI*
+
+*World Health Organization Region*
+
+    Americas
+
+225
+
+324.5
+
+166.7
+
+482.2
+
+    African
+
+30
+
+1906.4
+
+1134.1
+
+2678.7
+
+    Eastern Mediterranean
+
+24
+
+249.1
+
+32.3
+
+466.0
+
+    European
+
+33
+
+767.6
+
+407.8
+
+1127.3
+
+    South-East Asia
+
+48
+
+1148.7
+
+628.6
+
+1668.9
+
+    Western Pacific
+
+30
+
+560.0
+
+-131.7
+
+1251.7
+
+
+
+*Cohorts (n)*
+
+*Prevalence Rate*
+
+*Lower 95% CI*
+
+*Upper 95% CI*
+
+*World Health Organization Region*
+
+    Americas
+
+33
+
+1.7
+
+0.9
+
+2.5
+
+    African
+
+31
+
+2.8
+
+1.4
+
+4.1
+
+    Eastern Mediterranean
+
+7
+
+1.9
+
+0.5
+
+3.4
+
+    European
+
+21
+
+1.9
+
+0.8
+
+3.0
+
+    South-East Asian
+
+10
+
+2.4
+
+-1.1
+
+6.0
+
+    Western Pacific
+
+54
+
+1.2
+
+-0.1
+
+2.4
+
+
+Unfortunately we have some negative confidence intervals for some of our
+incidence and prevalence estimates. We would like to not have any negative
+confidence intervals and therefore would like to switch the models that we
+are using.
+
+Is there a way to keep our code (which we have put below for both incidence
+and prevalence) and run a poisson model for incidence and a binary or beta
+model for prevalence so that we no longer have a negative confidence
+interval for some of our variables? We noticed that when we run the model
+using log transformed incident and prevalence rates, the confidence
+intervals are positive. We are also wondering what the difference is
+between using PR/IR versus PLN/IRLN for fitting the model, and why the
+latter would result in all positive confidence intervals.
+
+Thank you again for all your help!
+
+Best
+Olivia and Leo
+
+
+*Code for incidence rates: *
+#data subsetted by WHO region
+
+pd_ec <- escalc(measure = 'IR', xi = data_sub$inc_positive,ti =
+data_sub$inc_person_years, append = TRUE,
+            data = data_sub)
+
+m0 <- rma.mv(yi, vi, method='REML', mods = formula,
+                        random= ~ 1 | study_id/cohort_id,
+                        tdist=TRUE,
+                        data=pd_ec)
+
+*Code for prevalence rates: *
+#data subsetted by WHO region
+
+pd_ec <- escalc(
+            measure = 'PR', xi = data_sub$prev_positive,ni =
+data_sub$prev_total_n, append = TRUE,
+            data = data_sub)
+
+ m0 <- rma.mv(yi, vi, method='REML', mods = formula,
+                        random= ~ 1 | study_id/cohort_id,
+                        tdist=TRUE,
+                        data=pd_ec)
+
+Thank you for any help you can provide!
+
+Best
+Leo and Olivia
+
+
+
+Leonardo Martinez, PhD, MPH
+Stanford University School of Medicine
+Division of Infectious Diseases and Geographic Medicine
+300 Pasteur Drive, Lane Building, Stanford, CA 94305
+Phone: +1.202.769.8090
+Email: leomarti at stanford.edu; chopotin at gmail.com
+Website <https://profiles.stanford.edu/leonardo-martinez-pantoja>
+
+
+On Wed, Sep 4, 2019 at 10:57 AM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Forgot to cc the mailing list, so resending this.
+>
+> -----Original Message-----
+> From: Viechtbauer, Wolfgang (SP)
+> Sent: Wednesday, 04 September, 2019 19:36
+> To: 'Leo Martinez'; 'Olivia Cords'
+> Subject: RE: [R-meta] metafor package in R - Risk ratios using rma.mv()
+>
+> Dear Leo, Dear Olivia,
+>
+> Late response (to Olivia), but I was out of the office the entire August.
+>
+> Q2) Yes, one can estimate rate ratios this way.
+>
+> They are different because the log transformation is non-linear. Also, the
+> normal approximation of the sampling distributions doesn't work in the same
+> way on the raw and on the log scale. To illustrate:
+>
+> Let's say we observe x=5 cases in t=100 person years, so IR = 5/100. For
+> IR values, the normal approximation is IR ~ N(theta, theta/t), where theta
+> is the true rate per person year (this follows from assuming that x is
+> Poisson distributed with rate t*theta), so we estimate the sampling
+> variance with v = IR/t. Hence, a 95% CI for theta is given by:
+>
+> x <- 5
+> t <- 100
+> IR <- x/t
+> IR + c(-1,1) * qnorm(.975) * sqrt(IR/t)
+>
+> which yields
+>
+> 0.006173873 0.093826127
+>
+> For log(IR), the normal approximation (after using the delta method) is
+> log(IR) ~ N(log(theta), 1/(t*theta)), so we estimate the sampling variance
+> with v = 1/x. Hence, a 95% CI for theta is given by:
+>
+> exp(log(IR) + c(-1,1) * qnorm(.975) * sqrt(1/x))
+>
+> which yields
+>
+> 0.02081139 0.12012652
+>
+> As you can see, these results are not the same. And this doesn't yet get
+> into the additional complexities involved when fitting the model you are
+> fitting (where we estimate additional variance components, which in turn
+> also has implications for how the estimates are weighted and combined).
+>
+> Q3) Just exponentiate the CIs for the model coefficients for the model
+> fitted with measure = "IRLN". So, exp(3.1798) is the first rate ratio with
+> (approximate) 95% CI exp(1.9348) and exp(4.4248).
+>
+> There is also a technical issue here that is relevant whenever we analyze
+> outcomes on some transformed scale where the transformation is non-linear.
+> exp(3.1798) is actually not the estimated *average* incidence rate for the
+> African region. To be precise, the correct interpretation is that
+> exp(3.1798) is the estimated *median* incidence rate for the African
+> region. The problem is that f(E(X)) != E(f(X)) whenever f() is non-linear
+> (Jensen's inequality). However, f(M(X)) = M(f(X)) when M() is the median.
+>
+> So, if we have the estimated average log incidence rate (which, under the
+> normality assumptions of the model, is equal to the estimated median log
+> incidence rate), the back-transformation gives us the estimated median
+> incidence rate (and not the estimated average incidence rate). So, this is
+> another reason why results are different when you analyze raw or log
+> transformed incidence rates.
+>
+> Essentially everybody ignores this issue when analyzing transformed
+> outcomes. This also applies to correlations, where there was a lot of
+> debate in the literature around the question whether we should analyze raw
+> or r-to-z transformed correlations (Adam Hafdahl eventually pointed out
+> this issue in this context).
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Leo Martinez
+> Sent: Wednesday, 04 September, 2019 18:10
+> To: r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] metafor package in R - Risk ratios using rma.mv()
+>
+> Dear All,
+>
+> Thanks for your previous help on this thread. I just wanted to follow up on
+> this topic with a few additional questions regarding  incident rate ratios
+> and confidence intervals using the metafor package and the rma.mv()
+> command.
+>
+> *Incidence Rates*I calculated the incidence rates (measure = "IR", ti =
+> data$person_years/1000) for tuberculosis on the data subsetted by World
+> Health Organization Region and got the following results from the model.
+>
+> m0 <- rma.mv(yi, vi, method='REML', mods = formula,
+>                         random= ~ 1 | study_id/cohort_id,
+>                         tdist=TRUE,
+>                         data=pd_ec)
+>
+> Americas Region 3.244
+> African Region 19.06
+> Eastern Mediterranean Region 2.491
+> European Region 7.675
+> South-East Asian Region 11.48
+> Western Pacific Region 5.600
+>
+> Rate Ratios:
+>
+> Following your suggestion above for calculating rate ratios for each WHO
+> Region, I used the measure = "IRLN" and exponentiated the coefficients of
+> the model. I got the following model output:
+>
+> Multivariate Meta-Analysis Model (k = 390; method: REML)
+>
+> Variance Components:
+>
+>             estim    sqrt  nlvls  fixed              factor
+> sigma^2.1  2.3898  1.5459     76     no            study_id
+> sigma^2.2  0.5833  0.7637    390     no  study_id/cohort_id
+>
+> Test for Residual Heterogeneity:
+> QE(df = 384) = 118469.9261, p-val < .0001
+>
+> Test of Moderators (coefficients 2:6):
+> F(df1 = 5, df2 = 384) = 7.3370, p-val < .0001
+>
+> Model Results:
+>
+>                                           estimate      se      tval
+> pval
+> intrcpt                                    -7.1326  0.2449  -29.1259
+> <.0001
+> who_region.1African Region                  3.1798  0.6332    5.0217
+> <.0001
+> who_region.1Eastern Mediterranean Region    0.9541  0.9634    0.9904
+> 0.3226
+> who_region.1European Region                 1.8665  0.5612    3.3261
+> 0.0010
+> who_region.1South-East Asian Region         2.6693  0.9360    2.8518
+> 0.0046
+> who_region.1Western Pacific Region          1.4697  0.8381    1.7536
+> 0.0803
+>                                             ci.lb    ci.ub
+> intrcpt                                   -7.6141  -6.6511  ***
+> who_region.1African Region                 1.9348   4.4248  ***
+> who_region.1Eastern Mediterranean Region  -0.9401   2.8483
+> who_region.1European Region                0.7631   2.9698  ***
+> who_region.1South-East Asian Region        0.8290   4.5096   **
+> who_region.1Western Pacific Region        -0.1781   3.1176    .
+>
+> And exponentiating the coefficients, I got the following rate ratios:
+>
+> Intrcpt (Americas) 0.000799
+> African Region 24.04225
+> Eastern Mediterranean Region 2.596419
+> European Region 6.465383
+> South-East Asian Region 14.42971
+> Western Pacific Region 4.348128
+>
+> Based on the incidence rates produced by using the entire dataset in the
+> model and first subsetting by region, these Rate Ratios don't seem to be
+> correct. Simply dividing the incidence rates by a comparator (Region of the
+> Americas) to produce rate ratios would give the following:
+>
+> Region of the Americas
+> African Region 5.875294245
+> Eastern Mediterranean Region 0.767788539
+> European Region 2.365564921
+> South-East Asian Region 3.540304225
+> Western Pacific Region 1.725952561
+>
+> *Q2) Is exponentiating the coefficients (measure = IRLN) the way to
+> calculate rate ratios? Why are these results so different?*
+>
+> *Confidence Intervals*To calculate the 95% confidence intervals for the
+> rate ratios, I first calculated the standard deviation (SD[ln(IR)] = (1/A1
+> + 1/A2)^0.5, where A1 and A2 are the number of tuberculosis cases in each
+> region), and then used the following: 95% CI's = exp[ln(IR) ? 1.96(SD)]).
+> It seems that this does not take into account the nested structure of the
+> data.
+>
+> *Q3) Is there a way to calculate the confidence intervals from the model
+> (either measure = "IRLN" or measure = "IR") output that takes into account
+> the nested structure of the data?*
+> Thank you again for your advice and the creation of this package.
+>
+> Best
+> Leo
+>
+> Leonardo Martinez, PhD, MPH
+> Stanford University School of Medicine
+> Division of Infectious Diseases and Geographic Medicine
+> 300 Pasteur Drive, Lane Building, Stanford, CA 94305
+> Phone: +1.202.769.8090
+> Email: leomarti at stanford.edu; chopotin at gmail.com
+> Website <https://profiles.stanford.edu/leonardo-martinez-pantoja>
+>
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191004/1c753ea8/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: 1003_PR_IR.xlsx
+Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+Size: 14856 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191004/1c753ea8/attachment-0001.xlsx>
+
+From robertob@kker @end|ng |rom gm@||@com  Thu Oct  3 18:54:28 2019
+From: robertob@kker @end|ng |rom gm@||@com (P. Roberto Bakker)
+Date: Thu, 3 Oct 2019 18:54:28 +0200
+Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+Message-ID: <CAKDq9_OTq6NaD4SUuWer+d=BSJc=RMfyz3NWAVZX1w2Cr+HRhw-5103@mail.gmail.com>
+
+Hi everybody
+
+I am performing a meta-analysis (with 'metafor' R-project) as described by
+Becker (1988), and I compute the standardized mean change for a treatment
+and control group.
+
+I compute a (standardized) effect size measure for pretest posttest control
+group designs, where the characteristic, response, or dependent variable
+assessed in the individual studies is a quantitative variable (Morris 2008).
+
+Now, two new articles are published recently with only the posttests.
+
+Question: can SMDs still be calculated with only the posttest (and sd) of
+treatment and control groups?
+
+Thank you in advance, Roberto
+
+	[[alternative HTML version deleted]]
+
+
+From dm@h@b@n @end|ng |rom gm@||@com  Sat Oct  5 12:30:47 2019
+From: dm@h@b@n @end|ng |rom gm@||@com (=?UTF-8?Q?Daniel_M=C3=B8nsted_Shabanzadeh?=)
+Date: Sat, 5 Oct 2019 12:30:47 +0200
+Subject: [R-meta] Back transformation of double arscine transformed
+ estimates in metafor
+In-Reply-To: <alpine.DEB.2.20.1910041328050.27430@wv-x1>
+References: <CABgeOtOTK8-6vu_w4eT6tNgzyF13MCbDm+RA6TtEa5w6kKM=TA@mail.gmail.com>
+ <e46a7ba0c3b14cfa8060b798af6fd294@UM-MAIL3214.unimaas.nl>
+ <CABgeOtN5FhJMwdDj5bS9-jnQ6ZVNs-FnyEk4A-gkQ2KXuvQWZQ@mail.gmail.com>
+ <alpine.DEB.2.20.1910041328050.27430@wv-x1>
+Message-ID: <CABgeOtMaz=ijvy+rmBLi6rQ+qCK4GPkMesAcgP_fKHsZ1LAbvA@mail.gmail.com>
+
+Dear Wolfgang
+
+I have now run the models, but still seem to have some conversion
+problems when trying to obtain proportions from the regression model.
+The variable age_cor is categorical with 6 levels (level 5 is ref.).
+
+b<-rma.glmm(xi=compl_treat, ni=total, mods = ~age_cor, measure = "PLO", data=a)
+c<-predict(b, newmods=c(0,0,0,0,1), transf=transf.ilogit)
+print(c)
+
+pred  ci.lb  ci.ub  cr.lb  cr.ub
+ 0.0183 0.0064 0.0516 0.0011 0.2460
+
+
+As far as I interpretate this results, it means that if age_cor is fixed at
+0 in level 1-4 and level 5 is fixed at 1, the proportion is 0.0183. Is it
+not possible to obtain proportions from all levels in the variabel when one
+level is the reference? Like the case in studies with relative
+risks exploring multiple level categorical variables with one reference
+level.
+
+Regards,
+Daniel
+
+Daniel M?nsted Shabanzadeh
+MD, PhD
+Department of Gastroenterology, Surgical Unit
+Hvidovre Hospital
+Mobile +45 2546 5251
+
+
+On Fri, Oct 4, 2019 at 1:30 PM Wolfgang Viechtbauer <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> 1) The logistic model also doesn't require adjustments to the counts, so
+> yes, it has the same advantage as the PFT (and PAS) transformation.
+>
+> 2) You are doing a meta-analysis of proportions, but the analysis is
+> carried out on a transformed scale (like with PFT). When you use a
+> logistic model, you are (implicitly) doing the analysis on a logit scale.
+> For easier interpretation, we then typically transform the results back to
+> odds or directly to proportions.
+>
+>
+> Best,
+> Wolfgang
+>
+> > Thank you for your reply!
+> > A few questions remain:
+> > 1. The reason for using FT transformation was due to many outcomes being
+> > equal to 0 in proportions and thereby to avoid adding numbers that
+> distort
+> > the estimates. Would the PAS or PLO have the same advantages as the FT
+> > transformation in this regard?
+> > 2. The meta-regression is performed on proportions and not on relative
+> > risks or odds. Can a meta-regression on proportions be performed in PAS
+> or
+> > PLO?
+> >
+> > Regards,
+> > Daniel
+> >
+> > fre. 4. okt. 2019 11.35 skrev Viechtbauer, Wolfgang (SP) <
+> > wolfgang.viechtbauer at maastrichtuniversity.nl>:
+> >
+> >> Dear Daniel,
+> >>
+> >> predict(metareg, transf=transf.ipft.hm, targ=list(ni=a$total)) gives
+> you
+> >> the fitted values (proportions) for the 11 studies. So these are the
+> >> predicted values (based on the model) for whatever values these studies
+> >> take on for the moderator variables. If you want to compute predicted
+> >> values for other combinations of moderator values, you need to use the
+> >> 'newmods' argument. For example:
+> >>
+> >> predict(metareg, newmods = c(0,1,1,0),
+> >>         transf=transf.ipft.hm, targ=list(ni=a$total))
+> >>
+> >> will give the predicted value (proportion) for continent = North
+> America,
+> >> age = infant, and pm = LA (based on your post on Stack Overflow --
+> >>
+> https://stackoverflow.com/questions/58203464/reverse-transformation-of-double-arscine-transformed-estimates-when-doing-meta-r
+> >> -- I can see that pm has two levels, LA (reference level) and TA).
+> >>
+> >> By varying one moderator and holding the other moderators constant, you
+> >> can illustrate how a moderator affects the results (you cannot just take
+> >> the model coefficients and transform them).
+> >>
+> >> But: The back-transformation for the FT transformation is problematic.
+> >> Please take a look at:
+> >>
+> >> https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1348
+> >>
+> >> Even though the FT transformation has some nice properties, I would
+> >> therefore avoid it (because we typically do want to back-transform in
+> the
+> >> end). You could either just use the 'standard' arcsine square root
+> >> transformation (measure="PAS") or maybe even better switch to a logistic
+> >> mixed-effects model, which you can fit with rma.glmm():
+> >>
+> >> metareg <- rma.glmm(measure="PLO", ai=compl, nu=total, data=a,
+> >>                     mods = ~ continent + age + pm)
+> >>
+> >> The results are then analyzed on the logit (log odds) scale. So, the
+> >> back-transformation to odds would be:
+> >>
+> >> predict(metareg, newmods = c(0,1,1,0), transf=exp)
+> >>
+> >> In fact, here, you can exponentiate the coefficients themselves, which
+> >> then reflect odds ratios:
+> >>
+> >> round(exp(coef(summary(metareg))[,c("estimtate", "ci.lb", "ci.ub")]),
+> 3)
+> >>
+> >> The back-transformation to proportions would be:
+> >>
+> >> predict(metareg, newmods = c(0,1,1,0), transf=transf.ilogit)
+> >>
+> >> Best,
+> >> Wolfgang
+> >>
+> >> -----Original Message-----
+> >> From: R-sig-meta-analysis [mailto:
+> >> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Daniel M?nsted
+> >> Shabanzadeh
+> >> Sent: Friday, 04 October, 2019 10:47
+> >> To: r-sig-meta-analysis at r-project.org
+> >> Subject: [R-meta] Back transformation of double arscine transformed
+> >> estimates in metafor
+> >>
+> >> Hey
+> >>
+> >> I am performing a meta-regression of multiple single arm
+> >> studies. The outcome is proportions of complications following a
+> specific
+> >> surgical treatment which is the same for all included studies. I want to
+> >> explore if variables such as age, continent or medications have an
+> impact
+> >> on the outcome. Since some of the identified studies have 0
+> complications
+> >> events I have performed Freeman-Tuckey double arscine transformation of
+> >> data.
+> >>
+> >> Data transformation
+> >> b<-escalc(xi=compl, ni=total, data=a, measure="PFT", add=0)
+> >>
+> >> Meta-regression of multiple identified studies
+> >> metareg<-rma(yi, vi, data=b, mods=~continent+age+pm)
+> >> print(metareg)
+> >>
+> >> Mixed-Effects Model (k = 11; tau^2 estimator: REML)
+> >>
+> >> tau^2 (estimated amount of residual heterogeneity):     0.0091 (SE =
+> >> 0.0060)
+> >> tau (square root of estimated tau^2 value):             0.0952
+> >> I^2 (residual heterogeneity / unaccounted variability): 91.15%
+> >> H^2 (unaccounted variability / sampling variability):   11.30
+> >> R^2 (amount of heterogeneity accounted for):            28.85%
+> >>
+> >> Test for Residual Heterogeneity:
+> >> QE(df = 6) = 78.3204, p-val < .0001
+> >>
+> >> Test of Moderators (coefficient(s) 2:5):
+> >> QM(df = 4) = 7.6936, p-val = 0.1035
+> >>
+> >> Model Results:
+> >>
+> >>                         estimate      se     zval    pval    ci.lb
+>  ci.ub
+> >> intrcpt                   0.3197  0.1079   2.9640  0.0030   0.1083
+> >> 0.5311  **
+> >> continentAsia            -0.1666  0.1062  -1.5685  0.1168  -0.3747
+> 0.0416
+> >> continentNorth America   -0.1755  0.1067  -1.6452  0.0999  -0.3845
+> >> 0.0336   .
+> >> ageinfant                 0.1824  0.0741   2.4616  0.0138   0.0372
+> >> 0.3277   *
+> >> pmTA                     -0.1484  0.0973  -1.5252  0.1272  -0.3392
+> 0.0423
+> >>
+> >> ---
+> >> Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+> >>
+> >> These estimates and CI are transformed. Usually I would transform them
+> back
+> >> to proportions with predict in presence of simple models. But I am not
+> sure
+> >> hos to do it in multiple models.
+> >>
+> >> predict(metareg, transf=transf.ipft.hm, targ=list(ni=a$total)). This
+> gives
+> >> us multiple lines of estimates which I cannot interpretate:
+> >>
+> >>      pred  ci.lb  ci.ub  cr.lb  cr.ub
+> >> 1  0.0259 0.0017 0.0715 0.0000 0.1388
+> >> 2  0.0202 0.0005 0.0594 0.0000 0.1245
+> >> 3  0.0000 0.0000 0.0348 0.0000 0.0692
+> >> 4  0.0202 0.0005 0.0594 0.0000 0.1245
+> >> 5  0.1058 0.0290 0.2206 0.0056 0.2976
+> >> 6  0.0175 0.0000 0.0940 0.0000 0.1478
+> >> 7  0.1174 0.0380 0.2310 0.0100 0.3110
+> >> 8  0.0202 0.0005 0.0594 0.0000 0.1245
+> >> 9  0.0283 0.0000 0.1236 0.0000 0.1799
+> >> 10 0.0259 0.0017 0.0715 0.0000 0.1388
+> >> 11 0.0259 0.0017 0.0715 0.0000 0.1388
+> >>
+> >> How do I obtain estimates of proportions for the impact of each variable
+> >> explored in the model?
+> >>
+> >> Regards,
+> >> Daniel
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sat Oct  5 14:16:11 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sat, 5 Oct 2019 12:16:11 +0000
+Subject: [R-meta] Back transformation of double arscine transformed
+ estimates in metafor
+In-Reply-To: <CABgeOtMaz=ijvy+rmBLi6rQ+qCK4GPkMesAcgP_fKHsZ1LAbvA@mail.gmail.com>
+References: <CABgeOtOTK8-6vu_w4eT6tNgzyF13MCbDm+RA6TtEa5w6kKM=TA@mail.gmail.com>
+ <e46a7ba0c3b14cfa8060b798af6fd294@UM-MAIL3214.unimaas.nl>
+ <CABgeOtN5FhJMwdDj5bS9-jnQ6ZVNs-FnyEk4A-gkQ2KXuvQWZQ@mail.gmail.com>
+ <alpine.DEB.2.20.1910041328050.27430@wv-x1>
+ <CABgeOtMaz=ijvy+rmBLi6rQ+qCK4GPkMesAcgP_fKHsZ1LAbvA@mail.gmail.com>
+Message-ID: <0e9ac38c466249e988ebe74b5b6a3592@UM-MAIL3214.unimaas.nl>
+
+Dear Daniel,
+
+If level 5 is the reference level, then that is what the intercept represents, so the 0.0183 cannot represent level 5. You would have to provide the output of 'b' for me to tell you better what is being estimated here, but 0.0183 is the estimated proportion for whatever level the last coefficient represents in the model.
+
+If you want all estimated proportions for all 6 levels, then you can get this with a single command:
+
+predict(b, newmods=rbind(0, diag(5)), transf=transf.ilogit)
+
+The first will be for the reference level, the rest for each other level.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Daniel M?nsted Shabanzadeh [mailto:dmshaban at gmail.com] 
+Sent: Saturday, 05 October, 2019 12:31
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Back transformation of double arscine transformed estimates in metafor
+
+Dear Wolfgang
+
+I have now run the models, but still seem to have some conversion problems when trying to obtain proportions from the regression model. The variable age_cor is categorical with?6 levels (level 5 is ref.).
+
+b<-rma.glmm(xi=compl_treat, ni=total, mods = ~age_cor, measure = "PLO", data=a)
+c<-predict(b, newmods=c(0,0,0,0,1), transf=transf.ilogit)
+print(c)
+
+pred  ci.lb  ci.ub  cr.lb  cr.ub
+ 0.0183 0.0064 0.0516 0.0011 0.2460
+
+As far as I interpretate this results, it means that if age_cor is fixed at 0 in level 1-4 and level 5 is fixed at 1, the proportion is?0.0183. Is it not possible to?obtain proportions?from all levels in the variabel?when one level is?the reference? Like the case in studies with relative risks?exploring multiple level categorical variables with one reference level. ??
+
+Regards,
+Daniel
+
+Daniel M?nsted Shabanzadeh
+MD, PhD
+Department of Gastroenterology, Surgical Unit
+Hvidovre Hospital
+Mobile?+45 2546 5251
+
+From dm@h@b@n @end|ng |rom gm@||@com  Sat Oct  5 17:55:46 2019
+From: dm@h@b@n @end|ng |rom gm@||@com (=?UTF-8?Q?Daniel_M=C3=B8nsted_Shabanzadeh?=)
+Date: Sat, 5 Oct 2019 17:55:46 +0200
+Subject: [R-meta] Back transformation of double arscine transformed
+ estimates in metafor
+In-Reply-To: <0e9ac38c466249e988ebe74b5b6a3592@UM-MAIL3214.unimaas.nl>
+References: <CABgeOtOTK8-6vu_w4eT6tNgzyF13MCbDm+RA6TtEa5w6kKM=TA@mail.gmail.com>
+ <e46a7ba0c3b14cfa8060b798af6fd294@UM-MAIL3214.unimaas.nl>
+ <CABgeOtN5FhJMwdDj5bS9-jnQ6ZVNs-FnyEk4A-gkQ2KXuvQWZQ@mail.gmail.com>
+ <alpine.DEB.2.20.1910041328050.27430@wv-x1>
+ <CABgeOtMaz=ijvy+rmBLi6rQ+qCK4GPkMesAcgP_fKHsZ1LAbvA@mail.gmail.com>
+ <0e9ac38c466249e988ebe74b5b6a3592@UM-MAIL3214.unimaas.nl>
+Message-ID: <CABgeOtP7hkE4c+WKqL50tmDCZ9X4GzMxOOoCwziGxAO8JV25-g@mail.gmail.com>
+
+Dear Wolfgang
+
+The variable age_cor has 6 levels (ref. level 5)
+
+
+ table(a$age_cor)
+      5       1       2       3       4 missing
+    111     140      27     113      19       8
+
+
+
+With your code suggestion slightly modified
+b<-rma.glmm(xi=compl_treat, ni=total, mods = ~age_cor, measure = "PLO",
+data=a)
+print(b)
+
+
+Mixed-Effects Model (k = 401; tau^2 estimator: ML)
+
+tau^2 (estimated amount of residual heterogeneity):     1.8327
+tau (square root of estimated tau^2 value):             1.3538
+I^2 (residual heterogeneity / unaccounted variability): 98.91%
+H^2 (unaccounted variability / sampling variability):   91.85
+
+Tests for Residual Heterogeneity:
+Wld(df = 395) = 4777257347008370311248.0000, p-val < .0001
+LRT(df = 395) =                      0.0000, p-val = 1.0000
+
+Test of Moderators (coefficient(s) 2:6):
+QM(df = 5) = 20.3959, p-val = 0.0011
+
+Model Results:
+
+                estimate      se      zval    pval    ci.lb    ci.ub
+intrcpt          -3.9819  0.1456  -27.3422  <.0001  -4.2674  -3.6965  ***
+age_cor1          0.3358  0.1922    1.7474  0.0806  -0.0408   0.7124    .
+age_cor2          0.3169  0.3093    1.0244  0.3057  -0.2894   0.9231
+age_cor3          0.8528  0.2012    4.2397  <.0001   0.4586   1.2471  ***
+age_cor4         -0.0370  0.3850   -0.0962  0.9234  -0.7916   0.7176
+age_cormissing    0.0009  0.5648    0.0016  0.9987  -1.1061   1.1080
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1
+
+
+c<-predict(b, newmods=rbind(0, diag(5)), transf=transf.ilogit)
+print(c)
+
+    pred  ci.lb  ci.ub  cr.lb  cr.ub
+1 0.0183 0.0138 0.0242 0.0013 0.2119
+2 0.0254 0.0200 0.0323 0.0018 0.2726
+3 0.0250 0.0148 0.0419 0.0017 0.2772
+4 0.0419 0.0322 0.0544 0.0030 0.3866
+5 0.0177 0.0089 0.0349 0.0012 0.2184
+6 0.0183 0.0064 0.0516 0.0011 0.2460
+
+
+- Is the interpretation that line 1 represents the age_cor reference
+level (level 5) proportion and the remaining levels as listed in print (b)?
+- If I want to explore age_cor further, can I add multiple moderators to
+the model and just increase the diag in predict?
+
+Regards,
+Daniel
+
+
+Daniel M?nsted Shabanzadeh
+MD, PhD
+Department of Gastroenterology, Surgical Unit
+Hvidovre Hospital
+Mobile +45 2546 5251
+
+
+On Sat, Oct 5, 2019 at 2:16 PM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Daniel,
+>
+> If level 5 is the reference level, then that is what the intercept
+> represents, so the 0.0183 cannot represent level 5. You would have to
+> provide the output of 'b' for me to tell you better what is being estimated
+> here, but 0.0183 is the estimated proportion for whatever level the last
+> coefficient represents in the model.
+>
+> If you want all estimated proportions for all 6 levels, then you can get
+> this with a single command:
+>
+> predict(b, newmods=rbind(0, diag(5)), transf=transf.ilogit)
+>
+> The first will be for the reference level, the rest for each other level.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Daniel M?nsted Shabanzadeh [mailto:dmshaban at gmail.com]
+> Sent: Saturday, 05 October, 2019 12:31
+> To: Viechtbauer, Wolfgang (SP)
+> Cc: r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] Back transformation of double arscine transformed
+> estimates in metafor
+>
+> Dear Wolfgang
+>
+> I have now run the models, but still seem to have some conversion problems
+> when trying to obtain proportions from the regression model. The variable
+> age_cor is categorical with 6 levels (level 5 is ref.).
+>
+> b<-rma.glmm(xi=compl_treat, ni=total, mods = ~age_cor, measure = "PLO",
+> data=a)
+> c<-predict(b, newmods=c(0,0,0,0,1), transf=transf.ilogit)
+> print(c)
+>
+> pred  ci.lb  ci.ub  cr.lb  cr.ub
+>  0.0183 0.0064 0.0516 0.0011 0.2460
+>
+> As far as I interpretate this results, it means that if age_cor is fixed
+> at 0 in level 1-4 and level 5 is fixed at 1, the proportion is 0.0183. Is
+> it not possible to obtain proportions from all levels in the variabel when
+> one level is the reference? Like the case in studies with relative
+> risks exploring multiple level categorical variables with one reference
+> level.
+>
+> Regards,
+> Daniel
+>
+> Daniel M?nsted Shabanzadeh
+> MD, PhD
+> Department of Gastroenterology, Surgical Unit
+> Hvidovre Hospital
+> Mobile +45 2546 5251
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sat Oct  5 23:36:39 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sat, 5 Oct 2019 21:36:39 +0000
+Subject: [R-meta] Back transformation of double arscine transformed
+ estimates in metafor
+In-Reply-To: <CABgeOtP7hkE4c+WKqL50tmDCZ9X4GzMxOOoCwziGxAO8JV25-g@mail.gmail.com>
+References: <CABgeOtOTK8-6vu_w4eT6tNgzyF13MCbDm+RA6TtEa5w6kKM=TA@mail.gmail.com>
+ <e46a7ba0c3b14cfa8060b798af6fd294@UM-MAIL3214.unimaas.nl>
+ <CABgeOtN5FhJMwdDj5bS9-jnQ6ZVNs-FnyEk4A-gkQ2KXuvQWZQ@mail.gmail.com>
+ <alpine.DEB.2.20.1910041328050.27430@wv-x1>
+ <CABgeOtMaz=ijvy+rmBLi6rQ+qCK4GPkMesAcgP_fKHsZ1LAbvA@mail.gmail.com>
+ <0e9ac38c466249e988ebe74b5b6a3592@UM-MAIL3214.unimaas.nl>
+ <CABgeOtP7hkE4c+WKqL50tmDCZ9X4GzMxOOoCwziGxAO8JV25-g@mail.gmail.com>
+Message-ID: <8a7d257e15f841048b4426bfbf1e9c14@UM-MAIL3214.unimaas.nl>
+
+- Is the interpretation that line 1 represents the age_cor reference level (level 5) proportion and the remaining levels as listed in print (b)? 
+
+Yes!
+
+- If I want to explore age_cor further, can I add multiple moderators to the model and just increase the diag in predict?
+
+Do you mean: More levels of age_cor? Then yes. If you mean adding additional moderators, then it depends on what kind of moderators you are adding. They may not be dummy variables.
+
+These might be useful readings:
+
+http://www.metafor-project.org/doku.php/tips:testing_factors_lincoms
+
+http://www.metafor-project.org/doku.php/tips:multiple_factors_interactions
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Daniel M?nsted Shabanzadeh [mailto:dmshaban at gmail.com] 
+Sent: Saturday, 05 October, 2019 17:56
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Back transformation of double arscine transformed estimates in metafor
+
+Dear Wolfgang
+
+The variable age_cor has 6 levels (ref. level 5)
+
+ table(a$age_cor)
+
+      5       1       2       3       4 missing 
+    111     140      27     113      19       8 
+
+With your code suggestion slightly modified 
+b<-rma.glmm(xi=compl_treat, ni=total, mods = ~age_cor, measure = "PLO", data=a)
+print(b)
+
+Mixed-Effects Model (k = 401; tau^2 estimator: ML)
+
+tau^2 (estimated amount of residual heterogeneity):     1.8327
+tau (square root of estimated tau^2 value):             1.3538
+I^2 (residual heterogeneity / unaccounted variability): 98.91%
+H^2 (unaccounted variability / sampling variability):   91.85
+
+Tests for Residual Heterogeneity: 
+Wld(df = 395) = 4777257347008370311248.0000, p-val < .0001
+LRT(df = 395) =                      0.0000, p-val = 1.0000
+
+Test of Moderators (coefficient(s) 2:6): 
+QM(df = 5) = 20.3959, p-val = 0.0011
+
+Model Results:
+
+                estimate      se      zval    pval    ci.lb    ci.ub     
+intrcpt          -3.9819  0.1456  -27.3422  <.0001  -4.2674  -3.6965  ***
+age_cor1          0.3358  0.1922    1.7474  0.0806  -0.0408   0.7124    .
+age_cor2          0.3169  0.3093    1.0244  0.3057  -0.2894   0.9231     
+age_cor3          0.8528  0.2012    4.2397  <.0001   0.4586   1.2471  ***
+age_cor4         -0.0370  0.3850   -0.0962  0.9234  -0.7916   0.7176     
+age_cormissing    0.0009  0.5648    0.0016  0.9987  -1.1061   1.1080     
+
+---
+Signif. codes:  0 ?***? 0.001 ?**? 0.01 ?*? 0.05 ?.? 0.1 ? ? 1 
+
+c<-predict(b, newmods=rbind(0, diag(5)), transf=transf.ilogit)
+print(c)
+    pred  ci.lb  ci.ub  cr.lb  cr.ub
+1 0.0183 0.0138 0.0242 0.0013 0.2119
+2 0.0254 0.0200 0.0323 0.0018 0.2726
+3 0.0250 0.0148 0.0419 0.0017 0.2772
+4 0.0419 0.0322 0.0544 0.0030 0.3866
+5 0.0177 0.0089 0.0349 0.0012 0.2184
+6 0.0183 0.0064 0.0516 0.0011 0.2460
+
+- Is the interpretation that line 1 represents the age_cor reference level?(level 5) proportion?and the remaining levels as listed in print (b)? 
+- If I want to explore age_cor further, can I add multiple moderators to the model?and just increase?the?diag in predict?
+
+Regards,
+Daniel??
+?
+Daniel M?nsted Shabanzadeh
+MD, PhD
+Department of Gastroenterology, Surgical Unit
+Hvidovre Hospital
+Mobile?+45 2546 5251?
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sat Oct  5 23:40:52 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sat, 5 Oct 2019 21:40:52 +0000
+Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+In-Reply-To: <CAKDq9_OTq6NaD4SUuWer+d=BSJc=RMfyz3NWAVZX1w2Cr+HRhw-5103@mail.gmail.com>
+References: <CAKDq9_OTq6NaD4SUuWer+d=BSJc=RMfyz3NWAVZX1w2Cr+HRhw-5103@mail.gmail.com>
+Message-ID: <25df3e2ee4e1432aa92a6b77a8e03922@UM-MAIL3214.unimaas.nl>
+
+Hi Roberto,
+
+Yes. In fact, that's essentially the original definition of the SMD, that is, the difference between two groups at the posttest divided by the SD (at the posttest).
+
+One can debate to what extent the standardized mean change (of a single group), the difference between two standardized mean changes (of two groups), and the standardized mean difference at the posttest (again, of two groups) can be combined in a single analysis. The canonical reference regarding this issue is:
+
+Morris, S. B., & DeShon, R. P. (2002). Combining effect size estimates in meta-analysis with repeated measures and independent-groups designs. Psychological Methods, 7(1), 105-125.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of P. Roberto Bakker
+Sent: Thursday, 03 October, 2019 18:54
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+
+Hi everybody
+
+I am performing a meta-analysis (with 'metafor' R-project) as described by
+Becker (1988), and I compute the standardized mean change for a treatment
+and control group.
+
+I compute a (standardized) effect size measure for pretest posttest control
+group designs, where the characteristic, response, or dependent variable
+assessed in the individual studies is a quantitative variable (Morris 2008).
+
+Now, two new articles are published recently with only the posttests.
+
+Question: can SMDs still be calculated with only the posttest (and sd) of
+treatment and control groups?
+
+Thank you in advance, Roberto
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sat Oct  5 23:49:17 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sat, 5 Oct 2019 21:49:17 +0000
+Subject: [R-meta] metafor package in R - Risk ratios using rma.mv()
+In-Reply-To: <CA+N-+=cpjGa7t1_YKRRze_V4xkcrhurkoVxQJhXrWJsNzENMcw@mail.gmail.com>
+References: <CAAkeBhmrQGOiW9FJr+9P9nPePcAk3YPUDU5NDFxEr0jcmuJdOA@mail.gmail.com>
+ <f737ae70ee254206a55c3982b2bd8513@UM-MAIL3214.unimaas.nl>
+ <CAAkeBh=j=OOiEN-kwR4Y6z4E=8SOQDm5KUsdYUeHJ8MryYVUVw@mail.gmail.com>
+ <18c3e033-a198-301f-ab44-bdbe450df393@dewey.myzen.co.uk>
+ <CAAkeBhkdvSmrLZanH6sQgCxnB+HYg_FVji7=OyYysLrfMBRy+Q@mail.gmail.com>
+ <CA+N-+=e-4GJbxBQV+72LoBu+ixupjirTYUnV1MzNupi1ctbdKw@mail.gmail.com>
+ <464e235a51e048fca1098126ecf51c36@UM-MAIL3214.unimaas.nl>
+ <CA+N-+=cpjGa7t1_YKRRze_V4xkcrhurkoVxQJhXrWJsNzENMcw@mail.gmail.com>
+Message-ID: <dd2497e1d608440ca57073ed8fe37225@UM-MAIL3214.unimaas.nl>
+
+Dear Olivia and Leo,
+
+rma.glmm() does Poisson and logistic models for incidences and proportions, respectively, but it cannot fit models with multilevel strutures (which is what 'random = ~ 1 | study_id/cohort_id' implies you are dealing with). You can however fit such models directly using glmer() from the 'lme4' package. Alternatively, you can stick to rma.mv() (which does allow you to account for the multilevel structure as you are doing right now) and switch to analyzing log incidence rates (IRLN) and logit transformed proportions (PLO) (note: for proportions, the logit transformation is usually better than using log-transformed proportions).
+
+Once you fit such models and then apply the respective back-transformations (exp for IRLN, transf.ilogit for PLO), you are guaranteed to get non-negative estimates and confidence interval bounds. That's just the nature of these transformations. For example, exp() will give you something that is >=0 no matter what value you plug in.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Leo Martinez [mailto:leomarti at stanford.edu] 
+Sent: Saturday, 05 October, 2019 0:28
+To: Viechtbauer, Wolfgang (SP)
+Cc: Olivia Cords; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] metafor package in R - Risk ratios using rma.mv()
+
+ATTACHMENT(S) REMOVED: 1003_PR_IR.xlsx 
+
+Dear Wolfgang and All,?
+
+Thanks so much for your prior help.?
+We have calculated incidence and prevalence rates from a mixed-effects model using the?rma.mv?command. We are attaching the results below.
+
+Variable??????? Cohorts (n)???? Incidence Rate/100k???? Lower 95% CI??? Upper 95% CI
+World Health Organization Region??????? ??????? ??????? ???????
+??? Americas??? 225???? 324.5?? 166.7?? 482.2
+??? African???? 30????? 1906.4? 1134.1? 2678.7
+??? Eastern Mediterranean?????? 24????? 249.1?? 32.3??? 466.0
+??? European??? 33????? 767.6?? 407.8?? 1127.3
+??? South-East Asia???? 48????? 1148.7? 628.6?? 1668.9
+??? Western Pacific???? 30????? 560.0?? -131.7? 1251.7
+
+??????? Cohorts (n)???? Prevalence Rate Lower 95% CI??? Upper 95% CI
+World Health Organization Region??????? ??????? ??????? ???????
+??? Americas??? 33????? 1.7???? 0.9???? 2.5
+??? African???? 31????? 2.8???? 1.4???? 4.1
+??? Eastern Mediterranean?????? 7?????? 1.9???? 0.5???? 3.4
+??? European??? 21????? 1.9???? 0.8???? 3.0
+??? South-East Asian??? 10????? 2.4???? -1.1??? 6.0
+??? Western Pacific???? 54????? 1.2???? -0.1??? 2.4
+
+Unfortunately we have some negative confidence intervals for some of our incidence and prevalence estimates. We would like to not have any negative confidence intervals?and therefore would like to switch the models that we are using.
+
+Is there a way to keep our code (which we have put below for both incidence and prevalence) and run a poisson model for incidence and a binary or beta model for prevalence so that we no longer have a negative confidence interval for some of our variables? We noticed that when we run the model using log transformed incident and prevalence rates, the confidence intervals are positive. We are also wondering what the difference is between using PR/IR versus PLN/IRLN for fitting the model, and why the latter would result in all positive confidence intervals.
+
+Thank you again for all your help!?
+
+Best
+Olivia and Leo
+
+Code for incidence rates:?
+#data subsetted by WHO region
+
+pd_ec <- escalc(measure = 'IR', xi = data_sub$inc_positive,ti = data_sub$inc_person_years, append = TRUE,?
+? ? ? ? ? ? data = data_sub)?
+
+m0 <-?rma.mv(yi, vi, method='REML', mods = formula,
+? ? ? ? ? ? ? ? ? ? ? ? random= ~ 1 | study_id/cohort_id,
+? ? ? ? ? ? ? ? ? ? ? ? tdist=TRUE,
+? ? ? ? ? ? ? ? ? ? ? ? data=pd_ec)
+
+Code for prevalence rates:?
+#data subsetted by WHO region
+
+pd_ec <- escalc(
+? ? ? ? ? ? measure = 'PR', xi = data_sub$prev_positive,ni = data_sub$prev_total_n, append = TRUE,
+? ? ? ? ? ? data = data_sub)
+
+?m0 <-?rma.mv(yi, vi, method='REML', mods = formula,
+? ? ? ? ? ? ? ? ? ? ? ? random= ~ 1 | study_id/cohort_id,
+? ? ? ? ? ? ? ? ? ? ? ? tdist=TRUE,
+? ? ? ? ? ? ? ? ? ? ? ? data=pd_ec)
+
+Thank you for any help you can provide!
+
+Best
+Leo and Olivia
+
+Leonardo Martinez, PhD, MPH
+Stanford University School of Medicine
+Division of Infectious Diseases and Geographic Medicine
+300 Pasteur Drive, Lane Building, Stanford, CA 94305
+Phone: +1.202.769.8090 ?
+Email:?leomarti at stanford.edu;?chopotin at gmail.com
+Website
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sun Oct  6 00:03:58 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sat, 5 Oct 2019 22:03:58 +0000
+Subject: [R-meta] Simple Bayesian meta-analysis in R
+In-Reply-To: <CAKchtifK1wZZZgnFJPwDYtxYxA_vC8jRfgmiZL=ciZpwNPfCrQ@mail.gmail.com>
+References: <CAKchtifK1wZZZgnFJPwDYtxYxA_vC8jRfgmiZL=ciZpwNPfCrQ@mail.gmail.com>
+Message-ID: <24840b407abe4fb3ae914983a14a6970@UM-MAIL3214.unimaas.nl>
+
+Dear Gaspar,
+
+Yes, your model code is correct. 
+
+I don't know how to extract a Bayes factor here, but you can in essence examine the equivalence by looking at the coefficient corresponding to the 'version' dummy variable (this should be called something like 'beta_version' in the output). This coefficient represents the *difference* between the two versions, so if it is 0, then there is no difference. Obviously, that difference will never be exactly 0, so you can look at the 2.5% and 97.5% percentiles of the posterior distribution of that coefficient. You can be 95% certain that the difference falls within these bounds.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Gaspar Lukacs
+Sent: Friday, 27 September, 2019 17:45
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Simple Bayesian meta-analysis in R
+
+Hi,
+
+I'd like to conduct a Bayesian meta-analysis in R in order to support
+equivalence between the effects of two design types (within each study).
+E.g., Bayes factors would be perfect.
+
+The metaBMA package seems to imply that I can get simple Bayes factors for
+a moderator in a meta-analysis. (Most other Bayesian packages don't seem to
+allow moderators.) But I don't find any info about how exactly to use it
+and/or how to interpret the output.
+
+Here is a simple example:
+
+bayes_model = metaBMA::meta_random(
+    y = cohens_d~version,
+    SE = sed,
+    labels = study,
+    data = met_bf
+)
+
+"cohens_d" is the effect in each study, separately for each of the two
+levels of "version", and I would simply want to know whether there is
+substantial support for the equivalence between the "version" factors. Is
+this model correct? And in any case, how can I get Bayes factors out of it
+(or any direct proof of equivalence)?
+
+A more detailed description of the question is here (where I was suggested
+this mailing list):
+https://stats.stackexchange.com/questions/428654/simple-bayesian-meta-analysis-in-r
+
+I'd much appreciate any help.
+
+Best,
+Gaspar
+
+
+From g@@p@r@|uk@c@ @end|ng |rom un|v|e@@c@@t  Sun Oct  6 11:23:33 2019
+From: g@@p@r@|uk@c@ @end|ng |rom un|v|e@@c@@t (Gaspar Lukacs)
+Date: Sun, 6 Oct 2019 11:23:33 +0200
+Subject: [R-meta] Simple Bayesian meta-analysis in R
+In-Reply-To: <24840b407abe4fb3ae914983a14a6970@UM-MAIL3214.unimaas.nl>
+References: <CAKchtifK1wZZZgnFJPwDYtxYxA_vC8jRfgmiZL=ciZpwNPfCrQ@mail.gmail.com>
+ <24840b407abe4fb3ae914983a14a6970@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAKchtieDewU2eM3ohCjb7r5vVFChPpOPq01hE64Cx26ZSZoA3w@mail.gmail.com>
+
+Thanks for the reply Wolfgang! That's a good start to know that the model
+is correct. But yeah, the CI for equivalence is pretty much the same as
+with frequentist approach. So what would be more convincing (for
+reviewers..) is to show Bayes factors.
+
+On Sun, 6 Oct 2019 at 00:04, Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Gaspar,
+>
+> Yes, your model code is correct.
+>
+> I don't know how to extract a Bayes factor here, but you can in essence
+> examine the equivalence by looking at the coefficient corresponding to the
+> 'version' dummy variable (this should be called something like
+> 'beta_version' in the output). This coefficient represents the *difference*
+> between the two versions, so if it is 0, then there is no difference.
+> Obviously, that difference will never be exactly 0, so you can look at the
+> 2.5% and 97.5% percentiles of the posterior distribution of that
+> coefficient. You can be 95% certain that the difference falls within these
+> bounds.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Gaspar Lukacs
+> Sent: Friday, 27 September, 2019 17:45
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Simple Bayesian meta-analysis in R
+>
+> Hi,
+>
+> I'd like to conduct a Bayesian meta-analysis in R in order to support
+> equivalence between the effects of two design types (within each study).
+> E.g., Bayes factors would be perfect.
+>
+> The metaBMA package seems to imply that I can get simple Bayes factors for
+> a moderator in a meta-analysis. (Most other Bayesian packages don't seem to
+> allow moderators.) But I don't find any info about how exactly to use it
+> and/or how to interpret the output.
+>
+> Here is a simple example:
+>
+> bayes_model = metaBMA::meta_random(
+>     y = cohens_d~version,
+>     SE = sed,
+>     labels = study,
+>     data = met_bf
+> )
+>
+> "cohens_d" is the effect in each study, separately for each of the two
+> levels of "version", and I would simply want to know whether there is
+> substantial support for the equivalence between the "version" factors. Is
+> this model correct? And in any case, how can I get Bayes factors out of it
+> (or any direct proof of equivalence)?
+>
+> A more detailed description of the question is here (where I was suggested
+> this mailing list):
+>
+> https://stats.stackexchange.com/questions/428654/simple-bayesian-meta-analysis-in-r
+>
+> I'd much appreciate any help.
+>
+> Best,
+> Gaspar
+>
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Mon Oct  7 02:59:20 2019
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Sun, 6 Oct 2019 19:59:20 -0500
+Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+In-Reply-To: <25df3e2ee4e1432aa92a6b77a8e03922@UM-MAIL3214.unimaas.nl>
+References: <CAKDq9_OTq6NaD4SUuWer+d=BSJc=RMfyz3NWAVZX1w2Cr+HRhw-5103@mail.gmail.com>
+ <25df3e2ee4e1432aa92a6b77a8e03922@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAFUVuJwAiTDckjitrfA00f6NepQLp+4Ps3NUmZXc8Oki1XaF+w@mail.gmail.com>
+
+Roberto,
+
+Just to add a bit to Wolfgang's response: I think it is helpful to consider
+this question under the framework of risk of bias.
+
+If an experiment is properly randomized and there is no attrition, then the
+difference in post-test means is an unbiased estimator of the average
+treatment effect (ATE). The same is true in a pre/post experiment: if the
+randomization is properly conducted and there is not attrition, then the
+difference in mean change scores is an unbiased estimator of the ATE
+(because the difference in pre-test means has expectation zero). In other
+words, both designs are used to estimate the same target parameter (albeit
+with different degrees of precision).
+
+Where discrepancies might arise is if the design isn't perfect, such as if
+the randomization might have been faulty (due to lack of allocation
+concealment or something) or if there is substantial attrition, either of
+which could lead to bias in the estimate of the ATE. The pre-post design is
+probably more robust to such imperfections because it adjusts for baseline
+differences. The post-test only design is likely less robust because
+there's no baseline covariates that could be used to adjust for differences
+between groups at post-test. Considered in light, whether it's a good idea
+to include post-test only designs depends on whether the post-test only
+designs are at low risk of bias.
+
+James
+
+On Sat, Oct 5, 2019 at 4:46 PM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Hi Roberto,
+>
+> Yes. In fact, that's essentially the original definition of the SMD, that
+> is, the difference between two groups at the posttest divided by the SD (at
+> the posttest).
+>
+> One can debate to what extent the standardized mean change (of a single
+> group), the difference between two standardized mean changes (of two
+> groups), and the standardized mean difference at the posttest (again, of
+> two groups) can be combined in a single analysis. The canonical reference
+> regarding this issue is:
+>
+> Morris, S. B., & DeShon, R. P. (2002). Combining effect size estimates in
+> meta-analysis with repeated measures and independent-groups designs.
+> Psychological Methods, 7(1), 105-125.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of P. Roberto Bakker
+> Sent: Thursday, 03 October, 2019 18:54
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+>
+> Hi everybody
+>
+> I am performing a meta-analysis (with 'metafor' R-project) as described by
+> Becker (1988), and I compute the standardized mean change for a treatment
+> and control group.
+>
+> I compute a (standardized) effect size measure for pretest posttest control
+> group designs, where the characteristic, response, or dependent variable
+> assessed in the individual studies is a quantitative variable (Morris
+> 2008).
+>
+> Now, two new articles are published recently with only the posttests.
+>
+> Question: can SMDs still be calculated with only the posttest (and sd) of
+> treatment and control groups?
+>
+> Thank you in advance, Roberto
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Mon Oct  7 14:16:28 2019
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Mon, 7 Oct 2019 14:16:28 +0200
+Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+In-Reply-To: <CAKDq9_OTq6NaD4SUuWer+d=BSJc=RMfyz3NWAVZX1w2Cr+HRhw-5103@mail.gmail.com>
+References: <CAKDq9_OTq6NaD4SUuWer+d=BSJc=RMfyz3NWAVZX1w2Cr+HRhw-5103@mail.gmail.com>
+Message-ID: <e04b9ac1-7be4-d1be-18ca-116080bbed9e@imbi.uni-freiburg.de>
+
+Hi Roberto,
+
+Just to add to the responses by Wolfgang and James.
+
+The Cochrane Handbook warns against combining SMDs based on change 
+scores (pre-post comparisons) and post-test comparisons (see 
+https://training.cochrane.org/handbook/current/chapter-10#section-10-5-2). 
+The reason is that the standard deviation used in the denominator of the 
+SMD is different for change scores and post-tests.
+
+Best wishes, Guido
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Mon Oct  7 14:57:33 2019
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 7 Oct 2019 13:57:33 +0100
+Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+In-Reply-To: <25df3e2ee4e1432aa92a6b77a8e03922@UM-MAIL3214.unimaas.nl>
+References: <CAKDq9_OTq6NaD4SUuWer+d=BSJc=RMfyz3NWAVZX1w2Cr+HRhw-5103@mail.gmail.com>
+ <25df3e2ee4e1432aa92a6b77a8e03922@UM-MAIL3214.unimaas.nl>
+Message-ID: <035b8ae7-6fc3-bbfe-1422-99298264551e@dewey.myzen.co.uk>
+
+Dear Roberto
+
+You may have already thought of this but including a categorical 
+moderator to distinguish the designs would be useful. Of course if it 
+shows that the designs give different results you have the problem of 
+explaining it but at least you know.
+
+This is a supplement to the advice from W, J and G.
+
+Michael
+
+On 05/10/2019 22:40, Viechtbauer, Wolfgang (SP) wrote:
+> Hi Roberto,
+> 
+> Yes. In fact, that's essentially the original definition of the SMD, that is, the difference between two groups at the posttest divided by the SD (at the posttest).
+> 
+> One can debate to what extent the standardized mean change (of a single group), the difference between two standardized mean changes (of two groups), and the standardized mean difference at the posttest (again, of two groups) can be combined in a single analysis. The canonical reference regarding this issue is:
+> 
+> Morris, S. B., & DeShon, R. P. (2002). Combining effect size estimates in meta-analysis with repeated measures and independent-groups designs. Psychological Methods, 7(1), 105-125.
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of P. Roberto Bakker
+> Sent: Thursday, 03 October, 2019 18:54
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+> 
+> Hi everybody
+> 
+> I am performing a meta-analysis (with 'metafor' R-project) as described by
+> Becker (1988), and I compute the standardized mean change for a treatment
+> and control group.
+> 
+> I compute a (standardized) effect size measure for pretest posttest control
+> group designs, where the characteristic, response, or dependent variable
+> assessed in the individual studies is a quantitative variable (Morris 2008).
+> 
+> Now, two new articles are published recently with only the posttests.
+> 
+> Question: can SMDs still be calculated with only the posttest (and sd) of
+> treatment and control groups?
+> 
+> Thank you in advance, Roberto
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Oct  7 22:13:32 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 7 Oct 2019 20:13:32 +0000
+Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+In-Reply-To: <e04b9ac1-7be4-d1be-18ca-116080bbed9e@imbi.uni-freiburg.de>
+References: <CAKDq9_OTq6NaD4SUuWer+d=BSJc=RMfyz3NWAVZX1w2Cr+HRhw-5103@mail.gmail.com>
+ <e04b9ac1-7be4-d1be-18ca-116080bbed9e@imbi.uni-freiburg.de>
+Message-ID: <08882a96272a4f74975f93d3dbc853f8@UM-MAIL3214.unimaas.nl>
+
+That is correct when using standardized mean change values using change score standardization -- and indeed, that's not something that should done. However, the standardized mean change using raw score standardization also standardizes based on the variability at a single time point and hence is in principle comparable to the standardized mean difference at the posttest (leaving aside other issues, such as time effects). I would still be very careful when doing this and I very much like Michael's suggestion to examine this via a moderator analysis.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Guido Schwarzer
+Sent: Monday, 07 October, 2019 14:16
+To: P. Roberto Bakker; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Calculating SMD from posttest only - is this possible?
+
+Hi Roberto,
+
+Just to add to the responses by Wolfgang and James.
+
+The Cochrane Handbook warns against combining SMDs based on change 
+scores (pre-post comparisons) and post-test comparisons (see 
+https://training.cochrane.org/handbook/current/chapter-10#section-10-5-2). 
+The reason is that the standard deviation used in the denominator of the 
+SMD is different for change scores and post-tests.
+
+Best wishes, Guido
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+From robertob@kker @end|ng |rom gm@||@com  Tue Oct  8 03:46:51 2019
+From: robertob@kker @end|ng |rom gm@||@com (P. Roberto Bakker)
+Date: Mon, 7 Oct 2019 18:46:51 -0700
+Subject: [R-meta] Calculating SMD from posttest only - is this possible?
+In-Reply-To: <08882a96272a4f74975f93d3dbc853f8@UM-MAIL3214.unimaas.nl>
+References: <CAKDq9_OTq6NaD4SUuWer+d=BSJc=RMfyz3NWAVZX1w2Cr+HRhw-5103@mail.gmail.com>
+ <e04b9ac1-7be4-d1be-18ca-116080bbed9e@imbi.uni-freiburg.de>
+ <08882a96272a4f74975f93d3dbc853f8@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAKDq9_P5uV33_cDvEjuvyjz=MRrYry=ooYB7rWmoLT9+2j7Big@mail.gmail.com>
+
+Hi Wolfgang, Guido, Michael, and James,
+
+Your information and explanation are really helpful, interesting and
+important. A lot of my questions now have a clear answer, and I
+understand better what needs to be done. I will bring your information to
+my meta-analysis group. As your information is published in the
+R-sig-meta-analysis Archives, other people will benefit.
+
+Thank you very much and best regards,
+Roberto
+
+
+Op ma 7 okt. 2019 om 13:13 schreef Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl>:
+
+> That is correct when using standardized mean change values using change
+> score standardization -- and indeed, that's not something that should done.
+> However, the standardized mean change using raw score standardization also
+> standardizes based on the variability at a single time point and hence is
+> in principle comparable to the standardized mean difference at the posttest
+> (leaving aside other issues, such as time effects). I would still be very
+> careful when doing this and I very much like Michael's suggestion to
+> examine this via a moderator analysis.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Guido Schwarzer
+> Sent: Monday, 07 October, 2019 14:16
+> To: P. Roberto Bakker; r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] Calculating SMD from posttest only - is this
+> possible?
+>
+> Hi Roberto,
+>
+> Just to add to the responses by Wolfgang and James.
+>
+> The Cochrane Handbook warns against combining SMDs based on change
+> scores (pre-post comparisons) and post-test comparisons (see
+> https://training.cochrane.org/handbook/current/chapter-10#section-10-5-2).
+>
+> The reason is that the standard deviation used in the denominator of the
+> SMD is different for change scores and post-tests.
+>
+> Best wishes, Guido
+>
+> --
+> Dr. Guido Schwarzer
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+>
+> Phone: +49/761/203-6668
+> Mail: sc at imbi.uni-freiburg.de
+> Homepage: http://www.imbi.uni-freiburg.de
+>
+> ORCID iD: https://orcid.org/0000-0001-6214-9087
+> R-book: https://www.springer.com/gp/book/9783319214153
+>
+
+	[[alternative HTML version deleted]]
+
+
+From dm@h@b@n @end|ng |rom gm@||@com  Thu Oct 10 10:11:02 2019
+From: dm@h@b@n @end|ng |rom gm@||@com (=?UTF-8?Q?Daniel_M=C3=B8nsted_Shabanzadeh?=)
+Date: Thu, 10 Oct 2019 10:11:02 +0200
+Subject: [R-meta] Meta-regression of proportions using rma.glmm
+Message-ID: <CABgeOtOMHdPQ9s-20VG+1B34mecB4n8TdKYQwS2SdUq33fpDrw@mail.gmail.com>
+
+Hey
+
+I am performing af meta-regression of post-operative complications in
+single-arm studies. I am using the rma.glmm function on logit transformed
+data (measure ="PLO"). Many of the studies have 0 events - are these
+studie's proportions removed from the model? In that case, how can i
+include them?
+
+Regards,
+Daniel
+
+Daniel M?nsted Shabanzadeh
+MD, PhD
+Department of Gastroenterology, Surgical Unit
+Hvidovre Hospital
+Mobile +45 2546 5251
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Oct 10 13:42:46 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 10 Oct 2019 11:42:46 +0000
+Subject: [R-meta] Meta-regression of proportions using rma.glmm
+In-Reply-To: <CABgeOtOMHdPQ9s-20VG+1B34mecB4n8TdKYQwS2SdUq33fpDrw@mail.gmail.com>
+References: <CABgeOtOMHdPQ9s-20VG+1B34mecB4n8TdKYQwS2SdUq33fpDrw@mail.gmail.com>
+Message-ID: <3f63b8a6ab8f466bb3223c05407333c4@UM-MAIL3214.unimaas.nl>
+
+Dear Daniel,
+
+No, studies with 0 events are not removed. To illustrate:
+
+library(metafor)
+
+xi <- c(0,1,0,0,1,2)
+ni <- rep(10,6)
+
+res <- rma.glmm(measure="PLO", xi=xi, ni=ni)
+res
+predict(res, transf=exp)
+
+res <- rma.glmm(measure="PLO", xi=xi, ni=ni, subset=xi>0)
+res
+predict(res, transf=exp)
+
+As you can see, in the second model, the estimate of the odds is much higher, since there I have explicitly thrown out the studies with 0 events.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Daniel M?nsted Shabanzadeh [mailto:dmshaban at gmail.com] 
+Sent: Thursday, 10 October, 2019 10:11
+To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+Subject: Meta-regression of proportions using rma.glmm
+
+Hey
+
+I am performing af meta-regression of post-operative complications in single-arm studies. I am using the rma.glmm function on logit transformed data (measure ="PLO").?Many of the studies have 0 events - are these studie's proportions?removed from the model? In that?case, how can i include them?
+
+Regards,
+Daniel??
+
+Daniel M?nsted Shabanzadeh
+MD, PhD
+Department of Gastroenterology, Surgical Unit
+Hvidovre Hospital
+Mobile?+45 2546 5251?
+
+From mut|u@um@rog|u @end|ng |rom h@cettepe@edu@tr  Thu Oct 10 14:29:12 2019
+From: mut|u@um@rog|u @end|ng |rom h@cettepe@edu@tr (Mutlu Umaroglu)
+Date: Thu, 10 Oct 2019 15:29:12 +0300
+Subject: [R-meta] Tau2 estimate problem
+In-Reply-To: <f003898352de551e139fe780bb08741c@hacettepe.edu.tr>
+References: <f003898352de551e139fe780bb08741c@hacettepe.edu.tr>
+Message-ID: <dd5c513d65fc727a9a55d9fea8839172@hacettepe.edu.tr>
+
+Dear All,
+
+I generated random data for meta analysis with user-defined effect size 
+and tau2 (eg. es=1, T^2=0.3). After generating random data, I perform a 
+meta-analysis. However, the results (for tau2) are different from 
+user-defined tau2. I need some technical assistance to fix code.
+
+Regards,
+Mutlu
+
+
+rowMeans(es2)		#1
+[1] 0.9941907 0.9941133
+
+> rowMeans(tu2)		#0.3
+[1] 0.08509195 0.08346508
+
+----
+
+library(metafor)
+library(Sim.PLFN)
+
+set.seed(9999)
+
+sml.nr=1000		#1000 simulation
+study.nr=10		#with 10 studies in meta analysis
+
+eff.size=1		#Effect size for meta analysis
+t2=.3			#Tau2 for meta analysis
+
+es2<-NULL
+tu2<-NULL
+
+for (i in 1:sml.nr){
+
+   s2=Trunc(n=study.nr, T.dist="chisq", T.dist.par=1, L=0.36, R=2.4)/4
+   y1=c(rnorm(study.nr, mean = eff.size, sd = t2+s2))
+   metadata<-data.frame(y1,s2)
+
+	DLmet<-rma(y1,s2,data=metadata,method="DL")
+	REMLmet<-rma(y1,s2,data=metadata,method="REML")
+
+	EffectSize= c(DLmet$b,REMLmet$b)
+         es2 = cbind(es2, EffectSize)
+
+	taau2= c(DLmet$tau2,REMLmet$tau2)
+	tu2 = cbind(tu2, taau2)
+}
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Oct 10 14:38:18 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 10 Oct 2019 12:38:18 +0000
+Subject: [R-meta] Tau2 estimate problem
+In-Reply-To: <dd5c513d65fc727a9a55d9fea8839172@hacettepe.edu.tr>
+References: <f003898352de551e139fe780bb08741c@hacettepe.edu.tr>
+ <dd5c513d65fc727a9a55d9fea8839172@hacettepe.edu.tr>
+Message-ID: <404cd53b9343467b9aaf75519de48898@UM-MAIL3214.unimaas.nl>
+
+Hi Mutlu,
+
+The problem is in this line:
+
+y1=c(rnorm(study.nr, mean = eff.size, sd = t2+s2))
+
+Note that 'sd' is for specifying the SD. So it should be:
+
+y1=c(rnorm(study.nr, mean = eff.size, sd = sqrt(t2+s2)))
+
+Then it will work as expected.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Mutlu Umaroglu
+Sent: Thursday, 10 October, 2019 14:29
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Tau2 estimate problem
+
+Dear All,
+
+I generated random data for meta analysis with user-defined effect size 
+and tau2 (eg. es=1, T^2=0.3). After generating random data, I perform a 
+meta-analysis. However, the results (for tau2) are different from 
+user-defined tau2. I need some technical assistance to fix code.
+
+Regards,
+Mutlu
+
+
+rowMeans(es2)		#1
+[1] 0.9941907 0.9941133
+
+> rowMeans(tu2)		#0.3
+[1] 0.08509195 0.08346508
+
+----
+
+library(metafor)
+library(Sim.PLFN)
+
+set.seed(9999)
+
+sml.nr=1000		#1000 simulation
+study.nr=10		#with 10 studies in meta analysis
+
+eff.size=1		#Effect size for meta analysis
+t2=.3			#Tau2 for meta analysis
+
+es2<-NULL
+tu2<-NULL
+
+for (i in 1:sml.nr){
+
+   s2=Trunc(n=study.nr, T.dist="chisq", T.dist.par=1, L=0.36, R=2.4)/4
+   y1=c(rnorm(study.nr, mean = eff.size, sd = t2+s2))
+   metadata<-data.frame(y1,s2)
+
+	DLmet<-rma(y1,s2,data=metadata,method="DL")
+	REMLmet<-rma(y1,s2,data=metadata,method="REML")
+
+	EffectSize= c(DLmet$b,REMLmet$b)
+         es2 = cbind(es2, EffectSize)
+
+	taau2= c(DLmet$tau2,REMLmet$tau2)
+	tu2 = cbind(tu2, taau2)
+}
+
+
+From juhyung2 @end|ng |rom @t@n|ord@edu  Tue Oct 15 00:48:52 2019
+From: juhyung2 @end|ng |rom @t@n|ord@edu (Ju Lee)
+Date: Mon, 14 Oct 2019 22:48:52 +0000
+Subject: [R-meta] Covariance-variance matrix when studies share multiple
+ treatment x control comparison
+In-Reply-To: <4e6488c3b0bc4c83bb462ca19b425e84@UM-MAIL3214.unimaas.nl>
+References: <SN6PR02MB43365E2145486F3B477E87B8F78E0@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <a763661f63cc4f8d9f2aa71ecb801d9e@UM-MAIL3214.unimaas.nl>
+ <SN6PR02MB43367D8973CEA30D4DDDA3DBF78E0@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <SN6PR02MB4336D7A4218F4A156FF2113CF78E0@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <f4241eaa7bf647cca6efc0793a3e5117@UM-MAIL3214.unimaas.nl>
+ <SN6PR02MB4336D5B4FCEBA0DE4CAFF6A1F7860@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <37025d470e7d4f689a7c889231cd0631@UM-MAIL3214.unimaas.nl>
+ <CAFUVuJwUpbFmm+t1jFeB5_mNBwhvCLyWueLL=VoBaWkGyvd8_Q@mail.gmail.com>
+ <SN6PR02MB4336B0D0A1C804C4A5FC99D4F7860@SN6PR02MB4336.namprd02.prod.outlook.com>,
+ <CAFUVuJwB_JBePN1DmwMGWBZ9mtvwabaSE1UKEQMRYKMTwV=S7g@mail.gmail.com>
+ <SN6PR02MB4336AB2BC7B20A3B4DC78C1EF7810@SN6PR02MB4336.namprd02.prod.outlook.com>,
+ <4e6488c3b0bc4c83bb462ca19b425e84@UM-MAIL3214.unimaas.nl>
+Message-ID: <BYAPR02MB55591096625E00AE7E0B2723F7900@BYAPR02MB5559.namprd02.prod.outlook.com>
+
+Dear Wolfgang, James,
+
+Thank you for all your helpful suggestions and feedback.
+Following up on previous posts, I am wondering what would be the best way to visualize the funnel plot when I am using modified egger test suggested by Pustejovsky and Rodgers (2018).
+
+Based on our previous conversation, I am wondering if I should plot modified precision sqrt(1 / n1+ 1 / n2) against  Hedges' d (x axis), instead of SE or inverse SE against residuals....
+
+Is there a way to do this through funnel() or funnel.rma() function? Below is my current code with egger.full being the model being run with Hedges' d and "sqrt(1 / n1+ 1 / n2)" as modified precision.
+
+Would specifying yaxis as "yaxis="sqrtninv" equivalent to this approach? or maybe I need an alternative approach here?
+
+Thank you very much,
+Best
+JU
+
+prec.<-function(CN,TN){
+  pr<-sqrt((1 / CN) + (1/TN))
+  return(pr)
+}
+precision.2<-prec.(MHF$n.t, MHF$n.c)
+head(precision.2)
+egger.full<-rma.mv(hedged~precision.2, CV, data=MHF, random = list(~ 1 | Study, ~1|Id))
+egger.full
+
+funnel(egger.full, level=c(90, 95, 99),
+       shade=c("white", "gray", "gray40"),back="white",
+       yaxis="     ", xlab="", ylab="",
+       digits=c(2,2))
+
+
+________________________________
+From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: Friday, September 27, 2019 8:27 AM
+To: Ju Lee <juhyung2 at stanford.edu>; James Pustejovsky <jepusto at gmail.com>
+Cc: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Subject: RE: Covariance-variance matrix when studies share multiple treatment x control comparison
+
+You are still using 'residuals' as the outcome. Don't do that. Just use the Hedges' g values as the outcome. Also, you should specify the correct V matrix (I think you called it VCV in an earlier post). So, for example:
+
+rma.mv(hedged ~ precision.2, VCV, data=MHF, random = list(~ 1 | Study, ~1 | Id),  subset=(Spatial.scale.2=="Fragmentation scale"))
+
+I haven't looked at your other post in detail, but 'random = ~ factor(x) | Study/Id' doesn't actually work (at least not in the way you think it does). Please update your metafor installation to get an error that will inform you of this. Instead, random = list(~factor(x)|Study, ~factor(x)|Id) is indeed the correct way to specify two '~ inner | outer' terms.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Ju Lee [mailto:juhyung2 at stanford.edu]
+Sent: Friday, 27 September, 2019 16:46
+To: James Pustejovsky
+Cc: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+Subject: Re: Covariance-variance matrix when studies share multiple treatment x control comparison
+
+Dear James, Wolfgang,
+
+Thank you very much for this information.
+I have one question extending from this is: While I run my main mixed modes always using var-covar. matrix (to account for shared study groups within each study),
+it is acceptable that my egger-like regression does not incorporate this structure, but rather just use sqrt(1 / n1 + 1 / n2)  as precision (instead of sqrt(diag(v.c.matrix)) like Wolfgang suggested as one possibility) and use p-value for precision term (precision.2 which is p=0.2382) to determine the asymmetry?
+
+prec.<-function(CN,TN){
+  pr<-sqrt((1 / CN) + (1/TN))
+  return(pr)
+}
+precision.2<-prec.(MHF$n.t, MHF$n.c)
+> egger.pr2.frag<-rma.mv(residuals~precision.2,var,data=MHF,random =list( ~ 1 | Study, ~1|Id),  subset=(Spatial.scale.2=="Fragmentation scale"))
+> egger.pr2.frag
+
+Multivariate Meta-Analysis Model (k = 285; method: REML)
+Variance Components:
+  estim    sqrt  nlvls  fixed  factor
+sigma^2.1  0.4255  0.6523     73     no   Study
+sigma^2.2  0.3130  0.5595    285     no      Id
+Test for Residual Heterogeneity:
+  QE(df = 283) = 1041.1007, p-val < .0001
+Test of Moderators (coefficient(s) 2):
+  QM(df = 1) = 1.3909, p-val = 0.2382
+
+Model Results:
+  estimate      se     zval    pval    ci.lb   ci.ub
+intrcpt        0.0529  0.1617   0.3274  0.7433  -0.2640  0.3699
+precision.2   -0.0668  0.0567  -1.1794  0.2382  -0.1779  0.0442
+---
+  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+
+Thank you very much, both of you.
+Best,
+JU
+
+p.s. Wolfgang, I think I figured out what went wrong with how I specified my random effects in my previous e-mail. Specifying it as random=list(~factor(x)|Study, ~factor(x)|Id) instead of random= ~factor(x)|Study/Id generates results that makes sense to me now. Please let me know if this is correct way I should be coding.
+
+	[[alternative HTML version deleted]]
+
+
+From W@Iqb@| @end|ng |rom newc@@t|e@@c@uk  Tue Oct 15 15:29:39 2019
+From: W@Iqb@| @end|ng |rom newc@@t|e@@c@uk (Wasim Iqbal (PGR))
+Date: Tue, 15 Oct 2019 13:29:39 +0000
+Subject: [R-meta] Principle component analysis VS multivariate meta-analysis
+References: <AM6PR07MB57971709C88146F5A594E66CB8930@AM6PR07MB5797.eurprd07.prod.outlook.com>
+Message-ID: <WM!ccb1a8d701e66ad160bed15ba17ba710a529b1dd3957a2885b24c4d56f4d74dec50e3f5d9d6851a8865a49beb9e7d549!@mailhub-mx5.ncl.ac.uk>
+
+Dear Metafor members,
+
+I was wondering if anyone could help unravel the reasoning behind carrying out a principle component analysis compared to a multivariate meta-analysis between outcomes.
+
+For instance, a literature review collected data on enzyme kinetics from a range of published papers. They then analysed the relationships between the kinetic parameters using PCA. Surely, would a multivariate meta-analysis not be better since it will be taking into account any between study-heterogenity which would have otherwise been overlooked if a normal PCA was carried out?
+
+Hope you understand what I mean.
+
+Kind regards
+Wasim
+
+Newcastle University
+
+Sent from Mail<https://go.microsoft.com/fwlink/?LinkId=550986> for Windows 10
+
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Wed Oct 16 16:25:08 2019
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 16 Oct 2019 09:25:08 -0500
+Subject: [R-meta] Covariance-variance matrix when studies share multiple
+ treatment x control comparison
+In-Reply-To: <BYAPR02MB55591096625E00AE7E0B2723F7900@BYAPR02MB5559.namprd02.prod.outlook.com>
+References: <SN6PR02MB43365E2145486F3B477E87B8F78E0@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <a763661f63cc4f8d9f2aa71ecb801d9e@UM-MAIL3214.unimaas.nl>
+ <SN6PR02MB43367D8973CEA30D4DDDA3DBF78E0@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <SN6PR02MB4336D7A4218F4A156FF2113CF78E0@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <f4241eaa7bf647cca6efc0793a3e5117@UM-MAIL3214.unimaas.nl>
+ <SN6PR02MB4336D5B4FCEBA0DE4CAFF6A1F7860@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <37025d470e7d4f689a7c889231cd0631@UM-MAIL3214.unimaas.nl>
+ <CAFUVuJwUpbFmm+t1jFeB5_mNBwhvCLyWueLL=VoBaWkGyvd8_Q@mail.gmail.com>
+ <SN6PR02MB4336B0D0A1C804C4A5FC99D4F7860@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <CAFUVuJwB_JBePN1DmwMGWBZ9mtvwabaSE1UKEQMRYKMTwV=S7g@mail.gmail.com>
+ <SN6PR02MB4336AB2BC7B20A3B4DC78C1EF7810@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <4e6488c3b0bc4c83bb462ca19b425e84@UM-MAIL3214.unimaas.nl>
+ <BYAPR02MB55591096625E00AE7E0B2723F7900@BYAPR02MB5559.namprd02.prod.outlook.com>
+Message-ID: <CAFUVuJyW1yaJcQxc98tAUA16Dq5yzDGza6T4z0ibH-btVkYwgQ@mail.gmail.com>
+
+Ju,
+
+Yes, I agree that it would be best to create a funnel plot of Hedges' d
+estimates versus the modified measure of precision. You can do this using
+the basic funnel plot function where you feed in the vector of effect sizes
+and vector of modified precisions:
+funnel(x = MHF$hedged, sei = precision.2, <...additional formatting
+options...>)
+
+James
+
+On Mon, Oct 14, 2019 at 5:48 PM Ju Lee <juhyung2 at stanford.edu> wrote:
+
+> Dear Wolfgang, James,
+>
+> Thank you for all your helpful suggestions and feedback.
+> Following up on previous posts, I am wondering what would be the best way
+> to visualize the funnel plot when I am using modified egger test suggested
+> by Pustejovsky and Rodgers (2018).
+>
+> Based on our previous conversation, I am wondering if I should plot
+> modified precision sqrt(1 / n1+ 1 / n2) against  Hedges' d (x axis),
+> instead of SE or inverse SE against residuals....
+>
+> Is there a way to do this through funnel() or funnel.rma() function? Below
+> is my current code with egger.full being the model being run with Hedges' d
+> and "sqrt(1 / n1+ 1 / n2)" as modified precision.
+>
+> Would specifying yaxis as "yaxis="sqrtninv" equivalent to this approach?
+> or maybe I need an alternative approach here?
+>
+> Thank you very much,
+> Best
+> JU
+>
+> prec.<-function(CN,TN){
+>   pr<-sqrt((1 / CN) + (1/TN))
+>   return(pr)
+> }
+> precision.2<-prec.(MHF$n.t, MHF$n.c)
+> head(precision.2)
+> egger.full<-rma.mv(hedged~precision.2, CV, data=MHF, random = list(~ 1 |
+> Study, ~1|Id))
+> egger.full
+>
+> funnel(egger.full, level=c(90, 95, 99),
+>        shade=c("white", "gray", "gray40"),back="white",
+>        yaxis="     ", xlab="", ylab="",
+>        digits=c(2,2))
+>
+>
+> ------------------------------
+> *From:* Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>
+> *Sent:* Friday, September 27, 2019 8:27 AM
+> *To:* Ju Lee <juhyung2 at stanford.edu>; James Pustejovsky <jepusto at gmail.com
+> >
+> *Cc:* r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org
+> >
+> *Subject:* RE: Covariance-variance matrix when studies share multiple
+> treatment x control comparison
+>
+> You are still using 'residuals' as the outcome. Don't do that. Just use
+> the Hedges' g values as the outcome. Also, you should specify the correct V
+> matrix (I think you called it VCV in an earlier post). So, for example:
+>
+> rma.mv(hedged ~ precision.2, VCV, data=MHF, random = list(~ 1 | Study, ~1
+> | Id),  subset=(Spatial.scale.2=="Fragmentation scale"))
+>
+> I haven't looked at your other post in detail, but 'random = ~ factor(x) |
+> Study/Id' doesn't actually work (at least not in the way you think it
+> does). Please update your metafor installation to get an error that will
+> inform you of this. Instead, random = list(~factor(x)|Study, ~factor(x)|Id)
+> is indeed the correct way to specify two '~ inner | outer' terms.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Ju Lee [mailto:juhyung2 at stanford.edu <juhyung2 at stanford.edu>]
+> Sent: Friday, 27 September, 2019 16:46
+> To: James Pustejovsky
+> Cc: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+> Subject: Re: Covariance-variance matrix when studies share multiple
+> treatment x control comparison
+>
+> Dear James, Wolfgang,
+>
+> Thank you very much for this information.
+> I have one question extending from this is: While I run my main mixed
+> modes always using var-covar. matrix (to account for shared study groups
+> within each study),
+> it is acceptable that my egger-like regression does not incorporate this
+> structure, but rather just use sqrt(1 / n1 + 1 / n2)  as precision (instead
+> of sqrt(diag(v.c.matrix)) like Wolfgang suggested as one possibility) and
+> use p-value for precision term (precision.2 which is p=0.2382) to determine
+> the asymmetry?
+>
+> prec.<-function(CN,TN){
+>   pr<-sqrt((1 / CN) + (1/TN))
+>   return(pr)
+> }
+> precision.2<-prec.(MHF$n.t, MHF$n.c)
+> > egger.pr2.frag<-rma.mv(residuals~precision.2,var,data=MHF,random =list(
+> ~ 1 | Study, ~1|Id),  subset=(Spatial.scale.2=="Fragmentation scale"))
+> > egger.pr2.frag
+>
+> Multivariate Meta-Analysis Model (k = 285; method: REML)
+> Variance Components:
+>   estim    sqrt  nlvls  fixed  factor
+> sigma^2.1  0.4255  0.6523     73     no   Study
+> sigma^2.2  0.3130  0.5595    285     no      Id
+> Test for Residual Heterogeneity:
+>   QE(df = 283) = 1041.1007, p-val < .0001
+> Test of Moderators (coefficient(s) 2):
+>   QM(df = 1) = 1.3909, p-val = 0.2382
+>
+> Model Results:
+>   estimate      se     zval    pval    ci.lb   ci.ub
+> intrcpt        0.0529  0.1617   0.3274  0.7433  -0.2640  0.3699
+> precision.2   -0.0668  0.0567  -1.1794  0.2382  -0.1779  0.0442
+> ---
+>   Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+>
+>
+> Thank you very much, both of you.
+> Best,
+> JU
+>
+> p.s. Wolfgang, I think I figured out what went wrong with how I specified
+> my random effects in my previous e-mail. Specifying it
+> as random=list(~factor(x)|Study, ~factor(x)|Id) instead of random=
+> ~factor(x)|Study/Id generates results that makes sense to me now. Please
+> let me know if this is correct way I should be coding.
+>
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Wed Oct 16 16:28:51 2019
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 16 Oct 2019 09:28:51 -0500
+Subject: [R-meta] Covariance-variance matrix when studies share multiple
+ treatment x control comparison
+In-Reply-To: <CAFUVuJyW1yaJcQxc98tAUA16Dq5yzDGza6T4z0ibH-btVkYwgQ@mail.gmail.com>
+References: <SN6PR02MB43365E2145486F3B477E87B8F78E0@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <a763661f63cc4f8d9f2aa71ecb801d9e@UM-MAIL3214.unimaas.nl>
+ <SN6PR02MB43367D8973CEA30D4DDDA3DBF78E0@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <SN6PR02MB4336D7A4218F4A156FF2113CF78E0@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <f4241eaa7bf647cca6efc0793a3e5117@UM-MAIL3214.unimaas.nl>
+ <SN6PR02MB4336D5B4FCEBA0DE4CAFF6A1F7860@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <37025d470e7d4f689a7c889231cd0631@UM-MAIL3214.unimaas.nl>
+ <CAFUVuJwUpbFmm+t1jFeB5_mNBwhvCLyWueLL=VoBaWkGyvd8_Q@mail.gmail.com>
+ <SN6PR02MB4336B0D0A1C804C4A5FC99D4F7860@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <CAFUVuJwB_JBePN1DmwMGWBZ9mtvwabaSE1UKEQMRYKMTwV=S7g@mail.gmail.com>
+ <SN6PR02MB4336AB2BC7B20A3B4DC78C1EF7810@SN6PR02MB4336.namprd02.prod.outlook.com>
+ <4e6488c3b0bc4c83bb462ca19b425e84@UM-MAIL3214.unimaas.nl>
+ <BYAPR02MB55591096625E00AE7E0B2723F7900@BYAPR02MB5559.namprd02.prod.outlook.com>
+ <CAFUVuJyW1yaJcQxc98tAUA16Dq5yzDGza6T4z0ibH-btVkYwgQ@mail.gmail.com>
+Message-ID: <CAFUVuJxi_b1GuaQdUkr=JyjZ2XBpiaSsgm8uN4rscvD_wSeMBA@mail.gmail.com>
+
+Forgot to add:
+I think it's also reasonable to still include the contour-enhanced options
+that depict significance levels, even with the modified measure of
+precision. The reason is that these contours actually *do* correspond to
+the significance levels for the test of (unstandardized) mean differences,
+which is exactly the test that would be reported in a primary study and
+might be used as the basis for judging whether a study/result should be
+published.
+
+On Wed, Oct 16, 2019 at 9:25 AM James Pustejovsky <jepusto at gmail.com> wrote:
+
+> Ju,
+>
+> Yes, I agree that it would be best to create a funnel plot of Hedges' d
+> estimates versus the modified measure of precision. You can do this using
+> the basic funnel plot function where you feed in the vector of effect sizes
+> and vector of modified precisions:
+> funnel(x = MHF$hedged, sei = precision.2, <...additional formatting
+> options...>)
+>
+> James
+>
+> On Mon, Oct 14, 2019 at 5:48 PM Ju Lee <juhyung2 at stanford.edu> wrote:
+>
+>> Dear Wolfgang, James,
+>>
+>> Thank you for all your helpful suggestions and feedback.
+>> Following up on previous posts, I am wondering what would be the best way
+>> to visualize the funnel plot when I am using modified egger test suggested
+>> by Pustejovsky and Rodgers (2018).
+>>
+>> Based on our previous conversation, I am wondering if I should plot
+>> modified precision sqrt(1 / n1+ 1 / n2) against  Hedges' d (x axis),
+>> instead of SE or inverse SE against residuals....
+>>
+>> Is there a way to do this through funnel() or funnel.rma() function?
+>> Below is my current code with egger.full being the model being run with
+>> Hedges' d and "sqrt(1 / n1+ 1 / n2)" as modified precision.
+>>
+>> Would specifying yaxis as "yaxis="sqrtninv" equivalent to this approach?
+>> or maybe I need an alternative approach here?
+>>
+>> Thank you very much,
+>> Best
+>> JU
+>>
+>> prec.<-function(CN,TN){
+>>   pr<-sqrt((1 / CN) + (1/TN))
+>>   return(pr)
+>> }
+>> precision.2<-prec.(MHF$n.t, MHF$n.c)
+>> head(precision.2)
+>> egger.full<-rma.mv(hedged~precision.2, CV, data=MHF, random = list(~ 1 |
+>> Study, ~1|Id))
+>> egger.full
+>>
+>> funnel(egger.full, level=c(90, 95, 99),
+>>        shade=c("white", "gray", "gray40"),back="white",
+>>        yaxis="     ", xlab="", ylab="",
+>>        digits=c(2,2))
+>>
+>>
+>> ------------------------------
+>> *From:* Viechtbauer, Wolfgang (SP) <
+>> wolfgang.viechtbauer at maastrichtuniversity.nl>
+>> *Sent:* Friday, September 27, 2019 8:27 AM
+>> *To:* Ju Lee <juhyung2 at stanford.edu>; James Pustejovsky <
+>> jepusto at gmail.com>
+>> *Cc:* r-sig-meta-analysis at r-project.org <
+>> r-sig-meta-analysis at r-project.org>
+>> *Subject:* RE: Covariance-variance matrix when studies share multiple
+>> treatment x control comparison
+>>
+>> You are still using 'residuals' as the outcome. Don't do that. Just use
+>> the Hedges' g values as the outcome. Also, you should specify the correct V
+>> matrix (I think you called it VCV in an earlier post). So, for example:
+>>
+>> rma.mv(hedged ~ precision.2, VCV, data=MHF, random = list(~ 1 | Study,
+>> ~1 | Id),  subset=(Spatial.scale.2=="Fragmentation scale"))
+>>
+>> I haven't looked at your other post in detail, but 'random = ~ factor(x)
+>> | Study/Id' doesn't actually work (at least not in the way you think it
+>> does). Please update your metafor installation to get an error that will
+>> inform you of this. Instead, random = list(~factor(x)|Study, ~factor(x)|Id)
+>> is indeed the correct way to specify two '~ inner | outer' terms.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: Ju Lee [mailto:juhyung2 at stanford.edu <juhyung2 at stanford.edu>]
+>> Sent: Friday, 27 September, 2019 16:46
+>> To: James Pustejovsky
+>> Cc: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+>> Subject: Re: Covariance-variance matrix when studies share multiple
+>> treatment x control comparison
+>>
+>> Dear James, Wolfgang,
+>>
+>> Thank you very much for this information.
+>> I have one question extending from this is: While I run my main mixed
+>> modes always using var-covar. matrix (to account for shared study groups
+>> within each study),
+>> it is acceptable that my egger-like regression does not incorporate this
+>> structure, but rather just use sqrt(1 / n1 + 1 / n2)  as precision (instead
+>> of sqrt(diag(v.c.matrix)) like Wolfgang suggested as one possibility) and
+>> use p-value for precision term (precision.2 which is p=0.2382) to determine
+>> the asymmetry?
+>>
+>> prec.<-function(CN,TN){
+>>   pr<-sqrt((1 / CN) + (1/TN))
+>>   return(pr)
+>> }
+>> precision.2<-prec.(MHF$n.t, MHF$n.c)
+>> > egger.pr2.frag<-rma.mv(residuals~precision.2,var,data=MHF,random
+>> =list( ~ 1 | Study, ~1|Id),  subset=(Spatial.scale.2=="Fragmentation
+>> scale"))
+>> > egger.pr2.frag
+>>
+>> Multivariate Meta-Analysis Model (k = 285; method: REML)
+>> Variance Components:
+>>   estim    sqrt  nlvls  fixed  factor
+>> sigma^2.1  0.4255  0.6523     73     no   Study
+>> sigma^2.2  0.3130  0.5595    285     no      Id
+>> Test for Residual Heterogeneity:
+>>   QE(df = 283) = 1041.1007, p-val < .0001
+>> Test of Moderators (coefficient(s) 2):
+>>   QM(df = 1) = 1.3909, p-val = 0.2382
+>>
+>> Model Results:
+>>   estimate      se     zval    pval    ci.lb   ci.ub
+>> intrcpt        0.0529  0.1617   0.3274  0.7433  -0.2640  0.3699
+>> precision.2   -0.0668  0.0567  -1.1794  0.2382  -0.1779  0.0442
+>> ---
+>>   Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+>>
+>>
+>> Thank you very much, both of you.
+>> Best,
+>> JU
+>>
+>> p.s. Wolfgang, I think I figured out what went wrong with how I specified
+>> my random effects in my previous e-mail. Specifying it
+>> as random=list(~factor(x)|Study, ~factor(x)|Id) instead of random=
+>> ~factor(x)|Study/Id generates results that makes sense to me now. Please
+>> let me know if this is correct way I should be coding.
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Oct 16 18:30:26 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 16 Oct 2019 16:30:26 +0000
+Subject: [R-meta] 
+ Principle component analysis VS multivariate meta-analysis
+In-Reply-To: <WM!ccb1a8d701e66ad160bed15ba17ba710a529b1dd3957a2885b24c4d56f4d74dec50e3f5d9d6851a8865a49beb9e7d549!@mailhub-mx5.ncl.ac.uk>
+References: <AM6PR07MB57971709C88146F5A594E66CB8930@AM6PR07MB5797.eurprd07.prod.outlook.com>
+ <WM!ccb1a8d701e66ad160bed15ba17ba710a529b1dd3957a2885b24c4d56f4d74dec50e3f5d9d6851a8865a49beb9e7d549!@mailhub-mx5.ncl.ac.uk>
+Message-ID: <616e70f2b1154b45acc19f4e05a301a2@UM-MAIL3213.unimaas.nl>
+
+Dear Wasim,
+
+Just to clarify -- this is the r-sig-meta-analysis mailing list, not the metafor mailing list.
+
+This aside, it's difficult to speculate about the motivation behind what somebody has done in this literature review without further details. But PCA is a variable reduction method and doesn't make any kind of model / distributional assumptions, so I am not even sure how to think about such a comparison (i.e., PCA vs multivariate meta-analysis).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Wasim Iqbal (PGR)
+Sent: Tuesday, 15 October, 2019 15:30
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Principle component analysis VS multivariate meta-analysis
+
+Dear Metafor members,
+
+I was wondering if anyone could help unravel the reasoning behind carrying out a principle component analysis compared to a multivariate meta-analysis between outcomes.
+
+For instance, a literature review collected data on enzyme kinetics from a range of published papers. They then analysed the relationships between the kinetic parameters using PCA. Surely, would a multivariate meta-analysis not be better since it will be taking into account any between study-heterogenity which would have otherwise been overlooked if a normal PCA was carried out?
+
+Hope you understand what I mean.
+
+Kind regards
+Wasim
+
+Newcastle University
+
+
+From |en@@ch@e|er2304 @end|ng |rom gm@||@com  Sat Oct 19 21:41:39 2019
+From: |en@@ch@e|er2304 @end|ng |rom gm@||@com (=?utf-8?Q?Lena_Sch=C3=A4fer?=)
+Date: Sat, 19 Oct 2019 15:41:39 -0400
+Subject: [R-meta] Effect sizes for mixed-effects models
+Message-ID: <A070371E-6858-43A0-A0E7-9431A65BBF61@gmail.com>
+
+Hi everyone,
+
+I am writing to ask two questions related to the calculation of effect sizes for mixed-effects models for a meta-analysis.
+To derive effect sizes for mixed-effects models, we generally follow the Hedges 2007 paper (https://journals.sagepub.com/doi/abs/10.3102/1076998606298043?journalCode=jebb <https://journals.sagepub.com/doi/abs/10.3102/1076998606298043?journalCode=jebb>) and a blogpost by Jake Westfall on effect-size calculations for within-subjects designs (http://jakewestfall.org/blog/index.php/2016/03/25/five-different-cohens-d-statistics-for-within-subject-designs/ <http://jakewestfall.org/blog/index.php/2016/03/25/five-different-cohens-d-statistics-for-within-subject-designs/>):
+
+1.     Variance for complex mixed-effects models
+While the calculation of Cohen?s d is unproblematic (formula 8 on page 346 in Hedges, 2007), the calculation of the respective variance turned out to be difficult for complex study designs. Hedge?s provided the following formula () to derive V(dw):
+
+V(dw) = ((NT + NC) / (NT * NC)) * ((1+(n-1)p)/(1-p)) + ((dw^2) / (2(N ? M)))
+
+with NT referring to the number of observations in the treatment group, NC referring to the number of observations in the control group, N referring to the total number of observations (NT + NC  = N), n referring to the number of observations per cluster, p referring to the ICC, and M referring to the number of clusters.
+For our meta-analysis, we want to derive the variance related to Cohen?s d for a mixed-subjects design with some participant conducting a task only in the control condition and other participants conducting the task in the control and in the experimental condition (within-subjects design). Since the number of observations per cluster differs (some participants have 30 observations, others have 60) we decided to use the variance formula for unequal cluster sample sizes in which n is substituted with the cluster sample size ? (formula 18 on page 350):
+
+? = ((NC * ?mTi = 1 (nTi)^2) / (NT * N)) +  ((NT * ?mCi = 1 (nCi)^2) / (NC * N))
+
+iWhile we expected that this formula would yield an unequal cluster sample size between 30 and 60, it gives us a value of 30 (which is equal to the cluster sample size if this would be a between-subjects design). This suggests that the formula cannot account for the participants which are both in the control and the experimental condition. Do you have any advice on how we could derive an accurate variance estimate for such a design?
+
+2. Turning Cohen?s d into Hedge?s g for mixed-models
+Finally, we want to transform Cohen?s d into Hedge?s g using:
+
+g(d) = d * (1- ((3) / (4 * df - 1))
+
+We are uncertain how to best estimate the dfs in our mixed-models. We considered using Kenward-Roger approximated dfs but this does not seem feasible since we only have access to parts of the raw data-sets used to derive dw and V{dw}. Potentially, another option would be to estimate the dfs via the effective sample size. This seems more feasible since the authors of primary papers provided us with the ICC related to each model. What do you think about this option?
+
+If you have any thoughts on this, we would greatly appreciate it if you could let us know what you think. Thank you for taking the time to consider our request, and please don?t hesitate to reach out if anything is unclear.
+
+Thank you very much and best regards,
+Lena Sch?fer
+
+On behalf of a collaborative team that additionally includes Leah Somerville (head of the Affective Neuroscience and Development Laboratory), Katherine Powers (former postdoc in the Affective Neuroscience and Development Laboratory) and Bernd Figner (Radboud University).
+
+
+	[[alternative HTML version deleted]]
+
+
+From @1m@j@|y @end|ng |rom un|-tr|er@de  Mon Oct 21 15:22:22 2019
+From: @1m@j@|y @end|ng |rom un|-tr|er@de (Jalynskij, Maria)
+Date: Mon, 21 Oct 2019 13:22:22 +0000
+Subject: [R-meta] Question about rma(measure = "COR", ..)
+Message-ID: <bbe53b9c0f2d4871abd9c29d10444a9e@uni-trier.de>
+
+Dear all,
+
+
+while conducting a meta-analysis I asked myself a few questions.
+
+
+a)When I'm conduction a random effects meta-analysis with correlation-coefficients as effects sizes using
+
+
+rma(measure = "COR", ri = corr, ni = n, data = data)
+
+, does R conduct the analysis with Fisher's-z-transformed coefficients in the background and compute the main-effect results back into the r metric for the output or not?
+
+
+b) Or should I use rma(measure="ZCOR", ri = corr, ni = n, data = data), and conduct the main result back by myown at the end?
+
+
+In the second version the Trim and Fill method doesn't make any sense.
+
+
+I would be glad about some support.
+
+
+Sincerely,
+
+Maria
+
+
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Mon Oct 21 15:35:04 2019
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 21 Oct 2019 14:35:04 +0100
+Subject: [R-meta] Question about rma(measure = "COR", ..)
+In-Reply-To: <bbe53b9c0f2d4871abd9c29d10444a9e@uni-trier.de>
+References: <bbe53b9c0f2d4871abd9c29d10444a9e@uni-trier.de>
+Message-ID: <82410f7f-af51-a462-3b0e-c39954e6f994@dewey.myzen.co.uk>
+
+Dear Maria
+
+If you want it to analyse on the transformed scale you need your second 
+option ZCOR and then back transform the results. You may want to use the 
+function transf.ztor() provided to help you.
+
+I am not sure about your query about trim and fill here but it does seem 
+to have become a less popular option recently.
+
+Michael
+
+On 21/10/2019 14:22, Jalynskij, Maria wrote:
+> Dear all,
+> 
+> 
+> while conducting a meta-analysis I asked myself a few questions.
+> 
+> 
+> a)When I'm conduction a random effects meta-analysis with correlation-coefficients as effects sizes using
+> 
+> 
+> rma(measure = "COR", ri = corr, ni = n, data = data)
+> 
+> , does R conduct the analysis with Fisher's-z-transformed coefficients in the background and compute the main-effect results back into the r metric for the output or not?
+> 
+> 
+> b) Or should I use rma(measure="ZCOR", ri = corr, ni = n, data = data), and conduct the main result back by myown at the end?
+> 
+> 
+> In the second version the Trim and Fill method doesn't make any sense.
+> 
+> 
+> I would be glad about some support.
+> 
+> 
+> Sincerely,
+> 
+> Maria
+> 
+> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From jepu@to @end|ng |rom gm@||@com  Tue Oct 22 05:12:04 2019
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Mon, 21 Oct 2019 22:12:04 -0500
+Subject: [R-meta] Effect sizes for mixed-effects models
+In-Reply-To: <A070371E-6858-43A0-A0E7-9431A65BBF61@gmail.com>
+References: <A070371E-6858-43A0-A0E7-9431A65BBF61@gmail.com>
+Message-ID: <CAFUVuJw+R1-RFPfO0UdRmKae713AoLzRQbDJ-3tTwL_7_m+6aA@mail.gmail.com>
+
+Lena,
+
+The formula you tried from Hedges 2007 is derived under the assumption that
+treatment assignment is at the cluster level, so I don't think it will work
+for your mixed design. The following post might be useful to answer your
+questions:
+https://www.jepusto.com/alternative-formulas-for-the-smd/
+In it, I suggest a quite general approach to estimating the variance of a
+standardized mean difference effect size, even if it is based on a complex
+experimental design. Suppose that you calculate the SMD estimate as
+
+d = b / S,
+
+where b is the unstandardized mean difference (which in your design
+involves a combination of within- and between-Ss comparisons) and S is the
+standard deviation of the outcome, which generally might involve a sum of
+multiple variance components. A delta-method approximation to the variance
+of d is
+
+Vd = (SEb / S)^2 + d^2 / (2 v),
+
+where SEb is the standard error of b, S is the denominator of the effect
+size estimate, d is the effect size estimate, and v is the degrees of
+freedom of S^2, defined by v = 2[ E(S^2)]^2 / Var(S^2). The SEb should
+usually be reported in primary studies (or can be back-calculated from t
+statistics or CIs). Thus, the only tricky bit is to find the degrees of
+freedom for the standardizing variance S^2. You might need to just make a
+rough approximation, based on for instance the total number of
+participants. Using a rough approximation (e.g., v = 30) should not have
+much effect on the total estimated variance Vd unless d is very large, so
+personally I would not worry too much about getting it perfect.
+
+As I explain in the post, you can also use the degrees of freedom v to do
+Hedges' g correction, taking
+
+g = J(v) * d,
+
+where J(v) = 1 - 3 / (4 * v - 1). Again, it's not worth worrying about
+getting the degrees of freedom perfect. Consider that J(30) = 0.9748 and
+J(60) = 0.9874, so the g estimate will differ by only a tiny amount
+depending on the degrees of freedom you use.
+
+James
+
+On Sat, Oct 19, 2019 at 2:41 PM Lena Sch?fer <lenaschaefer2304 at gmail.com>
+wrote:
+
+> Hi everyone,
+>
+> I am writing to ask two questions related to the calculation of effect
+> sizes for mixed-effects models for a meta-analysis.
+> To derive effect sizes for mixed-effects models, we generally follow the
+> Hedges 2007 paper (
+> https://journals.sagepub.com/doi/abs/10.3102/1076998606298043?journalCode=jebb
+> <
+> https://journals.sagepub.com/doi/abs/10.3102/1076998606298043?journalCode=jebb>)
+> and a blogpost by Jake Westfall on effect-size calculations for
+> within-subjects designs (
+> http://jakewestfall.org/blog/index.php/2016/03/25/five-different-cohens-d-statistics-for-within-subject-designs/
+> <
+> http://jakewestfall.org/blog/index.php/2016/03/25/five-different-cohens-d-statistics-for-within-subject-designs/
+> >):
+>
+> 1.     Variance for complex mixed-effects models
+> While the calculation of Cohen?s d is unproblematic (formula 8 on page 346
+> in Hedges, 2007), the calculation of the respective variance turned out to
+> be difficult for complex study designs. Hedge?s provided the following
+> formula () to derive V(dw):
+>
+> V(dw) = ((NT + NC) / (NT * NC)) * ((1+(n-1)p)/(1-p)) + ((dw^2) / (2(N ?
+> M)))
+>
+> with NT referring to the number of observations in the treatment group, NC
+> referring to the number of observations in the control group, N referring
+> to the total number of observations (NT + NC  = N), n referring to the
+> number of observations per cluster, p referring to the ICC, and M referring
+> to the number of clusters.
+> For our meta-analysis, we want to derive the variance related to Cohen?s d
+> for a mixed-subjects design with some participant conducting a task only in
+> the control condition and other participants conducting the task in the
+> control and in the experimental condition (within-subjects design). Since
+> the number of observations per cluster differs (some participants have 30
+> observations, others have 60) we decided to use the variance formula for
+> unequal cluster sample sizes in which n is substituted with the cluster
+> sample size ? (formula 18 on page 350):
+>
+> ? = ((NC * ?mTi = 1 (nTi)^2) / (NT * N)) +  ((NT * ?mCi = 1 (nCi)^2) / (NC
+> * N))
+>
+> iWhile we expected that this formula would yield an unequal cluster sample
+> size between 30 and 60, it gives us a value of 30 (which is equal to the
+> cluster sample size if this would be a between-subjects design). This
+> suggests that the formula cannot account for the participants which are
+> both in the control and the experimental condition. Do you have any advice
+> on how we could derive an accurate variance estimate for such a design?
+>
+> 2. Turning Cohen?s d into Hedge?s g for mixed-models
+> Finally, we want to transform Cohen?s d into Hedge?s g using:
+>
+> g(d) = d * (1- ((3) / (4 * df - 1))
+>
+> We are uncertain how to best estimate the dfs in our mixed-models. We
+> considered using Kenward-Roger approximated dfs but this does not seem
+> feasible since we only have access to parts of the raw data-sets used to
+> derive dw and V{dw}. Potentially, another option would be to estimate the
+> dfs via the effective sample size. This seems more feasible since the
+> authors of primary papers provided us with the ICC related to each model.
+> What do you think about this option?
+>
+> If you have any thoughts on this, we would greatly appreciate it if you
+> could let us know what you think. Thank you for taking the time to consider
+> our request, and please don?t hesitate to reach out if anything is unclear.
+>
+> Thank you very much and best regards,
+> Lena Sch?fer
+>
+> On behalf of a collaborative team that additionally includes Leah
+> Somerville (head of the Affective Neuroscience and Development Laboratory),
+> Katherine Powers (former postdoc in the Affective Neuroscience and
+> Development Laboratory) and Bernd Figner (Radboud University).
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Tue Oct 22 10:37:11 2019
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Tue, 22 Oct 2019 10:37:11 +0200
+Subject: [R-meta] Question about rma(measure = "COR", ..)
+In-Reply-To: <bbe53b9c0f2d4871abd9c29d10444a9e@uni-trier.de>
+References: <bbe53b9c0f2d4871abd9c29d10444a9e@uni-trier.de>
+Message-ID: <b079693b-81f2-bd1d-5dcd-c862376d5ecb@imbi.uni-freiburg.de>
+
+Am 21.10.19 um 15:22 schrieb Jalynskij, Maria:
+
+> [...]
+> b) Or should I use rma(measure="ZCOR", ri = corr, ni = n, data = data), and conduct the main result back by myown at the end?
+>
+>
+> In the second version the Trim and Fill method doesn't make any sense.
+
+Dear Maria,
+
+While one may question whether Trim and Fill is the best method to 
+adjust for small study effects in meta-analysis, I do not understand why 
+the method should make sense for untransformed correlations but not for 
+Fisher z-transformed correlations.
+
+Trim and Fill removes the most extreme studies (trim step), determines a 
+symmetry axis and adds the extreme studies on the opposite side (fill 
+step). This works both for untransformed and Fisher transformed 
+correlations.
+
+Best wishes, Guido
+
+P.S. I would always prefer to meta-analyse Fisher transformed 
+correlations as the meta-analysis of untransformed correlations could 
+result in impossible confidence limits outside -1 and 1. Accordingly, 
+the Fisher method is the default in /metacor()/ of R package *meta* 
+(which automatically does the back-calculation for the user).
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+	[[alternative HTML version deleted]]
+
+
+From @1d@rupp @end|ng |rom un|-tr|er@de  Tue Oct 22 12:22:24 2019
+From: @1d@rupp @end|ng |rom un|-tr|er@de (Rupp, Daniel)
+Date: Tue, 22 Oct 2019 10:22:24 +0000
+Subject: [R-meta] Metafor: Reliability Generalization and
+ Bonett-Transformation
+Message-ID: <2957cb3a071e46ffb8482100d91f42cf@uni-trier.de>
+
+I am currently working on a Meta-Analysis of Cronbachs Alphas in Knowledge Tests. I am using the escalc function with the ABT Measure to calculate the alphas and the respective sampling variances. Everything is working out, but I am wondering about the inverse Transformation of tau2 after the rma. Just transforming ist shouldn't be right, since the variance is on another scale than alpha. So i thought about calculating the square root of tau2, conducting the inverse transformation and square it to get a backtransformed tau2. Is this the right way to do it or is there another way?
+
+Best,
+Daniel
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Oct 22 12:43:40 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 22 Oct 2019 10:43:40 +0000
+Subject: [R-meta] Metafor: Reliability Generalization and
+ Bonett-Transformation
+In-Reply-To: <2957cb3a071e46ffb8482100d91f42cf@uni-trier.de>
+References: <2957cb3a071e46ffb8482100d91f42cf@uni-trier.de>
+Message-ID: <98860f166f5247a29b968ab25255fcf9@UM-MAIL3214.unimaas.nl>
+
+Dear Daniel,
+
+One cannot back-transform the value of tau^2 or tau in that manner. One possibility would be to apply the delta method (https://en.wikipedia.org/wiki/Delta_method). For the back-transformation of the ABT measure, this would be:
+
+dat <- dat.bonett2010
+dat <- escalc(measure="ABT", ai=ai, mi=mi, ni=ni, data=dat)
+dat
+
+res <- rma(yi, vi, data=dat)
+res
+
+c(res$tau2 * (exp(-res$beta))^2) # estimated tau^2 in the original units
+
+That should be somewhat close to just analyzing the raw alpha values directly:
+
+dat <- escalc(measure="ARAW", ai=ai, mi=mi, ni=ni, data=dat)
+rma(yi, vi, data=dat)$tau2
+
+But I wouldn't recommend doing this (either analyzing the raw alpha values or back-transforming tau^2 in this manner). Instead, one can just compute a prediction/credibility interval and back-transform its bounds:
+
+dat <- escalc(measure="ABT", ai=ai, mi=mi, ni=ni, data=dat)
+res <- rma(yi, vi, data=dat)
+predict(res, transf=transf.iabt)
+
+The cr.lb/ci.ub values reflect the amount of heterogeneity in a much more understandable way than reporting tau^2.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Rupp, Daniel
+Sent: Tuesday, 22 October, 2019 12:22
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Metafor: Reliability Generalization and Bonett-Transformation
+
+I am currently working on a Meta-Analysis of Cronbachs Alphas in Knowledge Tests. I am using the escalc function with the ABT Measure to calculate the alphas and the respective sampling variances. Everything is working out, but I am wondering about the inverse Transformation of tau2 after the rma. Just transforming ist shouldn't be right, since the variance is on another scale than alpha. So i thought about calculating the square root of tau2, conducting the inverse transformation and square it to get a backtransformed tau2. Is this the right way to do it or is there another way?
+
+Best,
+Daniel
+
+
+From m@@o@berger@t m@iii@g oii gm@ii@com  Tue Oct 22 13:53:37 2019
+From: m@@o@berger@t m@iii@g oii gm@ii@com (m@@o@berger@t m@iii@g oii gm@ii@com)
+Date: Tue, 22 Oct 2019 13:53:37 +0200
+Subject: [R-meta] Meta analysis on means and standard deviation
+Message-ID: <B7CCB964-6F1E-4D87-854B-D6BA1A2B979D@gmail.com>
+
+Dear Meta-analysis community,
+
+We are performing a meta-analysis on means and we have some questions about the package metafor. 
+Our dataset includes means, standard deviations, the year of measure, and the age of our population.
+
+The code for our meta regression is : 
+meta= rma.uni(yi = M, vi = variance, weights = 1/variance, method="REML", mods=~1+Year+Age, data=table)
+
+1: We would like to estimate an adjusted pooled variance. 
+For the moment, we have succeed to obtain an adjusted pooled mean. But for the variance, can we take into account the value in the variance-covariance matrix (? vb ?) as a result of an adjusted pooled variance?
+
+2: We categorized the variable ? year ? and we would like to have a global p-value of this categorized value.
+Is the function in ? Anova ? anova(meta, btt = 2:4) correct to obtain this global p-value? 
+And is it adjusted related to our other variable ? age ? ?
+
+Is it possible to have a p-value for trend? 
+
+3: Is the ? lsmeans ?  package compatible with metafor? 
+
+Thank you in advance. 
+
+Best regards. 
+
+Manon Bergerat 
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Oct 22 14:40:32 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 22 Oct 2019 12:40:32 +0000
+Subject: [R-meta] Meta analysis on means and standard deviation
+In-Reply-To: <B7CCB964-6F1E-4D87-854B-D6BA1A2B979D@gmail.com>
+References: <B7CCB964-6F1E-4D87-854B-D6BA1A2B979D@gmail.com>
+Message-ID: <a540fa3ac24f41deb114023c03d28a80@UM-MAIL3214.unimaas.nl>
+
+Dear Manon,
+
+Just to check: Is 'variance' in data frame 'table' the variance of the raw measurements or is it the variance of the means? It should be the latter (if 'variance' is the variance of the measurements, then the variance of the means is 'variance / n', where 'n' is the sample size).
+
+1) I don't know what you mean by 'adjusted variance'. Variance of what? The variance of the 'adjusted mean'? If so, how did you compute the 'adjusted mean'?
+
+2) With anova(meta, btt = 2:4) you would be testing coefficients 2, 3, and 4 simultaneously. If those coefficients correspond to the 'year' factor, then yes, this is the correct way to do this. And yes, if 'age' is included in the model, then this test is 'adjusted' for 'age'.
+
+3) I don't know - haven't tried.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of manonbergerat at gmail.com
+Sent: Tuesday, 22 October, 2019 13:54
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Meta analysis on means and standard deviation
+
+Dear Meta-analysis community,
+
+We are performing a meta-analysis on means and we have some questions about the package metafor. 
+Our dataset includes means, standard deviations, the year of measure, and the age of our population.
+
+The code for our meta regression is : 
+meta= rma.uni(yi = M, vi = variance, weights = 1/variance, method="REML", mods=~1+Year+Age, data=table)
+
+1: We would like to estimate an adjusted pooled variance. 
+For the moment, we have succeed to obtain an adjusted pooled mean. But for the variance, can we take into account the value in the variance-covariance matrix (? vb ?) as a result of an adjusted pooled variance?
+
+2: We categorized the variable ? year ? and we would like to have a global p-value of this categorized value.
+Is the function in ? Anova ? anova(meta, btt = 2:4) correct to obtain this global p-value? 
+And is it adjusted related to our other variable ? age ? ?
+
+Is it possible to have a p-value for trend? 
+
+3: Is the ? lsmeans ?  package compatible with metafor? 
+
+Thank you in advance. 
+
+Best regards. 
+
+Manon Bergerat
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Tue Oct 22 15:37:48 2019
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 22 Oct 2019 14:37:48 +0100
+Subject: [R-meta] Meta analysis on means and standard deviation
+In-Reply-To: <a540fa3ac24f41deb114023c03d28a80@UM-MAIL3214.unimaas.nl>
+References: <B7CCB964-6F1E-4D87-854B-D6BA1A2B979D@gmail.com>
+ <a540fa3ac24f41deb114023c03d28a80@UM-MAIL3214.unimaas.nl>
+Message-ID: <6406d2f7-dccb-f409-f737-5f5d385b1eae@dewey.myzen.co.uk>
+
+Dear Manon
+
+You might want to swap to emmeans as lsmeans is deprecated. According to 
+one of the vignettes for emmeans there is no support for objects of 
+class rma. However this is R so you could always try it and see what 
+happens. You are not going to break anything.
+
+Michael
+
+On 22/10/2019 13:40, Viechtbauer, Wolfgang (SP) wrote:
+> Dear Manon,
+> 
+> Just to check: Is 'variance' in data frame 'table' the variance of the raw measurements or is it the variance of the means? It should be the latter (if 'variance' is the variance of the measurements, then the variance of the means is 'variance / n', where 'n' is the sample size).
+> 
+> 1) I don't know what you mean by 'adjusted variance'. Variance of what? The variance of the 'adjusted mean'? If so, how did you compute the 'adjusted mean'?
+> 
+> 2) With anova(meta, btt = 2:4) you would be testing coefficients 2, 3, and 4 simultaneously. If those coefficients correspond to the 'year' factor, then yes, this is the correct way to do this. And yes, if 'age' is included in the model, then this test is 'adjusted' for 'age'.
+> 
+> 3) I don't know - haven't tried.
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of manonbergerat at gmail.com
+> Sent: Tuesday, 22 October, 2019 13:54
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Meta analysis on means and standard deviation
+> 
+> Dear Meta-analysis community,
+> 
+> We are performing a meta-analysis on means and we have some questions about the package metafor.
+> Our dataset includes means, standard deviations, the year of measure, and the age of our population.
+> 
+> The code for our meta regression is :
+> meta= rma.uni(yi = M, vi = variance, weights = 1/variance, method="REML", mods=~1+Year+Age, data=table)
+> 
+> 1: We would like to estimate an adjusted pooled variance.
+> For the moment, we have succeed to obtain an adjusted pooled mean. But for the variance, can we take into account the value in the variance-covariance matrix (? vb ?) as a result of an adjusted pooled variance?
+> 
+> 2: We categorized the variable ? year ? and we would like to have a global p-value of this categorized value.
+> Is the function in ? Anova ? anova(meta, btt = 2:4) correct to obtain this global p-value?
+> And is it adjusted related to our other variable ? age ? ?
+> 
+> Is it possible to have a p-value for trend?
+> 
+> 3: Is the ? lsmeans ?  package compatible with metafor?
+> 
+> Thank you in advance.
+> 
+> Best regards.
+> 
+> Manon Bergerat
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From steph@@ie@wi@keibei@er m@iii@g oii bii@uzh@ch  Tue Oct 22 15:43:48 2019
+From: steph@@ie@wi@keibei@er m@iii@g oii bii@uzh@ch (steph@@ie@wi@keibei@er m@iii@g oii bii@uzh@ch)
+Date: Tue, 22 Oct 2019 15:43:48 +0200
+Subject: [R-meta] metafor - averaging over rma result
+Message-ID: <OFEFDD8EEE.DC2566D6-ONC125849B.004A7DC8-C125849B.004B6C05@lotus.uzh.ch>
+
+Dear experts, 
+
+for a meta-analysis, we calculated the variability ratio (VR) of all included studies
+using the rma function of the metafor package.
+
+We would like to plot the results in a forest plot grouped by disorder for a less 
+busy presentation (compared to plotting the VR for every study).
+
+Yet, averaging over the VRs, especially over the confidence intervals seems
+worrying.
+
+Do you have any suggestions?
+
+Thank you, 
+Stephanie
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Oct 22 17:02:58 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 22 Oct 2019 15:02:58 +0000
+Subject: [R-meta] metafor - averaging over rma result
+In-Reply-To: <OFEFDD8EEE.DC2566D6-ONC125849B.004A7DC8-C125849B.004B6C05@lotus.uzh.ch>
+References: <OFEFDD8EEE.DC2566D6-ONC125849B.004A7DC8-C125849B.004B6C05@lotus.uzh.ch>
+Message-ID: <14a0912cbca3412db7015f6cd6cb8f18@UM-MAIL3214.unimaas.nl>
+
+Dear Stephanie,
+
+My suggestion would be to fit a sensible model that uses 'disorder' as a predictor and then plot the model coefficients using the forest() function. Here is an example, not using VRs, but the idea is the same:
+
+library(metafor)
+
+dat <- dat.bourassa1996
+
+# calculate log(OR) and corresponding sampling variances
+dat <- escalc(measure="OR", ai=lh.le, bi=lh.re, ci=rh.le, di=rh.re, data=dat)
+dat
+
+# fit model
+res <- rma(yi, vi, mods = ~ eye_assess - 1, data=dat, subset=sex=="combined")
+res
+
+# by removing the intercept, the coefficients are the estimated log(OR)s for each level of 'eye_assess'
+
+# pass coefficients and variance of the coefficients to forest() function
+forest(coef(res), diag(vcov(res)), slab=names(coef(res)), atrans=exp, 
+       at = c(log(c(1, 2, 4, 8, 16, 32))), xlab="Odds Ratio (log scale)")
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of stephanie.winkelbeiner at bli.uzh.ch
+Sent: Tuesday, 22 October, 2019 15:44
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] metafor - averaging over rma result
+
+Dear experts, 
+
+for a meta-analysis, we calculated the variability ratio (VR) of all included studies
+using the rma function of the metafor package.
+
+We would like to plot the results in a forest plot grouped by disorder for a less 
+busy presentation (compared to plotting the VR for every study).
+
+Yet, averaging over the VRs, especially over the confidence intervals seems
+worrying.
+
+Do you have any suggestions?
+
+Thank you, 
+Stephanie
+
+
+From m@@o@berger@t m@iii@g oii gm@ii@com  Tue Oct 22 18:54:27 2019
+From: m@@o@berger@t m@iii@g oii gm@ii@com (m@@o@berger@t m@iii@g oii gm@ii@com)
+Date: Tue, 22 Oct 2019 18:54:27 +0200
+Subject: [R-meta] Meta analysis on means and standard deviation
+In-Reply-To: <6406d2f7-dccb-f409-f737-5f5d385b1eae@dewey.myzen.co.uk>
+References: <B7CCB964-6F1E-4D87-854B-D6BA1A2B979D@gmail.com>
+ <a540fa3ac24f41deb114023c03d28a80@UM-MAIL3214.unimaas.nl>
+ <6406d2f7-dccb-f409-f737-5f5d385b1eae@dewey.myzen.co.uk>
+Message-ID: <2334F833-A959-4F7C-9C97-B61120FB1340@gmail.com>
+
+Thank you very much already for your quick answer. 
+
+To clarify our question, we want to study 2 outcomes : the mean and the standard deviation. 
+In the data frame table, we have the variance of the raw measurements. 
+
+1: Regarding the mean, we obtained a mean of our means (and its Standard error) thanks to the function rma.uni
+meta_mean = rma.uni(yi = M, vi = variance, weights = 1/variance, method="REML", data=table). 
+
+To obtain the standard deviation of the meta_mean, is it correct to use this code ? : 
+meta_meanSD  = table$se*sqrt(table$QE)
+
+2: Regarding the variance of the raw measurements, is it correct to use this function to obtain the value of variance ? 
+meta_SD = rma.uni(yi = variance,  vi = ? variance-of-variance ?, weights = 1/? variance-of-variance ?, method="REML", data=table)
+
+Thank you again. 
+
+Best, 
+
+Manon
+
+
+> Le 22 oct. 2019 ? 15:37, Michael Dewey <lists at dewey.myzen.co.uk> a ?crit :
+> 
+> Dear Manon
+> 
+> You might want to swap to emmeans as lsmeans is deprecated. According to one of the vignettes for emmeans there is no support for objects of class rma. However this is R so you could always try it and see what happens. You are not going to break anything.
+> 
+> Michael
+> 
+> On 22/10/2019 13:40, Viechtbauer, Wolfgang (SP) wrote:
+>> Dear Manon,
+>> Just to check: Is 'variance' in data frame 'table' the variance of the raw measurements or is it the variance of the means? It should be the latter (if 'variance' is the variance of the measurements, then the variance of the means is 'variance / n', where 'n' is the sample size).
+>> 1) I don't know what you mean by 'adjusted variance'. Variance of what? The variance of the 'adjusted mean'? If so, how did you compute the 'adjusted mean'?
+>> 2) With anova(meta, btt = 2:4) you would be testing coefficients 2, 3, and 4 simultaneously. If those coefficients correspond to the 'year' factor, then yes, this is the correct way to do this. And yes, if 'age' is included in the model, then this test is 'adjusted' for 'age'.
+>> 3) I don't know - haven't tried.
+>> Best,
+>> Wolfgang
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of manonbergerat at gmail.com
+>> Sent: Tuesday, 22 October, 2019 13:54
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Meta analysis on means and standard deviation
+>> Dear Meta-analysis community,
+>> We are performing a meta-analysis on means and we have some questions about the package metafor.
+>> Our dataset includes means, standard deviations, the year of measure, and the age of our population.
+>> The code for our meta regression is :
+>> meta= rma.uni(yi = M, vi = variance, weights = 1/variance, method="REML", mods=~1+Year+Age, data=table)
+>> 1: We would like to estimate an adjusted pooled variance.
+>> For the moment, we have succeed to obtain an adjusted pooled mean. But for the variance, can we take into account the value in the variance-covariance matrix (? vb ?) as a result of an adjusted pooled variance?
+>> 2: We categorized the variable ? year ? and we would like to have a global p-value of this categorized value.
+>> Is the function in ? Anova ? anova(meta, btt = 2:4) correct to obtain this global p-value?
+>> And is it adjusted related to our other variable ? age ? ?
+>> Is it possible to have a p-value for trend?
+>> 3: Is the ? lsmeans ?  package compatible with metafor?
+>> Thank you in advance.
+>> Best regards.
+>> Manon Bergerat
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> -- 
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Oct 22 22:41:55 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 22 Oct 2019 20:41:55 +0000
+Subject: [R-meta] Meta analysis on means and standard deviation
+In-Reply-To: <2334F833-A959-4F7C-9C97-B61120FB1340@gmail.com>
+References: <B7CCB964-6F1E-4D87-854B-D6BA1A2B979D@gmail.com>
+ <a540fa3ac24f41deb114023c03d28a80@UM-MAIL3214.unimaas.nl>
+ <6406d2f7-dccb-f409-f737-5f5d385b1eae@dewey.myzen.co.uk>
+ <2334F833-A959-4F7C-9C97-B61120FB1340@gmail.com>
+Message-ID: <ab23519acdcf412c83007663d0e878a3@UM-MAIL3214.unimaas.nl>
+
+Dear Manon,
+
+Again, if 'variance' is just the variance of the raw measurements, then rma.uni(yi = M, vi = variance, ...) is incorrect. The 'vi' argument is for supplying the sampling variances of the outcome measure (the square of the standard errors) and for means, the sampling variance is 'variance / sample size':
+
+https://en.wikipedia.org/wiki/Standard_error#Standard_error_of_the_mean
+
+Also, any particular reason why you are setting the 'weights' argument?
+
+With respect to your questions:
+
+1) table$se*sqrt(table$QE) makes no sense. If you want to know what the estimated variance of the true means is, then table$tau2 gives you that.
+
+2) In principle yes (assuming you correctly compute the sampling variances of the variances), but variances have a rather skewed sampling distribution. A better approach is to analyze the log-transformed standard deviations. See also:
+
+https://wviechtb.github.io/metafor/reference/escalc.html
+
+and search for "SDLN" and:
+
+Nakagawa, S., Poulin, R., Mengersen, K., Reinhold, K., Engqvist, L., Lagisz, M., & Senior, A. M. (2015). Meta-analysis of variation: Ecological and evolutionary applications and beyond. Methods in Ecology and Evolution, 6, 143-152.
+
+Best,
+Wolfgang 
+
+-----Original Message-----
+From: manonbergerat at gmail.com [mailto:manonbergerat at gmail.com] 
+Sent: Tuesday, 22 October, 2019 18:54
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org; Michael Dewey
+Subject: Re: [R-meta] Meta analysis on means and standard deviation
+
+Thank you very much already for your quick answer.?
+
+To clarify our question, we want to study 2 outcomes : the mean and the standard deviation.?
+In the data frame table, we have the variance of the raw measurements.?
+
+1: Regarding the mean, we obtained a mean of our means (and its Standard error) thanks to the function rma.uni
+meta_mean = rma.uni(yi = M, vi = variance, weights = 1/variance, method="REML", data=table).?
+
+To obtain the standard deviation of the meta_mean, is it correct to use this code ? :?
+meta_meanSD? = table$se*sqrt(table$QE)
+
+2: Regarding the variance of the raw measurements, is it correct to use this function to obtain the value of variance ??
+meta_SD = rma.uni(yi = variance,? vi = ??variance-of-variance??, weights = 1/??variance-of-variance??, method="REML", data=table)
+
+Thank you again.?
+
+Best,?
+
+Manon
+
+Le 22 oct. 2019 ? 15:37, Michael Dewey <lists at dewey.myzen.co.uk> a ?crit :
+
+Dear Manon
+
+You might want to swap to emmeans as lsmeans is deprecated. According to one of the vignettes for emmeans there is no support for objects of class rma. However this is R so you could always try it and see what happens. You are not going to break anything.
+
+Michael
+
+On 22/10/2019 13:40, Viechtbauer, Wolfgang (SP) wrote:
+
+Dear Manon,
+Just to check: Is 'variance' in data frame 'table' the variance of the raw measurements or is it the variance of the means? It should be the latter (if 'variance' is the variance of the measurements, then the variance of the means is 'variance / n', where 'n' is the sample size).
+1) I don't know what you mean by 'adjusted variance'. Variance of what? The variance of the 'adjusted mean'? If so, how did you compute the 'adjusted mean'?
+2) With anova(meta, btt = 2:4) you would be testing coefficients 2, 3, and 4 simultaneously. If those coefficients correspond to the 'year' factor, then yes, this is the correct way to do this. And yes, if 'age' is included in the model, then this test is 'adjusted' for 'age'.
+3) I don't know - haven't tried.
+Best,
+Wolfgang
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of manonbergerat at gmail.com
+Sent: Tuesday, 22 October, 2019 13:54
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Meta analysis on means and standard deviation
+Dear Meta-analysis community,
+We are performing a meta-analysis on means and we have some questions about the package metafor.
+Our dataset includes means, standard deviations, the year of measure, and the age of our population.
+The code for our meta regression is :
+meta= rma.uni(yi = M, vi = variance, weights = 1/variance, method="REML", mods=~1+Year+Age, data=table)
+1: We would like to estimate an adjusted pooled variance.
+For the moment, we have succeed to obtain an adjusted pooled mean. But for the variance, can we take into account the value in the variance-covariance matrix (? vb ?) as a result of an adjusted pooled variance?
+2: We categorized the variable ? year ? and we would like to have a global p-value of this categorized value.
+Is the function in ? Anova ? anova(meta, btt = 2:4) correct to obtain this global p-value?
+And is it adjusted related to our other variable ? age ? ?
+Is it possible to have a p-value for trend?
+3: Is the ? lsmeans ? ?package compatible with metafor?
+Thank you in advance.
+Best regards.
+Manon Bergerat
+
+From p@u|ch@ng1231 @end|ng |rom gm@||@com  Wed Oct 23 11:31:52 2019
+From: p@u|ch@ng1231 @end|ng |rom gm@||@com (Paul Chang)
+Date: Wed, 23 Oct 2019 17:31:52 +0800
+Subject: [R-meta] Fwd: How to add the regression line onto Deek's funnel plot
+In-Reply-To: <CADjnPq3FGX5vm49zW3kb5DOVWCL+A+wtf96TP+tYGrV6XpHXvA@mail.gmail.com>
+References: <CADjnPq3FGX5vm49zW3kb5DOVWCL+A+wtf96TP+tYGrV6XpHXvA@mail.gmail.com>
+Message-ID: <CADjnPq3YVuVXRF6JzMpBUQQNY2-kab_LqvL=33Vn-PrtsQnfyQ@mail.gmail.com>
+
+To whom this may concern,
+
+I've been learning how to perform meta-analysis of diagnostic test accuracy
+(DTA).
+I used mada package maintained by Prof. Doebler.
+I'm aware that publication bias of DTA is better analyzed with the method
+proposed by Deek et al in 2005.
+The Deek's funnel plot plots the lnDOR against the inverse of the square
+root of effective sample size (ESS).
+Test of asymmetry is then conducted by regression of lnDOR with 1/root(ESS).
+Please see the attachment "deeks2005" for more details.
+
+Since Deek's funnel plot is not included in the mada package, and after
+discussion with Prof. Doebler, I adopted his suggestion that I use funnel()
+function within the metafor package to customize what I need to plot Deek's
+funnel plot.
+I've got so close except for the final step: adding the regression line to
+the funnel plot.
+I used the Child Behavior Checklist (CBCL) scale in the Chang et al study
+to practice.
+Please see the attachment for the dataset ("chang_cbcl.csv"), my code
+("Deek funnel plot.R") and the results after running in the console
+("console.txt").
+The regression to test the asymmetry yielded same P-value as in the Chang
+et al. study.
+Please see the attachments of their funnel plot and mine
+("chang_cbcl_deeksfunnel.png" and "myplot.png", respectively).
+
+As I mentioned earlier, I couldn't find a way to correctly add the
+regression line onto the funnel plot.
+Is there any solution you suggest?
+Please let me know.
+
+Thank you very much. Best wishes.
+
+-- 
+???
+Chang, Chun-Yu (Paul)
+???????100?
+Class 2018, School of Medicine, Tzu Chi University
+??????PGY
+Post-graduate-year doctor, Taipei Tzu Chi Hospital, Buddhist Tzu Chi
+Medical Foundation, New Taipei, Taiwan
+E-mail: paulchang1231 at gmail.com <paulchan1231 at gmail.com>
+Cell: 0978000933
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/efb2696a/attachment-0001.html>
+
+-------------- next part --------------
+An embedded and charset-unspecified text was scrubbed...
+Name: console.txt
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/efb2696a/attachment-0001.txt>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: chang_cbcl.csv
+Type: text/csv
+Size: 1408 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/efb2696a/attachment-0001.csv>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Deek funnel plot.R
+Type: application/octet-stream
+Size: 1421 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/efb2696a/attachment-0001.obj>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: chang_cbcl_deeksfunnel.PNG
+Type: image/png
+Size: 31598 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/efb2696a/attachment-0002.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: myplot.png
+Type: image/png
+Size: 5566 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/efb2696a/attachment-0003.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: deeks2005.pdf
+Type: application/pdf
+Size: 2069940 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/efb2696a/attachment-0001.pdf>
+
+From p@u|ch@ng1231 @end|ng |rom gm@||@com  Wed Oct 23 11:49:10 2019
+From: p@u|ch@ng1231 @end|ng |rom gm@||@com (Paul Chang)
+Date: Wed, 23 Oct 2019 17:49:10 +0800
+Subject: [R-meta] How to add the regression line onto Deek's funnel plot
+In-Reply-To: <CADjnPq3YVuVXRF6JzMpBUQQNY2-kab_LqvL=33Vn-PrtsQnfyQ@mail.gmail.com>
+References: <CADjnPq3FGX5vm49zW3kb5DOVWCL+A+wtf96TP+tYGrV6XpHXvA@mail.gmail.com>
+ <CADjnPq3YVuVXRF6JzMpBUQQNY2-kab_LqvL=33Vn-PrtsQnfyQ@mail.gmail.com>
+Message-ID: <CADjnPq1v=mREcfiYJeM_ncGUp2exHR4EG4wzUT8DQJ4525sy5A@mail.gmail.com>
+
+To whom this may concern,
+
+I've been learning how to perform meta-analysis of diagnostic test accuracy
+(DTA).
+I used mada package maintained by Prof. Doebler.
+I'm aware that publication bias of DTA is better analyzed with the method
+proposed by Deek et al in 2005.
+The Deek's funnel plot plots the lnDOR against the inverse of the square
+root of effective sample size (ESS).
+Test of asymmetry is then conducted by regression of lnDOR with 1/root(ESS).
+Please see the attachment "deeks2005" for more details.
+
+Since Deek's funnel plot is not included in the mada package, and after
+discussion with Prof. Doebler, I adopted his suggestion that I use funnel()
+function within the metafor package to customize what I need to plot Deek's
+funnel plot.
+I've got so close except for the final step: adding the regression line to
+the funnel plot.
+I used the Child Behavior Checklist (CBCL) scale in the Chang et al study
+to practice.
+Please see the attachment for the dataset ("chang_cbcl.csv"), my code
+("Deek funnel plot.R") and the results after running in the console
+("console.txt").
+The regression to test the asymmetry yielded same P-value as in the Chang
+et al. study.
+Please see the attachments of their funnel plot and mine
+("chang_cbcl_deeksfunnel.png" and "myplot.png", respectively).
+
+As I mentioned earlier, I couldn't find a way to correctly add the
+regression line onto the funnel plot.
+Is there any solution you suggest?
+Please let me know.
+
+Thank you very much. Best wishes.
+
+-- 
+???
+Chang, Chun-Yu (Paul)
+???????100?
+Class 2018, School of Medicine, Tzu Chi University
+??????PGY
+Post-graduate-year doctor, Taipei Tzu Chi Hospital, Buddhist Tzu Chi
+Medical Foundation, New Taipei, Taiwan
+E-mail: paulchang1231 at gmail.com <paulchan1231 at gmail.com>
+Cell: 0978000933
+
+
+-- 
+???
+Chang, Chun-Yu (Paul)
+???????100?
+Class 2018, School of Medicine, Tzu Chi University
+??????PGY
+Post-graduate-year doctor, Taipei Tzu Chi Hospital, Buddhist Tzu Chi
+Medical Foundation, New Taipei, Taiwan
+E-mail: paulchang1231 at gmail.com <paulchan1231 at gmail.com>
+Cell: 0978000933
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/1457962f/attachment-0001.html>
+
+-------------- next part --------------
+An embedded and charset-unspecified text was scrubbed...
+Name: console.txt
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/1457962f/attachment-0001.txt>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: chang_cbcl_deeksfunnel.PNG
+Type: image/png
+Size: 31598 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/1457962f/attachment-0002.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: myplot.png
+Type: image/png
+Size: 5566 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/1457962f/attachment-0003.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: chang_cbcl.csv
+Type: text/csv
+Size: 1408 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/1457962f/attachment-0001.csv>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Deek funnel plot.R
+Type: application/octet-stream
+Size: 1421 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/1457962f/attachment-0001.obj>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: deeks2005.pdf
+Type: application/pdf
+Size: 2069940 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20191023/1457962f/attachment-0001.pdf>
+
+From steph@@ie@wi@keibei@er m@iii@g oii bii@uzh@ch  Thu Oct 24 20:17:51 2019
+From: steph@@ie@wi@keibei@er m@iii@g oii bii@uzh@ch (steph@@ie@wi@keibei@er m@iii@g oii bii@uzh@ch)
+Date: Thu, 24 Oct 2019 20:17:51 +0200
+Subject: [R-meta] Antwort: RE:  metafor - averaging over rma result
+In-Reply-To: <14a0912cbca3412db7015f6cd6cb8f18@UM-MAIL3214.unimaas.nl>
+References: <14a0912cbca3412db7015f6cd6cb8f18@UM-MAIL3214.unimaas.nl>,
+ <OFEFDD8EEE.DC2566D6-ONC125849B.004A7DC8-C125849B.004B6C05@lotus.uzh.ch>
+Message-ID: <OFFDFEA376.6A801710-ONC125849D.0064830E-C125849D.0064830F@lotus.uzh.ch>
+
+Dear Wolfgang, 
+
+thanks a lot for your swift and helpful reply!
+
+Do I understand correctly that you, from a statistical point of view, would not 
+recommend aggregating over the rma results by disorder and then plotting those in a
+forest plot, considering that this would not accurately represent the overall intercept
+as well as would lead to a bias in the VRs and corresponding CIs in the plot?
+
+Thanks for your take on that.
+
+Best, 
+Stephanie 
+
+-----"Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> schrieb: -----
+An: "stephanie.winkelbeiner at bli.uzh.ch" <stephanie.winkelbeiner at bli.uzh.ch>, "r-sig-meta-analysis at r-project.org" <r-sig-meta-analysis at r-project.org>
+Von: "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Datum: 22.10.2019 17:03
+Betreff: RE: [R-meta] metafor - averaging over rma result
+
+Dear Stephanie,
+
+My suggestion would be to fit a sensible model that uses 'disorder' as a predictor and then plot the model coefficients using the forest() function. Here is an example, not using VRs, but the idea is the same:
+
+library(metafor)
+
+dat <- dat.bourassa1996
+
+# calculate log(OR) and corresponding sampling variances
+dat <- escalc(measure="OR", ai=lh.le, bi=lh.re, ci=rh.le, di=rh.re, data=dat)
+dat
+
+# fit model
+res <- rma(yi, vi, mods = ~ eye_assess - 1, data=dat, subset=sex=="combined")
+res
+
+# by removing the intercept, the coefficients are the estimated log(OR)s for each level of 'eye_assess'
+
+# pass coefficients and variance of the coefficients to forest() function
+forest(coef(res), diag(vcov(res)), slab=names(coef(res)), atrans=exp, 
+       at = c(log(c(1, 2, 4, 8, 16, 32))), xlab="Odds Ratio (log scale)")
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of stephanie.winkelbeiner at bli.uzh.ch
+Sent: Tuesday, 22 October, 2019 15:44
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] metafor - averaging over rma result
+
+Dear experts, 
+
+for a meta-analysis, we calculated the variability ratio (VR) of all included studies
+using the rma function of the metafor package.
+
+We would like to plot the results in a forest plot grouped by disorder for a less 
+busy presentation (compared to plotting the VR for every study).
+
+Yet, averaging over the VRs, especially over the confidence intervals seems
+worrying.
+
+Do you have any suggestions?
+
+Thank you, 
+Stephanie
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Oct 28 12:34:36 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 28 Oct 2019 11:34:36 +0000
+Subject: [R-meta] Antwort: RE:  metafor - averaging over rma result
+In-Reply-To: <OFFDFEA376.6A801710-ONC125849D.0064830E-C125849D.0064830F@lotus.uzh.ch>
+References: <14a0912cbca3412db7015f6cd6cb8f18@UM-MAIL3214.unimaas.nl>,
+ <OFEFDD8EEE.DC2566D6-ONC125849B.004A7DC8-C125849B.004B6C05@lotus.uzh.ch>
+ <OFFDFEA376.6A801710-ONC125849D.0064830E-C125849D.0064830F@lotus.uzh.ch>
+Message-ID: <c9e691201f2248d38977a2aee14180d3@UM-MAIL3214.unimaas.nl>
+
+Dear Stephanie,
+
+Aggregating per disorder would be another option. This isn't all that different from the approach I described below, except that it allows tau^2 to differ per disorder, while the approach I described assumes a common tau^2 regardless of the disorder. But one can allow tau^2 to differ across disorders as well:
+
+http://www.metafor-project.org/doku.php/tips:comp_two_independent_estimates
+
+To use the same example:
+
+library(metafor)
+
+dat <- dat.bourassa1996
+
+# calculate log(OR) and corresponding sampling variances
+dat <- escalc(measure="OR", ai=lh.le, bi=lh.re, ci=rh.le, di=rh.re, data=dat, subset=sex=="combined")
+dat
+
+# fit model
+res1 <- rma(yi, vi, mods = ~ eye_assess - 1, data=dat)
+res1
+
+# allow tau^2 to differ across groups
+res2 <- rma.mv(yi, vi, mods = ~ eye_assess - 1, random = ~ eye_assess | sample, struct="DIAG", data=dat)
+res2
+
+# fit model per group
+res3 <- lapply(split(dat, dat$eye_assess), function(x) rma(yi, vi, data=x))
+
+# compare coefficients
+cbind(coef(res1), coef(res2), sapply(res3, function(x) coef(x)))
+
+# compare tau^2 estimates
+cbind(res1$tau2, res2$tau2, sapply(res3, function(x) x$tau2))
+
+The minor differences in res2 and res3 are due to slight differences in the optimization methods.
+
+I assume your overall model doesn't allow for different tau^2 values per disorder, so it is basically this:
+
+res4 <- rma(yi, vi, data=dat)
+res4
+
+One could also make the argument that the most sensible thing is to fit a model assuming a common tau^2, but fixing the tau^2 to the one from the overall model:
+
+res5 <- rma(yi, vi, mods = ~ eye_assess - 1, data=dat, tau2=res4$tau2)
+
+The reason is that one can then meta-analyze the coefficients from that model and obtain the the same results as the ones from the overall model:
+
+rma(coef(res5), vi=diag(vcov(res5)), method="FE")
+
+(things like I^2, H^2, and the Q-test are different, but the rest is the same)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: stephanie.winkelbeiner at bli.uzh.ch [mailto:stephanie.winkelbeiner at bli.uzh.ch] 
+Sent: Thursday, 24 October, 2019 20:18
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Antwort: RE: [R-meta] metafor - averaging over rma result
+
+Dear Wolfgang,?
+
+thanks a lot for your swift and helpful reply!
+
+Do I understand correctly that you, from a statistical point of view, would not?
+recommend aggregating over the rma results by disorder and then plotting those in a
+forest plot, considering that this would not accurately represent the overall intercept
+as well as would lead to a bias in the VRs and corresponding CIs in the plot?
+
+Thanks for your take on that.
+
+Best,?
+Stephanie?
+
+-----"Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> schrieb: -----
+An: "stephanie.winkelbeiner at bli.uzh.ch" <stephanie.winkelbeiner at bli.uzh.ch>, "r-sig-meta-analysis at r-project.org" <r-sig-meta-analysis at r-project.org>
+Von: "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Datum: 22.10.2019 17:03
+Betreff: RE: [R-meta] metafor - averaging over rma result
+Dear Stephanie,
+
+My suggestion would be to fit a sensible model that uses 'disorder' as a predictor and then plot the model coefficients using the forest() function. Here is an example, not using VRs, but the idea is the same:
+
+library(metafor)
+
+dat <- dat.bourassa1996
+
+# calculate log(OR) and corresponding sampling variances
+dat <- escalc(measure="OR", ai=lh.le, bi=lh.re, ci=rh.le, di=rh.re, data=dat)
+dat
+
+# fit model
+res <- rma(yi, vi, mods = ~ eye_assess - 1, data=dat, subset=sex=="combined")
+res
+
+# by removing the intercept, the coefficients are the estimated log(OR)s for each level of 'eye_assess'
+
+# pass coefficients and variance of the coefficients to forest() function
+forest(coef(res), diag(vcov(res)), slab=names(coef(res)), atrans=exp, 
+?? ? ? at = c(log(c(1, 2, 4, 8, 16, 32))), xlab="Odds Ratio (log scale)")
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of stephanie.winkelbeiner at bli.uzh.ch
+Sent: Tuesday, 22 October, 2019 15:44
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] metafor - averaging over rma result
+
+Dear experts, 
+
+for a meta-analysis, we calculated the variability ratio (VR) of all included studies
+using the rma function of the metafor package.
+
+We would like to plot the results in a forest plot grouped by disorder for a less 
+busy presentation (compared to plotting the VR for every study).
+
+Yet, averaging over the VRs, especially over the confidence intervals seems
+worrying.
+
+Do you have any suggestions?
+
+Thank you, 
+Stephanie
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Oct 28 15:29:56 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 28 Oct 2019 14:29:56 +0000
+Subject: [R-meta] How to add the regression line onto Deek's funnel plot
+In-Reply-To: <CADjnPq1v=mREcfiYJeM_ncGUp2exHR4EG4wzUT8DQJ4525sy5A@mail.gmail.com>
+References: <CADjnPq3FGX5vm49zW3kb5DOVWCL+A+wtf96TP+tYGrV6XpHXvA@mail.gmail.com>
+ <CADjnPq3YVuVXRF6JzMpBUQQNY2-kab_LqvL=33Vn-PrtsQnfyQ@mail.gmail.com>
+ <CADjnPq1v=mREcfiYJeM_ncGUp2exHR4EG4wzUT8DQJ4525sy5A@mail.gmail.com>
+Message-ID: <1318f01ea9354371a9e0db094fa74e98@UM-MAIL3214.unimaas.nl>
+
+Hi Paul,
+
+Thanks for the reproducible example. Here is how I would do it (without using ggplot2).
+
+library(metafor)
+
+# read data
+df <- read.csv("chang_cbcl.csv")
+
+# calculate effect size as lnDOR
+data1 <- escalc(measure="OR", ai=TP, bi=FP, ci=FN, di=TN, data=df)
+data1
+
+# funnel plot with 1/sqrt(data1$ESS) on y-axis
+fplot <- funnel(data1$yi, 1/sqrt(data1$ESS), yaxis="vi", atransf=exp,
+                at=log(c(1, 10, 100, 1000)), ylim=c(0.04,0.20), refline=NA,
+                xlab="Diagnostic Odds Ratio", ylab="1/root(ESS)",
+                main="Deek's Funnel Plot Asymmetry Test", pch=21, cex=2)
+
+# add text
+text(fplot$x, fplot$y, fplot$slab, cex=.6)
+
+# regression test
+newf_lm <- lm(yi ~ I(1/sqrt(ESS)), weights = ESS, data = data1)
+summary(newf_lm)
+
+# add line
+lims <- range(1/sqrt(data1$ESS))
+segments(coef(newf_lm)[1] + coef(newf_lm)[2] * lims[1], lims[1], 
+         coef(newf_lm)[1] + coef(newf_lm)[2] * lims[2], lims[2], lwd=2)
+
+# add legend
+legend("topright", inset=.01, legend=c("Study", "Regression Line"),
+       pch=c(21, NA), lty=c(NA, "solid"), bg="white")
+
+That comes pretty close to chang_cbcl_deeksfunnel.png.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Paul Chang
+Sent: Wednesday, 23 October, 2019 11:49
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] How to add the regression line onto Deek's funnel plot
+
+To whom this may concern,
+
+I've been learning how to perform meta-analysis of diagnostic test accuracy (DTA).
+I used mada package maintained by Prof. Doebler.
+I'm aware that publication bias of DTA is better analyzed with the method proposed by Deek et al in 2005.
+The Deek's funnel plot plots the lnDOR against the inverse of the square root of effective sample size (ESS).
+Test of asymmetry is then conducted by regression of lnDOR with 1/root(ESS).
+Please see the attachment "deeks2005" for more details.
+
+Since Deek's funnel plot is not included in the mada package, and after discussion with Prof. Doebler, I adopted his suggestion that I use funnel() function within the metafor package to customize what I need to plot Deek's funnel plot.
+I've got so close except for the final step: adding the regression line to the funnel plot.
+I used the Child Behavior Checklist (CBCL) scale in the Chang et al study to practice.
+Please see the attachment for the dataset ("chang_cbcl.csv"), my code ("Deek funnel plot.R") and the results after running in the console ("console.txt").
+The regression to test the asymmetry yielded same P-value as in the Chang et al. study.
+Please see the attachments of their funnel plot and mine ("chang_cbcl_deeksfunnel.png" and "myplot.png", respectively).
+
+As I mentioned earlier, I couldn't find a way to correctly add the regression line onto the funnel plot.
+Is there any solution you suggest?
+Please let me know.??
+
+Thank you very much. Best wishes.
+
+--
+???
+Chang, Chun-Yu (Paul)
+???????100?
+Class 2018, School of Medicine, Tzu Chi University
+??????PGY
+Post-graduate-year doctor,?Taipei Tzu Chi Hospital, Buddhist Tzu Chi Medical Foundation, New Taipei, Taiwan
+E-mail: paulchang1231 at gmail.com
+Cell: 0978000933
+

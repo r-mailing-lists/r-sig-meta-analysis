@@ -1,0 +1,4033 @@
+From brend@n @end|ng |rom brend@n@-b|t@@com  Sun Oct  1 10:55:53 2023
+From: brend@n @end|ng |rom brend@n@-b|t@@com (Brendan Pearl)
+Date: Sun, 01 Oct 2023 08:55:53 +0000
+Subject: [R-meta] When and how to use 'obs' vs 'type' in vcalc
+Message-ID: <OA13GWQi7aFb_bkIrG_r-Q6jhmFKSUOaGOaOxlhm5GaabdS4oSXlS-YFCjtzrZqgWb-8AJcwgF4aN4jDN-g7wkrhXvAy_NX3JN5S1mSa5f8=@brendans-bits.com>
+
+Hello,
+
+I am trying to work out when to use "obs" vs "type" in vcalc when creating a V matrix from a long series of odds ratio effect sizes. Each article within the dataset reports multiple effect sizes (each is a predictor-outcome pair), and each article is nested within a larger dataset (i.e. some studies have used overlapping samples).
+For background: I plan to run a multivariate analysis (and then obtain robust cluster estimates) using this code:
+res_multivariate <- rma.mv(yi=yi,
+V,
+data=dat,
+random = ~1 | DATASET/STUDY,
+mods = ~ factor(RELATIONSHIP)-1,
+method = "REML" )
+
+Question 1: Which is the 'correct' variable to set in vcalc ('obs' or 'type')? I get the exact same V matrix regardless of whether I use obs or type. This is the code I am running (changing the obs/type variable):
+V <- vcalc(vi, cluster=DATASET, subgroup = STUDY, data=dat, rho=0.6, obs = es.id3)
+
+Question 2: What is the 'correct' way to label the obs/type?
+1: Unique number to each extracted effect size within each article? (e.g. es.id1)
+2: The same number to each row that has the same predictor-outcome pair? (e.g. es.id2)
+3: A unique number to each extracted effect size across the whole dataset? (e.g. es.id3)
+
+For reference: the following is a representation of my dataset with effect sizes and sampling variances removed for brevity:
+
+structure(list(DATASET = c("Dataset_A", "Dataset_A", "Dataset_B",
+"Dataset_A", "Dataset_A", "Dataset_B", "Dataset_A", "Dataset_B",
+"Dataset_B", "Dataset_A", "Dataset_A", "Dataset_B"), STUDY = c("Study_A",
+"Study_B", "Study_D", "Study_A", "Study_B", "Study_E", "Study_A",
+"Study_D", "Study_F", "Study_A", "Study_C", "Study_F"), OUTCOME = c("Homelessness",
+"Homelessness", "Homelessness", "Incarceration", "Incarceration",
+"Incarceration", "Homelessness", "Homelessness", "Homelessness",
+"Incarceration", "Incarceration", "Incarceration"), PREDICTOR = c("Female",
+"Female", "Female", "Female", "Female", "Female", "Younger_Older",
+"Younger_Older", "Younger_Older", "Younger_Older", "Younger_Older",
+"Younger_Older"), es.id1 = c(1, 1, 1, 3, 2, 1, 2, 2, 2, 4, 1,
+1), es.id2 = c(1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4), es.id3 = c(1,
+5, 8, 3, 6, 10, 2, 9, 12, 4, 7, 11)), row.names = c(NA, -12L), class = c("tbl_df",
+"tbl", "data.frame"))
+	[[alternative HTML version deleted]]
+
+
+From brend@n @end|ng |rom brend@n@-b|t@@com  Sun Oct  1 13:11:19 2023
+From: brend@n @end|ng |rom brend@n@-b|t@@com (Brendan Pearl)
+Date: Sun, 01 Oct 2023 11:11:19 +0000
+Subject: [R-meta] When and how to use 'obs' vs 'type' in vcalc
+In-Reply-To: <OA13GWQi7aFb_bkIrG_r-Q6jhmFKSUOaGOaOxlhm5GaabdS4oSXlS-YFCjtzrZqgWb-8AJcwgF4aN4jDN-g7wkrhXvAy_NX3JN5S1mSa5f8=@brendans-bits.com>
+References: <OA13GWQi7aFb_bkIrG_r-Q6jhmFKSUOaGOaOxlhm5GaabdS4oSXlS-YFCjtzrZqgWb-8AJcwgF4aN4jDN-g7wkrhXvAy_NX3JN5S1mSa5f8=@brendans-bits.com>
+Message-ID: <0RUxW6q86I7mBizXJDgar89BHDQQLfMBdcF_beqZSydoQ2sqirMMGr21-95vmwQt2OxugYkpXiHs3uTMX87zGVvX7VB2Il2B9DJ6cY1uTxs=@brendans-bits.com>
+
+I think I have partly answered one of my questions: type lets me distinguish between types of constructs - in my case, highlighting outcomes that I expect to be correlated and distinguishing them from other outcomes where I expect them not be correlated.
+It only made sense to me when I created a dataset with four outcomes (A, B, C, D). Within pairs were highly correlated with each other, but between pairs were only loosely correlated.
+
+So my question now is: what is the 'right' way to number effect sizes:
+1: Unique number to each extracted effect size within each article? (e.g. es.id1)
+2: The same number to each row that has the same predictor-outcome pair? (e.g. es.id2)
+3: A unique number to each extracted effect size across the whole dataset? (e.g. es.id3)
+
+Brendan.
+
+
+------- Original Message -------
+On Sunday, October 1st, 2023 at 7:55 PM, Brendan Pearl via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+
+
+> Hello,
+> 
+> I am trying to work out when to use "obs" vs "type" in vcalc when creating a V matrix from a long series of odds ratio effect sizes. Each article within the dataset reports multiple effect sizes (each is a predictor-outcome pair), and each article is nested within a larger dataset (i.e. some studies have used overlapping samples).
+> For background: I plan to run a multivariate analysis (and then obtain robust cluster estimates) using this code:
+> res_multivariate <- rma.mv(yi=yi,
+> V,
+> data=dat,
+> random = ~1 | DATASET/STUDY,
+> mods = ~ factor(RELATIONSHIP)-1,
+> method = "REML" )
+> 
+> Question 1: Which is the 'correct' variable to set in vcalc ('obs' or 'type')? I get the exact same V matrix regardless of whether I use obs or type. This is the code I am running (changing the obs/type variable):
+> V <- vcalc(vi, cluster=DATASET, subgroup = STUDY, data=dat, rho=0.6, obs = es.id3)
+> 
+> Question 2: What is the 'correct' way to label the obs/type?
+> 1: Unique number to each extracted effect size within each article? (e.g. es.id1)
+> 2: The same number to each row that has the same predictor-outcome pair? (e.g. es.id2)
+> 3: A unique number to each extracted effect size across the whole dataset? (e.g. es.id3)
+> 
+> For reference: the following is a representation of my dataset with effect sizes and sampling variances removed for brevity:
+> 
+> structure(list(DATASET = c("Dataset_A", "Dataset_A", "Dataset_B",
+> "Dataset_A", "Dataset_A", "Dataset_B", "Dataset_A", "Dataset_B",
+> "Dataset_B", "Dataset_A", "Dataset_A", "Dataset_B"), STUDY = c("Study_A",
+> "Study_B", "Study_D", "Study_A", "Study_B", "Study_E", "Study_A",
+> "Study_D", "Study_F", "Study_A", "Study_C", "Study_F"), OUTCOME = c("Homelessness",
+> "Homelessness", "Homelessness", "Incarceration", "Incarceration",
+> "Incarceration", "Homelessness", "Homelessness", "Homelessness",
+> "Incarceration", "Incarceration", "Incarceration"), PREDICTOR = c("Female",
+> "Female", "Female", "Female", "Female", "Female", "Younger_Older",
+> "Younger_Older", "Younger_Older", "Younger_Older", "Younger_Older",
+> "Younger_Older"), es.id1 = c(1, 1, 1, 3, 2, 1, 2, 2, 2, 4, 1,
+> 1), es.id2 = c(1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4), es.id3 = c(1,
+> 5, 8, 3, 6, 10, 2, 9, 12, 4, 7, 11)), row.names = c(NA, -12L), class = c("tbl_df",
+> "tbl", "data.frame"))
+> [[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From k|etduchuynh @end|ng |rom gm@||@com  Tue Oct  3 18:35:32 2023
+From: k|etduchuynh @end|ng |rom gm@||@com (Kiet Huynh)
+Date: Tue, 3 Oct 2023 11:35:32 -0500
+Subject: [R-meta] Score Normalization for Moderator Analysis in
+ Meta-Analysis
+In-Reply-To: <6cbdec2681be423b90b376b000fca274@maastrichtuniversity.nl>
+References: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+ <c27c7629b33b453fa8a82b444e363165@maastrichtuniversity.nl>
+ <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+ <6cbdec2681be423b90b376b000fca274@maastrichtuniversity.nl>
+Message-ID: <48F472A2-E5B7-477B-B11D-3A8ED0B76E5D@gmail.com>
+
+
+Wolfgang,
+
+Thanks for info and resources. You answered my question about looking for some guidance on both the minimum number of studies needed to estimate such a model, and some general rules of thumb to work from. 
+
+I also enjoyed your ?three patients? video. I got a good laugh from that!
+
+- KH
+
+> On Sep 29, 2023, at 6:27 AM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> I just noticed that the last question has remained unanswered: 
+> 
+> Depends on what you mean by "need". To run such an analysis, assuming 'scale' is just a two-level factor and you want to run a model with '~ factor(scale) * pompmean', then you will need five effect sizes, two for the first and three for the second level of 'scale'. That will give you just enough information to fit such a model and estimate the amount of residual heterogeneity.
+> 
+> But I assume that this is not what you mean by "need". If you meant something along the lines of 'having enough power', then I cannot give you an answer to that question, because it is like asking: "I want to run a study - how many subjects do I need?" (although turns out that the answer to that question is: "three patients" -- https://www.youtube.com/watch?v=Hz1fyhVOjr4). To give an informed answer to that question, one would have to do a power analysis:
+> 
+> Hedges, L. V., & Pigott, T. D. (2004). The power of statistical tests for moderators in meta-analysis. Psychological Methods, 9(4), 426-445. 
+> 
+> If you meant something along the lines of 'so that reviewers are not going to complain that my sample size is too small', then one could refer to rules of thumb like what you can find in the Cochrane Handbook:
+> 
+> https://training.cochrane.org/handbook/current/chapter-10#section-10-11-5-1
+> 
+> "It is very unlikely that an investigation of heterogeneity will produce useful findings unless there is a substantial number of studies. Typical advice for undertaking simple regression analyses: that at least ten observations (i.e. ten studies in a meta-analysis) should be available for each characteristic modelled. However, even this will be too few when the covariates are unevenly distributed across studies."
+> 
+> To be clear, this is an entirely arbitrary rule (and one also finds suggestions like '5 studies per characteristic'). Also, what exactly 'for each characteristic modelled' means is not entirely clear, but say we interpret this as 'per model coefficient'. The model above has 4 model coefficients (including the intercept), so then we would need at least 40 effect sizes.
+> 
+> To be fair, this rule does relate somewhat to the issue of overfitting, since more complex models require more data points to avoid overfitting. But even then, one would have to articulate more precisely what exactly one is concerned about.
+> 
+> Best,
+> Wolfgang
+> 
+>> -----Original Message-----
+>> From: Kiet Huynh [mailto:kietduchuynh at gmail.com]
+>> Sent: Thursday, 14 September, 2023 17:10
+>> To: Viechtbauer, Wolfgang (NP)
+>> Cc: R Special Interest Group for Meta-Analysis
+>> Subject: Re: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>> 
+>> Hi Wolfgang,
+>> 
+>> Thanks for the reminder about including links when cross posting.
+>> 
+>> I appreciate the helpful expiation for the proportion/percentage of maximum
+>> possible' (POMP) score method for moderation analysis. Especially helpful was the
+>> tip on using the scale type to interact with the POMP score mean to determine if
+>> the relationship between social support and the strength of the association
+>> between LGBTQ+ discrimination and mental health differs depending on the scale
+>> used. Do you have a sense of how many effect sizes would be needed for that?
+>> 
+>> Best,
+>> 
+>> Kiet
+>> 
+>> On Sep 13, 2023, at 3:25 AM, Viechtbauer, Wolfgang (NP)
+>> <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>> 
+>> Dear Kiet,
+>> 
+>> I don't mind cross-posting, but when doing so, please indicate this in posts, so
+>> in case answers are provided elsewhere, duplicate efforts can be avoided. For
+>> reference, this question was also posted here:
+>> 
+>> https://stats.stackexchange.com/questions/626306/score-normalization-for-
+>> moderator-analysis-in-meta-analysis
+>> 
+>> What you describe under 2 is the 'proportion/percentage of maximum possible'
+>> (POMP) score method, which is nicely discussed in this article:
+>> 
+>> Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units
+>> and the circumstance for POMP. Multivariate Behavioral Research, 34(3), 315-
+>> 346. https://doi.org/10.1207/S15327906MBR3403_2
+>> 
+>> This approach assumes that the observed values on one scale are linear
+>> transformations of the observed values on other scales. Of course that is never
+>> quite true, but can hold as a rough approximation. In fact, this is also the
+>> assumption underlying various effect size / outcome measures (e.g., standardized
+>> mean differences, correlation coefficients), so it is an implicit assumption in
+>> many meta-analyses anyway (except that you are now also applying this assumption
+>> to the moderator variable). There was a thread related to this in April:
+>> 
+>> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004529.html
+>> 
+>> When this assumption is not correct (with respect to the variables involved in
+>> computing the correlations or with respect to the moderator variable), then this
+>> becomes one of the sources of (residual) heterogeneity. Of course, we have
+>> random/mixed-effects models to account for (residual) heterogeneity, so this is
+>> not the end of the world. But if scales are measuring entirely different
+>> constructs, then we should be more worried if we lump them together.
+>> 
+>> If you have enough studies, then you can also code the type of scale used to
+>> measure social support (e.g., MSPSS versus other or even more fine-grained if you
+>> have enough studies) and include this in your moderator analysis and allow it to
+>> interact with the POMP score mean of the social support scale. That way, you can
+>> examine if the relationship between social support and the strength of the
+>> association between LGBTQ+ discrimination and mental health differs depending on
+>> the scale used.
+>> 
+>> Best,
+>> Wolfgang
+>> 
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>> Behalf Of Kiet Huynh via R-sig-meta-analysis
+>> Sent: Tuesday, 12 September, 2023 21:56
+>> To: R meta
+>> Cc: Kiet Huynh
+>> Subject: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>> 
+>> Hello colleagues,
+>> 
+>> I?m conducting a meta-analysis of the association between LGBTQ+ discrimination
+>> and mental health. Both are continuous variables, and I am analyzing correlation
+>> coefficients. I?m interested in looking at moderators (continuous) of the
+>> relationship between these two variables. One such moderator is social support
+>> (continuous). I am considering two approaches for running the moderator analysis:
+>> 
+>> 1) Many of the studies used the same MSPSS social support scale. I plan to use
+>> the mean value of the MSPSS as a continuous moderator variable of the
+>> discrimination-mental health relationship.
+>> 
+>> 2) Most studies, however, use different measures of social support. I plan to use
+>> the min-max normalization method to put all the social support measure on the
+>> same scale, and then use that normalized mean as the moderator variable of the
+>> discrimination-mental health relationship. For an example use of min-max
+>> normalization method, see Endendijk et al. (2020). However, the Endendijk et al.
+>> (2020) study uses the min-max normalization method for the outcome and not for a
+>> moderator. The formula for the min-max normalization method is:
+>> 
+>> x? = (x - min)/(max - min)
+>> x? is the normalized mean, x is the mean of the sample, min is the minimum
+>> possible value of the scale, and max is the maximum possible value of the scale.
+>> 
+>> The benefit to the second approach is that I can include more studies in this
+>> moderator analysis, and not just the studies using the same measure of social
+>> support.
+>> 
+>> My question is whether both approaches are valid methods for testing moderator
+>> analysis? Are there any issues with using the of min-max normalization method for
+>> moderator analysis?
+>> 
+>> Thank you,
+>> 
+>> - KH
+>> 
+>> Reference:
+>> 
+>> Endendijk, J. J., van Baar, A. L., & Dekovi?, M. (2020). He is a stud, she is a
+>> slut! A meta-analysis on the continued existence of sexual double standards.
+>> Personality and Social Psychology Review, 24(2), 163?190.
+>> https://doi.org/10.1177/1088868319891310
+>> 
+>> ----
+>> 
+>> Kiet Huynh, PhD (he/him)
+>> (hear pronunciation <https://www.name-coach.com/kiet-huynh-94be0772-1bfd-4ece-
+>> afba-14699186f2b9>)
+>> Assistant Professor
+>> Department of Psychology
+>> 
+>> Terrill Hall Rm # 336
+>> University of North Texas
+>> Denton, TX 76203
+>> Kiet.Huynh at unt.edu <mailto:Kiet.Huynh at unt.edu>
+> 
+
+
+From k|etduchuynh @end|ng |rom gm@||@com  Tue Oct  3 18:35:32 2023
+From: k|etduchuynh @end|ng |rom gm@||@com (Kiet Huynh)
+Date: Tue, 3 Oct 2023 11:35:32 -0500
+Subject: [R-meta] Score Normalization for Moderator Analysis in
+ Meta-Analysis
+In-Reply-To: <6cbdec2681be423b90b376b000fca274@maastrichtuniversity.nl>
+References: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+ <c27c7629b33b453fa8a82b444e363165@maastrichtuniversity.nl>
+ <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+ <6cbdec2681be423b90b376b000fca274@maastrichtuniversity.nl>
+Message-ID: <48F472A2-E5B7-477B-B11D-3A8ED0B76E5D@gmail.com>
+
+
+Wolfgang,
+
+Thanks for info and resources. You answered my question about looking for some guidance on both the minimum number of studies needed to estimate such a model, and some general rules of thumb to work from. 
+
+I also enjoyed your ?three patients? video. I got a good laugh from that!
+
+- KH
+
+> On Sep 29, 2023, at 6:27 AM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> I just noticed that the last question has remained unanswered: 
+> 
+> Depends on what you mean by "need". To run such an analysis, assuming 'scale' is just a two-level factor and you want to run a model with '~ factor(scale) * pompmean', then you will need five effect sizes, two for the first and three for the second level of 'scale'. That will give you just enough information to fit such a model and estimate the amount of residual heterogeneity.
+> 
+> But I assume that this is not what you mean by "need". If you meant something along the lines of 'having enough power', then I cannot give you an answer to that question, because it is like asking: "I want to run a study - how many subjects do I need?" (although turns out that the answer to that question is: "three patients" -- https://www.youtube.com/watch?v=Hz1fyhVOjr4). To give an informed answer to that question, one would have to do a power analysis:
+> 
+> Hedges, L. V., & Pigott, T. D. (2004). The power of statistical tests for moderators in meta-analysis. Psychological Methods, 9(4), 426-445. 
+> 
+> If you meant something along the lines of 'so that reviewers are not going to complain that my sample size is too small', then one could refer to rules of thumb like what you can find in the Cochrane Handbook:
+> 
+> https://training.cochrane.org/handbook/current/chapter-10#section-10-11-5-1
+> 
+> "It is very unlikely that an investigation of heterogeneity will produce useful findings unless there is a substantial number of studies. Typical advice for undertaking simple regression analyses: that at least ten observations (i.e. ten studies in a meta-analysis) should be available for each characteristic modelled. However, even this will be too few when the covariates are unevenly distributed across studies."
+> 
+> To be clear, this is an entirely arbitrary rule (and one also finds suggestions like '5 studies per characteristic'). Also, what exactly 'for each characteristic modelled' means is not entirely clear, but say we interpret this as 'per model coefficient'. The model above has 4 model coefficients (including the intercept), so then we would need at least 40 effect sizes.
+> 
+> To be fair, this rule does relate somewhat to the issue of overfitting, since more complex models require more data points to avoid overfitting. But even then, one would have to articulate more precisely what exactly one is concerned about.
+> 
+> Best,
+> Wolfgang
+> 
+>> -----Original Message-----
+>> From: Kiet Huynh [mailto:kietduchuynh at gmail.com]
+>> Sent: Thursday, 14 September, 2023 17:10
+>> To: Viechtbauer, Wolfgang (NP)
+>> Cc: R Special Interest Group for Meta-Analysis
+>> Subject: Re: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>> 
+>> Hi Wolfgang,
+>> 
+>> Thanks for the reminder about including links when cross posting.
+>> 
+>> I appreciate the helpful expiation for the proportion/percentage of maximum
+>> possible' (POMP) score method for moderation analysis. Especially helpful was the
+>> tip on using the scale type to interact with the POMP score mean to determine if
+>> the relationship between social support and the strength of the association
+>> between LGBTQ+ discrimination and mental health differs depending on the scale
+>> used. Do you have a sense of how many effect sizes would be needed for that?
+>> 
+>> Best,
+>> 
+>> Kiet
+>> 
+>> On Sep 13, 2023, at 3:25 AM, Viechtbauer, Wolfgang (NP)
+>> <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>> 
+>> Dear Kiet,
+>> 
+>> I don't mind cross-posting, but when doing so, please indicate this in posts, so
+>> in case answers are provided elsewhere, duplicate efforts can be avoided. For
+>> reference, this question was also posted here:
+>> 
+>> https://stats.stackexchange.com/questions/626306/score-normalization-for-
+>> moderator-analysis-in-meta-analysis
+>> 
+>> What you describe under 2 is the 'proportion/percentage of maximum possible'
+>> (POMP) score method, which is nicely discussed in this article:
+>> 
+>> Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units
+>> and the circumstance for POMP. Multivariate Behavioral Research, 34(3), 315-
+>> 346. https://doi.org/10.1207/S15327906MBR3403_2
+>> 
+>> This approach assumes that the observed values on one scale are linear
+>> transformations of the observed values on other scales. Of course that is never
+>> quite true, but can hold as a rough approximation. In fact, this is also the
+>> assumption underlying various effect size / outcome measures (e.g., standardized
+>> mean differences, correlation coefficients), so it is an implicit assumption in
+>> many meta-analyses anyway (except that you are now also applying this assumption
+>> to the moderator variable). There was a thread related to this in April:
+>> 
+>> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004529.html
+>> 
+>> When this assumption is not correct (with respect to the variables involved in
+>> computing the correlations or with respect to the moderator variable), then this
+>> becomes one of the sources of (residual) heterogeneity. Of course, we have
+>> random/mixed-effects models to account for (residual) heterogeneity, so this is
+>> not the end of the world. But if scales are measuring entirely different
+>> constructs, then we should be more worried if we lump them together.
+>> 
+>> If you have enough studies, then you can also code the type of scale used to
+>> measure social support (e.g., MSPSS versus other or even more fine-grained if you
+>> have enough studies) and include this in your moderator analysis and allow it to
+>> interact with the POMP score mean of the social support scale. That way, you can
+>> examine if the relationship between social support and the strength of the
+>> association between LGBTQ+ discrimination and mental health differs depending on
+>> the scale used.
+>> 
+>> Best,
+>> Wolfgang
+>> 
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>> Behalf Of Kiet Huynh via R-sig-meta-analysis
+>> Sent: Tuesday, 12 September, 2023 21:56
+>> To: R meta
+>> Cc: Kiet Huynh
+>> Subject: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>> 
+>> Hello colleagues,
+>> 
+>> I?m conducting a meta-analysis of the association between LGBTQ+ discrimination
+>> and mental health. Both are continuous variables, and I am analyzing correlation
+>> coefficients. I?m interested in looking at moderators (continuous) of the
+>> relationship between these two variables. One such moderator is social support
+>> (continuous). I am considering two approaches for running the moderator analysis:
+>> 
+>> 1) Many of the studies used the same MSPSS social support scale. I plan to use
+>> the mean value of the MSPSS as a continuous moderator variable of the
+>> discrimination-mental health relationship.
+>> 
+>> 2) Most studies, however, use different measures of social support. I plan to use
+>> the min-max normalization method to put all the social support measure on the
+>> same scale, and then use that normalized mean as the moderator variable of the
+>> discrimination-mental health relationship. For an example use of min-max
+>> normalization method, see Endendijk et al. (2020). However, the Endendijk et al.
+>> (2020) study uses the min-max normalization method for the outcome and not for a
+>> moderator. The formula for the min-max normalization method is:
+>> 
+>> x? = (x - min)/(max - min)
+>> x? is the normalized mean, x is the mean of the sample, min is the minimum
+>> possible value of the scale, and max is the maximum possible value of the scale.
+>> 
+>> The benefit to the second approach is that I can include more studies in this
+>> moderator analysis, and not just the studies using the same measure of social
+>> support.
+>> 
+>> My question is whether both approaches are valid methods for testing moderator
+>> analysis? Are there any issues with using the of min-max normalization method for
+>> moderator analysis?
+>> 
+>> Thank you,
+>> 
+>> - KH
+>> 
+>> Reference:
+>> 
+>> Endendijk, J. J., van Baar, A. L., & Dekovi?, M. (2020). He is a stud, she is a
+>> slut! A meta-analysis on the continued existence of sexual double standards.
+>> Personality and Social Psychology Review, 24(2), 163?190.
+>> https://doi.org/10.1177/1088868319891310
+>> 
+>> ----
+>> 
+>> Kiet Huynh, PhD (he/him)
+>> (hear pronunciation <https://www.name-coach.com/kiet-huynh-94be0772-1bfd-4ece-
+>> afba-14699186f2b9>)
+>> Assistant Professor
+>> Department of Psychology
+>> 
+>> Terrill Hall Rm # 336
+>> University of North Texas
+>> Denton, TX 76203
+>> Kiet.Huynh at unt.edu <mailto:Kiet.Huynh at unt.edu>
+> 
+
+
+From |@uren@he|denre|ch @end|ng |rom @de|@|de@edu@@u  Mon Oct  9 03:42:10 2023
+From: |@uren@he|denre|ch @end|ng |rom @de|@|de@edu@@u (Lauren Mary Heidenreich)
+Date: Mon, 9 Oct 2023 01:42:10 +0000
+Subject: [R-meta] Questions re multilevel meta-analysis
+Message-ID: <SY4P282MB07290CB982702E01D6CB637FCECEA-6455@SY4P282MB0729.AUSP282.PROD.OUTLOOK.COM>
+
+Hi everyone,
+
+I am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the relationship between cognitive reserve (CR) indicators (e.g., educational attainment, occupational complexity, pre-morbid IQ) and cognitive outcomes (e.g., working memory, long term memory, visual processing speed etc), among individuals previously infected with COVID-19. Because the moderating effect of CR on cognitive outcomes can only be assessed by including an estimate of brain pathology status, we are specifically exploring how CR and COVID-19 severity (e.g., time in hospital, need for oxygen therapy) interact to predict cognitive outcomes. We would expect to find a negative relationship between the severity of the disease and cognitive outcomes, which is less pronounced in people who have a higher CR (see hypothetical interaction: https://universityofadelaide.box.com/s/c0ehcj70m3765w99xbi6om61udos5czv).
+
+[cid:7fe4ce9b-00b6-4c72-9e73-5dee198341eb]
+To assess this relationship we have performed regression models which take the following form:
+lm(cognitive outcome ~ age + sex + cognitive reserve * COVID severity)
+
+In a given study, there may be a range of cognitive outcomes, cognitive reserve indicators and COVID severity indicators that were assessed. In order to capture all this information we have repeated the linear model for every possible combination of these (ranging anywhere from a handful to 200 models per study). The size of the main effects and interaction effect were then extracted in the form of semipartial correlations<https://journals.sagepub.com/doi/10.3102/1076998610396901>, which are the effect sizes of interest for the meta-analyses. (A semipartial correlation is essentially a standard correlation which has been corrected for potential confounds). Across 30 studies we have derived approximately 1000 effect sizes for each of the main effects, and the interaction term.
+
+We have then run three multilevel meta-analyses (for the main effect of CR, main effect of COVID severity, and the interaction effect) with the following code:
+
+V = impute_covariance_matrix(vi = df$vi, cluster = df$study_id, r = 0.6)
+model <- rma.mv(yi,
+              V,
+              random = list(~ 1 | study_id/effectsize_id),
+              tdist = TRUE,
+              method = "REML",
+              sparse = TRUE,
+              data = data_temp)
+
+and performed a series of moderation analyses which assess the influence of (1) cognitive domain, (2) CR indicator and (3) severity indicator on the results.
+
+moderation <- rma.mv(yi,
+                           V,
+                           mods = ~ moderator,
+                           random = list(~ moderator | study_id, ~1 | effectsize_id),
+                           struct ="HCS",
+                           tdist = TRUE,
+                           method = "REML",
+                           sparse = TRUE,
+                           control = list(rel.tol=1e-8),
+                           data = data_temp_2)
+
+As I have been conducting these analyses, several questions have presented themselves.
+
+(1) Plotting the moderating influence of CR indicator (CRQ scores, Education level, Education years etc) on the main effect of CR resulted in the following: https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel
+
+ [cid:e94c07b9-e951-489f-b76c-15ab7b0d332f]
+
+As you can see, the estimated central tendency for CRQ scores is very inflated relative to the individual effect sizes (it is also somewhat inflated for the other CR indicators). I am assuming the estimate for CRQ scores is inflated because 64 effect sizes were derived from only one study? If this is correct, should it be dropped from the moderation analysis? If not, are you able to explain why this has occurred?
+
+(2) In regards to the calculations used to compute V via the impute_covariance_matrix() function, is it possible to manually calculate this from the raw data? If so, are you able to provide resources on how to do this?
+
+(3) Finally, given the unique nature of our meta-analysis and the large number of effect sizes that are derived from often very similar regression models, are there any problems you can see regarding our use of these functions?
+
+Any help with these questions would be greatly appreciated!
+
+Kind regards,
+Lauren Heidenreich
+PhD Student, University of Adelaide, South Australia
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image.png
+Type: image/png
+Size: 271326 bytes
+Desc: image.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0002.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image.png
+Type: image/png
+Size: 35011 bytes
+Desc: image.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0003.png>
+
+From |@uren@he|denre|ch @end|ng |rom @de|@|de@edu@@u  Mon Oct  9 03:42:10 2023
+From: |@uren@he|denre|ch @end|ng |rom @de|@|de@edu@@u (Lauren Mary Heidenreich)
+Date: Mon, 9 Oct 2023 01:42:10 +0000
+Subject: [R-meta] Questions re multilevel meta-analysis
+Message-ID: <SY4P282MB07290CB982702E01D6CB637FCECEA-123@SY4P282MB0729.AUSP282.PROD.OUTLOOK.COM>
+
+Hi everyone,
+
+I am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the relationship between cognitive reserve (CR) indicators (e.g., educational attainment, occupational complexity, pre-morbid IQ) and cognitive outcomes (e.g., working memory, long term memory, visual processing speed etc), among individuals previously infected with COVID-19. Because the moderating effect of CR on cognitive outcomes can only be assessed by including an estimate of brain pathology status, we are specifically exploring how CR and COVID-19 severity (e.g., time in hospital, need for oxygen therapy) interact to predict cognitive outcomes. We would expect to find a negative relationship between the severity of the disease and cognitive outcomes, which is less pronounced in people who have a higher CR (see hypothetical interaction: https://universityofadelaide.box.com/s/c0ehcj70m3765w99xbi6om61udos5czv).
+
+[cid:7fe4ce9b-00b6-4c72-9e73-5dee198341eb]
+To assess this relationship we have performed regression models which take the following form:
+lm(cognitive outcome ~ age + sex + cognitive reserve * COVID severity)
+
+In a given study, there may be a range of cognitive outcomes, cognitive reserve indicators and COVID severity indicators that were assessed. In order to capture all this information we have repeated the linear model for every possible combination of these (ranging anywhere from a handful to 200 models per study). The size of the main effects and interaction effect were then extracted in the form of semipartial correlations<https://journals.sagepub.com/doi/10.3102/1076998610396901>, which are the effect sizes of interest for the meta-analyses. (A semipartial correlation is essentially a standard correlation which has been corrected for potential confounds). Across 30 studies we have derived approximately 1000 effect sizes for each of the main effects, and the interaction term.
+
+We have then run three multilevel meta-analyses (for the main effect of CR, main effect of COVID severity, and the interaction effect) with the following code:
+
+V = impute_covariance_matrix(vi = df$vi, cluster = df$study_id, r = 0.6)
+model <- rma.mv(yi,
+              V,
+              random = list(~ 1 | study_id/effectsize_id),
+              tdist = TRUE,
+              method = "REML",
+              sparse = TRUE,
+              data = data_temp)
+
+and performed a series of moderation analyses which assess the influence of (1) cognitive domain, (2) CR indicator and (3) severity indicator on the results.
+
+moderation <- rma.mv(yi,
+                           V,
+                           mods = ~ moderator,
+                           random = list(~ moderator | study_id, ~1 | effectsize_id),
+                           struct ="HCS",
+                           tdist = TRUE,
+                           method = "REML",
+                           sparse = TRUE,
+                           control = list(rel.tol=1e-8),
+                           data = data_temp_2)
+
+As I have been conducting these analyses, several questions have presented themselves.
+
+(1) Plotting the moderating influence of CR indicator (CRQ scores, Education level, Education years etc) on the main effect of CR resulted in the following: https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel
+
+ [cid:e94c07b9-e951-489f-b76c-15ab7b0d332f]
+
+As you can see, the estimated central tendency for CRQ scores is very inflated relative to the individual effect sizes (it is also somewhat inflated for the other CR indicators). I am assuming the estimate for CRQ scores is inflated because 64 effect sizes were derived from only one study? If this is correct, should it be dropped from the moderation analysis? If not, are you able to explain why this has occurred?
+
+(2) In regards to the calculations used to compute V via the impute_covariance_matrix() function, is it possible to manually calculate this from the raw data? If so, are you able to provide resources on how to do this?
+
+(3) Finally, given the unique nature of our meta-analysis and the large number of effect sizes that are derived from often very similar regression models, are there any problems you can see regarding our use of these functions?
+
+Any help with these questions would be greatly appreciated!
+
+Kind regards,
+Lauren Heidenreich
+PhD Student, University of Adelaide, South Australia
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/371c2160/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image.png
+Type: image/png
+Size: 271326 bytes
+Desc: image.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/371c2160/attachment-0002.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image.png
+Type: image/png
+Size: 35011 bytes
+Desc: image.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/371c2160/attachment-0003.png>
+
+From g@b|k|m01 @end|ng |rom gm@||@com  Wed Oct 11 16:10:52 2023
+From: g@b|k|m01 @end|ng |rom gm@||@com (Gabriel Cotlier)
+Date: Wed, 11 Oct 2023 17:10:52 +0300
+Subject: [R-meta] forest plot function overall effect size rounded
+Message-ID: <CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>
+
+Hello all,
+I would like to ask how to modify in the forest plot the value of the
+overall effect size to be round (overall_effect_size, 1) since it
+aurtomatically does round(overall_effect_size, 2) for instance in my case
+the model's output overall effect size is :
+
+p0 <- predict(res)
+p0
+# pred     se  ci.lb  ci.ub   pi.lb  pi.ub
+# 0.7080 0.2950 0.1297 1.2863 -2.9950 4.4110
+
+That is 0.7080 but in the forest lot is round(0.7080, 2) that is 0.71 as it
+appears in the forest plot (lower right corner):
+
+  100% 0.71 [0.13, 1.29]
+
+Therefore I would like to access the variable in the forest plot and set it
+to be round(0.7080, 1) so as to have the overall effect size as is in the
+model output, that is 0.70 or alternatively 0.7080.
+
+Thanks a lot.
+Kid regards,
+Gabriel
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Oct 11 16:45:53 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 11 Oct 2023 15:45:53 +0100
+Subject: [R-meta] forest plot function overall effect size rounded
+In-Reply-To: <CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>
+References: <CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>
+Message-ID: <c7e0bdfa-c900-5e75-3ce3-1ceecb58498e@dewey.myzen.co.uk>
+
+Dear Gabriel
+
+Comments in-line
+
+On 11/10/2023 15:10, Gabriel Cotlier via R-sig-meta-analysis wrote:
+> Hello all,
+> I would like to ask how to modify in the forest plot the value of the
+> overall effect size to be round (overall_effect_size, 1) since it
+> aurtomatically does round(overall_effect_size, 2) for instance in my case
+> the model's output overall effect size is :
+> 
+> p0 <- predict(res)
+> p0
+> # pred     se  ci.lb  ci.ub   pi.lb  pi.ub
+> # 0.7080 0.2950 0.1297 1.2863 -2.9950 4.4110
+> 
+> That is 0.7080 but in the forest lot is round(0.7080, 2) that is 0.71 as it
+> appears in the forest plot (lower right corner):
+> 
+>    100% 0.71 [0.13, 1.29]
+> 
+> Therefore I would like to access the variable in the forest plot and set it
+> to be round(0.7080, 1) so as to have the overall effect size as is in the
+> model output, that is 0.70 or alternatively 0.7080.
+
+But round(0.7080, 1) is 0.7, not 0.70. Rounded to 2 decimals it is 0.71 
+which you state you do not want. Perhaps it would help if you explained 
+what you mean by rounding as what you ask does not seem to correspond to 
+what is usually meant by the term.
+
+Michael
+
+> 
+> Thanks a lot.
+> Kid regards,
+> Gabriel
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+
+From g@b|k|m01 @end|ng |rom gm@||@com  Wed Oct 11 17:31:15 2023
+From: g@b|k|m01 @end|ng |rom gm@||@com (Gabriel Cotlier)
+Date: Wed, 11 Oct 2023 18:31:15 +0300
+Subject: [R-meta] forest plot function overall effect size rounded
+In-Reply-To: <c7e0bdfa-c900-5e75-3ce3-1ceecb58498e@dewey.myzen.co.uk>
+References: <CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>
+ <c7e0bdfa-c900-5e75-3ce3-1ceecb58498e@dewey.myzen.co.uk>
+Message-ID: <CAAKwTDFqsK0Qf8vJLMdosmv8WfEL9kD=DsjSdtuZgWw5_po5KA@mail.gmail.com>
+
+Dear Michael,
+
+Thank you very much for clarifying it. You are indeed right; one thing is
+rounding and the other is simply retrieving a given number of digits or
+number precision, at least as far as I understand it.
+I just would like to appear in the forest plot exactly the same value that
+gives the model results or output for the overall effect size, but if the
+model's output is, for instance, 0.7080 and such a number is too large,
+well then only the first 2 digits after the point would be 0.70.
+
+Thanks a lot for your help.
+Kind regards,
+Gabriel
+
+On Wed, Oct 11, 2023 at 5:46?PM Michael Dewey <lists at dewey.myzen.co.uk>
+wrote:
+
+> Dear Gabriel
+>
+> Comments in-line
+>
+> On 11/10/2023 15:10, Gabriel Cotlier via R-sig-meta-analysis wrote:
+> > Hello all,
+> > I would like to ask how to modify in the forest plot the value of the
+> > overall effect size to be round (overall_effect_size, 1) since it
+> > aurtomatically does round(overall_effect_size, 2) for instance in my case
+> > the model's output overall effect size is :
+> >
+> > p0 <- predict(res)
+> > p0
+> > # pred     se  ci.lb  ci.ub   pi.lb  pi.ub
+> > # 0.7080 0.2950 0.1297 1.2863 -2.9950 4.4110
+> >
+> > That is 0.7080 but in the forest lot is round(0.7080, 2) that is 0.71 as
+> it
+> > appears in the forest plot (lower right corner):
+> >
+> >    100% 0.71 [0.13, 1.29]
+> >
+> > Therefore I would like to access the variable in the forest plot and set
+> it
+> > to be round(0.7080, 1) so as to have the overall effect size as is in the
+> > model output, that is 0.70 or alternatively 0.7080.
+>
+> But round(0.7080, 1) is 0.7, not 0.70. Rounded to 2 decimals it is 0.71
+> which you state you do not want. Perhaps it would help if you explained
+> what you mean by rounding as what you ask does not seem to correspond to
+> what is usually meant by the term.
+>
+> Michael
+>
+> >
+> > Thanks a lot.
+> > Kid regards,
+> > Gabriel
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+> --
+> Michael
+>
+
+	[[alternative HTML version deleted]]
+
+
+From c@t|@@o||ve|r@ @end|ng |rom york@@c@uk  Wed Oct 11 17:36:43 2023
+From: c@t|@@o||ve|r@ @end|ng |rom york@@c@uk (Catia Oliveira)
+Date: Wed, 11 Oct 2023 16:36:43 +0100
+Subject: [R-meta] How to examine the moderating effect of sex in a
+ meta-analysis of group differences?
+Message-ID: <CACw+Tfdzm14vn2e1_=04nmu2X+bsTsfa9FmWc0fvQnYOkaAjNw@mail.gmail.com>
+
+Dear all,
+
+What is the best way of examining the moderating effect of sex when looking
+at group differences in variable X? I considered using the ratio between
+males/females, but this ratio often differs between groups, where the
+control group has more females and the intervention group has more males
+for example. Are there any clever solutions to this problem?
+
+Best wishes,
+
+Catia
+
+-- 
+C?tia Margarida Ferreira de Oliveira
+Research Associate
+Department of Psychology, Room C222
+University of York, YO10 5DD
+Twitter: @CatiaMOliveira
+pronouns: she, her
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Oct 11 17:46:02 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 11 Oct 2023 16:46:02 +0100
+Subject: [R-meta] forest plot function overall effect size rounded
+In-Reply-To: <CAAKwTDFqsK0Qf8vJLMdosmv8WfEL9kD=DsjSdtuZgWw5_po5KA@mail.gmail.com>
+References: <CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>
+ <c7e0bdfa-c900-5e75-3ce3-1ceecb58498e@dewey.myzen.co.uk>
+ <CAAKwTDFqsK0Qf8vJLMdosmv8WfEL9kD=DsjSdtuZgWw5_po5KA@mail.gmail.com>
+Message-ID: <f8b7971f-2555-2dfd-dba5-c95b15a84530@dewey.myzen.co.uk>
+
+Do you mean something like
+
+sprintf("%1.2f", ((trunc(100 * 0.7080) / 100)))
+
+perhaps?
+
+Michael
+
+On 11/10/2023 16:31, Gabriel Cotlier wrote:
+> Dear?Michael,
+> 
+> Thank you very much for clarifying it.?You are indeed right; one thing 
+> is rounding and the?other is simply?retrieving?a given?number of digits 
+> or number?precision, at least as far as I understand it.
+> I just would like to appear in the forest plot exactly the?same value 
+> that gives the model results or output for the overall effect size, but 
+> if the model's output is, for instance,?0.7080 and such a number is too 
+> large, well?then only?the first 2 digits after the point would be 0.70.
+> 
+> Thanks?a lot for?your?help.
+> Kind regards,
+> Gabriel
+> 
+> On Wed, Oct 11, 2023 at 5:46?PM Michael Dewey <lists at dewey.myzen.co.uk 
+> <mailto:lists at dewey.myzen.co.uk>> wrote:
+> 
+>     Dear Gabriel
+> 
+>     Comments in-line
+> 
+>     On 11/10/2023 15:10, Gabriel Cotlier via R-sig-meta-analysis wrote:
+>      > Hello all,
+>      > I would like to ask how to modify in the forest plot the value of the
+>      > overall effect size to be round (overall_effect_size, 1) since it
+>      > aurtomatically does round(overall_effect_size, 2) for instance in
+>     my case
+>      > the model's output overall effect size is :
+>      >
+>      > p0 <- predict(res)
+>      > p0
+>      > # pred? ? ?se ci.lb <http://ci.lb>? ci.ub pi.lb <http://pi.lb>? pi.ub
+>      > # 0.7080 0.2950 0.1297 1.2863 -2.9950 4.4110
+>      >
+>      > That is 0.7080 but in the forest lot is round(0.7080, 2) that is
+>     0.71 as it
+>      > appears in the forest plot (lower right corner):
+>      >
+>      >? ? 100% 0.71 [0.13, 1.29]
+>      >
+>      > Therefore I would like to access the variable in the forest plot
+>     and set it
+>      > to be round(0.7080, 1) so as to have the overall effect size as
+>     is in the
+>      > model output, that is 0.70 or alternatively 0.7080.
+> 
+>     But round(0.7080, 1) is 0.7, not 0.70. Rounded to 2 decimals it is 0.71
+>     which you state you do not want. Perhaps it would help if you explained
+>     what you mean by rounding as what you ask does not seem to
+>     correspond to
+>     what is usually meant by the term.
+> 
+>     Michael
+> 
+>      >
+>      > Thanks a lot.
+>      > Kid regards,
+>      > Gabriel
+>      >
+>      >? ? ? ?[[alternative HTML version deleted]]
+>      >
+>      > _______________________________________________
+>      > R-sig-meta-analysis mailing list @
+>     R-sig-meta-analysis at r-project.org
+>     <mailto:R-sig-meta-analysis at r-project.org>
+>      > To manage your subscription to this mailing list, go to:
+>      > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>     <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+>      >
+> 
+>     -- 
+>     Michael
+> 
+> 
+> <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>	Virus-free.www.avg.com <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>
+> 
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+
+-- 
+Michael
+
+
+From g@b|k|m01 @end|ng |rom gm@||@com  Wed Oct 11 18:04:04 2023
+From: g@b|k|m01 @end|ng |rom gm@||@com (Gabriel Cotlier)
+Date: Wed, 11 Oct 2023 19:04:04 +0300
+Subject: [R-meta] forest plot function overall effect size rounded
+In-Reply-To: <f8b7971f-2555-2dfd-dba5-c95b15a84530@dewey.myzen.co.uk>
+References: <CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>
+ <c7e0bdfa-c900-5e75-3ce3-1ceecb58498e@dewey.myzen.co.uk>
+ <CAAKwTDFqsK0Qf8vJLMdosmv8WfEL9kD=DsjSdtuZgWw5_po5KA@mail.gmail.com>
+ <f8b7971f-2555-2dfd-dba5-c95b15a84530@dewey.myzen.co.uk>
+Message-ID: <CAAKwTDGD=wYvFQqBh+ypGFq6sBLx=uMhci4dahauEtLOLuMECQ@mail.gmail.com>
+
+Yes, indeed, sprintf("%1.2f", ((trunc(100 * 0.7080) / 100))) is a good
+solution.
+Do you know how to plug the value into the forest plot location where the
+overall effect size is (lower right-hand side corner)?
+Thanks a lot.
+Gabriel
+
+
+On Wed, Oct 11, 2023 at 6:46?PM Michael Dewey <lists at dewey.myzen.co.uk>
+wrote:
+
+> Do you mean something like
+>
+> sprintf("%1.2f", ((trunc(100 * 0.7080) / 100)))
+>
+> perhaps?
+>
+> Michael
+>
+> On 11/10/2023 16:31, Gabriel Cotlier wrote:
+> > Dear Michael,
+> >
+> > Thank you very much for clarifying it. You are indeed right; one thing
+> > is rounding and the other is simply retrieving a given number of digits
+> > or number precision, at least as far as I understand it.
+> > I just would like to appear in the forest plot exactly the same value
+> > that gives the model results or output for the overall effect size, but
+> > if the model's output is, for instance, 0.7080 and such a number is too
+> > large, well then only the first 2 digits after the point would be 0.70.
+> >
+> > Thanks a lot for your help.
+> > Kind regards,
+> > Gabriel
+> >
+> > On Wed, Oct 11, 2023 at 5:46?PM Michael Dewey <lists at dewey.myzen.co.uk
+> > <mailto:lists at dewey.myzen.co.uk>> wrote:
+> >
+> >     Dear Gabriel
+> >
+> >     Comments in-line
+> >
+> >     On 11/10/2023 15:10, Gabriel Cotlier via R-sig-meta-analysis wrote:
+> >      > Hello all,
+> >      > I would like to ask how to modify in the forest plot the value of
+> the
+> >      > overall effect size to be round (overall_effect_size, 1) since it
+> >      > aurtomatically does round(overall_effect_size, 2) for instance in
+> >     my case
+> >      > the model's output overall effect size is :
+> >      >
+> >      > p0 <- predict(res)
+> >      > p0
+> >      > # pred     se ci.lb <http://ci.lb>  ci.ub pi.lb <http://pi.lb>
+> pi.ub
+> >      > # 0.7080 0.2950 0.1297 1.2863 -2.9950 4.4110
+> >      >
+> >      > That is 0.7080 but in the forest lot is round(0.7080, 2) that is
+> >     0.71 as it
+> >      > appears in the forest plot (lower right corner):
+> >      >
+> >      >    100% 0.71 [0.13, 1.29]
+> >      >
+> >      > Therefore I would like to access the variable in the forest plot
+> >     and set it
+> >      > to be round(0.7080, 1) so as to have the overall effect size as
+> >     is in the
+> >      > model output, that is 0.70 or alternatively 0.7080.
+> >
+> >     But round(0.7080, 1) is 0.7, not 0.70. Rounded to 2 decimals it is
+> 0.71
+> >     which you state you do not want. Perhaps it would help if you
+> explained
+> >     what you mean by rounding as what you ask does not seem to
+> >     correspond to
+> >     what is usually meant by the term.
+> >
+> >     Michael
+> >
+> >      >
+> >      > Thanks a lot.
+> >      > Kid regards,
+> >      > Gabriel
+> >      >
+> >      >       [[alternative HTML version deleted]]
+> >      >
+> >      > _______________________________________________
+> >      > R-sig-meta-analysis mailing list @
+> >     R-sig-meta-analysis at r-project.org
+> >     <mailto:R-sig-meta-analysis at r-project.org>
+> >      > To manage your subscription to this mailing list, go to:
+> >      > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >     <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+> >      >
+> >
+> >     --
+> >     Michael
+> >
+> >
+> > <
+> http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>
+> Virus-free.www.avg.com <
+> http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient
+> >
+> >
+> > <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+>
+> --
+> Michael
+>
+
+	[[alternative HTML version deleted]]
+
+
+From w|||thek|w| @end|ng |rom gm@||@com  Thu Oct 12 20:47:00 2023
+From: w|||thek|w| @end|ng |rom gm@||@com (Will Hopkins)
+Date: Fri, 13 Oct 2023 07:47:00 +1300
+Subject: [R-meta] How to examine the moderating effect of sex in a
+ meta-analysis of group differences?
+In-Reply-To: <CACw+Tfdzm14vn2e1_=04nmu2X+bsTsfa9FmWc0fvQnYOkaAjNw@mail.gmail.com>
+References: <CACw+Tfdzm14vn2e1_=04nmu2X+bsTsfa9FmWc0fvQnYOkaAjNw@mail.gmail.com>
+Message-ID: <092c01d9fd3c$7ddfe2f0$799fa8d0$@gmail.com>
+
+I devised a cool solution to this problem some years ago. I include a modifying covariate called Maleness, with values ranging from 0 to 1, depending on the proportion of males. (You could, of course, make it Femaleness, but the values of 0 and 1 would have the wrong phallic significance.) This approach extends to other binary subject characteristics, such as sedentary vs active. 
+
+It sounds like you are including effects in control and intervention groups as repeated measurements in your meta-analysis, so interact Maleness with Treatment, and make sure you include appropriate additional random effects to account for the repeated measurement. I don't know how it works in metafor, but in SAS it's:
+random StudyID;
+random EstimateID/Group=Treatment;
+
+Will
+
+-----Original Message-----
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf Of Catia Oliveira via R-sig-meta-analysis
+Sent: Thursday, October 12, 2023 4:37 AM
+To: R meta <r-sig-meta-analysis at r-project.org>
+Cc: Catia Oliveira <catia.oliveira at york.ac.uk>
+Subject: [R-meta] How to examine the moderating effect of sex in a meta-analysis of group differences?
+
+Dear all,
+
+What is the best way of examining the moderating effect of sex when looking at group differences in variable X? I considered using the ratio between males/females, but this ratio often differs between groups, where the control group has more females and the intervention group has more males for example. Are there any clever solutions to this problem?
+
+Best wishes,
+
+Catia
+
+--
+C?tia Margarida Ferreira de Oliveira
+Research Associate
+Department of Psychology, Room C222
+University of York, YO10 5DD
+Twitter: @CatiaMOliveira
+pronouns: she, her
+
+	[[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From @@r@m@j@n@@en @end|ng |rom uv@@n|  Tue Oct 17 14:27:09 2023
+From: @@r@m@j@n@@en @end|ng |rom uv@@n| (Arne Janssen)
+Date: Tue, 17 Oct 2023 12:27:09 +0000
+Subject: [R-meta] fsn with robust
+Message-ID: <AM9PR10MB449860C0E0F39FCD6FFE12678AD6A@AM9PR10MB4498.EURPRD10.PROD.OUTLOOK.COM>
+
+L.S.,
+
+I wonder if there is something like a fsn test for time series data that are analysed with a multivatiate/multilevel mixed effects model with continuous-time autoregression followed by a robust analysis.
+
+Best wishes,
+Arne Janssen
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Oct 17 15:09:14 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 17 Oct 2023 13:09:14 +0000
+Subject: [R-meta] fsn with robust
+In-Reply-To: <AM9PR10MB449860C0E0F39FCD6FFE12678AD6A@AM9PR10MB4498.EURPRD10.PROD.OUTLOOK.COM>
+References: <AM9PR10MB449860C0E0F39FCD6FFE12678AD6A@AM9PR10MB4498.EURPRD10.PROD.OUTLOOK.COM>
+Message-ID: <AS8PR08MB9193DDDB6881A3429047DFA78BD6A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Arne,
+
+At the moment, the answer would be no. Until a month ago, there wasn't even a version of the fail-safe N method for standard random-effects models (all previous methods that have been described in the literature so far were either based on methods for pooling p-values or the equal-effects model). In the most recent update of metafor, I have actually implemented a version of fsn() that is based on a random-effects model. That in itself wasn't entirely trivial, but taking this further to multilevel/multivariate models and/or models based on robust variance estimation would be a rather big leap.
+
+If you are interested, I'll talk about this update to fsn() (among other things) on Thursday during my upcoming live stream:
+
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-September/004901.html
+
+There are ways one can imagine generalizing fsn() to more complex models, but there are some conceptual and practical issues one would have to address first. If viewers on Thursday are interested, I could discuss this a bit (these live streams are always a bit dynamic, so things can go in unpredictable directions).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Arne Janssen via R-sig-meta-analysis
+> Sent: Tuesday, October 17, 2023 14:27
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Arne Janssen <a.r.m.janssen at uva.nl>
+> Subject: [R-meta] fsn with robust
+>
+> L.S.,
+>
+> I wonder if there is something like a fsn test for time series data that are
+> analysed with a multivatiate/multilevel mixed effects model with continuous-time
+> autoregression followed by a robust analysis.
+>
+> Best wishes,
+> Arne Janssen
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Oct 17 15:21:00 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 17 Oct 2023 13:21:00 +0000
+Subject: [R-meta] fsn with robust
+In-Reply-To: <AM9PR10MB4498F432CE08378B45DDC2358AD6A@AM9PR10MB4498.EURPRD10.PROD.OUTLOOK.COM>
+References: <AM9PR10MB449860C0E0F39FCD6FFE12678AD6A@AM9PR10MB4498.EURPRD10.PROD.OUTLOOK.COM>
+ <AS8PR08MB9193DDDB6881A3429047DFA78BD6A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <AM9PR10MB4498F432CE08378B45DDC2358AD6A@AM9PR10MB4498.EURPRD10.PROD.OUTLOOK.COM>
+Message-ID: <AS8PR08MB91930776EB59E8AE8A93139C8BD6A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Please always cc the mailing list when responding.
+
+No, I do not record these live streams:
+
+https://www.wvbauer.com/doku.php/live_streams#notes_faqs
+
+The materials will however be available.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Arne Janssen <a.r.m.janssen at uva.nl>
+> Sent: Tuesday, October 17, 2023 15:14
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Subject: RE: fsn with robust
+>
+> Dear Wolfgang,
+>
+> as always you amaze me with the speed of your reply! Thanks for the information;
+> unfortunately, I will have another meeting on Thursday. Will it be available
+> online afterwards?
+>
+> Cheers,
+> Arne
+>
+> -----Original Message-----
+> From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Sent: Tuesday, 17 October 2023 15:09
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Arne Janssen <a.r.m.janssen at uva.nl>
+> Subject: RE: fsn with robust
+>
+> Dear Arne,
+>
+> At the moment, the answer would be no. Until a month ago, there wasn't even a
+> version of the fail-safe N method for standard random-effects models (all
+> previous methods that have been described in the literature so far were either
+> based on methods for pooling p-values or the equal-effects model). In the most
+> recent update of metafor, I have actually implemented a version of fsn() that is
+> based on a random-effects model. That in itself wasn't entirely trivial, but
+> taking this further to multilevel/multivariate models and/or models based on
+> robust variance estimation would be a rather big leap.
+>
+> If you are interested, I'll talk about this update to fsn() (among other things)
+> on Thursday during my upcoming live stream:
+>
+> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-September/004901.html
+>
+> There are ways one can imagine generalizing fsn() to more complex models, but
+> there are some conceptual and practical issues one would have to address first.
+> If viewers on Thursday are interested, I could discuss this a bit (these live
+> streams are always a bit dynamic, so things can go in unpredictable directions).
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> > On Behalf Of Arne Janssen via R-sig-meta-analysis
+> > Sent: Tuesday, October 17, 2023 14:27
+> > To: r-sig-meta-analysis at r-project.org
+> > Cc: Arne Janssen <a.r.m.janssen at uva.nl>
+> > Subject: [R-meta] fsn with robust
+> >
+> > L.S.,
+> >
+> > I wonder if there is something like a fsn test for time series data
+> > that are analysed with a multivatiate/multilevel mixed effects model
+> > with continuous-time autoregression followed by a robust analysis.
+> >
+> > Best wishes,
+> > Arne Janssen
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Oct 18 23:09:42 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 18 Oct 2023 21:09:42 +0000
+Subject: [R-meta] forest plot function overall effect size rounded
+In-Reply-To: <CAAKwTDGD=wYvFQqBh+ypGFq6sBLx=uMhci4dahauEtLOLuMECQ@mail.gmail.com>
+References: <CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>
+ <c7e0bdfa-c900-5e75-3ce3-1ceecb58498e@dewey.myzen.co.uk>
+ <CAAKwTDFqsK0Qf8vJLMdosmv8WfEL9kD=DsjSdtuZgWw5_po5KA@mail.gmail.com>
+ <f8b7971f-2555-2dfd-dba5-c95b15a84530@dewey.myzen.co.uk>
+ <CAAKwTDGD=wYvFQqBh+ypGFq6sBLx=uMhci4dahauEtLOLuMECQ@mail.gmail.com>
+Message-ID: <AS8PR08MB919305CA9A82D3C64F58A5178BD5A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+I have to say that this is a strange thing to do, but here is an example showing how this can be done:
+
+library(metafor)
+
+dat <- escalc(measure="OR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg,
+                            slab=paste0(author, ", ", year))
+
+res <- rma(yi, vi, data=dat)
+res
+
+forest(res)
+
+res$beta <- as.numeric(sprintf("%1.2f", ((trunc(100 * coef(res)) / 100))))
+forest(res)
+
+Again, not something I would ever recommend doing.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Gabriel Cotlier via R-sig-meta-analysis
+> Sent: Wednesday, October 11, 2023 18:04
+> To: Michael Dewey <lists at dewey.myzen.co.uk>
+> Cc: Gabriel Cotlier <gabiklm01 at gmail.com>; R Special Interest Group for Meta-
+> Analysis <r-sig-meta-analysis at r-project.org>
+> Subject: Re: [R-meta] forest plot function overall effect size rounded
+>
+> Yes, indeed, sprintf("%1.2f", ((trunc(100 * 0.7080) / 100))) is a good
+> solution.
+> Do you know how to plug the value into the forest plot location where the
+> overall effect size is (lower right-hand side corner)?
+> Thanks a lot.
+> Gabriel
+>
+> On Wed, Oct 11, 2023 at 6:46?PM Michael Dewey <lists at dewey.myzen.co.uk>
+> wrote:
+>
+> > Do you mean something like
+> >
+> > sprintf("%1.2f", ((trunc(100 * 0.7080) / 100)))
+> >
+> > perhaps?
+> >
+> > Michael
+> >
+> > On 11/10/2023 16:31, Gabriel Cotlier wrote:
+> > > Dear Michael,
+> > >
+> > > Thank you very much for clarifying it. You are indeed right; one thing
+> > > is rounding and the other is simply retrieving a given number of digits
+> > > or number precision, at least as far as I understand it.
+> > > I just would like to appear in the forest plot exactly the same value
+> > > that gives the model results or output for the overall effect size, but
+> > > if the model's output is, for instance, 0.7080 and such a number is too
+> > > large, well then only the first 2 digits after the point would be 0.70.
+> > >
+> > > Thanks a lot for your help.
+> > > Kind regards,
+> > > Gabriel
+> > >
+> > > On Wed, Oct 11, 2023 at 5:46?PM Michael Dewey <lists at dewey.myzen.co.uk
+> > > <mailto:lists at dewey.myzen.co.uk>> wrote:
+> > >
+> > >     Dear Gabriel
+> > >
+> > >     Comments in-line
+> > >
+> > >     On 11/10/2023 15:10, Gabriel Cotlier via R-sig-meta-analysis wrote:
+> > >      > Hello all,
+> > >      > I would like to ask how to modify in the forest plot the value of
+> > the
+> > >      > overall effect size to be round (overall_effect_size, 1) since it
+> > >      > aurtomatically does round(overall_effect_size, 2) for instance in
+> > >     my case
+> > >      > the model's output overall effect size is :
+> > >      >
+> > >      > p0 <- predict(res)
+> > >      > p0
+> > >      > # pred     se ci.lb <http://ci.lb>  ci.ub pi.lb <http://pi.lb>
+> > pi.ub
+> > >      > # 0.7080 0.2950 0.1297 1.2863 -2.9950 4.4110
+> > >      >
+> > >      > That is 0.7080 but in the forest lot is round(0.7080, 2) that is
+> > >     0.71 as it
+> > >      > appears in the forest plot (lower right corner):
+> > >      >
+> > >      >    100% 0.71 [0.13, 1.29]
+> > >      >
+> > >      > Therefore I would like to access the variable in the forest plot
+> > >     and set it
+> > >      > to be round(0.7080, 1) so as to have the overall effect size as
+> > >     is in the
+> > >      > model output, that is 0.70 or alternatively 0.7080.
+> > >
+> > >     But round(0.7080, 1) is 0.7, not 0.70. Rounded to 2 decimals it is
+> > 0.71
+> > >     which you state you do not want. Perhaps it would help if you
+> > explained
+> > >     what you mean by rounding as what you ask does not seem to
+> > >     correspond to
+> > >     what is usually meant by the term.
+> > >
+> > >     Michael
+> > >
+> > >      >
+> > >      > Thanks a lot.
+> > >      > Kid regards,
+> > >      > Gabriel
+
+From g@b|k|m01 @end|ng |rom gm@||@com  Thu Oct 19 21:43:04 2023
+From: g@b|k|m01 @end|ng |rom gm@||@com (Gabriel Cotlier)
+Date: Thu, 19 Oct 2023 22:43:04 +0300
+Subject: [R-meta] forest plot function overall effect size rounded
+In-Reply-To: <AS8PR08MB919305CA9A82D3C64F58A5178BD5A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>
+ <c7e0bdfa-c900-5e75-3ce3-1ceecb58498e@dewey.myzen.co.uk>
+ <CAAKwTDFqsK0Qf8vJLMdosmv8WfEL9kD=DsjSdtuZgWw5_po5KA@mail.gmail.com>
+ <f8b7971f-2555-2dfd-dba5-c95b15a84530@dewey.myzen.co.uk>
+ <CAAKwTDGD=wYvFQqBh+ypGFq6sBLx=uMhci4dahauEtLOLuMECQ@mail.gmail.com>
+ <AS8PR08MB919305CA9A82D3C64F58A5178BD5A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <CAAKwTDGm6uGs+3iV3gg4b3iNsH5rh1BXJAmRCs+6M9k8wGR9GA@mail.gmail.com>
+
+Dear Wolfgang,
+Thank you very much for your help.
+Kind regards,
+Gabriel
+
+
+On Thu, Oct 19, 2023 at 12:10?AM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> I have to say that this is a strange thing to do, but here is an example
+> showing how this can be done:
+>
+> library(metafor)
+>
+> dat <- escalc(measure="OR", ai=tpos, bi=tneg, ci=cpos, di=cneg,
+> data=dat.bcg,
+>                             slab=paste0(author, ", ", year))
+>
+> res <- rma(yi, vi, data=dat)
+> res
+>
+> forest(res)
+>
+> res$beta <- as.numeric(sprintf("%1.2f", ((trunc(100 * coef(res)) / 100))))
+> forest(res)
+>
+> Again, not something I would ever recommend doing.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Gabriel Cotlier via R-sig-meta-analysis
+> > Sent: Wednesday, October 11, 2023 18:04
+> > To: Michael Dewey <lists at dewey.myzen.co.uk>
+> > Cc: Gabriel Cotlier <gabiklm01 at gmail.com>; R Special Interest Group for
+> Meta-
+> > Analysis <r-sig-meta-analysis at r-project.org>
+> > Subject: Re: [R-meta] forest plot function overall effect size rounded
+> >
+> > Yes, indeed, sprintf("%1.2f", ((trunc(100 * 0.7080) / 100))) is a good
+> > solution.
+> > Do you know how to plug the value into the forest plot location where the
+> > overall effect size is (lower right-hand side corner)?
+> > Thanks a lot.
+> > Gabriel
+> >
+> > On Wed, Oct 11, 2023 at 6:46?PM Michael Dewey <lists at dewey.myzen.co.uk>
+> > wrote:
+> >
+> > > Do you mean something like
+> > >
+> > > sprintf("%1.2f", ((trunc(100 * 0.7080) / 100)))
+> > >
+> > > perhaps?
+> > >
+> > > Michael
+> > >
+> > > On 11/10/2023 16:31, Gabriel Cotlier wrote:
+> > > > Dear Michael,
+> > > >
+> > > > Thank you very much for clarifying it. You are indeed right; one
+> thing
+> > > > is rounding and the other is simply retrieving a given number of
+> digits
+> > > > or number precision, at least as far as I understand it.
+> > > > I just would like to appear in the forest plot exactly the same value
+> > > > that gives the model results or output for the overall effect size,
+> but
+> > > > if the model's output is, for instance, 0.7080 and such a number is
+> too
+> > > > large, well then only the first 2 digits after the point would be
+> 0.70.
+> > > >
+> > > > Thanks a lot for your help.
+> > > > Kind regards,
+> > > > Gabriel
+> > > >
+> > > > On Wed, Oct 11, 2023 at 5:46?PM Michael Dewey <
+> lists at dewey.myzen.co.uk
+> > > > <mailto:lists at dewey.myzen.co.uk>> wrote:
+> > > >
+> > > >     Dear Gabriel
+> > > >
+> > > >     Comments in-line
+> > > >
+> > > >     On 11/10/2023 15:10, Gabriel Cotlier via R-sig-meta-analysis
+> wrote:
+> > > >      > Hello all,
+> > > >      > I would like to ask how to modify in the forest plot the
+> value of
+> > > the
+> > > >      > overall effect size to be round (overall_effect_size, 1)
+> since it
+> > > >      > aurtomatically does round(overall_effect_size, 2) for
+> instance in
+> > > >     my case
+> > > >      > the model's output overall effect size is :
+> > > >      >
+> > > >      > p0 <- predict(res)
+> > > >      > p0
+> > > >      > # pred     se ci.lb <http://ci.lb>  ci.ub pi.lb <http://pi.lb
+> >
+> > > pi.ub
+> > > >      > # 0.7080 0.2950 0.1297 1.2863 -2.9950 4.4110
+> > > >      >
+> > > >      > That is 0.7080 but in the forest lot is round(0.7080, 2) that
+> is
+> > > >     0.71 as it
+> > > >      > appears in the forest plot (lower right corner):
+> > > >      >
+> > > >      >    100% 0.71 [0.13, 1.29]
+> > > >      >
+> > > >      > Therefore I would like to access the variable in the forest
+> plot
+> > > >     and set it
+> > > >      > to be round(0.7080, 1) so as to have the overall effect size
+> as
+> > > >     is in the
+> > > >      > model output, that is 0.70 or alternatively 0.7080.
+> > > >
+> > > >     But round(0.7080, 1) is 0.7, not 0.70. Rounded to 2 decimals it
+> is
+> > > 0.71
+> > > >     which you state you do not want. Perhaps it would help if you
+> > > explained
+> > > >     what you mean by rounding as what you ask does not seem to
+> > > >     correspond to
+> > > >     what is usually meant by the term.
+> > > >
+> > > >     Michael
+> > > >
+> > > >      >
+> > > >      > Thanks a lot.
+> > > >      > Kid regards,
+> > > >      > Gabriel
+>
+
+	[[alternative HTML version deleted]]
+
+
+From |@@@c@@@ywe|| @end|ng |rom @de|@|de@edu@@u  Tue Oct 24 05:09:42 2023
+From: |@@@c@@@ywe|| @end|ng |rom @de|@|de@edu@@u (Isaac Calvin Saywell)
+Date: Tue, 24 Oct 2023 03:09:42 +0000
+Subject: [R-meta] Questions about multilevel meta-analysis structure
+In-Reply-To: <CAKt3tzmDdhCtfXTs=O9r+YOTu0R82oNsof1mmY=TeKR7v6orYw@mail.gmail.com>
+References: <SY4P282MB3016D887BC36805D53FD3BD7B13EA@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+ <CAFUVuJx3FsKTJnWV8AKzSC3erL77g57dN-qA_r6b=J+r4rbDBA@mail.gmail.com>
+ <CAKt3tzkDzwL7G8TH83uxAA=CTePDGsmXAQ5oBvv2cNvtr0YosA@mail.gmail.com>
+ <SY4P282MB301675A73A4DEE4BE69F520EB102A@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+ <CAKt3tzmDdhCtfXTs=O9r+YOTu0R82oNsof1mmY=TeKR7v6orYw@mail.gmail.com>
+Message-ID: <SY4P282MB3016A0F42BA0F864DB018E39B1DFA-1838@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+
+Hi Reza & James,
+
+Thank you for your help with my previous questions. I am working on another multilevel meta-analysis with a colleague and we were hoping you could help us with a few more questions. This is an individual participant data (IPD) meta-analysis, so we have access to the raw data. We are exploring the relationship between cognitive reserve (CR) indicators (e.g., educational attainment, occupational complexity, pre-morbid IQ) and cognitive outcomes (e.g., working memory, long term memory, visual processing speed etc), among individuals previously infected with COVID-19. We are specifically exploring how CR and COVID-19 severity (e.g., time in hospital, need for oxygen therapy etc) interact to predict cognitive outcomes. We would expect to find a negative relationship between the severity of the disease and cognitive outcomes, which is less pronounced in people who have a higher CR (see hypothetical interaction: https://universityofadelaide.box.com/s/c0ehcj70m3765w99xbi6om61udos5czv).
+
+
+[cid:f1ef5d4b-d91c-470e-9e00-ecac0878ec5d]
+
+To assess this relationship we have performed regression models which take the following form:
+
+lm(cognitive outcome ~ age + sex + cognitive reserve * COVID severity)
+
+
+
+In a given study, there may be a range of cognitive outcomes, cognitive reserve indicators and COVID severity indicators that were assessed. In order to capture all this information we have repeated the linear model for every possible combination of these (ranging anywhere from a handful to 200 models per study). The size of the main effects and interaction effect were then extracted in the form of semipartial correlations<https://journals.sagepub.com/doi/10.3102/1076998610396901>, which are the effect sizes of interest for the meta-analyses. (A semipartial correlation is essentially a standard correlation which has been corrected for potential confounds such as age and sex). Across 30 studies we have derived approximately 1000 effect sizes for each of the main effects, and the interaction term.
+
+
+
+We have then run three multilevel meta-analyses (for the main effect of CR, main effect of COVID severity, and the interaction effect) with the following code:
+
+
+
+V = impute_covariance_matrix(vi = df$vi, cluster = df$study_id, r = 0.6)
+
+model <- rma.mv(yi,
+
+              V,
+
+              random = list(~ 1 | study_id/effectsize_id),
+
+              tdist = TRUE,
+
+              method = "REML",
+
+              sparse = TRUE,
+
+              data = data_temp)
+
+
+
+and performed a series of moderation analyses which assess the influence of (1) cognitive domain, (2) CR indicator and (3) severity indicator on the results.
+
+
+
+moderation <- rma.mv(yi,
+
+                           V,
+
+                           mods = ~ moderator,
+
+                           random = list(~ moderator | study_id, ~1 | effectsize_id),
+
+                           struct ="HCS",
+
+                           tdist = TRUE,
+
+                           method = "REML",
+
+                           sparse = TRUE,
+
+                           control = list(rel.tol=1e-8),
+
+                           data = data_temp_2)
+
+
+
+As we have been conducting these analyses, several questions have presented themselves.
+
+
+
+(1) Plotting the moderating influence of CR indicator (CRQ scores, Education level, Education years etc) on the main effect of CR resulted in the following: https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel
+
+
+
+ [cid:bcc2e594-c487-495d-8390-90c40103423b]
+
+
+
+As you can see, the estimated central tendency for CRQ scores is very inflated relative to the individual effect sizes (it is also somewhat inflated for the other CR indicators). We are assuming the estimate for CRQ scores is inflated because effect sizes were derived from only one study? If this is correct, should it be dropped from the moderation analysis? If not, do you have any ideas as to why this occurred? (Several of our other moderation analyses are showing the same problem, though not to the same extent as this one).
+
+
+
+(2) In regards to the calculations used to compute V via the impute_covariance_matrix() function, would it be preferential to manually calculate this from the raw data? If so, are you able to provide resources on how to do this?
+
+
+
+(3) Finally, given the unique nature of our meta-analysis and the large number of effect sizes that are derived from often very similar regression models, are there any problems you can see regarding our use of these functions?
+
+
+
+Any help with these questions would be greatly appreciated!
+
+
+
+Kind regards,
+
+Isaac Saywell
+
+
+________________________________
+From: Reza Norouzian <rnorouzian at gmail.com>
+Sent: Monday, 24 July 2023 12:36 PM
+To: Isaac Calvin Saywell <isaac.saywell at adelaide.edu.au>
+Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>; jepusto at gmail.com <jepusto at gmail.com>
+Subject: Re: [R-meta] Questions about multilevel meta-analysis structure
+
+CAUTION: External email. Only click on links or open attachments from trusted senders.
+
+Isaac,
+
+You don't need the "subgroup = dat$cog_domain" part in your
+impute_covariance_matrix() call.
+
+V_sub would be necessary, if you were doing a subgroup analysis using
+a single model such as Model 2.1 and Model 2.2 where your cog_domain
+could vary in the studies.
+
+Once you decide (e.g., based on better model fit relative to other
+candidate models) to adopt a multivariate model (letting true effects
+for the cognitive domains to have a joint distribution in the
+studies), then V_sub which serves to make the sampling errors
+associated with the cognitive domains independent in each study
+becomes irrelevant.
+
+Please also take a look at the archives as I believe you can find
+multiple useful posts discussing several other relevant issues such as
+using cluster robust inferences (p values, CIs) associated with the
+average effects of your cognitive domains in your current output.
+Alternatively, you can check out metafor's help page related to this
+issue by doing: ?robust.rma.mv
+
+Kind regards,
+Reza
+
+
+
+
+On Sun, Jul 23, 2023 at 8:59?PM Isaac Calvin Saywell
+<isaac.saywell at adelaide.edu.au> wrote:
+>
+> Hi James and Reza,
+>
+> Thank you both for your detailed responses, they have provided more clarity on multilevel modelling and cleared up any possible misunderstandings I had.
+>
+> My team and I have decided, in line with both of your suggestions, that "HCS" is the most appropriate model variance structure for our data (given there are many studies that don't include effects for all cognitive domains).
+>
+> Only a couple of cognitive domains get pulled downward in the multivariate model, where most effect estimates remain quite accurate. When testing the models, you suggested for the equivalent of subgroup analyses the effect estimates for the cognitive domains that were pulled downward were much closer to the effects in univariate models.
+>
+> My last question then would be should we be specifying cognitive domain as our subgroup for when imputing a variance-covariance matrix for our multilevel moderator model or is this not appropriate? Therefore, would the following code be suitable?
+>
+> ## V <- impute_covariance_matrix(vi = dat$variance, cluster = dat$study_id, r = 0.6, subgroup = dat$cog_domain)
+> ##
+> ## res <- rma.mv(yi,
+>
+> V,
+> mods = ~ cog_domain,
+> random = list(~ cog_domain | study_id, ~ 1 | unique_id),
+> struct = "HCS",
+> tdist = TRUE,
+> method = "REML",
+> data = dat)
+>
+>
+> Thank you to both of you again for sharing your expertise, it has been highly appreciated.
+>
+> Kind regards,
+>
+> Isaac
+> ________________________________
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Reza Norouzian via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+> Sent: Friday, 21 July 2023 12:36 AM
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> Cc: Reza Norouzian <rnorouzian at gmail.com>
+> Subject: Re: [R-meta] Questions about multilevel meta-analysis structure
+>
+> CAUTION: External email. Only click on links or open attachments from trusted senders.
+>
+> James' responses are right on. I typed this up a bit ago so instead of
+> dumping them I put them here in case they might be helpful.
+>
+> In general, modeling effect sizes may often depend at least on a couple of
+> things. First, what are study goals/objectives? For example, would that be
+> one of your study goals/objectives to understand the extent of
+> relationships that exists among the true effects associated with your 9
+> different cognitive domains? Does such an understanding help you back an
+> existing theoretical/practical view up or bring up a new one to the fore?
+>
+> If yes, then potentially one of ?~inner | outer? type formulas in your
+> model could to some extent help.
+>
+> Second, do you have empirical support to achieve your study goal? This one
+> essentially explains why I hedged a bit (?potentially?, ?one of?, ?to some
+> extent?) toward the end when describing the first goal above. Typically,
+> the structure of the data that you have collected could determine which (if
+> any) of the available random-effects structures can lend empirical support
+> to your initial goal.
+>
+> Some of these structures like UN allow you to tap into all the existing
+> bivariate relationships between your 9 different cognitive domains. But
+> that comes with a requirement. Those 9 cognitive domains must have
+> co-occurred in a good number of the studies you have included in your
+> meta-analysis. To the extent that this is not the case, you may need to
+> simplify your random-effects structures using alternatively available
+> structures (CS, HCS etc.).
+>
+> Responses to your questions are in-line below.
+>
+> 1. Is my model correctly structured to account for dependency using the
+> inner | outer formula (see MODEL 1 CODE below) or should I just specify
+> random effects at the study and unique effect size level (see MODEL 2 CODE
+> below).
+>
+> Please see my introductory explanation above. But please also note that
+> ?struct=? only works with formulas that are of the form ?~inner | outer?
+> where inner is something other than intercept (other than ~1). Thus, UN
+> is entirely ignored in model 2.
+>
+> 2. If I do need to specify an inner | outer formula to compare effect sizes
+> across cognitive domains, then is an unstructured variance-covariance
+> matrix ("UN") most appropriate (allowing tau^2 to differ among cognitive
+> domains) or should another structure be specified?
+>
+> Please see my introductory explanation above.
+>
+> 3. To account for effect size dependency is a variance-covariance matrix
+> necessary (this is what my model currently uses) or is it ok to use
+> sampling variance of each in the multilevel model.
+>
+> I?m assuming you?re referring to V. You?re not currently showing the
+> structure of V. See also James' response.
+>
+> 4. When subsetting my data by one cognitive domain and investigating this
+> same cognitive domain in a univariate multilevel model the effect estimate
+> tends to be lower compared to when all cognitive domains are included in a
+> single multilevel model as a moderator, is there a reason for this?
+>
+> See James? answer.
+>
+>
+> On Thu, Jul 20, 2023 at 9:53?AM James Pustejovsky via R-sig-meta-analysis <
+> r-sig-meta-analysis at r-project.org> wrote:
+>
+> > Hi Isaac,
+> >
+> > Comments inline below. (You've hit on something I'm interested in, so
+> > apologies in advance!)
+> >
+> > James
+> >
+> > On Thu, Jul 20, 2023 at 12:17?AM Isaac Calvin Saywell via
+> > R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+> >
+> > >
+> > > 1. Is my model correctly structured to account for dependency using the
+> > > inner | outer formula (see MODEL 1 CODE below) or should I just specify
+> > > random effects at the study and unique effect size level (see MODEL 2
+> > CODE
+> > > below).
+> > >
+> > >
+> > The syntax looks correct to me except for two things. First, the first
+> > argument of each model should presumably be yi = yi rather than vi. Second,
+> > in Model 2, the struct argument is not necessary and will be ignored (it's
+> > only relevant for models where the random effects have inner | outer
+> > structure).
+> >
+> > Conceptually, this is an interesting question. Model 1 is theoretically
+> > appealing because it uses a more flexible, general structure than Model 2.
+> > Model 1 is saying that there are different average effects for each
+> > cognitive domain, and each study has a unique set of effects per cognitive
+> > domain that are distinct from each other but can be inter-correlated. In
+> > contrast, Model 2 is saying that the study-level random effects apply
+> > equally to all cognitive domains---if study X has higher-than-average
+> > effects in domain A, then it will have effects in domain B that are equally
+> > higher-than-average.
+> >
+> > The big caveat with Model 2 is that it can be hard to fit unless you have
+> > lots of studies, and specifically lots of studies that report effects for
+> > multiple cognitive domains. To figure out if it is feasible to estimate
+> > this model, it can be useful to do some descriptives where you count the
+> > number of studies that include effect sizes from each possible *pair* of
+> > cognitive domains. If some pairs have very few studies, then it's going to
+> > be difficult or impossible to fit the multivariate random effects structure
+> > without imposing further restrictions.
+> >
+> > In case it's looking infeasible, there are some other random effects
+> > structures that are intermediate between Model 1 and Model 2, which might
+> > be worth trying:
+> > Model 1.0: random = list(~ cog_domain | study_id, ~ 1 | effectsize_id),
+> > struct = "UN"
+> > Model 1.1: random = list(~ cog_domain | study_id, ~ 1 | effectsize_id),
+> > struct = "HCS"
+> > Model 1.2: random = list(~ cog_domain | study_id, ~ 1 | effectsize_id),
+> > struct = "CS"
+> > Model 1.2 (equivalent specification, I think): random = ~ 1 | study_id /
+> > cog_domain / effectsize_id
+> > Model 2.0: random = list(~ 1 | study_id, ~ 1 | effectsize_id)
+> > Model 2.0 (equivalent specification): random = ~ 1 | study_id /
+> > effectsize_id
+> >
+> > So perhaps there is something in between 1.0 and 2.0 that will strike a
+> > balance between theoretical appeal and feasibility.
+> >
+> >
+> > > 2. If I do need to specify an inner | outer formula to compare effect
+> > > sizes across cognitive domains, then is an unstructured
+> > variance-covariance
+> > > matrix ("UN") most appropriate (allowing tau^2 to differ among cognitive
+> > > domains) or should another structure be specified?
+> > >
+> > > See previous response.
+> >
+> >
+> > > 3. To account for effect size dependency is a variance-covariance matrix
+> > > necessary (this is what my model currently uses) or is it ok to use
+> > > sampling variance of each in the multilevel model.
+> > >
+> >
+> > This has been discussed previously on the listserv. My perspective is that
+> > you should use whatever assumptions are most plausible. If you expect that
+> > there really is correlation in the sampling errors (e.g., because the
+> > effect size estimates are based on correlated outcomes measured on the same
+> > set of respondents), then I think it is more defensible to use a
+> > non-diagonal V matrix, as in your current syntax.
+> >
+> >
+> > >
+> > > 4. When subsetting my data by one cognitive domain and investigating this
+> > > same cognitive domain in a univariate multilevel model the effect
+> > estimate
+> > > tends to be lower compared to when all cognitive domains are included in
+> > a
+> > > single multilevel model as a moderator, is there a reason for this?
+> > >
+> >
+> > Is this true for *all* of the cognitive domains or only one or a few of
+> > them? Your Model 1 and Model 2 use random effects models that assume effect
+> > sizes from different cognitive domains are somewhat related (i.e., the
+> > random effects are correlated within study) and so the average effect for a
+> > given domain will be estimated based in part on the effect size estimates
+> > for that domain and in part by "borrowing information" from other domains
+> > that are correlated with it. Broadly speaking, the consequence of this
+> > borrowing of information is that the average effects will tend to be pulled
+> > toward each other, and thus will be a little less dispersed than if you
+> > estimate effects through subgroup analysis.
+> >
+> > The above would explain why some domains would get pulled downward in the
+> > multivariate model compared to the univariate model, but it would not
+> > explain why *all* of the domains are pulled down. If it's really all of
+> > them, then I suspect your data must have some sort of association between
+> > average effect size and the number of effect size estimates per study.
+> > That'd be weird and I'm not really sure how to interpret it. You could
+> > check on this by calculating a variable (call it k_j) that is the number of
+> > effect size estimates reported per study (across any cognitive domain) and
+> > then including that variable as a predictor in Model 1 or Model 2 above.
+> > This would at least tell you if there's something funky going on...
+> >
+> > As a bit of an aside, you can do the equivalent of a subgroup analysis
+> > within the framework of a multivariate working model, which might be
+> > another thing to explore to figure out what's going on. To do this, you'll
+> > first need to recalculate your V matrix, setting the subgroup argument to
+> > be equal to cog_domain. This amounts to making the assumption that there is
+> > correlation between effect size estimates *within* the same domain but not
+> > between domains of a given study. Call this new V matrix V_sub. Then try
+> > the following model specifications:
+> >
+> > Model 2.1: V = V_sub, random = list(~ cog_domain | study_id, ~ cog_domain |
+> > effectsize_id), struct = c("DIAG","DIAG")
+> > Model 2.2: V = V_sub, random = list(~ cog_domain | study_id, ~ 1 |
+> > effectsize_id), struct = "DIAG",
+> >
+> > Model 2.1 should reproduce what you get from running separate models by
+> > subgroup.
+> > Model 2.2 is a slight tweak on that, which assumes that there is a common
+> > within-study, within-subgroup variance instead of allowing this to differ
+> > by subgroup. Model 2.2 is nested in Models 1.0 and 1.1, but not in 1.2.
+> >
+> > [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis<https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+> >
+>
+> [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis<https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+
+	[[alternative HTML version deleted]]
+
+
+From |@@@c@@@ywe|| @end|ng |rom @de|@|de@edu@@u  Tue Oct 24 05:09:42 2023
+From: |@@@c@@@ywe|| @end|ng |rom @de|@|de@edu@@u (Isaac Calvin Saywell)
+Date: Tue, 24 Oct 2023 03:09:42 +0000
+Subject: [R-meta] Questions about multilevel meta-analysis structure
+In-Reply-To: <CAKt3tzmDdhCtfXTs=O9r+YOTu0R82oNsof1mmY=TeKR7v6orYw@mail.gmail.com>
+References: <SY4P282MB3016D887BC36805D53FD3BD7B13EA@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+ <CAFUVuJx3FsKTJnWV8AKzSC3erL77g57dN-qA_r6b=J+r4rbDBA@mail.gmail.com>
+ <CAKt3tzkDzwL7G8TH83uxAA=CTePDGsmXAQ5oBvv2cNvtr0YosA@mail.gmail.com>
+ <SY4P282MB301675A73A4DEE4BE69F520EB102A@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+ <CAKt3tzmDdhCtfXTs=O9r+YOTu0R82oNsof1mmY=TeKR7v6orYw@mail.gmail.com>
+Message-ID: <SY4P282MB3016A0F42BA0F864DB018E39B1DFA-8539@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+
+Hi Reza & James,
+
+Thank you for your help with my previous questions. I am working on another multilevel meta-analysis with a colleague and we were hoping you could help us with a few more questions. This is an individual participant data (IPD) meta-analysis, so we have access to the raw data. We are exploring the relationship between cognitive reserve (CR) indicators (e.g., educational attainment, occupational complexity, pre-morbid IQ) and cognitive outcomes (e.g., working memory, long term memory, visual processing speed etc), among individuals previously infected with COVID-19. We are specifically exploring how CR and COVID-19 severity (e.g., time in hospital, need for oxygen therapy etc) interact to predict cognitive outcomes. We would expect to find a negative relationship between the severity of the disease and cognitive outcomes, which is less pronounced in people who have a higher CR (see hypothetical interaction: https://universityofadelaide.box.com/s/c0ehcj70m3765w99xbi6om61udos5czv).
+
+
+[cid:f1ef5d4b-d91c-470e-9e00-ecac0878ec5d]
+
+To assess this relationship we have performed regression models which take the following form:
+
+lm(cognitive outcome ~ age + sex + cognitive reserve * COVID severity)
+
+
+
+In a given study, there may be a range of cognitive outcomes, cognitive reserve indicators and COVID severity indicators that were assessed. In order to capture all this information we have repeated the linear model for every possible combination of these (ranging anywhere from a handful to 200 models per study). The size of the main effects and interaction effect were then extracted in the form of semipartial correlations<https://journals.sagepub.com/doi/10.3102/1076998610396901>, which are the effect sizes of interest for the meta-analyses. (A semipartial correlation is essentially a standard correlation which has been corrected for potential confounds such as age and sex). Across 30 studies we have derived approximately 1000 effect sizes for each of the main effects, and the interaction term.
+
+
+
+We have then run three multilevel meta-analyses (for the main effect of CR, main effect of COVID severity, and the interaction effect) with the following code:
+
+
+
+V = impute_covariance_matrix(vi = df$vi, cluster = df$study_id, r = 0.6)
+
+model <- rma.mv(yi,
+
+              V,
+
+              random = list(~ 1 | study_id/effectsize_id),
+
+              tdist = TRUE,
+
+              method = "REML",
+
+              sparse = TRUE,
+
+              data = data_temp)
+
+
+
+and performed a series of moderation analyses which assess the influence of (1) cognitive domain, (2) CR indicator and (3) severity indicator on the results.
+
+
+
+moderation <- rma.mv(yi,
+
+                           V,
+
+                           mods = ~ moderator,
+
+                           random = list(~ moderator | study_id, ~1 | effectsize_id),
+
+                           struct ="HCS",
+
+                           tdist = TRUE,
+
+                           method = "REML",
+
+                           sparse = TRUE,
+
+                           control = list(rel.tol=1e-8),
+
+                           data = data_temp_2)
+
+
+
+As we have been conducting these analyses, several questions have presented themselves.
+
+
+
+(1) Plotting the moderating influence of CR indicator (CRQ scores, Education level, Education years etc) on the main effect of CR resulted in the following: https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel
+
+
+
+ [cid:bcc2e594-c487-495d-8390-90c40103423b]
+
+
+
+As you can see, the estimated central tendency for CRQ scores is very inflated relative to the individual effect sizes (it is also somewhat inflated for the other CR indicators). We are assuming the estimate for CRQ scores is inflated because effect sizes were derived from only one study? If this is correct, should it be dropped from the moderation analysis? If not, do you have any ideas as to why this occurred? (Several of our other moderation analyses are showing the same problem, though not to the same extent as this one).
+
+
+
+(2) In regards to the calculations used to compute V via the impute_covariance_matrix() function, would it be preferential to manually calculate this from the raw data? If so, are you able to provide resources on how to do this?
+
+
+
+(3) Finally, given the unique nature of our meta-analysis and the large number of effect sizes that are derived from often very similar regression models, are there any problems you can see regarding our use of these functions?
+
+
+
+Any help with these questions would be greatly appreciated!
+
+
+
+Kind regards,
+
+Isaac Saywell
+
+
+________________________________
+From: Reza Norouzian <rnorouzian at gmail.com>
+Sent: Monday, 24 July 2023 12:36 PM
+To: Isaac Calvin Saywell <isaac.saywell at adelaide.edu.au>
+Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>; jepusto at gmail.com <jepusto at gmail.com>
+Subject: Re: [R-meta] Questions about multilevel meta-analysis structure
+
+CAUTION: External email. Only click on links or open attachments from trusted senders.
+
+Isaac,
+
+You don't need the "subgroup = dat$cog_domain" part in your
+impute_covariance_matrix() call.
+
+V_sub would be necessary, if you were doing a subgroup analysis using
+a single model such as Model 2.1 and Model 2.2 where your cog_domain
+could vary in the studies.
+
+Once you decide (e.g., based on better model fit relative to other
+candidate models) to adopt a multivariate model (letting true effects
+for the cognitive domains to have a joint distribution in the
+studies), then V_sub which serves to make the sampling errors
+associated with the cognitive domains independent in each study
+becomes irrelevant.
+
+Please also take a look at the archives as I believe you can find
+multiple useful posts discussing several other relevant issues such as
+using cluster robust inferences (p values, CIs) associated with the
+average effects of your cognitive domains in your current output.
+Alternatively, you can check out metafor's help page related to this
+issue by doing: ?robust.rma.mv
+
+Kind regards,
+Reza
+
+
+
+
+On Sun, Jul 23, 2023 at 8:59?PM Isaac Calvin Saywell
+<isaac.saywell at adelaide.edu.au> wrote:
+>
+> Hi James and Reza,
+>
+> Thank you both for your detailed responses, they have provided more clarity on multilevel modelling and cleared up any possible misunderstandings I had.
+>
+> My team and I have decided, in line with both of your suggestions, that "HCS" is the most appropriate model variance structure for our data (given there are many studies that don't include effects for all cognitive domains).
+>
+> Only a couple of cognitive domains get pulled downward in the multivariate model, where most effect estimates remain quite accurate. When testing the models, you suggested for the equivalent of subgroup analyses the effect estimates for the cognitive domains that were pulled downward were much closer to the effects in univariate models.
+>
+> My last question then would be should we be specifying cognitive domain as our subgroup for when imputing a variance-covariance matrix for our multilevel moderator model or is this not appropriate? Therefore, would the following code be suitable?
+>
+> ## V <- impute_covariance_matrix(vi = dat$variance, cluster = dat$study_id, r = 0.6, subgroup = dat$cog_domain)
+> ##
+> ## res <- rma.mv(yi,
+>
+> V,
+> mods = ~ cog_domain,
+> random = list(~ cog_domain | study_id, ~ 1 | unique_id),
+> struct = "HCS",
+> tdist = TRUE,
+> method = "REML",
+> data = dat)
+>
+>
+> Thank you to both of you again for sharing your expertise, it has been highly appreciated.
+>
+> Kind regards,
+>
+> Isaac
+> ________________________________
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Reza Norouzian via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+> Sent: Friday, 21 July 2023 12:36 AM
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> Cc: Reza Norouzian <rnorouzian at gmail.com>
+> Subject: Re: [R-meta] Questions about multilevel meta-analysis structure
+>
+> CAUTION: External email. Only click on links or open attachments from trusted senders.
+>
+> James' responses are right on. I typed this up a bit ago so instead of
+> dumping them I put them here in case they might be helpful.
+>
+> In general, modeling effect sizes may often depend at least on a couple of
+> things. First, what are study goals/objectives? For example, would that be
+> one of your study goals/objectives to understand the extent of
+> relationships that exists among the true effects associated with your 9
+> different cognitive domains? Does such an understanding help you back an
+> existing theoretical/practical view up or bring up a new one to the fore?
+>
+> If yes, then potentially one of ?~inner | outer? type formulas in your
+> model could to some extent help.
+>
+> Second, do you have empirical support to achieve your study goal? This one
+> essentially explains why I hedged a bit (?potentially?, ?one of?, ?to some
+> extent?) toward the end when describing the first goal above. Typically,
+> the structure of the data that you have collected could determine which (if
+> any) of the available random-effects structures can lend empirical support
+> to your initial goal.
+>
+> Some of these structures like UN allow you to tap into all the existing
+> bivariate relationships between your 9 different cognitive domains. But
+> that comes with a requirement. Those 9 cognitive domains must have
+> co-occurred in a good number of the studies you have included in your
+> meta-analysis. To the extent that this is not the case, you may need to
+> simplify your random-effects structures using alternatively available
+> structures (CS, HCS etc.).
+>
+> Responses to your questions are in-line below.
+>
+> 1. Is my model correctly structured to account for dependency using the
+> inner | outer formula (see MODEL 1 CODE below) or should I just specify
+> random effects at the study and unique effect size level (see MODEL 2 CODE
+> below).
+>
+> Please see my introductory explanation above. But please also note that
+> ?struct=? only works with formulas that are of the form ?~inner | outer?
+> where inner is something other than intercept (other than ~1). Thus, UN
+> is entirely ignored in model 2.
+>
+> 2. If I do need to specify an inner | outer formula to compare effect sizes
+> across cognitive domains, then is an unstructured variance-covariance
+> matrix ("UN") most appropriate (allowing tau^2 to differ among cognitive
+> domains) or should another structure be specified?
+>
+> Please see my introductory explanation above.
+>
+> 3. To account for effect size dependency is a variance-covariance matrix
+> necessary (this is what my model currently uses) or is it ok to use
+> sampling variance of each in the multilevel model.
+>
+> I?m assuming you?re referring to V. You?re not currently showing the
+> structure of V. See also James' response.
+>
+> 4. When subsetting my data by one cognitive domain and investigating this
+> same cognitive domain in a univariate multilevel model the effect estimate
+> tends to be lower compared to when all cognitive domains are included in a
+> single multilevel model as a moderator, is there a reason for this?
+>
+> See James? answer.
+>
+>
+> On Thu, Jul 20, 2023 at 9:53?AM James Pustejovsky via R-sig-meta-analysis <
+> r-sig-meta-analysis at r-project.org> wrote:
+>
+> > Hi Isaac,
+> >
+> > Comments inline below. (You've hit on something I'm interested in, so
+> > apologies in advance!)
+> >
+> > James
+> >
+> > On Thu, Jul 20, 2023 at 12:17?AM Isaac Calvin Saywell via
+> > R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+> >
+> > >
+> > > 1. Is my model correctly structured to account for dependency using the
+> > > inner | outer formula (see MODEL 1 CODE below) or should I just specify
+> > > random effects at the study and unique effect size level (see MODEL 2
+> > CODE
+> > > below).
+> > >
+> > >
+> > The syntax looks correct to me except for two things. First, the first
+> > argument of each model should presumably be yi = yi rather than vi. Second,
+> > in Model 2, the struct argument is not necessary and will be ignored (it's
+> > only relevant for models where the random effects have inner | outer
+> > structure).
+> >
+> > Conceptually, this is an interesting question. Model 1 is theoretically
+> > appealing because it uses a more flexible, general structure than Model 2.
+> > Model 1 is saying that there are different average effects for each
+> > cognitive domain, and each study has a unique set of effects per cognitive
+> > domain that are distinct from each other but can be inter-correlated. In
+> > contrast, Model 2 is saying that the study-level random effects apply
+> > equally to all cognitive domains---if study X has higher-than-average
+> > effects in domain A, then it will have effects in domain B that are equally
+> > higher-than-average.
+> >
+> > The big caveat with Model 2 is that it can be hard to fit unless you have
+> > lots of studies, and specifically lots of studies that report effects for
+> > multiple cognitive domains. To figure out if it is feasible to estimate
+> > this model, it can be useful to do some descriptives where you count the
+> > number of studies that include effect sizes from each possible *pair* of
+> > cognitive domains. If some pairs have very few studies, then it's going to
+> > be difficult or impossible to fit the multivariate random effects structure
+> > without imposing further restrictions.
+> >
+> > In case it's looking infeasible, there are some other random effects
+> > structures that are intermediate between Model 1 and Model 2, which might
+> > be worth trying:
+> > Model 1.0: random = list(~ cog_domain | study_id, ~ 1 | effectsize_id),
+> > struct = "UN"
+> > Model 1.1: random = list(~ cog_domain | study_id, ~ 1 | effectsize_id),
+> > struct = "HCS"
+> > Model 1.2: random = list(~ cog_domain | study_id, ~ 1 | effectsize_id),
+> > struct = "CS"
+> > Model 1.2 (equivalent specification, I think): random = ~ 1 | study_id /
+> > cog_domain / effectsize_id
+> > Model 2.0: random = list(~ 1 | study_id, ~ 1 | effectsize_id)
+> > Model 2.0 (equivalent specification): random = ~ 1 | study_id /
+> > effectsize_id
+> >
+> > So perhaps there is something in between 1.0 and 2.0 that will strike a
+> > balance between theoretical appeal and feasibility.
+> >
+> >
+> > > 2. If I do need to specify an inner | outer formula to compare effect
+> > > sizes across cognitive domains, then is an unstructured
+> > variance-covariance
+> > > matrix ("UN") most appropriate (allowing tau^2 to differ among cognitive
+> > > domains) or should another structure be specified?
+> > >
+> > > See previous response.
+> >
+> >
+> > > 3. To account for effect size dependency is a variance-covariance matrix
+> > > necessary (this is what my model currently uses) or is it ok to use
+> > > sampling variance of each in the multilevel model.
+> > >
+> >
+> > This has been discussed previously on the listserv. My perspective is that
+> > you should use whatever assumptions are most plausible. If you expect that
+> > there really is correlation in the sampling errors (e.g., because the
+> > effect size estimates are based on correlated outcomes measured on the same
+> > set of respondents), then I think it is more defensible to use a
+> > non-diagonal V matrix, as in your current syntax.
+> >
+> >
+> > >
+> > > 4. When subsetting my data by one cognitive domain and investigating this
+> > > same cognitive domain in a univariate multilevel model the effect
+> > estimate
+> > > tends to be lower compared to when all cognitive domains are included in
+> > a
+> > > single multilevel model as a moderator, is there a reason for this?
+> > >
+> >
+> > Is this true for *all* of the cognitive domains or only one or a few of
+> > them? Your Model 1 and Model 2 use random effects models that assume effect
+> > sizes from different cognitive domains are somewhat related (i.e., the
+> > random effects are correlated within study) and so the average effect for a
+> > given domain will be estimated based in part on the effect size estimates
+> > for that domain and in part by "borrowing information" from other domains
+> > that are correlated with it. Broadly speaking, the consequence of this
+> > borrowing of information is that the average effects will tend to be pulled
+> > toward each other, and thus will be a little less dispersed than if you
+> > estimate effects through subgroup analysis.
+> >
+> > The above would explain why some domains would get pulled downward in the
+> > multivariate model compared to the univariate model, but it would not
+> > explain why *all* of the domains are pulled down. If it's really all of
+> > them, then I suspect your data must have some sort of association between
+> > average effect size and the number of effect size estimates per study.
+> > That'd be weird and I'm not really sure how to interpret it. You could
+> > check on this by calculating a variable (call it k_j) that is the number of
+> > effect size estimates reported per study (across any cognitive domain) and
+> > then including that variable as a predictor in Model 1 or Model 2 above.
+> > This would at least tell you if there's something funky going on...
+> >
+> > As a bit of an aside, you can do the equivalent of a subgroup analysis
+> > within the framework of a multivariate working model, which might be
+> > another thing to explore to figure out what's going on. To do this, you'll
+> > first need to recalculate your V matrix, setting the subgroup argument to
+> > be equal to cog_domain. This amounts to making the assumption that there is
+> > correlation between effect size estimates *within* the same domain but not
+> > between domains of a given study. Call this new V matrix V_sub. Then try
+> > the following model specifications:
+> >
+> > Model 2.1: V = V_sub, random = list(~ cog_domain | study_id, ~ cog_domain |
+> > effectsize_id), struct = c("DIAG","DIAG")
+> > Model 2.2: V = V_sub, random = list(~ cog_domain | study_id, ~ 1 |
+> > effectsize_id), struct = "DIAG",
+> >
+> > Model 2.1 should reproduce what you get from running separate models by
+> > subgroup.
+> > Model 2.2 is a slight tweak on that, which assumes that there is a common
+> > within-study, within-subgroup variance instead of allowing this to differ
+> > by subgroup. Model 2.2 is nested in Models 1.0 and 1.1, but not in 1.2.
+> >
+> > [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis<https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+> >
+>
+> [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis<https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+
+	[[alternative HTML version deleted]]
+
+
+From yh342 @end|ng |rom n@u@edu  Wed Oct 25 21:22:56 2023
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Wed, 25 Oct 2023 12:22:56 -0700
+Subject: [R-meta] Profile likelihood for metafor::rma.mv()
+Message-ID: <CA+dzWjqnk-46b9g0jZesRE9UdYVeVMJjkS6VqFizZKaWRvnVOQ@mail.gmail.com>
+
+Hello All,
+
+I have a profile log-likelihood for a parameter in my 'rma.mv()' model that
+looks like this (where lack of x in the middle denotes non-convergence):
+  z
+y    x
+
+               x x x
+--------------------
+The parameter estimate returned by rma.mv() is "y", but there clearly is
+another estimate, "z", that has a larger log-likelihood value than "y".
+
+So, the parameter estimate returned by rma.mv() is not the best. But in
+this situation, can I report "z" as the correct estimate and disregard "y"?
+
+Thanks,
+Yuhang
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Oct 26 08:42:55 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 26 Oct 2023 06:42:55 +0000
+Subject: [R-meta] Profile likelihood for metafor::rma.mv()
+In-Reply-To: <CA+dzWjqnk-46b9g0jZesRE9UdYVeVMJjkS6VqFizZKaWRvnVOQ@mail.gmail.com>
+References: <CA+dzWjqnk-46b9g0jZesRE9UdYVeVMJjkS6VqFizZKaWRvnVOQ@mail.gmail.com>
+Message-ID: <AS8PR08MB91932D6B8C51065EECAD05AC8BDDA@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Yuhang,
+
+I don't know the specifics of the model and how complex it is (in terms of the random effects structure and number of parameters it entails), but yes, model fitting can fail (non-convergence or convergence to a local optimum). The profile() function actually does a check if the log likelihood is higher for one of the values it profiles over compared to the value it found during the model fitting, so I assume you received the corresponding warning about this being the case here.
+
+One of the first things I would do in this case is to try out fitting the model with various different optimizers. It is very easy to switch to different optimizers:
+
+https://wviechtb.github.io/metafor/reference/rma.mv.html#note-1
+
+and there are close to 20 different options available. Some of them may fail completely, but there isn't one that is always best (nlminb, which is the default, is still a good default option in my opinion, but BFGS and others can work better under certain circumstances).
+
+Hopefully, switching to a different optimizer avoids the local optimum and some of the non-convergence problems in the profiling.
+
+One can also try to adjust the starting values for the model fitting algorithm and many optimizers have additional settings one can adjust, but messing with these settings is tedious.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Yuhang Hu via R-sig-meta-analysis
+> Sent: Wednesday, October 25, 2023 21:23
+> To: R meta <r-sig-meta-analysis at r-project.org>
+> Cc: Yuhang Hu <yh342 at nau.edu>
+> Subject: [R-meta] Profile likelihood for metafor::rma.mv()
+>
+> Hello All,
+>
+> I have a profile log-likelihood for a parameter in my 'rma.mv()' model that
+> looks like this (where lack of x in the middle denotes non-convergence):
+>   z
+> y    x
+>
+>                x x x
+> --------------------
+> The parameter estimate returned by rma.mv() is "y", but there clearly is
+> another estimate, "z", that has a larger log-likelihood value than "y".
+>
+> So, the parameter estimate returned by rma.mv() is not the best. But in
+> this situation, can I report "z" as the correct estimate and disregard "y"?
+>
+> Thanks,
+> Yuhang
+
+
+From jepu@to @end|ng |rom gm@||@com  Thu Oct 26 23:18:03 2023
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 26 Oct 2023 16:18:03 -0500
+Subject: [R-meta] Questions about multilevel meta-analysis structure
+In-Reply-To: <SY4P282MB3016A0F42BA0F864DB018E39B1DFA@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+References: <SY4P282MB3016D887BC36805D53FD3BD7B13EA@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+ <CAFUVuJx3FsKTJnWV8AKzSC3erL77g57dN-qA_r6b=J+r4rbDBA@mail.gmail.com>
+ <CAKt3tzkDzwL7G8TH83uxAA=CTePDGsmXAQ5oBvv2cNvtr0YosA@mail.gmail.com>
+ <SY4P282MB301675A73A4DEE4BE69F520EB102A@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+ <CAKt3tzmDdhCtfXTs=O9r+YOTu0R82oNsof1mmY=TeKR7v6orYw@mail.gmail.com>
+ <SY4P282MB3016A0F42BA0F864DB018E39B1DFA@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>
+Message-ID: <CAFUVuJyudJUWtLwSw2-hFmfAJ7ijtj8MTTk0k_qnqDT0Or3QJg@mail.gmail.com>
+
+Hi Isaac,
+
+Responses below.
+
+Best,
+James
+
+
+On Mon, Oct 23, 2023 at 10:10?PM Isaac Calvin Saywell <
+isaac.saywell at adelaide.edu.au> wrote:
+
+> <snip>
+>
+> (1) Plotting the moderating influence of CR indicator (CRQ scores,
+> Education level, Education years etc) on the main effect of CR resulted in
+> the following:
+> https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel
+>
+> As you can see, the estimated central tendency for CRQ scores is very
+> inflated relative to the individual effect sizes (it is also somewhat
+> inflated for the other CR indicators). We are assuming the estimate for CRQ
+> scores is inflated because effect sizes were derived from only one study?
+> If this is correct, should it be dropped from the moderation analysis? If
+> not, do you have any ideas as to why this occurred? (Several of our other
+> moderation analyses are showing the same problem, though not to the same
+> extent as this one).
+>
+
+This is indeed pretty weird. I'm speculating a bit, but my guess is that it
+happens because of the confluence of several conditions:
+1) There is only one study (call it study X) with effect sizes for CRQ and
+that study also includes other types of CR indicators.
+2) You're using a multivariate model that "borrows" information across
+categories.
+3) The effect sizes for other CR indicators in study X are below average
+relative to the overall effect size for that type of indicator. Because the
+model borrows information across categories, it infers that the observed
+effect sizes for CRQ from study X are also a bit below average relative to
+the overall effect size for CRQ. It therefore estimates the overall average
+to be above the mean of all the observed CRQ effects.
+
+This sort of reasoning is valid---and the prediction is reasonable, I would
+argue---if the working model that you're using is a good description of the
+real data generating process. But if it's haphazard or mis-specified, then
+the model could generate some pretty lousy predictions. Given that you've
+only got one study with effect sizes in this category, you have very little
+information to evaluate the modeling assumptions regarding how CRQ scores
+are related to other types of CR indicators, so pretty much any modeling
+assumption you make will be difficult to evaluate. Dropping effects based
+on CRQ scores (or perhaps just reporting them separately) might be prudent,
+but this sort of judgement really depends on knowing the specific context
+of your study.
+
+
+> (2) In regards to the calculations used to compute V via the
+> impute_covariance_matrix() function, would it be preferential to manually
+> calculate this from the raw data? If so, are you able to provide resources
+> on how to do this?
+>
+
+I don't know of any work that provides the covariances between semipartial
+correlations (maybe Ariel or Betsy know?). It could be derived (
+https://www.jepusto.com/multivariate-delta-method/) but doing so would be
+pretty tedious.
+
+Alternately, you could use seemingly unrelated regression. Say you have a
+dataset with outcomes Y1, Y2, Y3,..., CR predictors X1, X2, X3,..., and one
+common predictor U. Re-arrange the data so that you have a row for every
+observation and every unique combination of a Y and an X. The long-form
+data would need to look like this:
+ID Yid Xid Y  X     U
+1  1     1   y1  x1  u1
+1  2     1   y2  x1  u1
+1  3     1   y3  x1  u1
+1  1     2   y1  x2  u1
+1  2     2   y2  x2  u1
+1  3     2   y3  x2  u1
+1  1     3   y1  x3  u1
+1  2     3   y2  x3  u1
+1  3     3   y3  x3  u1
+1  1     4   y1  x4  u1
+1  2     4   y2  x4  u1
+1  3     4   y3  x4  u1
+2  1     1   y1  x1  u2
+2  2     1   y2  x1  u2
+2  3     1   y3  x1  u2
+2  1     2   y1  x2  u2
+2  2     2   y2  x2  u2
+2  3     2   y3  x2  u2
+2  1     3   y1  x3  u2
+2  2     3   y2  x3  u2
+2  3     3   y3  x3  u2
+2  1     4   y1  x4  u2
+2  2     4   y2  x4  u2
+2  3     4   y3  x4  u2
+3  1     1   y1  x1  u3
+3  2     1   y2  x1  u3
+3  3     1   y3  x1  u3
+3  1     2   y1  x2  u3
+3  2     2   y2  x2  u3
+3  3     2   y3  x2  u3
+3  1     3   y1  x3  u3
+3  2     3   y2  x3  u3
+3  3     3   y3  x3  u3
+3  1     4   y1  x4  u3
+3  2     4   y2  x4  u3
+3  3     4   y3  x4  u3
+etc.
+You can then fit the regression model
+Y = 0 + factor(Yid) * factor(Xid) + factor(Yid) * factor(Xid):(X + U + X *
+X)
+This should give you something that's exactly equivalent to fitting the
+basic model Y = X + U + X * U for each unique combination of Yid and Xid,
+but it puts all the coefficients together in one model. Then compute
+cluster-robust standard errors, clustering by ID variable to account for
+the fact that you've got the same value of Y or X repeated across several
+rows. Take the sub-matrix of the variance-covariance matrix corresponding
+to the beta coefficients of interest.
+
+Another alternative would be to just bootstrap the sampling variance
+covariance matrix. For a single primary study, this process involves the
+following:
+1. Draw a bootstrap re-sample of observations from the original data.
+2. Compute all the semi-partial correlation coefficients of interest. Store
+these "bootstrap r_sp" values in a vector.
+3. Repeat steps 1 and 2 a bunch of time (500-1000 times).
+4. Calculate the sample variance-covariance matrix of the bootstrap r_sp
+values. Use this as the V matrix for that primary study in the
+meta-analysis.
+
+
+> (3) Finally, given the unique nature of our meta-analysis and the large
+> number of effect sizes that are derived from often very similar regression
+> models, are there any problems you can see regarding our use of these
+> functions?
+>
+
+I would say that your application of multilevel meta-analysis is maybe a
+little bit unusual since you've got a relatively modest number studies and
+a whole lot of effect sizes that capture slightly different
+operationalizations of the constructs of interest. I don't know anything
+about the substantive area you're looking at or about the properties of
+different measures of cognitive reserve, but I could imagine someone
+objecting to taking such a "kitchen sink" approach to your research aims,
+raising questions such as:  Are some CR measures better than others? Why
+treat all different cognitive outcomes as more or less equal or
+interchangeable?
+
+One last thought. You might find the following article
+interesting/stimulating:
+Fern?ndez-Castilla, B., Maes, M., Declercq, L. *et al.* A demonstration and
+evaluation of the use of cross-classified random-effects models for
+meta-analysis. *Behav Res *51, 1286?1304 (2019).
+https://doi.org/10.3758/s13428-018-1063-2
+One of the motivating use-cases they describe is a situation similar to
+yours, where you have a variety of different operationalizations of a
+construct and the idea is to treat the specific operationalization as a
+random effect.
+
+	[[alternative HTML version deleted]]
+
+
+From t571 @end|ng |rom w|g@h@tp@edu@tw  Sat Oct 28 11:08:38 2023
+From: t571 @end|ng |rom w|g@h@tp@edu@tw (=?UTF-8?B?6Iux5paH56eR6Zmz5ZOB6Kqg?=)
+Date: Sat, 28 Oct 2023 17:08:38 +0800
+Subject: [R-meta] About how to interpret the following P-value from the
+ result
+Message-ID: <CAPm5Ok0RbLV0vFC4TCx=Mv3jTkSxrYixQtFGkJ-SdAd-7Q=qwQ@mail.gmail.com>
+
+I'm currently performing a meta-analysis on the relationship between
+"Digital game-based learning" and "English vocabulary acquisition". And I'm
+using the random effect model for moderator analysis since the
+heterogeneity effect is quite high. The following is the code I use for
+performing the moderator analysis for one moderator in my dataset, "device
+used":
+
+> mod.Device <- rma.mv(yi = y, V = v,+                        slab = studyID, data = DG,+                        random = ~ 1 | studyID/effectsizeID,+                        test = "t", method = "REML",+                        mods = ~ Device)> mod.Device
+
+and here is the result:
+
+
+
+Multivariate Meta-Analysis Model (k = 29; method: REML)
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed                factor
+sigma^2.1  0.0663  0.2575     28     no               studyID
+sigma^2.2  0.0000  0.0000     29     no  studyID/effectsizeID
+
+Test for Residual Heterogeneity:
+QE(df = 25) = 44.8744, p-val = 0.0086
+
+Test of Moderators (coefficients 2:4):
+F(df1 = 3, df2 = 25) = 0.8975, p-val = 0.4563
+
+Model Results:
+
+           estimate      se     tval  df    pval    ci.lb   ci.ub
+intrcpt      0.7746  0.1008   7.6856  25  <.0001   0.5670  0.9822  ***
+DeviceMD     0.0898  0.1681   0.5343  25  0.5978  -0.2564  0.4361
+DeviceN/A   -0.2275  0.2338  -0.9732  25  0.3398  -0.7091  0.2540
+DeviceV/A    0.2968  0.2936   1.0107  25  0.3219  -0.3080  0.9015
+
+intrcpt    = computer
+
+DeviceMD   = mobile devices
+
+DeviceN/A  = not available
+
+DeviceV/A  = VR or AR devices
+---
+
+and this is what I'm a little bit confused on. Can anyone help me clarify
+whether my explanation is correct or wrong?
+(1) the p-value under "*Test of moderators*" which is 0.4563, does this
+mean that this moderator (device used) does not have a significant impact
+on English vocabulary learning using digital game-based learning? (Since
+the p-value here is larger than 0.05)
+(2) the p-value of "*intrcpt*" which is <.0001, does this mean that using
+computers to learn English vocabulary still has a significant difference
+among the four types of devices?
+
+??? (Nick Chen)
+Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Sat Oct 28 14:37:47 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Sat, 28 Oct 2023 13:37:47 +0100
+Subject: [R-meta] About how to interpret the following P-value from the
+ result
+In-Reply-To: <CAPm5Ok0RbLV0vFC4TCx=Mv3jTkSxrYixQtFGkJ-SdAd-7Q=qwQ@mail.gmail.com>
+References: <CAPm5Ok0RbLV0vFC4TCx=Mv3jTkSxrYixQtFGkJ-SdAd-7Q=qwQ@mail.gmail.com>
+Message-ID: <a07f12c4-8067-41cf-99ca-2a62d3e4e129@dewey.myzen.co.uk>
+
+Dear Nick
+
+Comment in-line
+
+On 28/10/2023 10:08, ?????? via R-sig-meta-analysis wrote:
+> I'm currently performing a meta-analysis on the relationship between
+> "Digital game-based learning" and "English vocabulary acquisition". And I'm
+> using the random effect model for moderator analysis since the
+> heterogeneity effect is quite high. The following is the code I use for
+> performing the moderator analysis for one moderator in my dataset, "device
+> used":
+> 
+>> mod.Device <- rma.mv(yi = y, V = v,+                        slab = studyID, data = DG,+                        random = ~ 1 | studyID/effectsizeID,+                        test = "t", method = "REML",+                        mods = ~ Device)> mod.Device
+> 
+> and here is the result:
+> 
+> 
+> 
+> Multivariate Meta-Analysis Model (k = 29; method: REML)
+> 
+> Variance Components:
+> 
+>              estim    sqrt  nlvls  fixed                factor
+> sigma^2.1  0.0663  0.2575     28     no               studyID
+> sigma^2.2  0.0000  0.0000     29     no  studyID/effectsizeID
+> 
+> Test for Residual Heterogeneity:
+> QE(df = 25) = 44.8744, p-val = 0.0086
+> 
+> Test of Moderators (coefficients 2:4):
+> F(df1 = 3, df2 = 25) = 0.8975, p-val = 0.4563
+> 
+> Model Results:
+> 
+>             estimate      se     tval  df    pval    ci.lb   ci.ub
+> intrcpt      0.7746  0.1008   7.6856  25  <.0001   0.5670  0.9822  ***
+> DeviceMD     0.0898  0.1681   0.5343  25  0.5978  -0.2564  0.4361
+> DeviceN/A   -0.2275  0.2338  -0.9732  25  0.3398  -0.7091  0.2540
+> DeviceV/A    0.2968  0.2936   1.0107  25  0.3219  -0.3080  0.9015
+> 
+> intrcpt    = computer
+> 
+> DeviceMD   = mobile devices
+> 
+> DeviceN/A  = not available
+> 
+> DeviceV/A  = VR or AR devices
+> ---
+> 
+> and this is what I'm a little bit confused on. Can anyone help me clarify
+> whether my explanation is correct or wrong?
+> (1) the p-value under "*Test of moderators*" which is 0.4563, does this
+> mean that this moderator (device used) does not have a significant impact
+> on English vocabulary learning using digital game-based learning? (Since
+> the p-value here is larger than 0.05)
+
+Yes, that is what it implies.
+
+> (2) the p-value of "*intrcpt*" which is <.0001, does this mean that using
+> computers to learn English vocabulary still has a significant difference
+> among the four types of devices?
+> 
+
+No, that is the estimated value of the vocabulary score for the fourth 
+category of your moderator variable. It is unlikely that it has any 
+scientific value.
+
+Michael
+
+> ??? (Nick Chen)
+> Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+
+From wow99308008 @end|ng |rom gm@||@com  Sat Oct 28 16:48:54 2023
+From: wow99308008 @end|ng |rom gm@||@com (Nick Chen)
+Date: Sat, 28 Oct 2023 22:48:54 +0800
+Subject: [R-meta] About how to interpret the following P-value from the
+ result
+In-Reply-To: <a07f12c4-8067-41cf-99ca-2a62d3e4e129@dewey.myzen.co.uk>
+References: <CAPm5Ok0RbLV0vFC4TCx=Mv3jTkSxrYixQtFGkJ-SdAd-7Q=qwQ@mail.gmail.com>
+ <a07f12c4-8067-41cf-99ca-2a62d3e4e129@dewey.myzen.co.uk>
+Message-ID: <CAC_J9Nt3=Quztnt3MLzgDJEsp_wukGnRvFixow2X4ZRX0u9pTA@mail.gmail.com>
+
+Dear Micheal,
+
+     Thank you for the clarification. This has bugged me for quite a long
+time. Then one follow-up question, is there any test that can be done to
+show which of the element in the subgroup (here in this case, intercpt,
+DeviceMD, DeviceN/A, DeviceV/A) has significant difference than the others?
+
+Nick
+
+Michael Dewey via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>?
+2023?10?28? ?????8:38???
+
+> Dear Nick
+>
+> Comment in-line
+>
+> On 28/10/2023 10:08, ?????? via R-sig-meta-analysis wrote:
+> > I'm currently performing a meta-analysis on the relationship between
+> > "Digital game-based learning" and "English vocabulary acquisition". And
+> I'm
+> > using the random effect model for moderator analysis since the
+> > heterogeneity effect is quite high. The following is the code I use for
+> > performing the moderator analysis for one moderator in my dataset,
+> "device
+> > used":
+> >
+> >> mod.Device <- rma.mv(yi = y, V = v,+                        slab =
+> studyID, data = DG,+                        random = ~ 1 |
+> studyID/effectsizeID,+                        test = "t", method =
+> "REML",+                        mods = ~ Device)> mod.Device
+> >
+> > and here is the result:
+> >
+> >
+> >
+> > Multivariate Meta-Analysis Model (k = 29; method: REML)
+> >
+> > Variance Components:
+> >
+> >              estim    sqrt  nlvls  fixed                factor
+> > sigma^2.1  0.0663  0.2575     28     no               studyID
+> > sigma^2.2  0.0000  0.0000     29     no  studyID/effectsizeID
+> >
+> > Test for Residual Heterogeneity:
+> > QE(df = 25) = 44.8744, p-val = 0.0086
+> >
+> > Test of Moderators (coefficients 2:4):
+> > F(df1 = 3, df2 = 25) = 0.8975, p-val = 0.4563
+> >
+> > Model Results:
+> >
+> >             estimate      se     tval  df    pval    ci.lb   ci.ub
+> > intrcpt      0.7746  0.1008   7.6856  25  <.0001   0.5670  0.9822  ***
+> > DeviceMD     0.0898  0.1681   0.5343  25  0.5978  -0.2564  0.4361
+> > DeviceN/A   -0.2275  0.2338  -0.9732  25  0.3398  -0.7091  0.2540
+> > DeviceV/A    0.2968  0.2936   1.0107  25  0.3219  -0.3080  0.9015
+> >
+> > intrcpt    = computer
+> >
+> > DeviceMD   = mobile devices
+> >
+> > DeviceN/A  = not available
+> >
+> > DeviceV/A  = VR or AR devices
+> > ---
+> >
+> > and this is what I'm a little bit confused on. Can anyone help me clarify
+> > whether my explanation is correct or wrong?
+> > (1) the p-value under "*Test of moderators*" which is 0.4563, does this
+> > mean that this moderator (device used) does not have a significant impact
+> > on English vocabulary learning using digital game-based learning? (Since
+> > the p-value here is larger than 0.05)
+>
+> Yes, that is what it implies.
+>
+> > (2) the p-value of "*intrcpt*" which is <.0001, does this mean that using
+> > computers to learn English vocabulary still has a significant difference
+> > among the four types of devices?
+> >
+>
+> No, that is the estimated value of the vocabulary score for the fourth
+> category of your moderator variable. It is unlikely that it has any
+> scientific value.
+>
+> Michael
+>
+> > ??? (Nick Chen)
+> > Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+> --
+> Michael
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Sat Oct 28 17:20:46 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Sat, 28 Oct 2023 16:20:46 +0100
+Subject: [R-meta] About how to interpret the following P-value from the
+ result
+In-Reply-To: <CAC_J9Nt3=Quztnt3MLzgDJEsp_wukGnRvFixow2X4ZRX0u9pTA@mail.gmail.com>
+References: <CAPm5Ok0RbLV0vFC4TCx=Mv3jTkSxrYixQtFGkJ-SdAd-7Q=qwQ@mail.gmail.com>
+ <a07f12c4-8067-41cf-99ca-2a62d3e4e129@dewey.myzen.co.uk>
+ <CAC_J9Nt3=Quztnt3MLzgDJEsp_wukGnRvFixow2X4ZRX0u9pTA@mail.gmail.com>
+Message-ID: <8b43d811-38f7-2ac6-c5b1-743ecc6bf1c4@dewey.myzen.co.uk>
+
+Dear Nick
+
+The omnibus test for moderators has already told you that the hypothesis 
+that they are all equal cannot be rejected. If you go on to try to test 
+combinations of them for equality (which could include testing pairwise 
+differences) then you are likely to capitalise on chance and your 
+p-values and confidence intervals will not have their usual meaning.
+
+Having said that if you really, really want to do it look at the btt 
+parameter.
+
+Michael
+
+On 28/10/2023 15:48, Nick Chen via R-sig-meta-analysis wrote:
+> Dear Micheal,
+> 
+>       Thank you for the clarification. This has bugged me for quite a long
+> time. Then one follow-up question, is there any test that can be done to
+> show which of the element in the subgroup (here in this case, intercpt,
+> DeviceMD, DeviceN/A, DeviceV/A) has significant difference than the others?
+> 
+> Nick
+> 
+> Michael Dewey via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>?
+> 2023?10?28? ?????8:38???
+> 
+>> Dear Nick
+>>
+>> Comment in-line
+>>
+>> On 28/10/2023 10:08, ?????? via R-sig-meta-analysis wrote:
+>>> I'm currently performing a meta-analysis on the relationship between
+>>> "Digital game-based learning" and "English vocabulary acquisition". And
+>> I'm
+>>> using the random effect model for moderator analysis since the
+>>> heterogeneity effect is quite high. The following is the code I use for
+>>> performing the moderator analysis for one moderator in my dataset,
+>> "device
+>>> used":
+>>>
+>>>> mod.Device <- rma.mv(yi = y, V = v,+                        slab =
+>> studyID, data = DG,+                        random = ~ 1 |
+>> studyID/effectsizeID,+                        test = "t", method =
+>> "REML",+                        mods = ~ Device)> mod.Device
+>>>
+>>> and here is the result:
+>>>
+>>>
+>>>
+>>> Multivariate Meta-Analysis Model (k = 29; method: REML)
+>>>
+>>> Variance Components:
+>>>
+>>>               estim    sqrt  nlvls  fixed                factor
+>>> sigma^2.1  0.0663  0.2575     28     no               studyID
+>>> sigma^2.2  0.0000  0.0000     29     no  studyID/effectsizeID
+>>>
+>>> Test for Residual Heterogeneity:
+>>> QE(df = 25) = 44.8744, p-val = 0.0086
+>>>
+>>> Test of Moderators (coefficients 2:4):
+>>> F(df1 = 3, df2 = 25) = 0.8975, p-val = 0.4563
+>>>
+>>> Model Results:
+>>>
+>>>              estimate      se     tval  df    pval    ci.lb   ci.ub
+>>> intrcpt      0.7746  0.1008   7.6856  25  <.0001   0.5670  0.9822  ***
+>>> DeviceMD     0.0898  0.1681   0.5343  25  0.5978  -0.2564  0.4361
+>>> DeviceN/A   -0.2275  0.2338  -0.9732  25  0.3398  -0.7091  0.2540
+>>> DeviceV/A    0.2968  0.2936   1.0107  25  0.3219  -0.3080  0.9015
+>>>
+>>> intrcpt    = computer
+>>>
+>>> DeviceMD   = mobile devices
+>>>
+>>> DeviceN/A  = not available
+>>>
+>>> DeviceV/A  = VR or AR devices
+>>> ---
+>>>
+>>> and this is what I'm a little bit confused on. Can anyone help me clarify
+>>> whether my explanation is correct or wrong?
+>>> (1) the p-value under "*Test of moderators*" which is 0.4563, does this
+>>> mean that this moderator (device used) does not have a significant impact
+>>> on English vocabulary learning using digital game-based learning? (Since
+>>> the p-value here is larger than 0.05)
+>>
+>> Yes, that is what it implies.
+>>
+>>> (2) the p-value of "*intrcpt*" which is <.0001, does this mean that using
+>>> computers to learn English vocabulary still has a significant difference
+>>> among the four types of devices?
+>>>
+>>
+>> No, that is the estimated value of the vocabulary score for the fourth
+>> category of your moderator variable. It is unlikely that it has any
+>> scientific value.
+>>
+>> Michael
+>>
+>>> ??? (Nick Chen)
+>>> Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+>>>
+>>>        [[alternative HTML version deleted]]
+>>>
+>>> _______________________________________________
+>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>> To manage your subscription to this mailing list, go to:
+>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>
+>>
+>> --
+>> Michael
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+
+From x@|3111@deve|oper@ @end|ng |rom gm@||@com  Sun Oct 29 16:30:24 2023
+From: x@|3111@deve|oper@ @end|ng |rom gm@||@com (Andrzej Andrzej)
+Date: Sun, 29 Oct 2023 16:30:24 +0100
+Subject: [R-meta] "Favours experimental/vaccinated",
+ "Favours control" - Metafor
+Message-ID: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+
+Hi,
+
+I have a question about: "Favours experimental","Favours control" ?
+
+How do I do it correctly ?
+
+This is very easy for me to mix it up.
+
+https://www.metafor-project.org/doku.php/plots:forest_plot_bmj
+
+### add 'Favours control'/'Favours experimental' text below the x-axis
+text(c(-1,1), -2.5, c("Favors control","Favors experimental"), pos=c(4,2),
+offset=-0.3)
+
+How do I do it, that this is not the other way around, please ? And that my
+plot is correct and consistent with the data ?
+  As a beginner in metafor I am able to easily mix it up like this and now
+this is not reflecting the truth:
+
+text(c(-1,1), -2.5, c("Favours experimental", "Favours control"),
+pos=c(4,2), offset=-0.3)
+How do I know which way is correct ? In other words how do I know where to
+place "Favours experimental" or "Favours Vaccinated" when I use bcg data,
+left or right from 0 ?
+ I have done metafor::reporter(res) but still no clues in which
+direction/favour are the results/labels should be placed ?
+
+Is it possible to tweak reporter() function to show it ?
+
+
+Thank you very much in advance.
+regards,
+Andrzej
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Sun Oct 29 17:15:19 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Sun, 29 Oct 2023 16:15:19 +0000
+Subject: [R-meta] "Favours experimental/vaccinated",
+ "Favours control" - Metafor
+In-Reply-To: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+References: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+Message-ID: <17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>
+
+Dear Andrzej
+
+Comment in line
+
+On 29/10/2023 15:30, Andrzej Andrzej via R-sig-meta-analysis wrote:
+> Hi,
+> 
+> I have a question about: "Favours experimental","Favours control" ?
+> 
+> How do I do it correctly ?
+> 
+> This is very easy for me to mix it up.
+> 
+> https://www.metafor-project.org/doku.php/plots:forest_plot_bmj
+> 
+> ### add 'Favours control'/'Favours experimental' text below the x-axis
+> text(c(-1,1), -2.5, c("Favors control","Favors experimental"), pos=c(4,2),
+> offset=-0.3)
+> 
+> How do I do it, that this is not the other way around, please ? And that my
+> plot is correct and consistent with the data ?
+
+Do you mean whether to type   c("Favors control","Favors experimental") 
+or  c("Favors experimental", "Favors control")?
+
+If so the answer is that when you computed the effect size you knew 
+whetheh high values favoured experimental and so would be on the right 
+of the plot (the first option) or vice versa.
+
+Michael
+
+
+
+>    As a beginner in metafor I am able to easily mix it up like this and now
+> this is not reflecting the truth:
+> 
+> text(c(-1,1), -2.5, c("Favours experimental", "Favours control"),
+> pos=c(4,2), offset=-0.3)
+> How do I know which way is correct ? In other words how do I know where to
+> place "Favours experimental" or "Favours Vaccinated" when I use bcg data,
+> left or right from 0 ?
+>   I have done metafor::reporter(res) but still no clues in which
+> direction/favour are the results/labels should be placed ?
+> 
+> Is it possible to tweak reporter() function to show it ?
+> 
+> 
+> Thank you very much in advance.
+> regards,
+> Andrzej
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+
+From x@|3111@deve|oper@ @end|ng |rom gm@||@com  Sun Oct 29 18:24:49 2023
+From: x@|3111@deve|oper@ @end|ng |rom gm@||@com (Andrzej Andrzej)
+Date: Sun, 29 Oct 2023 18:24:49 +0100
+Subject: [R-meta] "Favours experimental/vaccinated",
+ "Favours control" - Metafor
+In-Reply-To: <17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>
+References: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+ <17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>
+Message-ID: <CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>
+
+Thank you Michael,
+Yes, I do not know how to quote here, but I try:
+1. "Do you mean whether to type   c("Favors control","Favors experimental")
+or  c("Favors experimental", "Favors control")?"
+Yes, exactly I do mean that.
+
+
+2. "If so the answer is that when you computed the effect size you knew
+whetheh high values favoured experimental and so would be on the right
+of the plot (the first option) or vice versa"
+Could you please guide me with explanation based on this code and WV data,
+please:
+https://wviechtb.github.io/metadat/reference/dat.bcg.html
+
+library(metafor)
+data(dat.bcg)
+dat <- dat.bcg
+
+### calculate log risk ratios and corresponding sampling variances
+dat <- escalc(measure="RR", ai=tpos, bi=tneg,
+                            ci=cpos, di=cneg, data=dat,
+                            slab=paste0(author, ", ", year))
+### random-effects model
+res <- rma(yi, vi, data=dat)
+forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade="zebra",
+       ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5,-8,-6,-4.5),
+       cex=0.75, header="Author(s) and Year")
+text(c(-9.5,-8,-6,-4.5), res$k+2, c("TB+", "TB-", "TB+", "TB-"), cex=0.75,
+font=2)
+text(c(-8.75,-5.25),     res$k+3, c("Vaccinated", "Control"),    cex=0.75,
+font=2)
+
+3. "whetheh high values favoured experimental and so would be on the right
+of the plot (the first option) or vice versa"
+Could you please explain using that forest plot and bcg.data, where are
+those higher values (in which group) so how should I label Log Risk Ratio X
+axis according to RevMan 5 style with " Favours control" and "Favours
+vaccinated" ? I want to understand which way is correct, please.
+best regards,
+Andrzej
+
+niedz., 29 pa? 2023 o 17:15 Michael Dewey <lists at dewey.myzen.co.uk>
+napisa?(a):
+
+> Dear Andrzej
+>
+> Comment in line
+>
+> On 29/10/2023 15:30, Andrzej Andrzej via R-sig-meta-analysis wrote:
+> > Hi,
+> >
+> > I have a question about: "Favours experimental","Favours control" ?
+> >
+> > How do I do it correctly ?
+> >
+> > This is very easy for me to mix it up.
+> >
+> > https://www.metafor-project.org/doku.php/plots:forest_plot_bmj
+> >
+> > ### add 'Favours control'/'Favours experimental' text below the x-axis
+> > text(c(-1,1), -2.5, c("Favors control","Favors experimental"),
+> pos=c(4,2),
+> > offset=-0.3)
+> >
+> > How do I do it, that this is not the other way around, please ? And that
+> my
+> > plot is correct and consistent with the data ?
+>
+> Do you mean whether to type   c("Favors control","Favors experimental")
+> or  c("Favors experimental", "Favors control")?
+>
+> If so the answer is that when you computed the effect size you knew
+> whetheh high values favoured experimental and so would be on the right
+> of the plot (the first option) or vice versa.
+>
+> Michael
+>
+>
+>
+> >    As a beginner in metafor I am able to easily mix it up like this and
+> now
+> > this is not reflecting the truth:
+> >
+> > text(c(-1,1), -2.5, c("Favours experimental", "Favours control"),
+> > pos=c(4,2), offset=-0.3)
+> > How do I know which way is correct ? In other words how do I know where
+> to
+> > place "Favours experimental" or "Favours Vaccinated" when I use bcg data,
+> > left or right from 0 ?
+> >   I have done metafor::reporter(res) but still no clues in which
+> > direction/favour are the results/labels should be placed ?
+> >
+> > Is it possible to tweak reporter() function to show it ?
+> >
+> >
+> > Thank you very much in advance.
+> > regards,
+> > Andrzej
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+> --
+> Michael
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Oct 30 15:45:57 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 30 Oct 2023 14:45:57 +0000
+Subject: [R-meta] "Favours experimental/vaccinated",
+ "Favours control" - Metafor
+In-Reply-To: <CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>
+References: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+ <17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>
+ <CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>
+Message-ID: <AS8PR08MB9193417B71E44FBD8243AC1F8BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Andrzej,
+
+In this example, the 2x2 table is of the form as shown here:
+
+https://wviechtb.github.io/metadat/reference/dat.bcg.html#details-1
+
+Since a low 'TB positive' count is desirable, a negative log risk ratio therefore indicates that the results of a study favor the vaccinated group.
+
+But one could just as well have computed the log risk ratios with:
+
+dat <- escalc(measure="RR", ai=cpos, bi=cneg,
+                            ci=tpos, ti=tneg, data=dat)
+
+In this case, a positive log risk ratio would indicate that the results favor the vaccinated group.
+
+So, one really has to understand what is being computed and whether positive or negative values indicate which group is being favored.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Andrzej Andrzej via R-sig-meta-analysis
+> Sent: Sunday, October 29, 2023 18:25
+> To: Michael Dewey <lists at dewey.myzen.co.uk>
+> Cc: Andrzej Andrzej <xaf3111.developers at gmail.com>; R Special Interest Group for
+> Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> Subject: Re: [R-meta] "Favours experimental/vaccinated", "Favours control" -
+> Metafor
+>
+> Thank you Michael,
+> Yes, I do not know how to quote here, but I try:
+> 1. "Do you mean whether to type   c("Favors control","Favors experimental")
+> or  c("Favors experimental", "Favors control")?"
+> Yes, exactly I do mean that.
+>
+> 2. "If so the answer is that when you computed the effect size you knew
+> whetheh high values favoured experimental and so would be on the right
+> of the plot (the first option) or vice versa"
+> Could you please guide me with explanation based on this code and WV data,
+> please:
+> https://wviechtb.github.io/metadat/reference/dat.bcg.html
+>
+> library(metafor)
+> data(dat.bcg)
+> dat <- dat.bcg
+>
+> ### calculate log risk ratios and corresponding sampling variances
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg,
+>                             ci=cpos, di=cneg, data=dat,
+>                             slab=paste0(author, ", ", year))
+> ### random-effects model
+> res <- rma(yi, vi, data=dat)
+> forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade="zebra",
+>        ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5,-8,-6,-4.5),
+>        cex=0.75, header="Author(s) and Year")
+> text(c(-9.5,-8,-6,-4.5), res$k+2, c("TB+", "TB-", "TB+", "TB-"), cex=0.75,
+> font=2)
+> text(c(-8.75,-5.25),     res$k+3, c("Vaccinated", "Control"),    cex=0.75,
+> font=2)
+>
+> 3. "whetheh high values favoured experimental and so would be on the right
+> of the plot (the first option) or vice versa"
+> Could you please explain using that forest plot and bcg.data, where are
+> those higher values (in which group) so how should I label Log Risk Ratio X
+> axis according to RevMan 5 style with " Favours control" and "Favours
+> vaccinated" ? I want to understand which way is correct, please.
+> best regards,
+> Andrzej
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Mon Oct 30 15:47:18 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 30 Oct 2023 14:47:18 +0000
+Subject: [R-meta] "Favours experimental/vaccinated",
+ "Favours control" - Metafor
+In-Reply-To: <CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>
+References: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+ <17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>
+ <CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>
+Message-ID: <75ff8870-98c4-03fc-e4c2-3b5771711fad@dewey.myzen.co.uk>
+
+I am sorry Andrzej but I really cannot think of anything which I would 
+add to my explanation of how it works. When you look at the BCG data can 
+you not see which direction the effect is going by examining tpos, tneg, 
+cpos and cneg?
+
+Michael
+
+On 29/10/2023 17:24, Andrzej Andrzej wrote:
+> Thank you Michael,
+> Yes, I do not know how to quote here, but I try:
+> 1. "Do you mean whether to type? ?c("Favors control","Favors experimental")
+> or? c("Favors experimental", "Favors control")?"
+> Yes, exactly I do mean that.
+> 
+> 
+> 2. "If so the answer is that when you computed the effect size you knew
+> whetheh high values favoured experimental and so would be on the right
+> of the plot (the first option) or vice versa"
+> Could you please guide me with explanation based on this code and WV 
+> data, please:
+> https://wviechtb.github.io/metadat/reference/dat.bcg.html 
+> <https://wviechtb.github.io/metadat/reference/dat.bcg.html>
+> 
+> library(metafor)
+> data(dat.bcg)
+> dat <- dat.bcg
+> 
+> ### calculate log risk ratios and corresponding sampling variances
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg,
+>  ? ? ? ? ? ? ? ? ? ? ? ? ? ? ci=cpos, di=cneg, data=dat,
+>  ? ? ? ? ? ? ? ? ? ? ? ? ? ? slab=paste0(author, ", ", year))
+> ### random-effects model
+> res <- rma(yi, vi, data=dat)
+> forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade="zebra",
+>  ? ? ? ?ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5,-8,-6,-4.5),
+>  ? ? ? ?cex=0.75, header="Author(s) and Year")
+> text(c(-9.5,-8,-6,-4.5), res$k+2, c("TB+", "TB-", "TB+", "TB-"), 
+> cex=0.75, font=2)
+> text(c(-8.75,-5.25), ? ? res$k+3, c("Vaccinated", "Control"),   
+>  ?cex=0.75, font=2)
+> 
+> 3. "whetheh high values favoured experimental and so would be on the right
+> of the plot (the first option) or vice versa"
+> Could you please explain using that forest plot and bcg.data, where are 
+> those higher values (in which group) so how should I label Log Risk 
+> Ratio X axis according to RevMan 5 style with " Favours control" and 
+> "Favours vaccinated" ? I want to understand which way is correct, please.
+> best regards,
+> Andrzej
+> 
+> niedz., 29 pa? 2023 o 17:15?Michael Dewey <lists at dewey.myzen.co.uk 
+> <mailto:lists at dewey.myzen.co.uk>> napisa?(a):
+> 
+>     Dear Andrzej
+> 
+>     Comment in line
+> 
+>     On 29/10/2023 15:30, Andrzej Andrzej via R-sig-meta-analysis wrote:
+>      > Hi,
+>      >
+>      > I have a question about: "Favours experimental","Favours control" ?
+>      >
+>      > How do I do it correctly ?
+>      >
+>      > This is very easy for me to mix it up.
+>      >
+>      > https://www.metafor-project.org/doku.php/plots:forest_plot_bmj
+>     <https://www.metafor-project.org/doku.php/plots:forest_plot_bmj>
+>      >
+>      > ### add 'Favours control'/'Favours experimental' text below the
+>     x-axis
+>      > text(c(-1,1), -2.5, c("Favors control","Favors experimental"),
+>     pos=c(4,2),
+>      > offset=-0.3)
+>      >
+>      > How do I do it, that this is not the other way around, please ?
+>     And that my
+>      > plot is correct and consistent with the data ?
+> 
+>     Do you mean whether to type? ?c("Favors control","Favors experimental")
+>     or? c("Favors experimental", "Favors control")?
+> 
+>     If so the answer is that when you computed the effect size you knew
+>     whetheh high values favoured experimental and so would be on the right
+>     of the plot (the first option) or vice versa.
+> 
+>     Michael
+> 
+> 
+> 
+>      >? ? As a beginner in metafor I am able to easily mix it up like
+>     this and now
+>      > this is not reflecting the truth:
+>      >
+>      > text(c(-1,1), -2.5, c("Favours experimental", "Favours control"),
+>      > pos=c(4,2), offset=-0.3)
+>      > How do I know which way is correct ? In other words how do I know
+>     where to
+>      > place "Favours experimental" or "Favours Vaccinated" when I use
+>     bcg data,
+>      > left or right from 0 ?
+>      >? ?I have done metafor::reporter(res) but still no clues in which
+>      > direction/favour are the results/labels should be placed ?
+>      >
+>      > Is it possible to tweak reporter() function to show it ?
+>      >
+>      >
+>      > Thank you very much in advance.
+>      > regards,
+>      > Andrzej
+>      >
+>      >? ? ? ?[[alternative HTML version deleted]]
+>      >
+>      > _______________________________________________
+>      > R-sig-meta-analysis mailing list @
+>     R-sig-meta-analysis at r-project.org
+>     <mailto:R-sig-meta-analysis at r-project.org>
+>      > To manage your subscription to this mailing list, go to:
+>      > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>     <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+>      >
+> 
+>     -- 
+>     Michael
+> 
+> 
+> <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>	Virus-free.www.avg.com <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>
+> 
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+
+-- 
+Michael
+
+
+From x@|3111@deve|oper@ @end|ng |rom gm@||@com  Mon Oct 30 17:09:26 2023
+From: x@|3111@deve|oper@ @end|ng |rom gm@||@com (Andrzej Andrzej)
+Date: Mon, 30 Oct 2023 17:09:26 +0100
+Subject: [R-meta] "Favours experimental/vaccinated",
+ "Favours control" - Metafor
+In-Reply-To: <AS8PR08MB9193417B71E44FBD8243AC1F8BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+ <17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>
+ <CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>
+ <AS8PR08MB9193417B71E44FBD8243AC1F8BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <CAKeUzcVpYJ5+DjZN3krTz=13aLUdq5KYVPvEqvu8Vh7u-LPw4g@mail.gmail.com>
+
+Dear Wolfgang,
+Thank you for your kind reply.
+How is that ?
+1. "Since a low 'TB positive' count is desirable, a negative log risk ratio
+therefore indicates that the results of a study favor the vaccinated group."
+This is perfectly clear to me, but this next one, I quote:
+2. "In this case, a positive log risk ratio would indicate that the results
+favor the vaccinated group."
+Whether log(RR) is negative or positive, the vaccinated group is favoured
+anyway ?
+I do not understand this, please clarify.
+best,
+Andrzej
+
+pon., 30 pa? 2023 o 15:46 Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> napisa?(a):
+
+> Dear Andrzej,
+>
+> In this example, the 2x2 table is of the form as shown here:
+>
+> https://wviechtb.github.io/metadat/reference/dat.bcg.html#details-1
+>
+> Since a low 'TB positive' count is desirable, a negative log risk ratio
+> therefore indicates that the results of a study favor the vaccinated group.
+>
+> But one could just as well have computed the log risk ratios with:
+>
+> dat <- escalc(measure="RR", ai=cpos, bi=cneg,
+>                             ci=tpos, ti=tneg, data=dat)
+>
+> In this case, a positive log risk ratio would indicate that the results
+> favor the vaccinated group.
+>
+> So, one really has to understand what is being computed and whether
+> positive or negative values indicate which group is being favored.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Andrzej Andrzej via R-sig-meta-analysis
+> > Sent: Sunday, October 29, 2023 18:25
+> > To: Michael Dewey <lists at dewey.myzen.co.uk>
+> > Cc: Andrzej Andrzej <xaf3111.developers at gmail.com>; R Special Interest
+> Group for
+> > Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> > Subject: Re: [R-meta] "Favours experimental/vaccinated", "Favours
+> control" -
+> > Metafor
+> >
+> > Thank you Michael,
+> > Yes, I do not know how to quote here, but I try:
+> > 1. "Do you mean whether to type   c("Favors control","Favors
+> experimental")
+> > or  c("Favors experimental", "Favors control")?"
+> > Yes, exactly I do mean that.
+> >
+> > 2. "If so the answer is that when you computed the effect size you knew
+> > whetheh high values favoured experimental and so would be on the right
+> > of the plot (the first option) or vice versa"
+> > Could you please guide me with explanation based on this code and WV
+> data,
+> > please:
+> > https://wviechtb.github.io/metadat/reference/dat.bcg.html
+> >
+> > library(metafor)
+> > data(dat.bcg)
+> > dat <- dat.bcg
+> >
+> > ### calculate log risk ratios and corresponding sampling variances
+> > dat <- escalc(measure="RR", ai=tpos, bi=tneg,
+> >                             ci=cpos, di=cneg, data=dat,
+> >                             slab=paste0(author, ", ", year))
+> > ### random-effects model
+> > res <- rma(yi, vi, data=dat)
+> > forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1),
+> shade="zebra",
+> >        ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5,-8,-6,-4.5),
+> >        cex=0.75, header="Author(s) and Year")
+> > text(c(-9.5,-8,-6,-4.5), res$k+2, c("TB+", "TB-", "TB+", "TB-"),
+> cex=0.75,
+> > font=2)
+> > text(c(-8.75,-5.25),     res$k+3, c("Vaccinated", "Control"),
+> cex=0.75,
+> > font=2)
+> >
+> > 3. "whetheh high values favoured experimental and so would be on the
+> right
+> > of the plot (the first option) or vice versa"
+> > Could you please explain using that forest plot and bcg.data, where are
+> > those higher values (in which group) so how should I label Log Risk
+> Ratio X
+> > axis according to RevMan 5 style with " Favours control" and "Favours
+> > vaccinated" ? I want to understand which way is correct, please.
+> > best regards,
+> > Andrzej
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Oct 30 18:25:47 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 30 Oct 2023 17:25:47 +0000
+Subject: [R-meta] "Favours experimental/vaccinated",
+ "Favours control" - Metafor
+In-Reply-To: <CAKeUzcVpYJ5+DjZN3krTz=13aLUdq5KYVPvEqvu8Vh7u-LPw4g@mail.gmail.com>
+References: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+ <17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>
+ <CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>
+ <AS8PR08MB9193417B71E44FBD8243AC1F8BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAKeUzcVpYJ5+DjZN3krTz=13aLUdq5KYVPvEqvu8Vh7u-LPw4g@mail.gmail.com>
+Message-ID: <AS8PR08MB9193D763071968BFB9B191C78BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+At this point, I would like to turn around the question:
+
+How do you think a log risk ratio is computed in a table of the form:
+
+          Outcome 1   Outcome 2
+Group 1   a           b
+Group 2   c           d
+
+where a, b, c, and d are the counts for the respective cells?
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Andrzej Andrzej <xaf3111.developers at gmail.com>
+> Sent: Monday, October 30, 2023 17:09
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Subject: Re: [R-meta] "Favours experimental/vaccinated", "Favours control" -
+> Metafor
+>
+> Dear Wolfgang,
+> Thank you for your kind reply.
+> How is that ?
+> 1. "Since a low 'TB positive' count is desirable, a negative log risk ratio
+> therefore indicates that the results of a study favor the vaccinated group."
+> This is perfectly clear to me, but this next one, I quote:
+> 2. "In this case, a positive log risk ratio would indicate that the results
+> favor the vaccinated group."
+> Whether log(RR) is negative or positive, the vaccinated group is favoured anyway
+> ?
+> I do not understand this, please clarify.
+> best,
+> Andrzej
+>
+> pon., 30 pa? 2023 o 15:46 Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> napisa?(a):
+> Dear Andrzej,
+>
+> In this example, the 2x2 table is of the form as shown here:
+>
+> https://wviechtb.github.io/metadat/reference/dat.bcg.html#details-1
+>
+> Since a low 'TB positive' count is desirable, a negative log risk ratio
+> therefore indicates that the results of a study favor the vaccinated group.
+>
+> But one could just as well have computed the log risk ratios with:
+>
+> dat <- escalc(measure="RR", ai=cpos, bi=cneg,
+>                             ci=tpos, ti=tneg, data=dat)
+>
+> In this case, a positive log risk ratio would indicate that the results favor
+> the vaccinated group.
+>
+> So, one really has to understand what is being computed and whether positive or
+> negative values indicate which group is being favored.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Andrzej Andrzej via R-sig-meta-analysis
+> > Sent: Sunday, October 29, 2023 18:25
+> > To: Michael Dewey <mailto:lists at dewey.myzen.co.uk>
+> > Cc: Andrzej Andrzej <mailto:xaf3111.developers at gmail.com>; R Special Interest
+> Group for
+> > Meta-Analysis <mailto:r-sig-meta-analysis at r-project.org>
+> > Subject: Re: [R-meta] "Favours experimental/vaccinated", "Favours control" -
+> > Metafor
+> >
+> > Thank you Michael,
+> > Yes, I do not know how to quote here, but I try:
+> > 1. "Do you mean whether to type   c("Favors control","Favors experimental")
+> > or  c("Favors experimental", "Favors control")?"
+> > Yes, exactly I do mean that.
+> >
+> > 2. "If so the answer is that when you computed the effect size you knew
+> > whetheh high values favoured experimental and so would be on the right
+> > of the plot (the first option) or vice versa"
+> > Could you please guide me with explanation based on this code and WV data,
+> > please:
+> > https://wviechtb.github.io/metadat/reference/dat.bcg.html
+> >
+> > library(metafor)
+> > data(dat.bcg)
+> > dat <- dat.bcg
+> >
+> > ### calculate log risk ratios and corresponding sampling variances
+> > dat <- escalc(measure="RR", ai=tpos, bi=tneg,
+> >                             ci=cpos, di=cneg, data=dat,
+> >                             slab=paste0(author, ", ", year))
+> > ### random-effects model
+> > res <- rma(yi, vi, data=dat)
+> > forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade="zebra",
+> >        ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5,-8,-6,-4.5),
+> >        cex=0.75, header="Author(s) and Year")
+> > text(c(-9.5,-8,-6,-4.5), res$k+2, c("TB+", "TB-", "TB+", "TB-"), cex=0.75,
+> > font=2)
+> > text(c(-8.75,-5.25),     res$k+3, c("Vaccinated", "Control"),    cex=0.75,
+> > font=2)
+> >
+> > 3. "whetheh high values favoured experimental and so would be on the right
+> > of the plot (the first option) or vice versa"
+> > Could you please explain using that forest plot and bcg.data, where are
+> > those higher values (in which group) so how should I label Log Risk Ratio X
+> > axis according to RevMan 5 style with " Favours control" and "Favours
+> > vaccinated" ? I want to understand which way is correct, please.
+> > best regards,
+> > Andrzej
+
+From x@|3111@deve|oper@ @end|ng |rom gm@||@com  Mon Oct 30 18:57:52 2023
+From: x@|3111@deve|oper@ @end|ng |rom gm@||@com (Andrzej Andrzej)
+Date: Mon, 30 Oct 2023 18:57:52 +0100
+Subject: [R-meta] "Favours experimental/vaccinated",
+ "Favours control" - Metafor
+In-Reply-To: <AS8PR08MB9193D763071968BFB9B191C78BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+ <17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>
+ <CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>
+ <AS8PR08MB9193417B71E44FBD8243AC1F8BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAKeUzcVpYJ5+DjZN3krTz=13aLUdq5KYVPvEqvu8Vh7u-LPw4g@mail.gmail.com>
+ <AS8PR08MB9193D763071968BFB9B191C78BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <CAKeUzcVTbphL_zqZPgEE0UoS38W+c8=fPVXCPDtpP8onoWutKg@mail.gmail.com>
+
+Here is the code for it:
+log_rr <- log((a/b)/(c/d))
+
+kind regards,
+Andrzej
+
+pon., 30 pa? 2023 o 18:26 Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> napisa?(a):
+
+> At this point, I would like to turn around the question:
+>
+> How do you think a log risk ratio is computed in a table of the form:
+>
+>           Outcome 1   Outcome 2
+> Group 1   a           b
+> Group 2   c           d
+>
+> where a, b, c, and d are the counts for the respective cells?
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Andrzej Andrzej <xaf3111.developers at gmail.com>
+> > Sent: Monday, October 30, 2023 17:09
+> > To: Viechtbauer, Wolfgang (NP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> > project.org>
+> > Subject: Re: [R-meta] "Favours experimental/vaccinated", "Favours
+> control" -
+> > Metafor
+> >
+> > Dear Wolfgang,
+> > Thank you for your kind reply.
+> > How is that ?
+> > 1. "Since a low 'TB positive' count is desirable, a negative log risk
+> ratio
+> > therefore indicates that the results of a study favor the vaccinated
+> group."
+> > This is perfectly clear to me, but this next one, I quote:
+> > 2. "In this case, a positive log risk ratio would indicate that the
+> results
+> > favor the vaccinated group."
+> > Whether log(RR) is negative or positive, the vaccinated group is
+> favoured anyway
+> > ?
+> > I do not understand this, please clarify.
+> > best,
+> > Andrzej
+> >
+> > pon., 30 pa? 2023 o 15:46 Viechtbauer, Wolfgang (NP)
+> > <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> napisa?(a):
+> > Dear Andrzej,
+> >
+> > In this example, the 2x2 table is of the form as shown here:
+> >
+> > https://wviechtb.github.io/metadat/reference/dat.bcg.html#details-1
+> >
+> > Since a low 'TB positive' count is desirable, a negative log risk ratio
+> > therefore indicates that the results of a study favor the vaccinated
+> group.
+> >
+> > But one could just as well have computed the log risk ratios with:
+> >
+> > dat <- escalc(measure="RR", ai=cpos, bi=cneg,
+> >                             ci=tpos, ti=tneg, data=dat)
+> >
+> > In this case, a positive log risk ratio would indicate that the results
+> favor
+> > the vaccinated group.
+> >
+> > So, one really has to understand what is being computed and whether
+> positive or
+> > negative values indicate which group is being favored.
+> >
+> > Best,
+> > Wolfgang
+> >
+> > > -----Original Message-----
+> > > From: R-sig-meta-analysis <mailto:
+> r-sig-meta-analysis-bounces at r-project.org>
+> > On Behalf
+> > > Of Andrzej Andrzej via R-sig-meta-analysis
+> > > Sent: Sunday, October 29, 2023 18:25
+> > > To: Michael Dewey <mailto:lists at dewey.myzen.co.uk>
+> > > Cc: Andrzej Andrzej <mailto:xaf3111.developers at gmail.com>; R Special
+> Interest
+> > Group for
+> > > Meta-Analysis <mailto:r-sig-meta-analysis at r-project.org>
+> > > Subject: Re: [R-meta] "Favours experimental/vaccinated", "Favours
+> control" -
+> > > Metafor
+> > >
+> > > Thank you Michael,
+> > > Yes, I do not know how to quote here, but I try:
+> > > 1. "Do you mean whether to type   c("Favors control","Favors
+> experimental")
+> > > or  c("Favors experimental", "Favors control")?"
+> > > Yes, exactly I do mean that.
+> > >
+> > > 2. "If so the answer is that when you computed the effect size you knew
+> > > whetheh high values favoured experimental and so would be on the right
+> > > of the plot (the first option) or vice versa"
+> > > Could you please guide me with explanation based on this code and WV
+> data,
+> > > please:
+> > > https://wviechtb.github.io/metadat/reference/dat.bcg.html
+> > >
+> > > library(metafor)
+> > > data(dat.bcg)
+> > > dat <- dat.bcg
+> > >
+> > > ### calculate log risk ratios and corresponding sampling variances
+> > > dat <- escalc(measure="RR", ai=tpos, bi=tneg,
+> > >                             ci=cpos, di=cneg, data=dat,
+> > >                             slab=paste0(author, ", ", year))
+> > > ### random-effects model
+> > > res <- rma(yi, vi, data=dat)
+> > > forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1),
+> shade="zebra",
+> > >        ilab=cbind(tpos, tneg, cpos, cneg),
+> ilab.xpos=c(-9.5,-8,-6,-4.5),
+> > >        cex=0.75, header="Author(s) and Year")
+> > > text(c(-9.5,-8,-6,-4.5), res$k+2, c("TB+", "TB-", "TB+", "TB-"),
+> cex=0.75,
+> > > font=2)
+> > > text(c(-8.75,-5.25),     res$k+3, c("Vaccinated", "Control"),
+> cex=0.75,
+> > > font=2)
+> > >
+> > > 3. "whetheh high values favoured experimental and so would be on the
+> right
+> > > of the plot (the first option) or vice versa"
+> > > Could you please explain using that forest plot and bcg.data, where are
+> > > those higher values (in which group) so how should I label Log Risk
+> Ratio X
+> > > axis according to RevMan 5 style with " Favours control" and "Favours
+> > > vaccinated" ? I want to understand which way is correct, please.
+> > > best regards,
+> > > Andrzej
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Oct 30 19:06:17 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 30 Oct 2023 18:06:17 +0000
+Subject: [R-meta] "Favours experimental/vaccinated",
+ "Favours control" - Metafor
+In-Reply-To: <CAKeUzcVTbphL_zqZPgEE0UoS38W+c8=fPVXCPDtpP8onoWutKg@mail.gmail.com>
+References: <CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>
+ <17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>
+ <CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>
+ <AS8PR08MB9193417B71E44FBD8243AC1F8BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAKeUzcVpYJ5+DjZN3krTz=13aLUdq5KYVPvEqvu8Vh7u-LPw4g@mail.gmail.com>
+ <AS8PR08MB9193D763071968BFB9B191C78BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CAKeUzcVTbphL_zqZPgEE0UoS38W+c8=fPVXCPDtpP8onoWutKg@mail.gmail.com>
+Message-ID: <AS8PR08MB9193C75C517720A2477E671A8BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+That would give you the log odds ratio, not risk ratio.
+
+But to shortcut the next 4-5 messages going back and forth:
+
+Once you have figured out the correct equation for the log risk ratio, then start replacing Group 1 and Group 2 and Outcome 1 and Outcome 2 with the appropriate values from the BCG dataset (or whatever dataset you are working with).
+
+Then think about what a positive value for log(RR) would imply about the probability of Outcome 1 in Group 1 relative to that of Group 2.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Andrzej Andrzej <xaf3111.developers at gmail.com>
+> Sent: Monday, October 30, 2023 18:58
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Subject: Re: [R-meta] "Favours experimental/vaccinated", "Favours control" -
+> Metafor
+>
+> Here is the code for it:
+> log_rr <- log((a/b)/(c/d))
+> kind regards,
+> Andrzej
+>
+> pon., 30 pa? 2023 o 18:26 Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> napisa?(a):
+> At this point, I would like to turn around the question:
+>
+> How do you think a log risk ratio is computed in a table of the form:
+>
+>           Outcome 1   Outcome 2
+> Group 1   a           b
+> Group 2   c           d
+>
+> where a, b, c, and d are the counts for the respective cells?
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Andrzej Andrzej <mailto:xaf3111.developers at gmail.com>
+> > Sent: Monday, October 30, 2023 17:09
+> > To: Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> > http://project.org>
+> > Subject: Re: [R-meta] "Favours experimental/vaccinated", "Favours control" -
+> > Metafor
+> >
+> > Dear Wolfgang,
+> > Thank you for your kind reply.
+> > How is that ?
+> > 1. "Since a low 'TB positive' count is desirable, a negative log risk ratio
+> > therefore indicates that the results of a study favor the vaccinated group."
+> > This is perfectly clear to me, but this next one, I quote:
+> > 2. "In this case, a positive log risk ratio would indicate that the results
+> > favor the vaccinated group."
+> > Whether log(RR) is negative or positive, the vaccinated group is favoured
+> anyway
+> > ?
+> > I do not understand this, please clarify.
+> > best,
+> > Andrzej
+> >
+> > pon., 30 pa? 2023 o 15:46 Viechtbauer, Wolfgang (NP)
+> > <mailto:mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> napisa?(a):
+> > Dear Andrzej,
+> >
+> > In this example, the 2x2 table is of the form as shown here:
+> >
+> > https://wviechtb.github.io/metadat/reference/dat.bcg.html#details-1
+> >
+> > Since a low 'TB positive' count is desirable, a negative log risk ratio
+> > therefore indicates that the results of a study favor the vaccinated group.
+> >
+> > But one could just as well have computed the log risk ratios with:
+> >
+> > dat <- escalc(measure="RR", ai=cpos, bi=cneg,
+> >                             ci=tpos, ti=tneg, data=dat)
+> >
+> > In this case, a positive log risk ratio would indicate that the results favor
+> > the vaccinated group.
+> >
+> > So, one really has to understand what is being computed and whether positive
+> or
+> > negative values indicate which group is being favored.
+> >
+> > Best,
+> > Wolfgang
+> >
+> > > -----Original Message-----
+> > > From: R-sig-meta-analysis <mailto:mailto:r-sig-meta-analysis-bounces at r-
+> project.org>
+> > On Behalf
+> > > Of Andrzej Andrzej via R-sig-meta-analysis
+> > > Sent: Sunday, October 29, 2023 18:25
+> > > To: Michael Dewey <mailto:mailto:lists at dewey.myzen.co.uk>
+> > > Cc: Andrzej Andrzej <mailto:mailto:xaf3111.developers at gmail.com>; R Special
+> Interest
+> > Group for
+> > > Meta-Analysis <mailto:mailto:r-sig-meta-analysis at r-project.org>
+> > > Subject: Re: [R-meta] "Favours experimental/vaccinated", "Favours control" -
+> > > Metafor
+> > >
+> > > Thank you Michael,
+> > > Yes, I do not know how to quote here, but I try:
+> > > 1. "Do you mean whether to type   c("Favors control","Favors experimental")
+> > > or  c("Favors experimental", "Favors control")?"
+> > > Yes, exactly I do mean that.
+> > >
+> > > 2. "If so the answer is that when you computed the effect size you knew
+> > > whetheh high values favoured experimental and so would be on the right
+> > > of the plot (the first option) or vice versa"
+> > > Could you please guide me with explanation based on this code and WV data,
+> > > please:
+> > > https://wviechtb.github.io/metadat/reference/dat.bcg.html
+> > >
+> > > library(metafor)
+> > > data(dat.bcg)
+> > > dat <- dat.bcg
+> > >
+> > > ### calculate log risk ratios and corresponding sampling variances
+> > > dat <- escalc(measure="RR", ai=tpos, bi=tneg,
+> > >                             ci=cpos, di=cneg, data=dat,
+> > >                             slab=paste0(author, ", ", year))
+> > > ### random-effects model
+> > > res <- rma(yi, vi, data=dat)
+> > > forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade="zebra",
+> > >        ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5,-8,-6,-4.5),
+> > >        cex=0.75, header="Author(s) and Year")
+> > > text(c(-9.5,-8,-6,-4.5), res$k+2, c("TB+", "TB-", "TB+", "TB-"), cex=0.75,
+> > > font=2)
+> > > text(c(-8.75,-5.25),     res$k+3, c("Vaccinated", "Control"),    cex=0.75,
+> > > font=2)
+> > >
+> > > 3. "whetheh high values favoured experimental and so would be on the right
+> > > of the plot (the first option) or vice versa"
+> > > Could you please explain using that forest plot and bcg.data, where are
+> > > those higher values (in which group) so how should I label Log Risk Ratio X
+> > > axis according to RevMan 5 style with " Favours control" and "Favours
+> > > vaccinated" ? I want to understand which way is correct, please.
+> > > best regards,
+> > > Andrzej
+

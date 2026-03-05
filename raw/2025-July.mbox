@@ -1,0 +1,180 @@
+From c@n@evenk@mp @end|ng |rom gmx@de  Tue Jul 29 16:44:18 2025
+From: c@n@evenk@mp @end|ng |rom gmx@de (Can Evenkamp)
+Date: Tue, 29 Jul 2025 16:44:18 +0200
+Subject: [R-meta] Four-Level Meta-Analysis in metafor
+Message-ID: <8908FE79-6F5E-422D-AABF-83A8E5F82C98@gmx.de>
+
+Hello all,
+I am an undergraduate student conducting my first meta-analysis.
+My data consists of 187 effect sizes (Pearson?s r) nested in 87 samples nested in 34 studies.
+Therefore, I used the following four-level model (LRT indicated better fit than a three-level model):
+
+four.level.model <- rma.mv(yi = fisherz,
+                            V = vi,
+                            data = data,
+                            random = ~ 1 | StudyID/SampleID/EffectID,
+                            test = "t",
+                            method = "REML")
+
+My question is whether and how I can create a forest plot aggregated at the study level?
+I have seen approaches for three-level models (https://doi.org/10.5964/meth.4013), but I am unsure how to apply this logic for four levels. Generally, I find very little information on four-level models (seems to be rather uncommon).
+In the end, I would like to have a forest plot showing the aggregated effect sizes (+ confidence intervals) for each study and the pooled estimate. Preferably, these should be back-transformed to Pearson?s r (my model is based on Fisher?s z metric). Is this possible with my model?
+
+I appreciate any advice or suggestions you may have.
+Please let me know if you need any additional information or details about my data or model.
+Thank you very much for your time and support!
+
+Best regards,
+Can
+
+From |@gogv @end|ng |rom d|@root@org  Wed Jul 30 13:05:45 2025
+From: |@gogv @end|ng |rom d|@root@org (iagogv)
+Date: Wed, 30 Jul 2025 13:05:45 +0200
+Subject: [R-meta] How to replace labels in metafor forest plots?
+Message-ID: <dad104c5f606cce852c2143bca16be9c@disroot.org>
+
+Hi all,
+
+Let's say we have the common example
+
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg,
+               slab=paste(author, year, sep=", "), data=dat.bcg)
+res <- rma(yi, vi, data=dat)
+forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade=TRUE,
+        ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5, -8, -6, 
+-4.5),
+        ilab.lab=c("TB+", "TB-", "TB+", "TB-"), cex=0.75, 
+header="Author(s) and Year")
+text(c(-8.75, -5.25), res$k+2.8, c("Vaccinated", "Control"), cex=0.75, 
+font=2)
+
+The header of the estimates column is Log [RR] [95% CI].
+
+I would like to change it (actually, my estimates are Hazard Ratios, and 
+I want to replace the label 'Estimate' by 'Hazard Ratio'), but adding 
+text in the same position just add the new text, but does not remove the 
+original label. How can I replace this label?
+
+Thank you for your help!
+
+Iago
+	[[alternative HTML version deleted]]
+
+
+From |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de  Thu Jul 31 16:19:59 2025
+From: |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de (Lukasz Stasielowicz)
+Date: Thu, 31 Jul 2025 16:19:59 +0200
+Subject: [R-meta] How to replace labels in metafor forest plots?
+In-Reply-To: <mailman.5609.13.1753956002.21312.r-sig-meta-analysis@r-project.org>
+References: <mailman.5609.13.1753956002.21312.r-sig-meta-analysis@r-project.org>
+Message-ID: <43bd9780-d5e8-4bd9-9cd7-ad4916a38995@uni-osnabrueck.de>
+
+Dear Iago,
+
+You could switch off the header() argument for the estimates and supply 
+the desired labels via text(). Based on your example code:
+
+
+
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg,
+               slab=paste(author, year, sep=", "), data=dat.bcg)
+res <- rma(yi, vi, data=dat)
+forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade=TRUE,
+        ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5, -8, -6,
+                                                        -4.5),
+        ilab.lab=c("TB+", "TB-", "TB+", "TB-"), cex=0.75,
+        header=c("Author(s) and Year",""))
+text(c(-8.75, -5.25), res$k+2.8, c("Vaccinated", "Control"), cex=0.75,
+      font=2)
+text(6,nrow(dat)+2,"Hazard Ratio",cex=0.75,font=2)
+
+
+
+
+Best,
+Lukasz
+-- 
+Lukasz Stasielowicz
+https://stasielowicz.com/
+
+On 31/07/2025 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+> Send R-sig-meta-analysis mailing list submissions to
+> 	r-sig-meta-analysis at r-project.org
+> 
+> To subscribe or unsubscribe via the World Wide Web, visit
+> 	https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> or, via email, send a message with subject or body 'help' to
+> 	r-sig-meta-analysis-request at r-project.org
+> 
+> You can reach the person managing the list at
+> 	r-sig-meta-analysis-owner at r-project.org
+> 
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of R-sig-meta-analysis digest..."
+> 
+> 
+> Today's Topics:
+> 
+>     1. How to replace labels in metafor forest plots? (iagogv)
+> 
+> ----------------------------------------------------------------------
+> 
+> Message: 1
+> Date: Wed, 30 Jul 2025 13:05:45 +0200
+> From: iagogv <iagogv at disroot.org>
+> To: R-sig-meta Analysis <r-sig-meta-analysis at r-project.org>
+> Subject: [R-meta] How to replace labels in metafor forest plots?
+> Message-ID: <dad104c5f606cce852c2143bca16be9c at disroot.org>
+> Content-Type: text/plain; charset="utf-8"
+> 
+> Hi all,
+> 
+> Let's say we have the common example
+> 
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg,
+>                 slab=paste(author, year, sep=", "), data=dat.bcg)
+> res <- rma(yi, vi, data=dat)
+> forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade=TRUE,
+>          ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5, -8, -6,
+> -4.5),
+>          ilab.lab=c("TB+", "TB-", "TB+", "TB-"), cex=0.75,
+> header="Author(s) and Year")
+> text(c(-8.75, -5.25), res$k+2.8, c("Vaccinated", "Control"), cex=0.75,
+> font=2)
+> 
+> The header of the estimates column is Log [RR] [95% CI].
+> 
+> I would like to change it (actually, my estimates are Hazard Ratios, and
+> I want to replace the label 'Estimate' by 'Hazard Ratio'), but adding
+> text in the same position just add the new text, but does not remove the
+> original label. How can I replace this label?
+> 
+> Thank you for your help!
+> 
+> Iago
+> 	[[alternative HTML version deleted]]
+> 
+> 
+> 
+> 
+> ------------------------------
+> 
+> Subject: Digest Footer
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> 
+> ------------------------------
+> 
+> End of R-sig-meta-analysis Digest, Vol 98, Issue 2
+> **************************************************
+
+
+-- 
+Diese E-Mail wurde von Avast-Antivirussoftware auf Viren gepr?ft.
+www.avast.com
+
+

@@ -1,0 +1,873 @@
+From p@h@ne| @end|ng |rom e@@ex@@c@uk  Wed Apr  6 13:19:29 2022
+From: p@h@ne| @end|ng |rom e@@ex@@c@uk (Hanel, Paul H P)
+Date: Wed, 6 Apr 2022 11:19:29 +0000
+Subject: [R-meta] Prediction intervals for multilevel meta-analysis
+Message-ID: <DB6PR0601MB23573F56476BE1E247545144AEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+
+Why do prediction intervals get so much wider when a multi-level approach is used?
+
+Prediction intervals are usually computed by +/- tau*1.96. Obtaining tau is straightforward when doing a random-effects meta-analysis (e.g., function rma() with metafor).
+
+When running a multilevel meta-analysis, things are a bit more complicated. According to Wolfgang Viechtbauer, it is possible to take the sum of the taus ? (or sigmas, as the taus are called in the output of the rma.mv() function). However, this results in even wider prediction intervals. For a random effects meta-analysis with over 300 effect sizes, the width of the prediction interval is 1.60 (tau = 0.41). Command used: rma(yi, vi, data = df)
+When I run a multilevel meta-analysis with effect sizes nested in studies, the width of the prediction interval is 2.34 (tau/sigma level 1 = .279, level 2 = .317). Command used: rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID), tdist = TRUE, data=df)
+If I add yet another level, articles (i.e., effect sizes nested within studies, studies nested within papers), the width of the prediction interval gets even wider: 2.74 (tau/sigma level 1 = .275, level 2 = .114, level 3 = .309). Command used: rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=df)
+
+Is it plausible that the prediction intervals get that much wider?
+
+Thanks,
+Paul
+
+
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Wed Apr  6 15:55:26 2022
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 6 Apr 2022 08:55:26 -0500
+Subject: [R-meta] Prediction intervals for multilevel meta-analysis
+In-Reply-To: <DB6PR0601MB23573F56476BE1E247545144AEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+References: <DB6PR0601MB23573F56476BE1E247545144AEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+Message-ID: <CAFUVuJwAcWu8r9brcKo=JGz2NBsho5oFPqmhSXXiv9gFHELm0g@mail.gmail.com>
+
+Hi Paul,
+
+In short, yes. The prediction interval incorporates two sources of
+uncertainty: uncertainty from the estimate of the mean effect (the center
+of the PI) and uncertainty from there being a distribution of effects about
+the mean (measured by the sum of the random effects variance components).
+In your case, my guess is that the change in the prediction intervals is
+driven by the first source. When you add in additional levels, you are
+acknowledging that there is additional dependence in the data structure,
+and this dependence leads to more uncertainty about the average effect. You
+should see this in how the standard error of the average effect increases
+across the three models you described. Particularly if the data include
+only a small number of top-level units, the increase in SE can lead to
+fairly big changes in the width of the PI.
+
+In the example you gave, it's interesting (at least to me
+::nerdfaceemoji::) to see that the second source of uncertainty doesn't
+actually change very much. We can see this by comparing the sums of
+variance components (sigma-squared's rather than sigmas):
+- Model 1 total RE variance: 0.41^2 = 0.1681
+- Model 2 total RE variance: 0.279^2 + 0.317^2 = 0.1783 (square root =
+0.4223)
+- Model 3 total RE variance: 0.275^2 + 0.114^2+0.309^2 = 0.1841 (square
+root = 0.4209)
+The total variance increases slightly, but not enough to affect the width
+of the PI by all that much. The differences between models indicate that
+they're similar to variance decompositions. Model 1 is estimating the total
+variance, Model 2 is telling how much of the total is at level 2 versus
+level 1, Model 3 is further breaking out how much of the total is at level
+3, level 2, and level 1.
+
+James
+
+--------------------------
+James Pustejovsky
+https://jepusto.com
+
+On Wed, Apr 6, 2022 at 6:19 AM Hanel, Paul H P <p.hanel at essex.ac.uk> wrote:
+
+> Why do prediction intervals get so much wider when a multi-level approach
+> is used?
+>
+> Prediction intervals are usually computed by +/- tau*1.96. Obtaining tau
+> is straightforward when doing a random-effects meta-analysis (e.g.,
+> function rma() with metafor).
+>
+> When running a multilevel meta-analysis, things are a bit more
+> complicated. According to Wolfgang Viechtbauer, it is possible to take the
+> sum of the taus ? (or sigmas, as the taus are called in the output of the
+> rma.mv() function). However, this results in even wider prediction
+> intervals. For a random effects meta-analysis with over 300 effect sizes,
+> the width of the prediction interval is 1.60 (tau = 0.41). Command used:
+> rma(yi, vi, data = df)
+> When I run a multilevel meta-analysis with effect sizes nested in studies,
+> the width of the prediction interval is 2.34 (tau/sigma level 1 = .279,
+> level 2 = .317). Command used: rma.mv(yi, vi, random = list(~ 1 |
+> effectID, ~ 1 | StudyID), tdist = TRUE, data=df)
+> If I add yet another level, articles (i.e., effect sizes nested within
+> studies, studies nested within papers), the width of the prediction
+> interval gets even wider: 2.74 (tau/sigma level 1 = .275, level 2 = .114,
+> level 3 = .309). Command used: rma.mv(yi, vi, random = list(~ 1 |
+> effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=df)
+>
+> Is it plausible that the prediction intervals get that much wider?
+>
+> Thanks,
+> Paul
+>
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From p@h@ne| @end|ng |rom e@@ex@@c@uk  Wed Apr  6 23:47:16 2022
+From: p@h@ne| @end|ng |rom e@@ex@@c@uk (Hanel, Paul H P)
+Date: Wed, 6 Apr 2022 21:47:16 +0000
+Subject: [R-meta] Prediction intervals for multilevel meta-analysis
+In-Reply-To: <CAFUVuJwAcWu8r9brcKo=JGz2NBsho5oFPqmhSXXiv9gFHELm0g@mail.gmail.com>
+References: <DB6PR0601MB23573F56476BE1E247545144AEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+ <CAFUVuJwAcWu8r9brcKo=JGz2NBsho5oFPqmhSXXiv9gFHELm0g@mail.gmail.com>
+Message-ID: <DB6PR0601MB2357442A4573204C8EA4192FAEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+
+Hi James,
+
+Thank you, that is very useful.
+
+Your answer makes me however wonder whether there is much point of reporting one prediction interval, since its width seems quite strongly depend on the number of levels. In the example I used three levels, but I could have added more levels (e.g., papers nested in authors, authors nested in countries) which would presumably have further increased the width of the PI.
+
+Would it be more straight forward and less subjective to report some descriptive statistics for the observed effect sizes, such as the 2.5 and 97.5 percentile?
+
+Paul
+
+From: James Pustejovsky <jepusto at gmail.com>
+Sent: 06 April 2022 14:55
+To: Hanel, Paul H P <p.hanel at essex.ac.uk>
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Prediction intervals for multilevel meta-analysis
+
+
+CAUTION: This email was sent from outside the University of Essex. Please do not click any links or open any attachments unless you recognise and trust the sender. If you are unsure whether the content of the email is safe or have any other queries, please contact the IT Helpdesk.
+Hi Paul,
+
+In short, yes. The prediction interval incorporates two sources of uncertainty: uncertainty from the estimate of the mean effect (the center of the PI) and uncertainty from there being a distribution of effects about the mean (measured by the sum of the random effects variance components). In your case, my guess is that the change in the prediction intervals is driven by the first source. When you add in additional levels, you are acknowledging that there is additional dependence in the data structure, and this dependence leads to more uncertainty about the average effect. You should see this in how the standard error of the average effect increases across the three models you described. Particularly if the data include only a small number of top-level units, the increase in SE can lead to fairly big changes in the width of the PI.
+
+In the example you gave, it's interesting (at least to me ::nerdfaceemoji::) to see that the second source of uncertainty doesn't actually change very much. We can see this by comparing the sums of variance components (sigma-squared's rather than sigmas):
+- Model 1 total RE variance: 0.41^2 = 0.1681
+- Model 2 total RE variance: 0.279^2 + 0.317^2 = 0.1783 (square root = 0.4223)
+- Model 3 total RE variance: 0.275^2 + 0.114^2+0.309^2 = 0.1841 (square root = 0.4209)
+The total variance increases slightly, but not enough to affect the width of the PI by all that much. The differences between models indicate that they're similar to variance decompositions. Model 1 is estimating the total variance, Model 2 is telling how much of the total is at level 2 versus level 1, Model 3 is further breaking out how much of the total is at level 3, level 2, and level 1.
+
+James
+
+--------------------------
+James Pustejovsky
+https://jepusto.com<https://linkprotect.cudasvc.com/url?a=https%3a%2f%2fjepusto.com&c=E,1,ZD3U59-zNRsG2euYoAnaP39fQZlhEZI1N0RIiSpOvlvZ5aIj0kDrp5anxIqgvNDsSWmnYg6dV6oJaVl_l2g6F8-_fxVb6b7OJ2ttQ1c8oyvMAPQf&typo=1>
+
+On Wed, Apr 6, 2022 at 6:19 AM Hanel, Paul H P <p.hanel at essex.ac.uk<mailto:p.hanel at essex.ac.uk>> wrote:
+Why do prediction intervals get so much wider when a multi-level approach is used?
+
+Prediction intervals are usually computed by +/- tau*1.96. Obtaining tau is straightforward when doing a random-effects meta-analysis (e.g., function rma() with metafor).
+
+When running a multilevel meta-analysis, things are a bit more complicated. According to Wolfgang Viechtbauer, it is possible to take the sum of the taus ? (or sigmas, as the taus are called in the output of the rma.mv<https://linkprotect.cudasvc.com/url?a=http%3a%2f%2frma.mv&c=E,1,3D86f418D6yyXOVVu-ciKZGvG9WuMj8eXOZ3ja0nvO9Nhl6K6yG3CgSiMjfk6fj-kF45kCvkxEX2Y1_1PoGXZrlqWZwtOLG2zRLLcq4FBVII4iyPR-kD4zRDefS9&typo=1>() function). However, this results in even wider prediction intervals. For a random effects meta-analysis with over 300 effect sizes, the width of the prediction interval is 1.60 (tau = 0.41). Command used: rma(yi, vi, data = df)
+When I run a multilevel meta-analysis with effect sizes nested in studies, the width of the prediction interval is 2.34 (tau/sigma level 1 = .279, level 2 = .317). Command used: rma.mv<https://linkprotect.cudasvc.com/url?a=http%3a%2f%2frma.mv&c=E,1,hu6Tp31xaJ9qHzvb4q9KxL_W1wYgrOzXjVGBia6e91MK1_CwmXjnzD0rLNm49s3dKa-B0AYZsKaR_OXkRI2z7RRMJMjcaM2z09RYyNi_3C1ynWKJ&typo=1>(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID), tdist = TRUE, data=df)
+If I add yet another level, articles (i.e., effect sizes nested within studies, studies nested within papers), the width of the prediction interval gets even wider: 2.74 (tau/sigma level 1 = .275, level 2 = .114, level 3 = .309). Command used: rma.mv<https://linkprotect.cudasvc.com/url?a=http%3a%2f%2frma.mv&c=E,1,b_gTFNJBBI02zrLSCRz8WQWFg6iQsQwxEMi4Xfm8bKZjw_D5u2PJecQOFVq6bifGJEnw5AFlYHvdC1YKCwAdgfOgdSwPUHKLWW9JNFuLqMwHl4AbeAgzfg,,&typo=1>(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=df)
+
+Is it plausible that the prediction intervals get that much wider?
+
+Thanks,
+Paul
+
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From p@h@ne| @end|ng |rom e@@ex@@c@uk  Thu Apr  7 00:51:11 2022
+From: p@h@ne| @end|ng |rom e@@ex@@c@uk (Hanel, Paul H P)
+Date: Wed, 6 Apr 2022 22:51:11 +0000
+Subject: [R-meta] Moderator/predictor in multi-level meta-analysis
+Message-ID: <DB6PR0601MB23578B5ADC31A20006821A4DAEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+
+Hello,
+
+When running a standard random effects meta-analysis with one categorical dichotomous predictor/moderator, the estimate of the moderator is very similar to the difference that you get when running a random effects meta-analysis for each level of the predictor separately. This is however different to when running a multi-level meta-analysis.
+
+I am running a meta-analysis with over 300 effect sizes in which all studies have a control and a treatment group. The mean differences between the control and the intervention group are quantified with Hedges' gs. One moderator/predictor of these differences is sample type: students vs non-students. When using a standard random-effects model we get:
+dfm <- subset(df, sample_type == 0) # sample_type has two levels: students (coded as 0) vs other (coded as 1 in sample_type variable)
+dft <- subset(df, sample_type == 1)
+rma(yi, vi,  data = dfm) # gives us g = .3855. yi are Hedges' gs.
+rma(yi, vi,  data = dft) # gives us g = .59.
+rma(yi, vi, mods = sample_type, data=df) # Now full dataset with sample_type as categorical moderator/predictor. Estimate = .21, which is very close to .59 - .3855 = .20. Also, the intercept is very close sample_type = 0, intercept = .3861.
+
+However, when switching to a multi-level model with effect sizes nested in studies nested in papers, things get more complicated. Using the same datasets as above we get
+rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=dfm) # gives us g = .45, 95%-CI [.33, .59]
+rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=dft) # gives us g = .61, 95%-CI [.48, .73]
+rma.mv(yi, vi, mods = ~ sample_type, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=df) # Now full dataset with sample_type as categorical moderator/predictor. Estimate = .08, 95%-CI[-.07, .24] which is quite a bit off from .61 - .45 = .16. Interestingly, the intercept is also off from sample_type = 0. Intercept = .48, even though I assumed it would be .45.
+
+In short, why is the estimate for the multi-level moderator test not similar to the difference between the two effect sizes obtained separately for each of the two subgroups - assuming there is no error in the code above? When looking at the confidence intervals, the difference between students vs others should be significant, but including the sample_type as moderator does not yield a significant finding.
+
+I got similar discrepancies when using a different moderator.
+
+Thank you,
+Paul
+
+
+	[[alternative HTML version deleted]]
+
+
+From |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de  Thu Apr  7 12:33:27 2022
+From: |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de (Lukasz Stasielowicz)
+Date: Thu, 7 Apr 2022 12:33:27 +0200
+Subject: [R-meta] Moderator/predictor in multi-level meta-analysis
+In-Reply-To: <mailman.4018.15.1649325610.58803.r-sig-meta-analysis@r-project.org>
+References: <mailman.4018.15.1649325610.58803.r-sig-meta-analysis@r-project.org>
+Message-ID: <ea12502f-dff5-dd23-9ef3-91258e833d1b@uni-osnabrueck.de>
+
+Dear Paul,
+
+such discrepancies are to be expected when making group comparisons (not 
+only in the meta-analytic context). Subgroup analyses based on separate 
+data sets will sometimes lead to different estimates than the combined 
+data set, because the latter contains more information. Therefore, group 
+comparisons within one model are often recommended.
+
+In the multi-level context there is a phenomenomen called shrinkage, 
+which reduces extreme estimates. It is often regarded as a good thing, 
+because extreme estimates might be unreliable. The extent of the 
+shrinkage depends on the data and random effects that were included 
+which could explain different estimates across analyses.
+
+
+Best,
+Lukasz
+-- 
+Lukasz Stasielowicz
+Osnabr?ck University
+Institute for Psychology
+Research methods, psychological assessment, and evaluation
+Seminarstra?e 20
+49074 Osnabr?ck (Germany)
+
+
+Am 07.04.2022 um 12:00 schrieb r-sig-meta-analysis-request at r-project.org:
+> Send R-sig-meta-analysis mailing list submissions to
+> 	r-sig-meta-analysis at r-project.org
+> 
+> To subscribe or unsubscribe via the World Wide Web, visit
+> 	https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> or, via email, send a message with subject or body 'help' to
+> 	r-sig-meta-analysis-request at r-project.org
+> 
+> You can reach the person managing the list at
+> 	r-sig-meta-analysis-owner at r-project.org
+> 
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of R-sig-meta-analysis digest..."
+> 
+> 
+> Today's Topics:
+> 
+>     1. Moderator/predictor in multi-level meta-analysis (Hanel, Paul H P)
+> 
+> ----------------------------------------------------------------------
+> 
+> Message: 1
+> Date: Wed, 6 Apr 2022 22:51:11 +0000
+> From: "Hanel, Paul H P" <p.hanel at essex.ac.uk>
+> To: "r-sig-meta-analysis at r-project.org"
+> 	<r-sig-meta-analysis at r-project.org>
+> Subject: [R-meta] Moderator/predictor in multi-level meta-analysis
+> Message-ID:
+> 	<DB6PR0601MB23578B5ADC31A20006821A4DAEE79 at DB6PR0601MB2357.eurprd06.prod.outlook.com>
+> 	
+> Content-Type: text/plain; charset="utf-8"
+> 
+> Hello,
+> 
+> When running a standard random effects meta-analysis with one categorical dichotomous predictor/moderator, the estimate of the moderator is very similar to the difference that you get when running a random effects meta-analysis for each level of the predictor separately. This is however different to when running a multi-level meta-analysis.
+> 
+> I am running a meta-analysis with over 300 effect sizes in which all studies have a control and a treatment group. The mean differences between the control and the intervention group are quantified with Hedges' gs. One moderator/predictor of these differences is sample type: students vs non-students. When using a standard random-effects model we get:
+> dfm <- subset(df, sample_type == 0) # sample_type has two levels: students (coded as 0) vs other (coded as 1 in sample_type variable)
+> dft <- subset(df, sample_type == 1)
+> rma(yi, vi,  data = dfm) # gives us g = .3855. yi are Hedges' gs.
+> rma(yi, vi,  data = dft) # gives us g = .59.
+> rma(yi, vi, mods = sample_type, data=df) # Now full dataset with sample_type as categorical moderator/predictor. Estimate = .21, which is very close to .59 - .3855 = .20. Also, the intercept is very close sample_type = 0, intercept = .3861.
+> 
+> However, when switching to a multi-level model with effect sizes nested in studies nested in papers, things get more complicated. Using the same datasets as above we get
+> rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=dfm) # gives us g = .45, 95%-CI [.33, .59]
+> rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=dft) # gives us g = .61, 95%-CI [.48, .73]
+> rma.mv(yi, vi, mods = ~ sample_type, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=df) # Now full dataset with sample_type as categorical moderator/predictor. Estimate = .08, 95%-CI[-.07, .24] which is quite a bit off from .61 - .45 = .16. Interestingly, the intercept is also off from sample_type = 0. Intercept = .48, even though I assumed it would be .45.
+> 
+> In short, why is the estimate for the multi-level moderator test not similar to the difference between the two effect sizes obtained separately for each of the two subgroups - assuming there is no error in the code above? When looking at the confidence intervals, the difference between students vs others should be significant, but including the sample_type as moderator does not yield a significant finding.
+> 
+> I got similar discrepancies when using a different moderator.
+> 
+> Thank you,
+> Paul
+> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> 
+> 
+> 
+> ------------------------------
+> 
+> Subject: Digest Footer
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> 
+> ------------------------------
+> 
+> End of R-sig-meta-analysis Digest, Vol 59, Issue 2
+> **************************************************
+
+
+From jepu@to @end|ng |rom gm@||@com  Thu Apr  7 16:23:08 2022
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 7 Apr 2022 09:23:08 -0500
+Subject: [R-meta] Prediction intervals for multilevel meta-analysis
+In-Reply-To: <DB6PR0601MB2357442A4573204C8EA4192FAEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+References: <DB6PR0601MB23573F56476BE1E247545144AEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+ <CAFUVuJwAcWu8r9brcKo=JGz2NBsho5oFPqmhSXXiv9gFHELm0g@mail.gmail.com>
+ <DB6PR0601MB2357442A4573204C8EA4192FAEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+Message-ID: <CAFUVuJyP-S-7xOuBc1tFwX=axEGJnVxK6rdo1MN+Ne037Z+t7A@mail.gmail.com>
+
+Hi Paul,
+
+I would suggest reporting a prediction interval for whatever model
+specification you think is appropriate for the synthesis. Which levels to
+include in the model is a broader question that you'll need to address for
+the overall synthesis, considering the structure of the data you're working
+with and your research aims/questions.
+
+I tend to think of prediction intervals as a tool for model
+interpretation--they help you (and readers) to interpret the implications
+of the model estimates, including both the estimated mean effect and the
+degree of heterogeneity. Simply reporting the percentiles of the ES
+estimates isn't as useful, in my opinion, because the distribution will be
+more dispersed due to sampling error of the ES estimates. For instance,
+consider a fixed (common) effect model where every study contributes an
+estimate of the same underlying effect size parameter and all the studies
+are fairly small. Those estimates will still be dispersed because of
+sampling error, so the percentiles will still span a potentially wide range
+of estimates. And that would remain true even if you have many many
+studies, so that there is very little uncertainty about the average effect
+size. All that said, I don't think it hurts anything to report raw ES
+percentiles, just as a further point of reference, in addition to a
+prediction interval from an appropriately specified model.
+
+James
+
+--------------------------
+James Pustejovsky
+https://jepusto.com
+
+
+On Wed, Apr 6, 2022 at 4:47 PM Hanel, Paul H P <p.hanel at essex.ac.uk> wrote:
+
+> Hi James,
+>
+>
+>
+> Thank you, that is very useful.
+>
+>
+>
+> Your answer makes me however wonder whether there is much point of
+> reporting one prediction interval, since its width seems quite strongly
+> depend on the number of levels. In the example I used three levels, but I
+> could have added more levels (e.g., papers nested in authors, authors
+> nested in countries) which would presumably have further increased the
+> width of the PI.
+>
+>
+>
+> Would it be more straight forward and less subjective to report some
+> descriptive statistics for the observed effect sizes, such as the 2.5 and
+> 97.5 percentile?
+>
+>
+>
+> Paul
+>
+>
+>
+> *From:* James Pustejovsky <jepusto at gmail.com>
+> *Sent:* 06 April 2022 14:55
+> *To:* Hanel, Paul H P <p.hanel at essex.ac.uk>
+> *Cc:* r-sig-meta-analysis at r-project.org
+> *Subject:* Re: [R-meta] Prediction intervals for multilevel meta-analysis
+>
+>
+>
+> *CAUTION:* This email was sent from outside the University of Essex.
+> Please do not click any links or open any attachments unless you recognise
+> and trust the sender. If you are unsure whether the content of the email is
+> safe or have any other queries, please contact the IT Helpdesk.
+>
+> Hi Paul,
+>
+>
+>
+> In short, yes. The prediction interval incorporates two sources of
+> uncertainty: uncertainty from the estimate of the mean effect (the center
+> of the PI) and uncertainty from there being a distribution of effects about
+> the mean (measured by the sum of the random effects variance components).
+> In your case, my guess is that the change in the prediction intervals is
+> driven by the first source. When you add in additional levels, you are
+> acknowledging that there is additional dependence in the data structure,
+> and this dependence leads to more uncertainty about the average effect. You
+> should see this in how the standard error of the average effect increases
+> across the three models you described. Particularly if the data include
+> only a small number of top-level units, the increase in SE can lead to
+> fairly big changes in the width of the PI.
+>
+>
+>
+> In the example you gave, it's interesting (at least to me
+> ::nerdfaceemoji::) to see that the second source of uncertainty doesn't
+> actually change very much. We can see this by comparing the sums of
+> variance components (sigma-squared's rather than sigmas):
+>
+> - Model 1 total RE variance: 0.41^2 = 0.1681
+>
+> - Model 2 total RE variance: 0.279^2 + 0.317^2 = 0.1783 (square root =
+> 0.4223)
+>
+> - Model 3 total RE variance: 0.275^2 + 0.114^2+0.309^2 = 0.1841 (square
+> root = 0.4209)
+>
+> The total variance increases slightly, but not enough to affect the width
+> of the PI by all that much. The differences between models indicate that
+> they're similar to variance decompositions. Model 1 is estimating the total
+> variance, Model 2 is telling how much of the total is at level 2 versus
+> level 1, Model 3 is further breaking out how much of the total is at level
+> 3, level 2, and level 1.
+>
+>
+>
+> James
+>
+>
+>
+> --------------------------
+>
+> James Pustejovsky
+>
+> https://jepusto.com
+> <https://linkprotect.cudasvc.com/url?a=https%3a%2f%2fjepusto.com&c=E,1,ZD3U59-zNRsG2euYoAnaP39fQZlhEZI1N0RIiSpOvlvZ5aIj0kDrp5anxIqgvNDsSWmnYg6dV6oJaVl_l2g6F8-_fxVb6b7OJ2ttQ1c8oyvMAPQf&typo=1>
+>
+>
+>
+>
+> On Wed, Apr 6, 2022 at 6:19 AM Hanel, Paul H P <p.hanel at essex.ac.uk>
+> wrote:
+>
+> Why do prediction intervals get so much wider when a multi-level approach
+> is used?
+>
+> Prediction intervals are usually computed by +/- tau*1.96. Obtaining tau
+> is straightforward when doing a random-effects meta-analysis (e.g.,
+> function rma() with metafor).
+>
+> When running a multilevel meta-analysis, things are a bit more
+> complicated. According to Wolfgang Viechtbauer, it is possible to take the
+> sum of the taus ? (or sigmas, as the taus are called in the output of the
+> rma.mv
+> <https://linkprotect.cudasvc.com/url?a=http%3a%2f%2frma.mv&c=E,1,3D86f418D6yyXOVVu-ciKZGvG9WuMj8eXOZ3ja0nvO9Nhl6K6yG3CgSiMjfk6fj-kF45kCvkxEX2Y1_1PoGXZrlqWZwtOLG2zRLLcq4FBVII4iyPR-kD4zRDefS9&typo=1>()
+> function). However, this results in even wider prediction intervals. For a
+> random effects meta-analysis with over 300 effect sizes, the width of the
+> prediction interval is 1.60 (tau = 0.41). Command used: rma(yi, vi, data =
+> df)
+> When I run a multilevel meta-analysis with effect sizes nested in studies,
+> the width of the prediction interval is 2.34 (tau/sigma level 1 = .279,
+> level 2 = .317). Command used: rma.mv
+> <https://linkprotect.cudasvc.com/url?a=http%3a%2f%2frma.mv&c=E,1,hu6Tp31xaJ9qHzvb4q9KxL_W1wYgrOzXjVGBia6e91MK1_CwmXjnzD0rLNm49s3dKa-B0AYZsKaR_OXkRI2z7RRMJMjcaM2z09RYyNi_3C1ynWKJ&typo=1>(yi,
+> vi, random = list(~ 1 | effectID, ~ 1 | StudyID), tdist = TRUE, data=df)
+> If I add yet another level, articles (i.e., effect sizes nested within
+> studies, studies nested within papers), the width of the prediction
+> interval gets even wider: 2.74 (tau/sigma level 1 = .275, level 2 = .114,
+> level 3 = .309). Command used: rma.mv
+> <https://linkprotect.cudasvc.com/url?a=http%3a%2f%2frma.mv&c=E,1,b_gTFNJBBI02zrLSCRz8WQWFg6iQsQwxEMi4Xfm8bKZjw_D5u2PJecQOFVq6bifGJEnw5AFlYHvdC1YKCwAdgfOgdSwPUHKLWW9JNFuLqMwHl4AbeAgzfg,,&typo=1>(yi,
+> vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist =
+> TRUE, data=df)
+>
+> Is it plausible that the prediction intervals get that much wider?
+>
+> Thanks,
+> Paul
+>
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From p@h@ne| @end|ng |rom e@@ex@@c@uk  Mon Apr 11 16:50:58 2022
+From: p@h@ne| @end|ng |rom e@@ex@@c@uk (Hanel, Paul H P)
+Date: Mon, 11 Apr 2022 14:50:58 +0000
+Subject: [R-meta] Prediction intervals for multilevel meta-analysis
+In-Reply-To: <CAFUVuJyP-S-7xOuBc1tFwX=axEGJnVxK6rdo1MN+Ne037Z+t7A@mail.gmail.com>
+References: <DB6PR0601MB23573F56476BE1E247545144AEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+ <CAFUVuJwAcWu8r9brcKo=JGz2NBsho5oFPqmhSXXiv9gFHELm0g@mail.gmail.com>
+ <DB6PR0601MB2357442A4573204C8EA4192FAEE79@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+ <CAFUVuJyP-S-7xOuBc1tFwX=axEGJnVxK6rdo1MN+Ne037Z+t7A@mail.gmail.com>
+Message-ID: <DB6PR0601MB23575981DAC67B808B9E0188AEEA9@DB6PR0601MB2357.eurprd06.prod.outlook.com>
+
+Hi James,
+
+Thank you, this is very useful.
+
+Best,
+Paul
+
+From: James Pustejovsky <jepusto at gmail.com>
+Sent: 07 April 2022 15:23
+To: Hanel, Paul H P <p.hanel at essex.ac.uk>
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Prediction intervals for multilevel meta-analysis
+
+Hi Paul,
+
+I would suggest reporting a prediction interval for whatever model specification you think is appropriate for the synthesis. Which levels to include in the model is a broader question that you'll need to address for the overall synthesis, considering the structure of the data you're working with and your research aims/questions.
+
+I tend to think of prediction intervals as a tool for model interpretation--they help you (and readers) to interpret the implications of the model estimates, including both the estimated mean effect and the degree of heterogeneity. Simply reporting the percentiles of the ES estimates isn't as useful, in my opinion, because the distribution will be more dispersed due to sampling error of the ES estimates. For instance, consider a fixed (common) effect model where every study contributes an estimate of the same underlying effect size parameter and all the studies are fairly small. Those estimates will still be dispersed because of sampling error, so the percentiles will still span a potentially wide range of estimates. And that would remain true even if you have many many studies, so that there is very little uncertainty about the average effect size. All that said, I don't think it hurts anything to report raw ES percentiles, just as a further point of reference, in addition to a prediction interval from an appropriately specified model.
+
+James
+
+--------------------------
+James Pustejovsky
+https://jepusto.com<https://linkprotect.cudasvc.com/url?a=https%3a%2f%2fjepusto.com%2f&c=E,1,WCyJv4Fibin2dE8uAlhG12xCGGI4XRGe-Qtgg-WifCwnvqfC09iN-D0kP9_FHhZsNVgTWQlrPhuegFcU5gRMQYqlFhzHRqlvkhjRN-fW&typo=1>
+
+
+On Wed, Apr 6, 2022 at 4:47 PM Hanel, Paul H P <p.hanel at essex.ac.uk<mailto:p.hanel at essex.ac.uk>> wrote:
+Hi James,
+
+Thank you, that is very useful.
+
+Your answer makes me however wonder whether there is much point of reporting one prediction interval, since its width seems quite strongly depend on the number of levels. In the example I used three levels, but I could have added more levels (e.g., papers nested in authors, authors nested in countries) which would presumably have further increased the width of the PI.
+
+Would it be more straight forward and less subjective to report some descriptive statistics for the observed effect sizes, such as the 2.5 and 97.5 percentile?
+
+Paul
+
+From: James Pustejovsky <jepusto at gmail.com<mailto:jepusto at gmail.com>>
+Sent: 06 April 2022 14:55
+To: Hanel, Paul H P <p.hanel at essex.ac.uk<mailto:p.hanel at essex.ac.uk>>
+Cc: r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] Prediction intervals for multilevel meta-analysis
+
+
+CAUTION: This email was sent from outside the University of Essex. Please do not click any links or open any attachments unless you recognise and trust the sender. If you are unsure whether the content of the email is safe or have any other queries, please contact the IT Helpdesk.
+Hi Paul,
+
+In short, yes. The prediction interval incorporates two sources of uncertainty: uncertainty from the estimate of the mean effect (the center of the PI) and uncertainty from there being a distribution of effects about the mean (measured by the sum of the random effects variance components). In your case, my guess is that the change in the prediction intervals is driven by the first source. When you add in additional levels, you are acknowledging that there is additional dependence in the data structure, and this dependence leads to more uncertainty about the average effect. You should see this in how the standard error of the average effect increases across the three models you described. Particularly if the data include only a small number of top-level units, the increase in SE can lead to fairly big changes in the width of the PI.
+
+In the example you gave, it's interesting (at least to me ::nerdfaceemoji::) to see that the second source of uncertainty doesn't actually change very much. We can see this by comparing the sums of variance components (sigma-squared's rather than sigmas):
+- Model 1 total RE variance: 0.41^2 = 0.1681
+- Model 2 total RE variance: 0.279^2 + 0.317^2 = 0.1783 (square root = 0.4223)
+- Model 3 total RE variance: 0.275^2 + 0.114^2+0.309^2 = 0.1841 (square root = 0.4209)
+The total variance increases slightly, but not enough to affect the width of the PI by all that much. The differences between models indicate that they're similar to variance decompositions. Model 1 is estimating the total variance, Model 2 is telling how much of the total is at level 2 versus level 1, Model 3 is further breaking out how much of the total is at level 3, level 2, and level 1.
+
+James
+
+--------------------------
+James Pustejovsky
+https://jepusto.com<https://linkprotect.cudasvc.com/url?a=https%3a%2f%2fjepusto.com&c=E,1,ZD3U59-zNRsG2euYoAnaP39fQZlhEZI1N0RIiSpOvlvZ5aIj0kDrp5anxIqgvNDsSWmnYg6dV6oJaVl_l2g6F8-_fxVb6b7OJ2ttQ1c8oyvMAPQf&typo=1>
+
+On Wed, Apr 6, 2022 at 6:19 AM Hanel, Paul H P <p.hanel at essex.ac.uk<mailto:p.hanel at essex.ac.uk>> wrote:
+Why do prediction intervals get so much wider when a multi-level approach is used?
+
+Prediction intervals are usually computed by +/- tau*1.96. Obtaining tau is straightforward when doing a random-effects meta-analysis (e.g., function rma() with metafor).
+
+When running a multilevel meta-analysis, things are a bit more complicated. According to Wolfgang Viechtbauer, it is possible to take the sum of the taus ? (or sigmas, as the taus are called in the output of the rma.mv<https://linkprotect.cudasvc.com/url?a=http%3a%2f%2frma.mv&c=E,1,3D86f418D6yyXOVVu-ciKZGvG9WuMj8eXOZ3ja0nvO9Nhl6K6yG3CgSiMjfk6fj-kF45kCvkxEX2Y1_1PoGXZrlqWZwtOLG2zRLLcq4FBVII4iyPR-kD4zRDefS9&typo=1>() function). However, this results in even wider prediction intervals. For a random effects meta-analysis with over 300 effect sizes, the width of the prediction interval is 1.60 (tau = 0.41). Command used: rma(yi, vi, data = df)
+When I run a multilevel meta-analysis with effect sizes nested in studies, the width of the prediction interval is 2.34 (tau/sigma level 1 = .279, level 2 = .317). Command used: rma.mv<https://linkprotect.cudasvc.com/url?a=http%3a%2f%2frma.mv&c=E,1,hu6Tp31xaJ9qHzvb4q9KxL_W1wYgrOzXjVGBia6e91MK1_CwmXjnzD0rLNm49s3dKa-B0AYZsKaR_OXkRI2z7RRMJMjcaM2z09RYyNi_3C1ynWKJ&typo=1>(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID), tdist = TRUE, data=df)
+If I add yet another level, articles (i.e., effect sizes nested within studies, studies nested within papers), the width of the prediction interval gets even wider: 2.74 (tau/sigma level 1 = .275, level 2 = .114, level 3 = .309). Command used: rma.mv<https://linkprotect.cudasvc.com/url?a=http%3a%2f%2frma.mv&c=E,1,b_gTFNJBBI02zrLSCRz8WQWFg6iQsQwxEMi4Xfm8bKZjw_D5u2PJecQOFVq6bifGJEnw5AFlYHvdC1YKCwAdgfOgdSwPUHKLWW9JNFuLqMwHl4AbeAgzfg,,&typo=1>(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=df)
+
+Is it plausible that the prediction intervals get that much wider?
+
+Thanks,
+Paul
+
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From r@ubb@|@h115 @end|ng |rom gm@||@com  Sat Apr 16 12:23:53 2022
+From: r@ubb@|@h115 @end|ng |rom gm@||@com (Roopa Subbaiah)
+Date: Sat, 16 Apr 2022 15:53:53 +0530
+Subject: [R-meta] Calculation of z scores in NMA analysis
+Message-ID: <CAHudoO0RQ6fzqHrUDRWjeMZ_EvxZvVjF+Hu0Xv6XddSeoUOv8w@mail.gmail.com>
+
+Hi All,
+
+Need help regarding calculation of z scores.
+
+We are working on nma analysis with three treatments compared to placebo.
+We are using netmeta package for stats. We have curated mean and sd values
+for each endpoint w. r. t trt and placebo. Need help to calculate weighted
+mean z scores with standard error. Please suggest ways of doing it. Thank
+you
+
+	[[alternative HTML version deleted]]
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Sat Apr 16 20:29:44 2022
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (=?UTF-8?Q?Dr=2e_Gerta_R=c3=bccker?=)
+Date: Sat, 16 Apr 2022 20:29:44 +0200
+Subject: [R-meta] Calculation of z scores in NMA analysis
+In-Reply-To: <CAHudoO0RQ6fzqHrUDRWjeMZ_EvxZvVjF+Hu0Xv6XddSeoUOv8w@mail.gmail.com>
+References: <CAHudoO0RQ6fzqHrUDRWjeMZ_EvxZvVjF+Hu0Xv6XddSeoUOv8w@mail.gmail.com>
+Message-ID: <f6ed01d6-9a46-9e15-d356-b8e1f65c06f3@imbi.uni-freiburg.de>
+
+Hi Roopa,
+
+First of all, I want to remind you of Wolfgang's e-mail referring to the 
+transparency rules of this mailing list. He wrote on 24 of March: "When 
+posting to the mailing list, please use your real name and include 
+information about any institutional/organizational affiliation if possible."
+
+Now to your question: It is not fully clear to me what you want to do 
+and why. If this is a network meta-analysis (NMA) of differences of 
+means, you need mean, sd, and sample size (n) for each comparison. 
+netmeta will then provide the NMA estimates for all comparisons in the 
+network, again as differences of means (MD). The resulting z-scores are 
+just tabulated with the printout, as you can see with the built-in 
+example data Senn2013:
+
+library(netmeta)
+data(Senn2013)
+net1 <- netmeta(TE, seTE, treat1.long, treat2.long, studlab,
+ ? data = Senn2013, sm = "MD", random = FALSE, nchar.trts = 4)
+net1
+
+Isn't this what you want? If not, what else do you expect?
+
+Best,
+
+Gerta
+
+Am 16.04.2022 um 12:23 schrieb Roopa Subbaiah:
+> Hi All,
+>
+> Need help regarding calculation of z scores.
+>
+> We are working on nma analysis with three treatments compared to placebo.
+> We are using netmeta package for stats. We have curated mean and sd values
+> for each endpoint w. r. t trt and placebo. Need help to calculate weighted
+> mean z scores with standard error. Please suggest ways of doing it. Thank
+> you
+>
+> 	[[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Guest Scientist
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Zinkmattenstr. 6a, D-79108 Freiburg, Germany
+
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+
+From @de||n@@@rten|e @end|ng |rom br|@to|@@c@uk  Wed Apr 20 19:15:24 2022
+From: @de||n@@@rten|e @end|ng |rom br|@to|@@c@uk (Adelina Artenie)
+Date: Wed, 20 Apr 2022 17:15:24 +0000
+Subject: [R-meta] Queries re: rma.mv
+Message-ID: <VI1PR0602MB3437B067B8C7DA5BD7CEFA51BFF59@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+
+Hello
+
+
+I am trying to do a meta-regression to explore whether incidence rates are changing over time. Some of the estimates are correlated so I am using the rma.mv function. The moderator is a measure of time.
+
+I have two questions please:
+
+  1.  I am trying to understand why is it that the correlated estimates are systematically up-weighted. I would have thought that any correlated data would be down-weighted or, at the very least, have a similar weight as the uncorrelated data. I appreciate that the weight calculation in this case is complex (https://www.metafor-project.org/doku.php/tips:weights_in_rma.mv_models ). I wonder if, conceptually, this would be expected? In my mock example, the correlated estimates have weights of 7-10% whereas the uncorrelated ones have weights of 4%. I see a similar trend in my own data, and I find the difference in the weights to be quite considerable.
+  2.  Could I confirm with you that my interpretation of the coefficient for the moderator is correct? In this case, the estimate is 0.0846, which represents the mean/median log IRR (incidence rate ratio) for a one-unit increase in the moderator. Therefore, the IRR is 1.088: for each unit increase in time, the incidence rate increases on average by 8.8% (ignoring the confidence intervals for now).
+Many thanks in advance,
+Adelina
+
+Adelina Artenie, MSc, PhD
+CIHR Postdoctoral Research Fellow
+Population Health Sciences
+Bristol Medical School
+University of Bristol
+
+Code
+***
+
+ID <- c(1:18)
+author <- c("AA", "AA", "BB", "CC", "DD", "EE", "EE", "EE", "FF", "GG", "HH", "II", "JJ",
+            "KK", "LL", "MM", "NN", "OO")
+cases <- c(8:25)
+prs_yrs <-c(200,150,3000,400,500,100,400,300,1200,456,177,296,664,123,123,432,67,3045)
+moderator<-c(1:18)
+
+mydata<-data.frame(ID,author,cases,prs_yrs,moderator)
+print(mydata)
+
+my_example <- escalc(measure="IRLN", xi=cases, ti=prs_yrs, data=mydata)
+my_example
+my_meta_reg <- rma.mv(yi = yi,
+                            V = vi,
+                            slab = author,
+                            data = my_example,
+                            random = ~ 1 | author/ID,
+                            test = "z",
+                            method = "REML",
+                            mods = ~ moderator)
+
+summary(my_meta_reg)
+regplot(my_meta_reg, label = T, transf=exp,
+        ylab = "Incidence rate",
+        xlab = "Moderator",
+        col="black",
+        plim = c(1,NA),
+        labsize = 0.5,
+        legend = F)
+forest(my_meta_reg, showweights=TRUE)
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Apr 20 20:41:52 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 20 Apr 2022 18:41:52 +0000
+Subject: [R-meta] Queries re: rma.mv
+In-Reply-To: <VI1PR0602MB3437B067B8C7DA5BD7CEFA51BFF59@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+References: <VI1PR0602MB3437B067B8C7DA5BD7CEFA51BFF59@VI1PR0602MB3437.eurprd06.prod.outlook.com>
+Message-ID: <a873a002ba9c4f1db34fc10e711a0a12@UM-MAIL3214.unimaas.nl>
+
+Dear Adelina,
+
+See below for my responses.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Adelina Artenie
+>Sent: Wednesday, 20 April, 2022 19:15
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Queries re: rma.mv
+>
+>Hello
+>
+>I am trying to do a meta-regression to explore whether incidence rates are
+>changing over time. Some of the estimates are correlated so I am using the rma.mv
+>function. The moderator is a measure of time.
+>
+>I have two questions please:
+>
+>  1.  I am trying to understand why is it that the correlated estimates are
+>systematically up-weighted. I would have thought that any correlated data would
+>be down-weighted or, at the very least, have a similar weight as the uncorrelated
+>data. I appreciate that the weight calculation in this case is complex
+>(https://www.metafor-project.org/doku.php/tips:weights_in_rma.mv_models ). I
+>wonder if, conceptually, this would be expected? In my mock example, the
+>correlated estimates have weights of 7-10% whereas the uncorrelated ones have
+>weights of 4%. I see a similar trend in my own data, and I find the difference in
+>the weights to be quite considerable.
+
+I assume you are referring to the weights shown in the forest plot. These are just based on the diagonal of the weight matrix. As you note, the weighting in such models is more complex, so looking at these weights doesn't really allow you to draw such a conclusion. In fact, generally, the effect will be as you expect, namely that correlated estimates will be downweighted. Consider the dat.konstantopoulos2011 dataset and let's make all sampling variances equal to each other to see this more clearly. Also, we will compute the row-sum weights, since these reflect more directly the weight each estimate is getting in this model.
+
+dat <- dat.konstantopoulos2011
+
+dat$vi <- median(dat$vi)
+res <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat)
+res
+
+wi <- weights(res, type="rowsum")
+
+data.frame(k = c(table(dat$district)),
+           weight = tapply(wi, dat$district, mean))
+
+So, as you can see, in clusters with more estimates, each individual estimate gets less weight.
+
+Things will be more complicated when sampling variances differ and also when including moderators in the model.
+
+>  2.  Could I confirm with you that my interpretation of the coefficient for the
+>moderator is correct? In this case, the estimate is 0.0846, which represents the
+>mean/median log IRR (incidence rate ratio) for a one-unit increase in the
+>moderator. Therefore, the IRR is 1.088: for each unit increase in time, the
+>incidence rate increases on average by 8.8% (ignoring the confidence intervals
+>for now).
+
+Correct.
+
+>Many thanks in advance,
+>Adelina
+>
+>Adelina Artenie, MSc, PhD
+>CIHR Postdoctoral Research Fellow
+>Population Health Sciences
+>Bristol Medical School
+>University of Bristol
+>
+>Code
+>***
+>
+>ID <- c(1:18)
+>author <- c("AA", "AA", "BB", "CC", "DD", "EE", "EE", "EE", "FF", "GG", "HH",
+>"II", "JJ",
+>            "KK", "LL", "MM", "NN", "OO")
+>cases <- c(8:25)
+>prs_yrs <-
+>c(200,150,3000,400,500,100,400,300,1200,456,177,296,664,123,123,432,67,3045)
+>moderator<-c(1:18)
+>
+>mydata<-data.frame(ID,author,cases,prs_yrs,moderator)
+>print(mydata)
+>
+>my_example <- escalc(measure="IRLN", xi=cases, ti=prs_yrs, data=mydata)
+>my_example
+>my_meta_reg <- rma.mv(yi = yi,
+>                            V = vi,
+>                            slab = author,
+>                            data = my_example,
+>                            random = ~ 1 | author/ID,
+>                            test = "z",
+>                            method = "REML",
+>                            mods = ~ moderator)
+>
+>summary(my_meta_reg)
+>regplot(my_meta_reg, label = T, transf=exp,
+>        ylab = "Incidence rate",
+>        xlab = "Moderator",
+>        col="black",
+>        plim = c(1,NA),
+>        labsize = 0.5,
+>        legend = F)
+>forest(my_meta_reg, showweights=TRUE)
+
+

@@ -1,0 +1,92 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2025-07",
+  "messages": [
+    {
+      "id": "msg-dde86fd76a63",
+      "message_id": "<8908FE79-6F5E-422D-AABF-83A8E5F82C98@gmx.de>",
+      "from_name": "Can Evenkamp",
+      "from_email_hash": "4d0a88214a5c1fef3fb472fc13bf9d13bb34b0d44b9440f22c66c91b18d7f250",
+      "date": "2025-07-29T16:44:18+02:00",
+      "subject": "[R-meta] Four-Level Meta-Analysis in metafor",
+      "subject_clean": "[R-meta] Four-Level Meta-Analysis in metafor",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hello all,\nI am an undergraduate student conducting my first meta-analysis.\nMy data consists of 187 effect sizes (Pearson?s r) nested in 87 samples nested in 34 studies.\nTherefore, I used the following four-level model (LRT indicated better fit than a three-level model):\n\nfour.level.model <- rma.mv(yi = fisherz,\n                            V = vi,\n                            data = data,\n                            random = ~ 1 | StudyID/SampleID/EffectID,\n                            test = \"t\",\n                            method = \"REML\")\n\nMy question is whether and how I can create a forest plot aggregated at the study level?\nI have seen approaches for three-level models (https://doi.org/10.5964/meth.4013), but I am unsure how to apply this logic for four levels. Generally, I find very little information on four-level models (seems to be rather uncommon).\nIn the end, I would like to have a forest plot showing the aggregated effect sizes (+ confidence intervals) for each study and the pooled estimate. Preferably, these should be back-transformed to Pearson?s r (my model is based on Fisher?s z metric). Is this possible with my model?\n\nI appreciate any advice or suggestions you may have.\nPlease let me know if you need any additional information or details about my data or model.\nThank you very much for your time and support!\n\nBest regards,\nCan",
+      "body_snippet": "Hello all,\nI am an undergraduate student conducting my first meta-analysis.\nMy data consists of 187 effect sizes (Pearson?s r) nested in 87 samples nested in 34 studies.\nTherefore, I used the followin",
+      "thread_id": "thread-dde86fd76a63",
+      "thread_depth": 0,
+      "month": "2025-07"
+    },
+    {
+      "id": "msg-bc4362b8d69e",
+      "message_id": "<dad104c5f606cce852c2143bca16be9c@disroot.org>",
+      "from_name": "iagogv",
+      "from_email_hash": "d5308f1d30ecf31e34e95074bc22416b10f380c4619d7768015505ed375f1370",
+      "date": "2025-07-30T13:05:45+02:00",
+      "subject": "[R-meta] How to replace labels in metafor forest plots?",
+      "subject_clean": "[R-meta] How to replace labels in metafor forest plots?",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi all,\n\nLet's say we have the common example\n\ndat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg,\n               slab=paste(author, year, sep=\", \"), data=dat.bcg)\nres <- rma(yi, vi, data=dat)\nforest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade=TRUE,\n        ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5, -8, -6, \n-4.5),\n        ilab.lab=c(\"TB+\", \"TB-\", \"TB+\", \"TB-\"), cex=0.75, \nheader=\"Author(s) and Year\")\ntext(c(-8.75, -5.25), res$k+2.8, c(\"Vaccinated\", \"Control\"), cex=0.75, \nfont=2)\n\nThe header of the estimates column is Log [RR] [95% CI].\n\nI would like to change it (actually, my estimates are Hazard Ratios, and \nI want to replace the label 'Estimate' by 'Hazard Ratio'), but adding \ntext in the same position just add the new text, but does not remove the \noriginal label. How can I replace this label?\n\nThank you for your help!\n\nIago\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi all,\n\nLet's say we have the common example\n\ndat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg,\n               slab=paste(author, year, sep=\", \"), data=dat.bcg)\nres <- rma(yi, vi, data=",
+      "thread_id": "thread-bc4362b8d69e",
+      "thread_depth": 0,
+      "month": "2025-07"
+    },
+    {
+      "id": "msg-36c4e81e0c29",
+      "message_id": "<43bd9780-d5e8-4bd9-9cd7-ad4916a38995@uni-osnabrueck.de>",
+      "from_name": "Lukasz Stasielowicz",
+      "from_email_hash": "8e7698f28015f696c76c8036e33b7e8bcb33cb7948bf9a7b4b00d1a91ed2c1f0",
+      "date": "2025-07-31T16:19:59+02:00",
+      "subject": "[R-meta] How to replace labels in metafor forest plots?",
+      "subject_clean": "[R-meta] How to replace labels in metafor forest plots?",
+      "in_reply_to": "<mailman.5609.13.1753956002.21312.r-sig-meta-analysis@r-project.org>",
+      "references": [
+        "<mailman.5609.13.1753956002.21312.r-sig-meta-analysis@r-project.org>"
+      ],
+      "body_plain": "Dear Iago,\n\nYou could switch off the header() argument for the estimates and supply \nthe desired labels via text(). Based on your example code:\n\n\n\ndat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg,\n               slab=paste(author, year, sep=\", \"), data=dat.bcg)\nres <- rma(yi, vi, data=dat)\nforest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade=TRUE,\n        ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5, -8, -6,\n                                                        -4.5),\n        ilab.lab=c(\"TB+\", \"TB-\", \"TB+\", \"TB-\"), cex=0.75,\n        header=c(\"Author(s) and Year\",\"\"))\ntext(c(-8.75, -5.25), res$k+2.8, c(\"Vaccinated\", \"Control\"), cex=0.75,\n      font=2)\ntext(6,nrow(dat)+2,\"Hazard Ratio\",cex=0.75,font=2)\n\n\n\n\nBest,\nLukasz\n-- \nLukasz Stasielowicz\nhttps://stasielowicz.com/\n\nOn 31/07/2025 12:00, r-sig-meta-analysis-request at r-project.org wrote:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. How to replace labels in metafor forest plots? (iagogv)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Wed, 30 Jul 2025 13:05:45 +0200\n> From: iagogv <iagogv at disroot.org>\n> To: R-sig-meta Analysis <r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] How to replace labels in metafor forest plots?\n> Message-ID: <dad104c5f606cce852c2143bca16be9c at disroot.org>\n> Content-Type: text/plain; charset=\"utf-8\"\n> \n> Hi all,\n> \n> Let's say we have the common example\n> \n> dat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg,\n>                 slab=paste(author, year, sep=\", \"), data=dat.bcg)\n> res <- rma(yi, vi, data=dat)\n> forest(res, addpred=TRUE, xlim=c(-16,7), at=seq(-3,2,by=1), shade=TRUE,\n>          ilab=cbind(tpos, tneg, cpos, cneg), ilab.xpos=c(-9.5, -8, -6,\n> -4.5),\n>          ilab.lab=c(\"TB+\", \"TB-\", \"TB+\", \"TB-\"), cex=0.75,\n> header=\"Author(s) and Year\")\n> text(c(-8.75, -5.25), res$k+2.8, c(\"Vaccinated\", \"Control\"), cex=0.75,\n> font=2)\n> \n> The header of the estimates column is Log [RR] [95% CI].\n> \n> I would like to change it (actually, my estimates are Hazard Ratios, and\n> I want to replace the label 'Estimate' by 'Hazard Ratio'), but adding\n> text in the same position just add the new text, but does not remove the\n> original label. How can I replace this label?\n> \n> Thank you for your help!\n> \n> Iago\n> \t[[alternative HTML version deleted]]\n> \n> \n> \n> \n> ------------------------------\n> \n> Subject: Digest Footer\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n> \n> ------------------------------\n> \n> End of R-sig-meta-analysis Digest, Vol 98, Issue 2\n> **************************************************\n\n\n-- \nDiese E-Mail wurde von Avast-Antivirussoftware auf Viren gepr?ft.\nwww.avast.com",
+      "body_snippet": "Dear Iago,\n\nYou could switch off the header() argument for the estimates and supply \nthe desired labels via text(). Based on your example code:\n\n\n\ndat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos",
+      "thread_id": "thread-36c4e81e0c29",
+      "thread_depth": 0,
+      "month": "2025-07"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-dde86fd76a63",
+      "subject": "[R-meta] Four-Level Meta-Analysis in metafor",
+      "message_count": 1,
+      "participants": [
+        "Can Evenkamp"
+      ],
+      "started": "2025-07-29T16:44:18+02:00",
+      "last_reply": "2025-07-29T16:44:18+02:00",
+      "root_message_id": "msg-dde86fd76a63"
+    },
+    {
+      "id": "thread-bc4362b8d69e",
+      "subject": "[R-meta] How to replace labels in metafor forest plots?",
+      "message_count": 1,
+      "participants": [
+        "iagogv"
+      ],
+      "started": "2025-07-30T13:05:45+02:00",
+      "last_reply": "2025-07-30T13:05:45+02:00",
+      "root_message_id": "msg-bc4362b8d69e"
+    },
+    {
+      "id": "thread-36c4e81e0c29",
+      "subject": "[R-meta] How to replace labels in metafor forest plots?",
+      "message_count": 1,
+      "participants": [
+        "Lukasz Stasielowicz"
+      ],
+      "started": "2025-07-31T16:19:59+02:00",
+      "last_reply": "2025-07-31T16:19:59+02:00",
+      "root_message_id": "msg-36c4e81e0c29"
+    }
+  ]
+}

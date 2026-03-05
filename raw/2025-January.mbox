@@ -1,0 +1,835 @@
+From n|ko|ett@@@ymeon|dou @end|ng |rom un|-m@nnhe|m@de  Wed Jan  8 11:45:33 2025
+From: n|ko|ett@@@ymeon|dou @end|ng |rom un|-m@nnhe|m@de (Nikoletta Symeonidou)
+Date: Wed, 8 Jan 2025 10:45:33 +0000
+Subject: [R-meta] Treating multiple conditions in within-subjects designs
+Message-ID: <edecf8b3eea74eab90670e0c39d84852@uni-mannheim.de>
+
+Dear list-members,
+
+We are currently conducting a meta-analysis using a hierarchical three-level model with the metafor package, where the highest level of the hierarchy is ?study? (i.e., outcomes nested within studies). We face a challenge with studies that include more than one control condition and we are unsure how to address this issue in within-subjects designs (i.e., same participants in all conditions).
+Specifically, several studies use within-subjects designs with more than two control conditions, which leads to multiple comparisons of interest per study (e.g., experimental condition vs. control condition 1, and experimental condition vs. control condition 2). Our main concern is how to account for the dependence that arises when the same experimental condition is used to calculate multiple effect sizes within a single study.
+- Does the hierarchical three-level model inherently account for this dependence?
+- If not, what strategies would you recommend for appropriately handling such cases (with the metafor package)?
+
+We greatly appreciate any guidance you can provide. Thank you!
+
+Best regards,
+Nikoletta Symeonidou (University of Mannheim)
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Jan  8 14:09:15 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 8 Jan 2025 13:09:15 +0000
+Subject: [R-meta] 
+ Treating multiple conditions in within-subjects designs
+In-Reply-To: <edecf8b3eea74eab90670e0c39d84852@uni-mannheim.de>
+References: <edecf8b3eea74eab90670e0c39d84852@uni-mannheim.de>
+Message-ID: <AS8PR08MB9193E1CCBB2420B69B4038A58B122@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Nikoletta,
+
+Please see below for my responses.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Nikoletta Symeonidou via R-sig-meta-analysis
+> Sent: Wednesday, January 8, 2025 11:46
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Nikoletta Symeonidou <nikoletta.symeonidou at uni-mannheim.de>
+> Subject: [R-meta] Treating multiple conditions in within-subjects designs
+>
+> Dear list-members,
+>
+> We are currently conducting a meta-analysis using a hierarchical three-level
+> model with the metafor package, where the highest level of the hierarchy is
+> "study" (i.e., outcomes nested within studies). We face a challenge with studies
+> that include more than one control condition and we are unsure how to address
+> this issue in within-subjects designs (i.e., same participants in all
+> conditions).
+> Specifically, several studies use within-subjects designs with more than two
+> control conditions, which leads to multiple comparisons of interest per study
+> (e.g., experimental condition vs. control condition 1, and experimental
+> condition vs. control condition 2). Our main concern is how to account for the
+> dependence that arises when the same experimental condition is used to calculate
+> multiple effect sizes within a single study.
+> - Does the hierarchical three-level model inherently account for this
+> dependence?
+
+No, or at least not fully. The three-level model accounts for potential dependence in the underlying true effects (in the example you gave, there is in theory a true effect for experimental condition vs. control condition 1 and a true effect for experimental condition vs. control condition 2). Whether such dependence in present or not is an empirical question. However, the model does not automatically account for the correlation (or covariance) between the sampling errors of the two effect sizes (i.e., using information from the experimental condition to compute the two effect sizes induces such a correlation). Roughly, that correlation is 0.5, but one can compute this more accurately, depending on the specific effect size measure used and the group sizes. The chapter by Gleser and Olkin (2009) in 'The handbook of research synthesis and meta-analysis' (2nd ed.) provides equations for several effect size measures. See also https://www.metafor-project.org/doku.php/analyses:gleser2009 for code to reproduce the calculations from that chapter. The vcalc() function from the metafor package also provides functionality to compute the covariance. This is what goes into the infamous 'V' matrix that can be used as the second argument to rma.mv().
+
+> - If not, what strategies would you recommend for appropriately handling such
+> cases (with the metafor package)?
+
+See above.
+
+In addition or alternatively (since constructing the V matrix can be a challenge), one could also skip constructing V, fit the three-level model assuming independent sampling errors as the 'working model', and then use cluster-robust inference methods (robust variance estimation) to fix things up (using robust(..., clubSandwich=TRUE)).
+
+> We greatly appreciate any guidance you can provide. Thank you!
+>
+> Best regards,
+> Nikoletta Symeonidou (University of Mannheim)
+
+
+From muetzeh @end|ng |rom un|-bremen@de  Thu Jan  9 11:18:57 2025
+From: muetzeh @end|ng |rom un|-bremen@de (=?UTF-8?Q?Hanna_M=C3=BCtze?=)
+Date: Thu, 9 Jan 2025 11:18:57 +0100
+Subject: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+Message-ID: <e8db6921-000c-4c72-bc11-df21878ce967@uni-bremen.de>
+
+Dear all,
+
+I conducted a Bayesian 3-level meta-analysis with |brms| and noticed 
+that ? is consistently estimated as 0, even in 2-level and 4-level 
+models. I observed the same behavior in this tutorial: 
+https://mvuorre.github.io/posts/2016-09-29-bayesian-meta-analysis/#ref-mcelreathStatisticalRethinkingBayesian2020. 
+How should I interpret this result?
+
+How should I interpret this result? Am I correct in assuming that 
+Bayesian models do not estimate the sampling error because it is assumed 
+to be known based on the sample size? Unfortunately, I could not find 
+references supporting this interpretation and would appreciate any 
+clarification or guidance.
+
+Thank you for your time and help!
+
+Best regards,
+Hanna M?tze
+
+	[[alternative HTML version deleted]]
+
+
+From i@io m@iii@g oii phys@ii@-courses@org  Thu Jan  9 11:43:08 2025
+From: i@io m@iii@g oii phys@ii@-courses@org (i@io m@iii@g oii phys@ii@-courses@org)
+Date: Thu, 9 Jan 2025 11:43:08 +0100 (CET)
+Subject: [R-meta] =?utf-8?q?Limited_Seats_Available_for_=22Meta-analysis_?=
+ =?utf-8?q?in_R=22_=2810-14_February=29?=
+Message-ID: <1736419388.402331099@webmail.jimdo.com>
+
+
+Dear all,
+there are only a few seats left for our upcoming online course, Meta-analysis in R, taking place from 10-14 February 2025. This course offers a comprehensive introduction to modern methods for evidence synthesis, focusing on systematic review and meta-analysis in ecology and evolution.
+ 
+Course website: [ https://www.physalia-courses.org/courses-workshops/metain-r/ ]( https://www.physalia-courses.org/courses-workshops/metain-r/ )
+Highlights:
+Learn how to design and conduct systematic reviews and meta-analyses in R.
+Hands-on sessions using real meta-analytic datasets.
+Explore advanced techniques like multilevel meta-analysis, meta-regression, and accounting for phylogeny.
+Master R packages metafor and orchaRd for your analyses.
+Adhere to open science principles with guidance on PRISMA EcoEvo standards.
+This course combines lectures and practical exercises to ensure you gain both theoretical knowledge and hands-on experience.
+ 
+Best regards,
+Carlo
+ 
+ 
+--------------------
+
+Carlo Pecoraro, Ph.D
+
+
+Physalia-courses DIRECTOR
+
+info at physalia-courses.org
+
+mobile: +49 17645230846
+
+
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jan  9 13:43:14 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 9 Jan 2025 12:43:14 +0000
+Subject: [R-meta] 
+ Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+In-Reply-To: <e8db6921-000c-4c72-bc11-df21878ce967@uni-bremen.de>
+References: <e8db6921-000c-4c72-bc11-df21878ce967@uni-bremen.de>
+Message-ID: <AS8PR08MB9193966173BCF2A70053A0AA8B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Hanna,
+
+Correct, when you use something like 'yi | se(sei) ~ ...' in brms, then the known standard errors replace the sigma parameter, which is just set to 0 (and given as such in the output). So sigma here is not an estimate but simply a fixed value. See help(brmsformula).
+
+It is possible to use 'yi | se(sei, sigma=TRUE) ~ ...', where sigma will be estimated. However, this just adds a regular error term to the model, which would be redundant with an estimate level random effect (i.e., (1 | estimate)), which should be part of the model anyway.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Hanna M?tze via R-sig-meta-analysis
+> Sent: Thursday, January 9, 2025 11:19
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Hanna M?tze <muetzeh at uni-bremen.de>
+> Subject: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+>
+> Dear all,
+>
+> I conducted a Bayesian 3-level meta-analysis with |brms| and noticed
+> that ? is consistently estimated as 0, even in 2-level and 4-level
+> models. I observed the same behavior in this tutorial:
+> https://mvuorre.github.io/posts/2016-09-29-bayesian-meta-analysis/#ref-
+> mcelreathStatisticalRethinkingBayesian2020.
+> How should I interpret this result?
+>
+> How should I interpret this result? Am I correct in assuming that
+> Bayesian models do not estimate the sampling error because it is assumed
+> to be known based on the sample size? Unfortunately, I could not find
+> references supporting this interpretation and would appreciate any
+> clarification or guidance.
+>
+> Thank you for your time and help!
+>
+> Best regards,
+> Hanna M?tze
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Thu Jan  9 14:50:03 2025
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Thu, 9 Jan 2025 13:50:03 +0000
+Subject: [R-meta] 
+ Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+In-Reply-To: <AS8PR08MB9193966173BCF2A70053A0AA8B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <e8db6921-000c-4c72-bc11-df21878ce967@uni-bremen.de>
+ <AS8PR08MB9193966173BCF2A70053A0AA8B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <SYBPR01MB7113314A5732D00E18904C0A9D132@SYBPR01MB7113.ausprd01.prod.outlook.com>
+
+Dear Hanna and Wolfgang,
+
+Just jump in. I have a following-up question regarding Wolfgang's comment about 'yi | se(sei, sigma=TRUE) ~ ...'
+
+If setting 'sigma=TRUE' is equivalent to add an estimate level random effect and if in the random part of the model I do not have (1 | estimate) (which means there is no redundant effect level random effect), whether "bf(y ~ X + (1 | study), sigma ~ 1 + X)" is equivalent to a location-scale meta-analysis?
+
+All the best,
+Yefeng
+
+________________________________
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Sent: Thursday, January 9, 2025 23:43
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Subject: Re: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+
+Dear Hanna,
+
+Correct, when you use something like 'yi | se(sei) ~ ...' in brms, then the known standard errors replace the sigma parameter, which is just set to 0 (and given as such in the output). So sigma here is not an estimate but simply a fixed value. See help(brmsformula).
+
+It is possible to use 'yi | se(sei, sigma=TRUE) ~ ...', where sigma will be estimated. However, this just adds a regular error term to the model, which would be redundant with an estimate level random effect (i.e., (1 | estimate)), which should be part of the model anyway.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Hanna M??tze via R-sig-meta-analysis
+> Sent: Thursday, January 9, 2025 11:19
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Hanna M??tze <muetzeh at uni-bremen.de>
+> Subject: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+>
+> Dear all,
+>
+> I conducted a Bayesian 3-level meta-analysis with |brms| and noticed
+> that ?? is consistently estimated as 0, even in 2-level and 4-level
+> models. I observed the same behavior in this tutorial:
+> https://mvuorre.github.io/posts/2016-09-29-bayesian-meta-analysis/#ref-
+> mcelreathStatisticalRethinkingBayesian2020.
+> How should I interpret this result?
+>
+> How should I interpret this result? Am I correct in assuming that
+> Bayesian models do not estimate the sampling error because it is assumed
+> to be known based on the sample size? Unfortunately, I could not find
+> references supporting this interpretation and would appreciate any
+> clarification or guidance.
+>
+> Thank you for your time and help!
+>
+> Best regards,
+> Hanna M??tze
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jan  9 17:59:18 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 9 Jan 2025 16:59:18 +0000
+Subject: [R-meta] 
+ Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+In-Reply-To: <SYBPR01MB7113314A5732D00E18904C0A9D132@SYBPR01MB7113.ausprd01.prod.outlook.com>
+References: <e8db6921-000c-4c72-bc11-df21878ce967@uni-bremen.de>
+ <AS8PR08MB9193966173BCF2A70053A0AA8B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <SYBPR01MB7113314A5732D00E18904C0A9D132@SYBPR01MB7113.ausprd01.prod.outlook.com>
+Message-ID: <AS8PR08MB9193B1643A51AF97D3DA5A168B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Yefeng,
+
+Yes, that is correct. To be precise, it should be:
+
+bf(yi | se(sei, sigma=TRUE) ~ X, sigma ~ X)
+
+Note that brms() parameterizes the scale part as log(tau) and not as log(tau^2) as is done in rma(), so the coefficients will be about half of the size (and of course can differ due to the priors).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> Sent: Thursday, January 9, 2025 14:50
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Subject: Re: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+>
+> Dear Hanna and Wolfgang,
+>
+> Just jump in. I have a following-up question regarding Wolfgang's comment about
+> 'yi | se(sei, sigma=TRUE) ~ ...'
+>
+> If setting 'sigma=TRUE' is equivalent to add an estimate level random effect and
+> if in the random part of the model I do not have (1 | estimate) (which means
+> there is no redundant effect level random effect), whether "bf(y ~ X + (1 |
+> study), sigma ~ 1 + X)" is equivalent to a location-scale meta-analysis?
+>
+> All the best,
+> Yefeng
+>
+> ________________________________________
+> From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org> on
+> behalf of Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis <mailto:r-sig-meta-
+> analysis at r-project.org>
+> Sent: Thursday, January 9, 2025 23:43
+> To: R Special Interest Group for Meta-Analysis <mailto:r-sig-meta-analysis at r-
+> project.org>
+> Cc: Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Subject: Re: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+>
+> Dear Hanna,
+>
+> Correct, when you use something like 'yi | se(sei) ~ ...' in brms, then the
+> known standard errors replace the sigma parameter, which is just set to 0 (and
+> given as such in the output). So sigma here is not an estimate but simply a
+> fixed value. See help(brmsformula).
+>
+> It is possible to use 'yi | se(sei, sigma=TRUE) ~ ...', where sigma will be
+> estimated. However, this just adds a regular error term to the model, which
+> would be redundant with an estimate level random effect (i.e., (1 | estimate)),
+> which should be part of the model anyway.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Hanna M?tze via R-sig-meta-analysis
+> > Sent: Thursday, January 9, 2025 11:19
+> > To: mailto:r-sig-meta-analysis at r-project.org
+> > Cc: Hanna M?tze <mailto:muetzeh at uni-bremen.de>
+> > Subject: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+> >
+> > Dear all,
+> >
+> > I conducted a Bayesian 3-level meta-analysis with |brms| and noticed
+> > that ? is consistently estimated as 0, even in 2-level and 4-level
+> > models. I observed the same behavior in this tutorial:
+> > https://mvuorre.github.io/posts/2016-09-29-bayesian-meta-analysis/#ref-
+> > mcelreathStatisticalRethinkingBayesian2020.
+> > How should I interpret this result?
+> >
+> > How should I interpret this result? Am I correct in assuming that
+> > Bayesian models do not estimate the sampling error because it is assumed
+> > to be known based on the sample size? Unfortunately, I could not find
+> > references supporting this interpretation and would appreciate any
+> > clarification or guidance.
+> >
+> > Thank you for your time and help!
+> >
+> > Best regards,
+> > Hanna M?tze
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Fri Jan 10 05:23:45 2025
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Fri, 10 Jan 2025 04:23:45 +0000
+Subject: [R-meta] 
+ Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+In-Reply-To: <AS8PR08MB9193B1643A51AF97D3DA5A168B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <e8db6921-000c-4c72-bc11-df21878ce967@uni-bremen.de>
+ <AS8PR08MB9193966173BCF2A70053A0AA8B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <SYBPR01MB7113314A5732D00E18904C0A9D132@SYBPR01MB7113.ausprd01.prod.outlook.com>
+ <AS8PR08MB9193B1643A51AF97D3DA5A168B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <SYBPR01MB71137457B02A8B4CA8DDBC189D1C2@SYBPR01MB7113.ausprd01.prod.outlook.com>
+
+Dear Wolfgang,
+
+Thank you for your confirmation and clarification. I have a further question. It is clear to me that for a dataset with dependent effect sizes, bf(yi | se(sei, sigma=TRUE) ~ X + (1 | study), sigma ~ X) will model location and estimate level scale parameter (or we call it effect size level in the context of meta-analysis) as a function of X.
+
+But for a dataset with independent effect sizes (where between-study level is equal to estimate level), what sort of scale parameter will be modelled by bf(yi | se(sei, sigma=TRUE) ~ X + (1 | study), sigma ~ X)? (1 | study) already accounts for all random effects and there is nothing left for  'sigma ~ X'.
+
+Another question is that a dataset with dependent effect sizes, if I want to model between-study variance (rather than estimate level) as a function of 'X', what the syntax will be?
+
+Happy to see your comment on these.
+
+Thanks,
+Yefeng
+
+
+
+
+________________________________
+From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: Friday, January 10, 2025 3:59
+To: Yefeng Yang <yefeng.yang1 at unsw.edu.au>; R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Subject: RE: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+
+Dear Yefeng,
+
+Yes, that is correct. To be precise, it should be:
+
+bf(yi | se(sei, sigma=TRUE) ~ X, sigma ~ X)
+
+Note that brms() parameterizes the scale part as log(tau) and not as log(tau^2) as is done in rma(), so the coefficients will be about half of the size (and of course can differ due to the priors).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> Sent: Thursday, January 9, 2025 14:50
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Subject: Re: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+>
+> Dear Hanna and Wolfgang,
+>
+> Just jump in. I have a following-up question regarding Wolfgang's comment about
+> 'yi | se(sei, sigma=TRUE) ~ ...'
+>
+> If setting 'sigma=TRUE' is equivalent to add an estimate level random effect and
+> if in the random part of the model I do not have (1 | estimate) (which means
+> there is no redundant effect level random effect), whether "bf(y ~ X + (1 |
+> study), sigma ~ 1 + X)" is equivalent to a location-scale meta-analysis?
+>
+> All the best,
+> Yefeng
+>
+> ________________________________________
+> From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org> on
+> behalf of Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis <mailto:r-sig-meta-
+> analysis at r-project.org>
+> Sent: Thursday, January 9, 2025 23:43
+> To: R Special Interest Group for Meta-Analysis <mailto:r-sig-meta-analysis at r-
+> project.org>
+> Cc: Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Subject: Re: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+>
+> Dear Hanna,
+>
+> Correct, when you use something like 'yi | se(sei) ~ ...' in brms, then the
+> known standard errors replace the sigma parameter, which is just set to 0 (and
+> given as such in the output). So sigma here is not an estimate but simply a
+> fixed value. See help(brmsformula).
+>
+> It is possible to use 'yi | se(sei, sigma=TRUE) ~ ...', where sigma will be
+> estimated. However, this just adds a regular error term to the model, which
+> would be redundant with an estimate level random effect (i.e., (1 | estimate)),
+> which should be part of the model anyway.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Hanna M??tze via R-sig-meta-analysis
+> > Sent: Thursday, January 9, 2025 11:19
+> > To: mailto:r-sig-meta-analysis at r-project.org
+> > Cc: Hanna M??tze <mailto:muetzeh at uni-bremen.de>
+> > Subject: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+> >
+> > Dear all,
+> >
+> > I conducted a Bayesian 3-level meta-analysis with |brms| and noticed
+> > that ?? is consistently estimated as 0, even in 2-level and 4-level
+> > models. I observed the same behavior in this tutorial:
+> > https://mvuorre.github.io/posts/2016-09-29-bayesian-meta-analysis/#ref-
+> > mcelreathStatisticalRethinkingBayesian2020.
+> > How should I interpret this result?
+> >
+> > How should I interpret this result? Am I correct in assuming that
+> > Bayesian models do not estimate the sampling error because it is assumed
+> > to be known based on the sample size? Unfortunately, I could not find
+> > references supporting this interpretation and would appreciate any
+> > clarification or guidance.
+> >
+> > Thank you for your time and help!
+> >
+> > Best regards,
+> > Hanna M??tze
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Jan 10 09:54:07 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 10 Jan 2025 08:54:07 +0000
+Subject: [R-meta] 
+ Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+In-Reply-To: <SYBPR01MB71137457B02A8B4CA8DDBC189D1C2@SYBPR01MB7113.ausprd01.prod.outlook.com>
+References: <e8db6921-000c-4c72-bc11-df21878ce967@uni-bremen.de>
+ <AS8PR08MB9193966173BCF2A70053A0AA8B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <SYBPR01MB7113314A5732D00E18904C0A9D132@SYBPR01MB7113.ausprd01.prod.outlook.com>
+ <AS8PR08MB9193B1643A51AF97D3DA5A168B132@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <SYBPR01MB71137457B02A8B4CA8DDBC189D1C2@SYBPR01MB7113.ausprd01.prod.outlook.com>
+Message-ID: <AS8PR08MB9193ACF14426F5DF7D16E63F8B1C2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+> -----Original Message-----
+> From: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> Sent: Friday, January 10, 2025 05:24
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>; R
+> Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> Subject: Re: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+>
+> Dear Wolfgang,
+>
+> Thank you for your confirmation and clarification. I have a further question. It
+> is clear to me that for a dataset with dependent effect sizes, bf(yi | se(sei,
+> sigma=TRUE) ~ X + (1 | study), sigma ~ X) will model location and estimate level
+> scale parameter (or we call it effect size level in the context of meta-
+> analysis) as a function of X.
+>
+> But for a dataset with independent effect sizes (where between-study level is
+> equal to estimate level), what sort of scale parameter will be modelled by bf(yi
+> | se(sei, sigma=TRUE) ~ X + (1 | study), sigma ~ X)? (1 | study) already
+> accounts for all random effects and there is nothing left for  'sigma ~ X'.
+
+That was my point earlier in the thread. Do NOT use sigma=TRUE and also add an estimate level random effect at the same time, since it is redundant.
+
+> Another question is that a dataset with dependent effect sizes, if I want to
+> model between-study variance (rather than estimate level) as a function of 'X',
+> what the syntax will be?
+
+Don't know off the top of my head if this is possible with brms().
+
+> Happy to see your comment on these.
+>
+> Thanks,
+> Yefeng
+>
+> ________________________________________
+> From: Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Sent: Friday, January 10, 2025 3:59
+> To: Yefeng Yang <mailto:yefeng.yang1 at unsw.edu.au>; R Special Interest Group for
+> Meta-Analysis <mailto:r-sig-meta-analysis at r-project.org>
+> Subject: RE: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+>
+> Dear Yefeng,
+>
+> Yes, that is correct. To be precise, it should be:
+>
+> bf(yi | se(sei, sigma=TRUE) ~ X, sigma ~ X)
+>
+> Note that brms() parameterizes the scale part as log(tau) and not as log(tau^2)
+> as is done in rma(), so the coefficients will be about half of the size (and of
+> course can differ due to the priors).
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Yefeng Yang <mailto:yefeng.yang1 at unsw.edu.au>
+> > Sent: Thursday, January 9, 2025 14:50
+> > To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> > project.org>
+> > Cc: Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Subject: Re: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models
+> (brms)
+> >
+> > Dear Hanna and Wolfgang,
+> >
+> > Just jump in. I have a following-up question regarding Wolfgang's comment
+> about
+> > 'yi | se(sei, sigma=TRUE) ~ ...'
+> >
+> > If setting 'sigma=TRUE' is equivalent to add an estimate level random effect
+> and
+> > if in the random part of the model I do not have (1 | estimate) (which means
+> > there is no redundant effect level random effect), whether "bf(y ~ X + (1 |
+> > study), sigma ~ 1 + X)" is equivalent to a location-scale meta-analysis?
+> >
+> > All the best,
+> > Yefeng
+> >
+> > ________________________________________
+> > From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org>
+> on
+> > behalf of Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis <mailto:r-sig-
+> meta-
+> > mailto:analysis at r-project.org>
+> > Sent: Thursday, January 9, 2025 23:43
+> > To: R Special Interest Group for Meta-Analysis <mailto:r-sig-meta-analysis at r-
+> > project.org>
+> > Cc: Viechtbauer, Wolfgang (NP)
+> > <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Subject: Re: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models
+> (brms)
+> >
+> > Dear Hanna,
+> >
+> > Correct, when you use something like 'yi | se(sei) ~ ...' in brms, then the
+> > known standard errors replace the sigma parameter, which is just set to 0 (and
+> > given as such in the output). So sigma here is not an estimate but simply a
+> > fixed value. See help(brmsformula).
+> >
+> > It is possible to use 'yi | se(sei, sigma=TRUE) ~ ...', where sigma will be
+> > estimated. However, this just adds a regular error term to the model, which
+> > would be redundant with an estimate level random effect (i.e., (1 |
+> estimate)),
+> > which should be part of the model anyway.
+> >
+> > Best,
+> > Wolfgang
+> >
+> > > -----Original Message-----
+> > > From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org>
+> > On Behalf
+> > > Of Hanna M?tze via R-sig-meta-analysis
+> > > Sent: Thursday, January 9, 2025 11:19
+> > > To: mailto:r-sig-meta-analysis at r-project.org
+> > > Cc: Hanna M?tze <mailto:muetzeh at uni-bremen.de>
+> > > Subject: [R-meta] Sigma in Bayesian Multi-Level Meta-Analytic Models (brms)
+> > >
+> > > Dear all,
+> > >
+> > > I conducted a Bayesian 3-level meta-analysis with |brms| and noticed
+> > > that ? is consistently estimated as 0, even in 2-level and 4-level
+> > > models. I observed the same behavior in this tutorial:
+> > > https://mvuorre.github.io/posts/2016-09-29-bayesian-meta-analysis/#ref-
+> > > mcelreathStatisticalRethinkingBayesian2020.
+> > > How should I interpret this result?
+> > >
+> > > How should I interpret this result? Am I correct in assuming that
+> > > Bayesian models do not estimate the sampling error because it is assumed
+> > > to be known based on the sample size? Unfortunately, I could not find
+> > > references supporting this interpretation and would appreciate any
+> > > clarification or guidance.
+> > >
+> > > Thank you for your time and help!
+> > >
+> > > Best regards,
+> > > Hanna M?tze
+
+From muetzeh @end|ng |rom un|-bremen@de  Fri Jan 24 16:18:52 2025
+From: muetzeh @end|ng |rom un|-bremen@de (=?UTF-8?Q?Hanna_M=C3=BCtze?=)
+Date: Fri, 24 Jan 2025 16:18:52 +0100
+Subject: [R-meta] Forestplot for Bayesian Three-Level-Model
+Message-ID: <60ba9443-51f8-436d-881b-15db3954f826@uni-bremen.de>
+
+Dear all,
+
+I am attempting to create a forest plot for a Bayesian three-level 
+meta-analysis. The plot should visualize the estimated true effect sizes 
+along with their corresponding 95% credible intervals (CrIs). 
+Optionally, I would like to include density distributions for each 
+observed effect size. The mathematical formulation is described here: 
+https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/multilevel-ma.html 
+<https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/multilevel-ma.html#multilevel-ma>.
+
+Specifically, each observed effect size ?ij\theta_{ij}can be expressed as:
+
+?ij=?+?ij(2)+?j(3)+?ij\theta_{ij} = \mu + \zeta^{(2)}_{ij} + 
+\zeta^{(3)}_j + \epsilon_{ij}
+
+Where:
+
+  * ?\m: the pooled true effect size,
+  * ?ij(2)\zeta^{(2)}_{ij}?: study-specific random deviation,
+  * ?j(3)\zeta^{(3)}_j?: effect size-specific random deviation, and
+  * ?ij\epsilon_{ij}?: residual error.
+
+Using the *|Chernobyl|* dataset from the |dmetar| package and a Bayesian 
+model fitted via |brms|, I am trying to map the statistical components 
+in this equation to the output of the |brms| model. Below is the code I 
+have used to define the model:
+
+# Load libraries library(pacman) p_load(dmetar, brms, rstan, posterior) 
+# Set Stan options options(mc.cores = parallel::detectCores()) 
+rstan_options(auto_write = TRUE) # Load data data("Chernobyl", package = 
+"dmetar") head(Chernobyl) # Define priors prior <- c( prior(normal(0, 
+1), class = Intercept), prior(cauchy(0, 0.5), class = sd) ) # Fit the 
+three-level model l3.model <- brm( z | se(se.z) ~ 1 + (1 | 
+author/es.id), data = Chernobyl, prior = prior, seed = 20121220, control 
+= list(max_treedepth = 15, adapt_delta = 0.999), iter = 4000, warmup = 
+1000, sample_prior = "yes", save_pars = save_pars(all = TRUE) ) # 
+Summarize posterior draws l3.model_sum_draws <- summarise_draws(l3.model)
+
+To compute the modeled effect size for, for instance, es.id=1es.id = 1, 
+I believe the formula should be:
+
+?11= b_Intercept + r_author[Aghajanyan.&Suskuv.(2009),Intercept] + 
+r_author:es.id[Aghajanyan.&Suskuv.(2009)_id_1,Intercept]
+
+I would calculate this based on the mean column in the 
+|l3.model_sum_draws| data frame. My interpretation is that this would 
+extend the two-level forest plot described here: 
+https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/bayesian-ma.html
+
+However, I am uncertain about the following:
+
+ 1. Is this interpretation of the hierarchical structure and the
+    calculation of ?11\theta_{11}correct?
+ 2. What is the role or meaning of the |z_1[1,1]| output in the
+    |l3.model_sum_draws|? Should it be included in the forest plot
+    calculation?
+ 3. Is it generally appropriate to visualize a three-level model in a
+    forest plot, or would an alternative approach be more suitable?
+
+I appreciate your guidance and suggestions.
+
+Kind regards,
+*Hanna M?tze*
+
+------------------------------------------------------------------------
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jan 30 13:04:42 2025
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 30 Jan 2025 12:04:42 +0000
+Subject: [R-meta] Forestplot for Bayesian Three-Level-Model
+In-Reply-To: <60ba9443-51f8-436d-881b-15db3954f826@uni-bremen.de>
+References: <60ba9443-51f8-436d-881b-15db3954f826@uni-bremen.de>
+Message-ID: <AS8PR08MB9193DA7776B41F61647C19098BE92@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Hanna,
+
+Please see below for my responses.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Hanna M?tze via R-sig-meta-analysis
+> Sent: Friday, January 24, 2025 16:19
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Hanna M?tze <muetzeh at uni-bremen.de>
+> Subject: [R-meta] Forestplot for Bayesian Three-Level-Model
+>
+> Dear all,
+>
+> I am attempting to create a forest plot for a Bayesian three-level
+> meta-analysis. The plot should visualize the estimated true effect sizes
+> along with their corresponding 95% credible intervals (CrIs).
+> Optionally, I would like to include density distributions for each
+> observed effect size. The mathematical formulation is described here:
+> https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/multilevel-ma.html
+> <https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/multilevel-
+> ma.html#multilevel-ma>.
+>
+> Specifically, each observed effect size ?_ij can be expressed as:
+>
+> ?_ij = ? + ?_ij(2) + ?_j(3) + ?_ij
+>
+> Where:
+>
+>   * ?: the pooled true effect size,
+>   * ?_ij(2): study-specific random deviation,
+>   * ?_j(3): effect size-specific random deviation, and
+>   * ?_ij?: residual error.
+
+?_ij(2) is the effect size specific random effect and ?_j(3) the study specific random effect.
+
+> Using the *|Chernobyl|* dataset from the |dmetar| package and a Bayesian
+> model fitted via |brms|, I am trying to map the statistical components
+> in this equation to the output of the |brms| model. Below is the code I
+> have used to define the model:
+>
+> # Load libraries
+> library(pacman)
+> p_load(dmetar, brms, rstan, posterior)
+> # Set Stan options
+> options(mc.cores = parallel::detectCores())
+> rstan_options(auto_write = TRUE)
+> # Load data data("Chernobyl", package = "dmetar")
+> head(Chernobyl)
+> # Define priors
+> prior <- c( prior(normal(0, 1), class = Intercept), prior(cauchy(0, 0.5), class = sd))
+> # Fit the three-level model
+> l3.model <- brm( z | se(se.z) ~ 1 + (1 | author/es.id), data = Chernobyl, prior
+> = prior, seed = 20121220, control = list(max_treedepth = 15, adapt_delta =
+> 0.999), iter = 4000, warmup = 1000, sample_prior = "yes", save_pars =
+> save_pars(all = TRUE))
+> # Summarize posterior draws
+> l3.model_sum_draws <- summarise_draws(l3.model)
+>
+> To compute the modeled effect size for, for instance, es.id = 1,
+> I believe the formula should be:
+>
+> ?11= b_Intercept + r_author[Aghajanyan.&Suskuv.(2009),Intercept] +
+> r_author:es.id[Aghajanyan.&Suskuv.(2009)_id_1,Intercept]
+
+Correct.
+
+> I would calculate this based on the mean column in the
+> |l3.model_sum_draws| data frame. My interpretation is that this would
+> extend the two-level forest plot described here:
+> https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/bayesian-ma.html
+>
+> However, I am uncertain about the following:
+>
+>  1. Is this interpretation of the hierarchical structure and the
+>     calculation of ?11 correct?
+
+Yes. In essence:
+
+with(l3.model_sum_draws,
+l3.model_sum_draws[variable == "b_Intercept","mean"] +
+l3.model_sum_draws[variable == "r_author[Aghajanyan.&.Suskov.(2009),Intercept]", "mean"] +
+l3.model_sum_draws[variable == "r_author:es.id[Aghajanyan.&.Suskov.(2009)_id_1,Intercept]", "mean"])
+
+Note that this takes the mean for each posterior distribution. But if you want to whole posterior distribution, then you need to add the individual draws:
+
+l3.draws <- as_draws_df(l3.model)
+
+which you can then again summarize:
+
+mean(l3.draws$b_Intercept + l3.draws$"r_author[Aghajanyan.&.Suskov.(2009),Intercept]" + l3.draws$"r_author:es.id[Aghajanyan.&.Suskov.(2009)_id_1,Intercept]")
+sd(l3.draws$b_Intercept + l3.draws$"r_author[Aghajanyan.&.Suskov.(2009),Intercept]" + l3.draws$"r_author:es.id[Aghajanyan.&.Suskov.(2009)_id_1,Intercept]")
+
+or compute quantiles of:
+
+quantile(l3.draws$b_Intercept + l3.draws$"r_author[Aghajanyan.&.Suskov.(2009),Intercept]" + l3.draws$"r_author:es.id[Aghajanyan.&.Suskov.(2009)_id_1,Intercept]", prob=c(.025, .975))
+
+>  2. What is the role or meaning of the |z_1[1,1]| output in the
+>     |l3.model_sum_draws|? Should it be included in the forest plot
+>     calculation?
+
+This has to do with some technical aspects of how brm() translates the model into Stan code. In essence, you can ignore this.
+
+>  3. Is it generally appropriate to visualize a three-level model in a
+>     forest plot, or would an alternative approach be more suitable?
+
+Sure, why not? You may want to indicate which estimates 'belong' to the same study. See the last examples at:
+
+https://wviechtb.github.io/metafor/reference/forest.rma.html
+
+Of course, if the number of estimates is very large, then the forest plot also gets very large (in terms of its height).
+
+> I appreciate your guidance and suggestions.
+>
+> Kind regards,
+> *Hanna M?tze*
+

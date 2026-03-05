@@ -1,0 +1,101 @@
+From x@|3111@deve|oper@ @end|ng |rom gm@||@com  Mon Mar  2 14:02:12 2026
+From: x@|3111@deve|oper@ @end|ng |rom gm@||@com (Andrzej Andrzej)
+Date: Mon, 2 Mar 2026 14:02:12 +0100
+Subject: [R-meta] Customising Prediction Distribution in metafor
+Message-ID: <CAKeUzcWBQugBLt_pj76TcUqAJGfnp1HPcofVoJ0r17xcDG+fjQ@mail.gmail.com>
+
+Hi,
+1. Is it possible to customise placement of Predictive Distribution results
+and distribution small plot in a forest plot or this can be done only by
+metafor automatically?
+I mean if I want to place it lower or to the right hand side of the plot
+(both: the results and small plot and "Predictive Distribution [95%PI]"
+subtitle  ?
+2. How does a Predictive Distribution results are calculated for non-normal
+distributions ?
+3. How to calculate the "lighter grey area" in Predictive Distribution
+small plot - here it says - it was about ( P ?  > 1) = 11 %. How to get
+that 0.11 ?
+
+
+https://www.youtube.com/watch?v=IKmak-mml5w&t=58s
+
+time:10:58
+
+Thank you,
+Andrzej
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Mar  2 15:13:01 2026
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 2 Mar 2026 14:13:01 +0000
+Subject: [R-meta] Customising Prediction Distribution in metafor
+In-Reply-To: <CAKeUzcWBQugBLt_pj76TcUqAJGfnp1HPcofVoJ0r17xcDG+fjQ@mail.gmail.com>
+References: <CAKeUzcWBQugBLt_pj76TcUqAJGfnp1HPcofVoJ0r17xcDG+fjQ@mail.gmail.com>
+Message-ID: <PA4PR08MB74357B6D13C98726E38179018B7EA@PA4PR08MB7435.eurprd08.prod.outlook.com>
+
+Dear Andrzej,
+
+Please see below for my responses.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Andrzej Andrzej via R-sig-meta-analysis
+> Sent: Monday, March 2, 2026 14:02
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Andrzej Andrzej <xaf3111.developers at gmail.com>
+> Subject: [R-meta] Customising Prediction Distribution in metafor
+> 
+> Hi,
+> 1. Is it possible to customise placement of Predictive Distribution results
+> and distribution small plot in a forest plot or this can be done only by
+> metafor automatically?
+> I mean if I want to place it lower or to the right hand side of the plot
+> (both: the results and small plot and "Predictive Distribution [95%PI]"
+> subtitle  ?
+
+If you want to put the predictive distribution into a different row, then you should first create the forest plot without it and then use the addpoly() function to add it. For example:
+
+dat <- dat.bcg
+dat <- escalc(measure="RR", ai=tpos, bi=tneg,
+                            ci=cpos, di=cneg, data=dat,
+                            slab=paste0(author, ", ", year))
+res <- rma(yi, vi, data=dat)
+res
+
+forest(res, ylim=c(-5,16))
+addpoly(res, predstyle="dist", row=c(NA,-4))
+
+Note that the 'row' argument for addpoly() can actually be two numbers, one for the summary polygon (which is already shown in the forst plot, so setting the first value to NA just skips plotting it again) and the other for the location of the predictive distribution.
+
+> 2. How does a Predictive Distribution results are calculated for non-normal
+> distributions ?
+
+There are many methods. In the presentation you are referring to, I essentially used the method by Wand and Lee (2019; https://doi.org/10.1002/jrsm.1345). Basically, this is just using kernel density estimation on the BLUPs, which you can get with the blup() function (Wang and Lee actually don?t quite use the BLUPs but something very similar to them, but the difference is negligible). So, for example:
+
+forest(res, ylim=c(-5,16), predstyle="dist")
+dens <- density(blup(res)$pred)
+addpoly(res, predstyle="dist", preddist=dens, row=c(NA,-4))
+
+> 3. How to calculate the "lighter grey area" in Predictive Distribution
+> small plot - here it says - it was about ( P ?  > 1) = 11 %. How to get
+> that 0.11 ?
+
+This one assumes normality. So you just need the center of the predictive distribution, which is just coef(res), and the standard error of the PI, which is part of what is returned by predict(). So:
+
+pred <- predict(res)
+pnorm(0, mean=coef(res), sd=pred$pi.se, lower.tail=FALSE)
+ 
+> https://www.youtube.com/watch?v=IKmak-mml5w&t=58s
+> 
+> time:10:58
+> 
+> Thank you,
+> Andrzej
+

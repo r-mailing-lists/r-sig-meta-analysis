@@ -1,0 +1,3606 @@
+From c@t|@@o||ve|r@ @end|ng |rom york@@c@uk  Sun Nov  6 00:21:10 2022
+From: c@t|@@o||ve|r@ @end|ng |rom york@@c@uk (Catia Oliveira)
+Date: Sat, 5 Nov 2022 23:21:10 +0000
+Subject: [R-meta] Question about MASEM with categorical predictors
+Message-ID: <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=gRbHhcBV1T2bPbp1zPZTg@mail.gmail.com>
+
+Dear all,
+
+Has any of you ever used MASEM with categorical predictors, where the path
+model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and V1 as a
+categorical variable whilst V2 and V3 are continuous. If so, could you
+please point me to the paper/code? I have only found examples of how to do
+it with continuous predictors but never using categorical variables.
+
+Best wishes,
+
+Catia
+
+	[[alternative HTML version deleted]]
+
+
+From jorgemmtte|xe|r@ @end|ng |rom gm@||@com  Tue Nov  8 22:18:00 2022
+From: jorgemmtte|xe|r@ @end|ng |rom gm@||@com (Jorge Teixeira)
+Date: Tue, 8 Nov 2022 21:18:00 +0000
+Subject: [R-meta] Meta package - add PI to each subgroup in a forest plot
+Message-ID: <CAOYO_yDy5jdz-6swkLcy5msu7ce2hcfjKf_D42j-8ZOCrjz_CA@mail.gmail.com>
+
+Dear all,
+
+Is it possible to add a Prediction interval to each subgroup in a forest
+plot?
+
+I wish to display PI for each level of  "BP_threshold", instead of only an
+overall PI.
+
+I tried this with no luck.
+
+
+#1
+DBP <- metacont(en, em, esd, cn, cm, csd, Study, method.tau = "DL",
+prediction = TRUE, comb.random = TRUE, data = dat, sm = "MD")
+
+#2
+forest_dbp_bp  <-update(DBP, byvar=BP_threshold )
+
+#3
+forest(forest_dbp_bp,    prediction = TRUE)
+
+Thank you.
+
+	[[alternative HTML version deleted]]
+
+
+From gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de  Wed Nov  9 11:16:22 2022
+From: gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de (Dr. Guido Schwarzer)
+Date: Wed, 9 Nov 2022 10:16:22 +0000
+Subject: [R-meta] 
+ Meta package - add PI to each subgroup in a forest plot
+In-Reply-To: <CAOYO_yDy5jdz-6swkLcy5msu7ce2hcfjKf_D42j-8ZOCrjz_CA@mail.gmail.com>
+References: <CAOYO_yDy5jdz-6swkLcy5msu7ce2hcfjKf_D42j-8ZOCrjz_CA@mail.gmail.com>
+Message-ID: <887A821F-8A3C-4824-A57A-7A59563B2A8F@uniklinik-freiburg.de>
+
+
+> Am 08.11.2022 um 22:18 schrieb Jorge Teixeira <jorgemmtteixeira at gmail.com>:
+> 
+> Dear all,
+> 
+> Is it possible to add a Prediction interval to each subgroup in a forest
+> plot?
+
+Yes, since version 5.2-0 of meta, using argument ?prediction.subgroup?, e.g.,
+
+m <- metagen(1:10, 1:10 / 10, subgroup = rep(LETTERS[1:4], 1:4))
+##
+forest(m, addrows.below.overall = 2)
+forest(m, addrows.below.overall = 2, prediction = TRUE)
+forest(m, addrows.below.overall = 2, prediction.subgroup = TRUE)
+forest(m, addrows.below.overall = 2, prediction.subgroup = k.w > 3)
+forest(m, addrows.below.overall = 2, prediction.subgroup = TRUE,
+overall = FALSE)
+##
+forest(update(m, prediction.subgroup = TRUE, overall = FALSE))
+
+Best wishes,
+Guido
+
+P.S. You are still using the deprecated arguments ?comb.random? and ?byvar? which have been replaced by ?random? and ?subgroup? in version 5.0-0 of meta, see output of news(package = "meta?) for more details on changes in meta.
+
+From Tor|@Pen@ @end|ng |rom @tonybrook@edu  Fri Nov 11 17:23:06 2022
+From: Tor|@Pen@ @end|ng |rom @tonybrook@edu (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+Date: Fri, 11 Nov 2022 11:23:06 -0500
+Subject: [R-meta] Questions About Multilevel Models
+Message-ID: <CAEmuQj90RhTRytj2Hn4Znjj0LOaw71S0sBEMLvnidOBiXSmmMQ@mail.gmail.com>
+
+Hi everyone -
+
+Thank you for all your guidance in advance!
+
+I have a couple of questions -- (1) is there a way to correct for range
+restriction and/or measurement error in multilevel analyses and (2) is
+there a way to calculate prediction intervals using the metafor package for
+multilevel models?  Thanks again for your help!
+
+Best,
+Tori
+
+-- 
+*Tori Pe?a <https://www.linkedin.com/in/toripena/> *(she/her/ella)
+Doctoral Candidate, Cognitive Psychology
+Dept. of Psychology
+Stony Brook University
+Stony Brook, NY 11790-2500
+[image: Stony Brook University logo]
+
+	[[alternative HTML version deleted]]
+
+
+From |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de  Sat Nov 12 14:17:19 2022
+From: |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de (Lukasz Stasielowicz)
+Date: Sat, 12 Nov 2022 14:17:19 +0100
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+Message-ID: <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+
+Dear Catia,
+
+Disclaimer: I am not up-to-date with MASEM advances so perhaps there is 
+a more user-friendly solution. Consider checking recent work by Mike 
+Cheung and Suzanne Jak for references about cutting-edge methods.
+
+If you have access to raw data then one could use the parameter-based 
+MASEM approach. Since it is possible to use categorical predictors in 
+lavaan/blavaan, one could fit the model separately for each sample and 
+then pool the estimates. This approach has a clear practical limitation: 
+all variables/categories need to be assessed in all studies, which is 
+not always the case.
+
+Alternatively, one could fit separate models for each category (e.g., 
+women, men). After all, stratification is just another kind of adjusting 
+for variables.
+
+Some references about the parameter-based approach can be found in this 
+article:
+Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling. 
+Oxford Research Encyclopedia of Business and Management, Oxford 
+University Press. https://doi.org/10.1093/acrefore/9780190224851.013.225
+
+
+Best,
+Lukasz
+-- 
+Lukasz Stasielowicz
+Osnabr?ck University
+Institute for Psychology
+Research methods, psychological assessment, and evaluation
+Lise-Meitner-Stra?e 3
+49076 Osnabr?ck (Germany)
+Twitter: https://twitter.com/l_stasielowicz
+
+On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+> Send R-sig-meta-analysis mailing list submissions to
+> 	r-sig-meta-analysis at r-project.org
+> 
+> To subscribe or unsubscribe via the World Wide Web, visit
+> 	https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> or, via email, send a message with subject or body 'help' to
+> 	r-sig-meta-analysis-request at r-project.org
+> 
+> You can reach the person managing the list at
+> 	r-sig-meta-analysis-owner at r-project.org
+> 
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of R-sig-meta-analysis digest..."
+> 
+> 
+> Today's Topics:
+> 
+>     1. Question about MASEM with categorical predictors (Catia Oliveira)
+> 
+> ----------------------------------------------------------------------
+> 
+> Message: 1
+> Date: Sat, 5 Nov 2022 23:21:10 +0000
+> From: Catia Oliveira <catia.oliveira at york.ac.uk>
+> To: R meta <r-sig-meta-analysis at r-project.org>
+> Subject: [R-meta] Question about MASEM with categorical predictors
+> Message-ID:
+> 	<CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+> Content-Type: text/plain; charset="utf-8"
+> 
+> Dear all,
+> 
+> Has any of you ever used MASEM with categorical predictors, where the path
+> model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and V1 as a
+> categorical variable whilst V2 and V3 are continuous. If so, could you
+> please point me to the paper/code? I have only found examples of how to do
+> it with continuous predictors but never using categorical variables.
+> 
+> Best wishes,
+> 
+> Catia
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> 
+> 
+> 
+> ------------------------------
+> 
+> Subject: Digest Footer
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> 
+> ------------------------------
+> 
+> End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+> **************************************************
+
+
+From m|kew|cheung @end|ng |rom gm@||@com  Sun Nov 13 02:26:24 2022
+From: m|kew|cheung @end|ng |rom gm@||@com (Mike Cheung)
+Date: Sun, 13 Nov 2022 09:26:24 +0800
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+Message-ID: <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+
+Dear Catia,
+
+Could you be more specific about how the data look like? For example,
+do you have the raw data? If not, what types of summary statistics do you
+have?
+
+How many levels are in V1? How many groups are? Are there incomplete data?
+
+-- 
+---------------------------------------------------------------------
+ Mike W.L. Cheung               Phone: (65) 6516-3702
+ Department of Psychology       Fax:   (65) 6773-1843
+ National University of Singapore
+ http://mikewlcheung.github.io/
+<http://courses.nus.edu.sg/course/psycwlm/internet/>
+---------------------------------------------------------------------
+
+On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+
+> Dear Catia,
+>
+> Disclaimer: I am not up-to-date with MASEM advances so perhaps there is
+> a more user-friendly solution. Consider checking recent work by Mike
+> Cheung and Suzanne Jak for references about cutting-edge methods.
+>
+> If you have access to raw data then one could use the parameter-based
+> MASEM approach. Since it is possible to use categorical predictors in
+> lavaan/blavaan, one could fit the model separately for each sample and
+> then pool the estimates. This approach has a clear practical limitation:
+> all variables/categories need to be assessed in all studies, which is
+> not always the case.
+>
+> Alternatively, one could fit separate models for each category (e.g.,
+> women, men). After all, stratification is just another kind of adjusting
+> for variables.
+>
+> Some references about the parameter-based approach can be found in this
+> article:
+> Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling.
+> Oxford Research Encyclopedia of Business and Management, Oxford
+> University Press. https://doi.org/10.1093/acrefore/9780190224851.013.225
+>
+>
+> Best,
+> Lukasz
+> --
+> Lukasz Stasielowicz
+> Osnabr?ck University
+> Institute for Psychology
+> Research methods, psychological assessment, and evaluation
+> Lise-Meitner-Stra?e 3
+> 49076 Osnabr?ck (Germany)
+> Twitter: https://twitter.com/l_stasielowicz
+>
+> On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+> > Send R-sig-meta-analysis mailing list submissions to
+> >       r-sig-meta-analysis at r-project.org
+> >
+> > To subscribe or unsubscribe via the World Wide Web, visit
+> >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> > or, via email, send a message with subject or body 'help' to
+> >       r-sig-meta-analysis-request at r-project.org
+> >
+> > You can reach the person managing the list at
+> >       r-sig-meta-analysis-owner at r-project.org
+> >
+> > When replying, please edit your Subject line so it is more specific
+> > than "Re: Contents of R-sig-meta-analysis digest..."
+> >
+> >
+> > Today's Topics:
+> >
+> >     1. Question about MASEM with categorical predictors (Catia Oliveira)
+> >
+> > ----------------------------------------------------------------------
+> >
+> > Message: 1
+> > Date: Sat, 5 Nov 2022 23:21:10 +0000
+> > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+> > To: R meta <r-sig-meta-analysis at r-project.org>
+> > Subject: [R-meta] Question about MASEM with categorical predictors
+> > Message-ID:
+> >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+> gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+> > Content-Type: text/plain; charset="utf-8"
+> >
+> > Dear all,
+> >
+> > Has any of you ever used MASEM with categorical predictors, where the
+> path
+> > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and V1 as a
+> > categorical variable whilst V2 and V3 are continuous. If so, could you
+> > please point me to the paper/code? I have only found examples of how to
+> do
+> > it with continuous predictors but never using categorical variables.
+> >
+> > Best wishes,
+> >
+> > Catia
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> >
+> >
+> >
+> > ------------------------------
+> >
+> > Subject: Digest Footer
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+> >
+> > ------------------------------
+> >
+> > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+> > **************************************************
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From c@t|@@o||ve|r@ @end|ng |rom york@@c@uk  Sun Nov 13 03:59:44 2022
+From: c@t|@@o||ve|r@ @end|ng |rom york@@c@uk (Catia Oliveira)
+Date: Sun, 13 Nov 2022 02:59:44 +0000
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+Message-ID: <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+
+Thank you both for replying to my question.
+
+@Mike Cheung <mikewlcheung at nus.edu.sg> The categorical variable represents
+sex, so only female and male. We aim to include only studies that have
+reported all the predictors of interest in the meta-analysis, so we are not
+anticipating missing data. It is unclear whether we will have access to the
+raw data for all studies, as we will not be able to know until we start
+going through the literature, but first, we need to preregister the
+meta-analysis. However, we are trying to anticipate all situations. I have
+read about the work you have done with Susanne Jak, but it is not clear
+whether I could include categorical variables using that approach. It also
+seems to require a lot of data, which may not be our case.
+If we have access to the raw data and are able to fit the model on each
+dataset, do you have any suggestions for how to better analyse it? From
+what I've read it seems that we could analyse each factor loading on its
+own and run a meta-regression, would that be reasonable?
+
+Thank you.
+
+Best wishes,
+
+Catia
+
+On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com> wrote:
+
+> Dear Catia,
+>
+> Could you be more specific about how the data look like? For example,
+> do you have the raw data? If not, what types of summary statistics do you
+> have?
+>
+> How many levels are in V1? How many groups are? Are there incomplete data?
+>
+> --
+> ---------------------------------------------------------------------
+>  Mike W.L. Cheung               Phone: (65) 6516-3702
+>  Department of Psychology       Fax:   (65) 6773-1843
+>  National University of Singapore
+>  http://mikewlcheung.github.io/
+> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+> ---------------------------------------------------------------------
+>
+> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+>
+> > Dear Catia,
+> >
+> > Disclaimer: I am not up-to-date with MASEM advances so perhaps there is
+> > a more user-friendly solution. Consider checking recent work by Mike
+> > Cheung and Suzanne Jak for references about cutting-edge methods.
+> >
+> > If you have access to raw data then one could use the parameter-based
+> > MASEM approach. Since it is possible to use categorical predictors in
+> > lavaan/blavaan, one could fit the model separately for each sample and
+> > then pool the estimates. This approach has a clear practical limitation:
+> > all variables/categories need to be assessed in all studies, which is
+> > not always the case.
+> >
+> > Alternatively, one could fit separate models for each category (e.g.,
+> > women, men). After all, stratification is just another kind of adjusting
+> > for variables.
+> >
+> > Some references about the parameter-based approach can be found in this
+> > article:
+> > Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling.
+> > Oxford Research Encyclopedia of Business and Management, Oxford
+> > University Press. https://doi.org/10.1093/acrefore/9780190224851.013.225
+> >
+> >
+> > Best,
+> > Lukasz
+> > --
+> > Lukasz Stasielowicz
+> > Osnabr?ck University
+> > Institute for Psychology
+> > Research methods, psychological assessment, and evaluation
+> > Lise-Meitner-Stra?e 3
+> > 49076 Osnabr?ck (Germany)
+> > Twitter: https://twitter.com/l_stasielowicz
+> >
+> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+> > > Send R-sig-meta-analysis mailing list submissions to
+> > >       r-sig-meta-analysis at r-project.org
+> > >
+> > > To subscribe or unsubscribe via the World Wide Web, visit
+> > >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> > > or, via email, send a message with subject or body 'help' to
+> > >       r-sig-meta-analysis-request at r-project.org
+> > >
+> > > You can reach the person managing the list at
+> > >       r-sig-meta-analysis-owner at r-project.org
+> > >
+> > > When replying, please edit your Subject line so it is more specific
+> > > than "Re: Contents of R-sig-meta-analysis digest..."
+> > >
+> > >
+> > > Today's Topics:
+> > >
+> > >     1. Question about MASEM with categorical predictors (Catia
+> Oliveira)
+> > >
+> > > ----------------------------------------------------------------------
+> > >
+> > > Message: 1
+> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+> > > To: R meta <r-sig-meta-analysis at r-project.org>
+> > > Subject: [R-meta] Question about MASEM with categorical predictors
+> > > Message-ID:
+> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+> > > Content-Type: text/plain; charset="utf-8"
+> > >
+> > > Dear all,
+> > >
+> > > Has any of you ever used MASEM with categorical predictors, where the
+> > path
+> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and V1
+> as a
+> > > categorical variable whilst V2 and V3 are continuous. If so, could you
+> > > please point me to the paper/code? I have only found examples of how to
+> > do
+> > > it with continuous predictors but never using categorical variables.
+> > >
+> > > Best wishes,
+> > >
+> > > Catia
+> > >
+> > >       [[alternative HTML version deleted]]
+> > >
+> > >
+> > >
+> > >
+> > > ------------------------------
+> > >
+> > > Subject: Digest Footer
+> > >
+> > > _______________________________________________
+> > > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > > To manage your subscription to this mailing list, go to:
+> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> > >
+> > >
+> > > ------------------------------
+> > >
+> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+> > > **************************************************
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m|kew|cheung @end|ng |rom gm@||@com  Sun Nov 13 05:01:58 2022
+From: m|kew|cheung @end|ng |rom gm@||@com (Mike Cheung)
+Date: Sun, 13 Nov 2022 12:01:58 +0800
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+ <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+Message-ID: <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+
+Dear Catia,
+
+If you have the raw data, you may use either a multiple-group SEM or
+multilevel SEM (assuming all variables are in comparable scales across
+studies). However, you may need to standardize or harmonize the variables
+before the analyses if the variables are not directly comparable across
+studies.
+
+It may be tricky to pool correlation matrices when there are categorical
+variables.
+
+An alternative is to fit the regression model in each group and
+meta-analyze the regression coefficients. There was some discussion in the
+following paper.
+
+Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for
+meta-analytic structural equation modeling: Review, issues, and
+illustrations. Research Synthesis Methods, 7(2), 140?155.
+https://doi.org/10.1002/jrsm.1166
+
+I hope it helps.
+
+Best,
+Mike
+
+On Sun, Nov 13, 2022 at 11:00 AM Catia Oliveira <catia.oliveira at york.ac.uk>
+wrote:
+
+> Thank you both for replying to my question.
+>
+> @Mike Cheung <mikewlcheung at nus.edu.sg> The categorical variable
+> represents sex, so only female and male. We aim to include only studies
+> that have reported all the predictors of interest in the meta-analysis, so
+> we are not anticipating missing data. It is unclear whether we will have
+> access to the raw data for all studies, as we will not be able to know
+> until we start going through the literature, but first, we need to
+> preregister the meta-analysis. However, we are trying to anticipate all
+> situations. I have read about the work you have done with Susanne Jak, but
+> it is not clear whether I could include categorical variables using that
+> approach. It also seems to require a lot of data, which may not be our case.
+> If we have access to the raw data and are able to fit the model on each
+> dataset, do you have any suggestions for how to better analyse it? From
+> what I've read it seems that we could analyse each factor loading on its
+> own and run a meta-regression, would that be reasonable?
+>
+> Thank you.
+>
+> Best wishes,
+>
+> Catia
+>
+> On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>
+>> Dear Catia,
+>>
+>> Could you be more specific about how the data look like? For example,
+>> do you have the raw data? If not, what types of summary statistics do you
+>> have?
+>>
+>> How many levels are in V1? How many groups are? Are there incomplete data?
+>>
+>> --
+>> ---------------------------------------------------------------------
+>>  Mike W.L. Cheung               Phone: (65) 6516-3702
+>>  Department of Psychology       Fax:   (65) 6773-1843
+>>  National University of Singapore
+>>  http://mikewlcheung.github.io/
+>> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+>> ---------------------------------------------------------------------
+>>
+>> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+>> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+>>
+>> > Dear Catia,
+>> >
+>> > Disclaimer: I am not up-to-date with MASEM advances so perhaps there is
+>> > a more user-friendly solution. Consider checking recent work by Mike
+>> > Cheung and Suzanne Jak for references about cutting-edge methods.
+>> >
+>> > If you have access to raw data then one could use the parameter-based
+>> > MASEM approach. Since it is possible to use categorical predictors in
+>> > lavaan/blavaan, one could fit the model separately for each sample and
+>> > then pool the estimates. This approach has a clear practical limitation:
+>> > all variables/categories need to be assessed in all studies, which is
+>> > not always the case.
+>> >
+>> > Alternatively, one could fit separate models for each category (e.g.,
+>> > women, men). After all, stratification is just another kind of adjusting
+>> > for variables.
+>> >
+>> > Some references about the parameter-based approach can be found in this
+>> > article:
+>> > Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling.
+>> > Oxford Research Encyclopedia of Business and Management, Oxford
+>> > University Press.
+>> https://doi.org/10.1093/acrefore/9780190224851.013.225
+>> >
+>> >
+>> > Best,
+>> > Lukasz
+>> > --
+>> > Lukasz Stasielowicz
+>> > Osnabr?ck University
+>> > Institute for Psychology
+>> > Research methods, psychological assessment, and evaluation
+>> > Lise-Meitner-Stra?e 3
+>> > 49076 Osnabr?ck (Germany)
+>> > Twitter: https://twitter.com/l_stasielowicz
+>> >
+>> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+>> > > Send R-sig-meta-analysis mailing list submissions to
+>> > >       r-sig-meta-analysis at r-project.org
+>> > >
+>> > > To subscribe or unsubscribe via the World Wide Web, visit
+>> > >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>> > > or, via email, send a message with subject or body 'help' to
+>> > >       r-sig-meta-analysis-request at r-project.org
+>> > >
+>> > > You can reach the person managing the list at
+>> > >       r-sig-meta-analysis-owner at r-project.org
+>> > >
+>> > > When replying, please edit your Subject line so it is more specific
+>> > > than "Re: Contents of R-sig-meta-analysis digest..."
+>> > >
+>> > >
+>> > > Today's Topics:
+>> > >
+>> > >     1. Question about MASEM with categorical predictors (Catia
+>> Oliveira)
+>> > >
+>> > > ----------------------------------------------------------------------
+>> > >
+>> > > Message: 1
+>> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+>> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+>> > > To: R meta <r-sig-meta-analysis at r-project.org>
+>> > > Subject: [R-meta] Question about MASEM with categorical predictors
+>> > > Message-ID:
+>> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+>> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+>> > > Content-Type: text/plain; charset="utf-8"
+>> > >
+>> > > Dear all,
+>> > >
+>> > > Has any of you ever used MASEM with categorical predictors, where the
+>> > path
+>> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and V1
+>> as a
+>> > > categorical variable whilst V2 and V3 are continuous. If so, could you
+>> > > please point me to the paper/code? I have only found examples of how
+>> to
+>> > do
+>> > > it with continuous predictors but never using categorical variables.
+>> > >
+>> > > Best wishes,
+>> > >
+>> > > Catia
+>> > >
+>> > >       [[alternative HTML version deleted]]
+>> > >
+>> > >
+>> > >
+>> > >
+>> > > ------------------------------
+>> > >
+>> > > Subject: Digest Footer
+>> > >
+>> > > _______________________________________________
+>> > > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> > > To manage your subscription to this mailing list, go to:
+>> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>> > >
+>> > >
+>> > > ------------------------------
+>> > >
+>> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+>> > > **************************************************
+>> >
+>> > _______________________________________________
+>> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> > To manage your subscription to this mailing list, go to:
+>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>> >
+>>
+>>         [[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Nov 14 12:12:22 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 14 Nov 2022 11:12:22 +0000
+Subject: [R-meta] Questions About Multilevel Models
+Message-ID: <6537e0b3d22b456a9ed735ae51eb94de@UM-MAIL3213.unimaas.nl>
+
+Dear Tori,
+
+1) Corrections like this are done typically on the effect size estimates (and corresponding sampling variances) before fitting the model (unless one uses methods like those described by Hunter and Schmidt using 'artifact distributions' and correcting estimates coming from the model, but this is really something very specific to the 'Hunter and Schmidt method'). So, you can apply any corrections you deem necessary and then use those in whatever model you like.
+
+2) Yes, predict() will provide those.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Tori Pe?a
+>Sent: Friday, 11 November, 2022 17:23
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Questions About Multilevel Models
+>
+>Hi everyone -
+>
+>Thank you for all your guidance in advance!
+>
+>I have a couple of questions -- (1) is there a way to correct for range
+>restriction and/or measurement error in multilevel analyses and (2) is
+>there a way to calculate prediction intervals using the metafor package for
+>multilevel models?  Thanks again for your help!
+>
+>Best,
+>Tori
+>
+>--
+>*Tori Pe?a <https://www.linkedin.com/in/toripena/> *(she/her/ella)
+>Doctoral Candidate, Cognitive Psychology
+>Dept. of Psychology
+>Stony Brook University
+>Stony Brook, NY 11790-2500
+>[image: Stony Brook University logo]
+
+From mem_w@|ton @end|ng |rom y@hoo@co@uk  Wed Nov 16 16:09:29 2022
+From: mem_w@|ton @end|ng |rom y@hoo@co@uk (mark walton)
+Date: Wed, 16 Nov 2022 15:09:29 +0000 (UTC)
+Subject: [R-meta] Which is the way of using "metamean" and the "byvar"
+ function to examine the influence of multiple categorical variable on the
+ mean values
+References: <1489998169.662103.1668611369365.ref@mail.yahoo.com>
+Message-ID: <1489998169.662103.1668611369365@mail.yahoo.com>
+
+
+I have collected data from 300+ studies on microplastic densities in rivers, I would like to investigate how they vary numeric variables (population density, Average GDP, plastic production) and categorical variables (vegetated/non-vegetated, continent, ecoregion, climatic zone).
+
+However, when running "metamean", and using the "byvar" function I can only analyze one variable at a time. Can anyone recommend a mutivariate method so I can look at what factors are driving the microplastic variation?
+
+Thanks
+
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Nov 16 17:58:01 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 16 Nov 2022 16:58:01 +0000
+Subject: [R-meta] Which is the way of using "metamean" and the "byvar"
+ function to examine the influence of multiple categorical variable on the
+ mean values
+In-Reply-To: <1489998169.662103.1668611369365@mail.yahoo.com>
+References: <1489998169.662103.1668611369365.ref@mail.yahoo.com>
+ <1489998169.662103.1668611369365@mail.yahoo.com>
+Message-ID: <d3bc9d80-6582-18ba-38ef-ae581e693e69@dewey.myzen.co.uk>
+
+Cross-posted on CrossValidated where I have just suggested a solution
+
+On 16/11/2022 15:09, mark walton wrote:
+> 
+> I have collected data from 300+ studies on microplastic densities in rivers, I would like to investigate how they vary numeric variables (population density, Average GDP, plastic production) and categorical variables (vegetated/non-vegetated, continent, ecoregion, climatic zone).
+> 
+> However, when running "metamean", and using the "byvar" function I can only analyze one variable at a time. Can anyone recommend a mutivariate method so I can look at what factors are driving the microplastic variation?
+> 
+> Thanks
+> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From chr|@ww|e@e @end|ng |rom gm@||@com  Thu Nov 17 17:18:54 2022
+From: chr|@ww|e@e @end|ng |rom gm@||@com (Christopher Wiese)
+Date: Thu, 17 Nov 2022 11:18:54 -0500
+Subject: [R-meta] metareg returning "Null" with no warnings
+Message-ID: <56AA90B1-4721-43A0-A8AF-E4DE131548DC@gmail.com>
+
+Hey All, 
+
+I?m running a meta-analysis through metafor and have an issue when I attempt to run metareg on the created object. Specifically, I run the metareg function on the ma_obj and get the right message (Meta-regressions have been added to ?ma_obj? - use get_metareg() to retrieve them), but when I inspect the created ma_obj, it?s ?NULL? all the way down. 
+
+Any idea why this is happening? I?ve used this same code on other analysis and it works fine. 
+
+Cheers,
+
+Chris
+__________________
+Chris W. Wiese, Ph.D.
+I-O Area Director
+Assistant Professor
+School of Psychology
+Georgia Institute of Technology
+654 Cherry Street Northwest 
+JS Coon 229 
+Atlanta, GA 30313
+Twitter <https://twitter.com/DrChrisWiese> | Website <https://www.christopherwiese.com/> | Meet <https://outlook.office365.com/owa/calendar/MeetwithDrWiese at gtvault.onmicrosoft.com/bookings/>
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20221117/fc27e922/attachment-0002.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: metaregNULL.R
+Type: application/octet-stream
+Size: 21389 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20221117/fc27e922/attachment-0001.obj>
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20221117/fc27e922/attachment-0003.html>
+
+From t@@@uere@@|g @end|ng |rom gmx@de  Thu Nov 17 17:22:29 2022
+From: t@@@uere@@|g @end|ng |rom gmx@de (Tobias Saueressig)
+Date: Thu, 17 Nov 2022 17:22:29 +0100
+Subject: [R-meta] 
+ =?utf-8?q?metareg_returning_=22Null=22_with_no_warnings?=
+In-Reply-To: <56AA90B1-4721-43A0-A8AF-E4DE131548DC@gmail.com>
+References: <56AA90B1-4721-43A0-A8AF-E4DE131548DC@gmail.com>
+Message-ID: <trinity-aee3b9e5-b7b6-4ed7-87b8-d88ee4f2b6a7-1668702149092@msvc-mesg-gmx026>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20221117/19f11112/attachment.html>
+
+From chr|@ww|e@e @end|ng |rom gm@||@com  Thu Nov 17 17:52:02 2022
+From: chr|@ww|e@e @end|ng |rom gm@||@com (Christopher Wiese)
+Date: Thu, 17 Nov 2022 11:52:02 -0500
+Subject: [R-meta] metareg returning "Null" with no warnings
+In-Reply-To: <trinity-aee3b9e5-b7b6-4ed7-87b8-d88ee4f2b6a7-1668702149092@msvc-mesg-gmx026>
+References: <56AA90B1-4721-43A0-A8AF-E4DE131548DC@gmail.com>
+ <trinity-aee3b9e5-b7b6-4ed7-87b8-d88ee4f2b6a7-1668702149092@msvc-mesg-gmx026>
+Message-ID: <373F7270-0353-46E8-885A-1D7B8522ED96@gmail.com>
+
+Sorry - I meant psychmeta (not metafor) when referring to the metareg function, which is a wrapper for metafor's rma function. 
+
+I can rewrite the code to (potentially) recreate the same result only using metafor?s functions, but I thought it was worth a shot asking this listserv in case anyone had an idea why this might be happening.  
+__________________
+Chris W. Wiese, Ph.D.
+I-O Area Director
+Assistant Professor
+School of Psychology
+Georgia Institute of Technology
+654 Cherry Street Northwest 
+JS Coon 229 
+Atlanta, GA 30313
+Twitter <https://twitter.com/DrChrisWiese> | Website <https://www.christopherwiese.com/> | Meet <https://outlook.office365.com/owa/calendar/MeetwithDrWiese at gtvault.onmicrosoft.com/bookings/>
+
+> On Nov 17, 2022, at 11:22 AM, Tobias Saueressig <t.saueressig at gmx.de> wrote:
+> 
+> Hi Christopher,
+> 
+> The command metareg is from the Package Meta. In metafor you specify the Regression in the rma.uni <http://rma.uni/> function.
+> 
+> Regards,
+> Tobias Saueressig
+> physiomeetsscience.net <http://physiomeetsscience.net/>
+> 
+> --
+> Diese Nachricht wurde von meinem Android Mobiltelefon mit GMX Mail gesendet.
+> Am 17.11.22, 17:19 schrieb Christopher Wiese <chriswwiese at gmail.com>:
+> Hey All, 
+> 
+> I?m running a meta-analysis through metafor and have an issue when I attempt to run metareg on the created object. Specifically, I run the metareg function on the ma_obj and get the right message (Meta-regressions have been added to ?ma_obj? - use get_metareg() to retrieve them), but when I inspect the created ma_obj, it?s ?NULL? all the way down. 
+> 
+> Any idea why this is happening? I?ve used this same code on other analysis and it works fine. 
+> 
+> Cheers,
+> 
+> Chris 
+> __________________ 
+> Chris W. Wiese, Ph.D. 
+> I-O Area Director 
+> Assistant Professor
+> School of Psychology 
+> Georgia Institute of Technology 
+> 654 Cherry Street Northwest  
+> JS Coon 229  
+> Atlanta, GA 30313 
+> Twitter <https://twitter.com/DrChrisWiese> | Website <https://www.christopherwiese.com/> | Meet <https://outlook.office365.com/owa/calendar/MeetwithDrWiese at gtvault.onmicrosoft.com/bookings/>
+> _______________________________________________ R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org To manage your subscription to this mailing list, go to: https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+	[[alternative HTML version deleted]]
+
+
+From chr|@ww|e@e @end|ng |rom gm@||@com  Thu Nov 17 18:05:45 2022
+From: chr|@ww|e@e @end|ng |rom gm@||@com (Christopher Wiese)
+Date: Thu, 17 Nov 2022 12:05:45 -0500
+Subject: [R-meta] metareg returning "Null" with no warnings
+In-Reply-To: <373F7270-0353-46E8-885A-1D7B8522ED96@gmail.com>
+References: <56AA90B1-4721-43A0-A8AF-E4DE131548DC@gmail.com>
+ <trinity-aee3b9e5-b7b6-4ed7-87b8-d88ee4f2b6a7-1668702149092@msvc-mesg-gmx026>
+ <373F7270-0353-46E8-885A-1D7B8522ED96@gmail.com>
+Message-ID: <8DEA49E3-D80E-42E7-9734-B5B6D6BCDA33@gmail.com>
+
+nm - I knew it was going to be something simple. I forgot to include the moderators in the ma_r function. 
+__________________
+Chris W. Wiese, Ph.D.
+I-O Area Director
+Assistant Professor
+School of Psychology
+Georgia Institute of Technology
+654 Cherry Street Northwest 
+JS Coon 229 
+Atlanta, GA 30313
+Twitter <https://twitter.com/DrChrisWiese> | Website <https://www.christopherwiese.com/> | Meet <https://outlook.office365.com/owa/calendar/MeetwithDrWiese at gtvault.onmicrosoft.com/bookings/>
+
+> On Nov 17, 2022, at 11:52 AM, Christopher Wiese <chriswwiese at gmail.com> wrote:
+> 
+> Sorry - I meant psychmeta (not metafor) when referring to the metareg function, which is a wrapper for metafor's rma function. 
+> 
+> I can rewrite the code to (potentially) recreate the same result only using metafor?s functions, but I thought it was worth a shot asking this listserv in case anyone had an idea why this might be happening.  
+> __________________
+> Chris W. Wiese, Ph.D.
+> I-O Area Director
+> Assistant Professor
+> School of Psychology
+> Georgia Institute of Technology
+> 654 Cherry Street Northwest 
+> JS Coon 229 
+> Atlanta, GA 30313
+> Twitter <https://twitter.com/DrChrisWiese> | Website <https://www.christopherwiese.com/> | Meet <https://outlook.office365.com/owa/calendar/MeetwithDrWiese at gtvault.onmicrosoft.com/bookings/>
+> 
+>> On Nov 17, 2022, at 11:22 AM, Tobias Saueressig <t.saueressig at gmx.de <mailto:t.saueressig at gmx.de>> wrote:
+>> 
+>> Hi Christopher,
+>> 
+>> The command metareg is from the Package Meta. In metafor you specify the Regression in the rma.uni <http://rma.uni/> function.
+>> 
+>> Regards,
+>> Tobias Saueressig
+>> physiomeetsscience.net <http://physiomeetsscience.net/>
+>> 
+>> --
+>> Diese Nachricht wurde von meinem Android Mobiltelefon mit GMX Mail gesendet.
+>> Am 17.11.22, 17:19 schrieb Christopher Wiese <chriswwiese at gmail.com <mailto:chriswwiese at gmail.com>>:
+>> Hey All, 
+>> 
+>> I?m running a meta-analysis through metafor and have an issue when I attempt to run metareg on the created object. Specifically, I run the metareg function on the ma_obj and get the right message (Meta-regressions have been added to ?ma_obj? - use get_metareg() to retrieve them), but when I inspect the created ma_obj, it?s ?NULL? all the way down. 
+>> 
+>> Any idea why this is happening? I?ve used this same code on other analysis and it works fine. 
+>> 
+>> Cheers,
+>> 
+>> Chris 
+>> __________________ 
+>> Chris W. Wiese, Ph.D. 
+>> I-O Area Director 
+>> Assistant Professor
+>> School of Psychology 
+>> Georgia Institute of Technology 
+>> 654 Cherry Street Northwest  
+>> JS Coon 229  
+>> Atlanta, GA 30313 
+>> Twitter <https://twitter.com/DrChrisWiese> | Website <https://www.christopherwiese.com/> | Meet <https://outlook.office365.com/owa/calendar/MeetwithDrWiese at gtvault.onmicrosoft.com/bookings/>
+>> _______________________________________________ R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org <mailto:R-sig-meta-analysis at r-project.org> To manage your subscription to this mailing list, go to: https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+
+
+	[[alternative HTML version deleted]]
+
+
+From c@t|@@o||ve|r@ @end|ng |rom york@@c@uk  Mon Nov 21 16:39:47 2022
+From: c@t|@@o||ve|r@ @end|ng |rom york@@c@uk (Catia Oliveira)
+Date: Mon, 21 Nov 2022 15:39:47 +0000
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+ <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+ <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+Message-ID: <CACw+TffmDgMxGgV3CNoeV=xXWt1dUZUwusqMnxAEpU49ECF6Pg@mail.gmail.com>
+
+Dear professor Mike,
+
+Thank you for your response. Wouldn't it be possible to run the path model
+I described if I used the hetcor() function in R on the raw data per study,
+where I would gather all the correlations between variables, including
+between gender and the numeric variables? Wouldn't this allow me to use the
+two staged approach you describe in "metaSEM: an R package for
+meta-analysis using structural equation modeling"?
+
+Thank you!
+
+Best wishes,
+
+Catia
+
+
+
+On Sun, 13 Nov 2022 at 04:02, Mike Cheung <mikewlcheung at gmail.com> wrote:
+
+> Dear Catia,
+>
+> If you have the raw data, you may use either a multiple-group SEM or
+> multilevel SEM (assuming all variables are in comparable scales across
+> studies). However, you may need to standardize or harmonize the variables
+> before the analyses if the variables are not directly comparable across
+> studies.
+>
+> It may be tricky to pool correlation matrices when there are categorical
+> variables.
+>
+> An alternative is to fit the regression model in each group and
+> meta-analyze the regression coefficients. There was some discussion in the
+> following paper.
+>
+> Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for
+> meta-analytic structural equation modeling: Review, issues, and
+> illustrations. Research Synthesis Methods, 7(2), 140?155.
+> https://doi.org/10.1002/jrsm.1166
+>
+> I hope it helps.
+>
+> Best,
+> Mike
+>
+> On Sun, Nov 13, 2022 at 11:00 AM Catia Oliveira <catia.oliveira at york.ac.uk>
+> wrote:
+>
+>> Thank you both for replying to my question.
+>>
+>> @Mike Cheung <mikewlcheung at nus.edu.sg> The categorical variable
+>> represents sex, so only female and male. We aim to include only studies
+>> that have reported all the predictors of interest in the meta-analysis, so
+>> we are not anticipating missing data. It is unclear whether we will have
+>> access to the raw data for all studies, as we will not be able to know
+>> until we start going through the literature, but first, we need to
+>> preregister the meta-analysis. However, we are trying to anticipate all
+>> situations. I have read about the work you have done with Susanne Jak, but
+>> it is not clear whether I could include categorical variables using that
+>> approach. It also seems to require a lot of data, which may not be our case.
+>> If we have access to the raw data and are able to fit the model on each
+>> dataset, do you have any suggestions for how to better analyse it? From
+>> what I've read it seems that we could analyse each factor loading on its
+>> own and run a meta-regression, would that be reasonable?
+>>
+>> Thank you.
+>>
+>> Best wishes,
+>>
+>> Catia
+>>
+>> On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>>
+>>> Dear Catia,
+>>>
+>>> Could you be more specific about how the data look like? For example,
+>>> do you have the raw data? If not, what types of summary statistics do you
+>>> have?
+>>>
+>>> How many levels are in V1? How many groups are? Are there incomplete
+>>> data?
+>>>
+>>> --
+>>> ---------------------------------------------------------------------
+>>>  Mike W.L. Cheung               Phone: (65) 6516-3702
+>>>  Department of Psychology       Fax:   (65) 6773-1843
+>>>  National University of Singapore
+>>>  http://mikewlcheung.github.io/
+>>> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+>>> ---------------------------------------------------------------------
+>>>
+>>> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+>>> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+>>>
+>>> > Dear Catia,
+>>> >
+>>> > Disclaimer: I am not up-to-date with MASEM advances so perhaps there is
+>>> > a more user-friendly solution. Consider checking recent work by Mike
+>>> > Cheung and Suzanne Jak for references about cutting-edge methods.
+>>> >
+>>> > If you have access to raw data then one could use the parameter-based
+>>> > MASEM approach. Since it is possible to use categorical predictors in
+>>> > lavaan/blavaan, one could fit the model separately for each sample and
+>>> > then pool the estimates. This approach has a clear practical
+>>> limitation:
+>>> > all variables/categories need to be assessed in all studies, which is
+>>> > not always the case.
+>>> >
+>>> > Alternatively, one could fit separate models for each category (e.g.,
+>>> > women, men). After all, stratification is just another kind of
+>>> adjusting
+>>> > for variables.
+>>> >
+>>> > Some references about the parameter-based approach can be found in this
+>>> > article:
+>>> > Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling.
+>>> > Oxford Research Encyclopedia of Business and Management, Oxford
+>>> > University Press.
+>>> https://doi.org/10.1093/acrefore/9780190224851.013.225
+>>> >
+>>> >
+>>> > Best,
+>>> > Lukasz
+>>> > --
+>>> > Lukasz Stasielowicz
+>>> > Osnabr?ck University
+>>> > Institute for Psychology
+>>> > Research methods, psychological assessment, and evaluation
+>>> > Lise-Meitner-Stra?e 3
+>>> > 49076 Osnabr?ck (Germany)
+>>> > Twitter: https://twitter.com/l_stasielowicz
+>>> >
+>>> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+>>> > > Send R-sig-meta-analysis mailing list submissions to
+>>> > >       r-sig-meta-analysis at r-project.org
+>>> > >
+>>> > > To subscribe or unsubscribe via the World Wide Web, visit
+>>> > >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>> > > or, via email, send a message with subject or body 'help' to
+>>> > >       r-sig-meta-analysis-request at r-project.org
+>>> > >
+>>> > > You can reach the person managing the list at
+>>> > >       r-sig-meta-analysis-owner at r-project.org
+>>> > >
+>>> > > When replying, please edit your Subject line so it is more specific
+>>> > > than "Re: Contents of R-sig-meta-analysis digest..."
+>>> > >
+>>> > >
+>>> > > Today's Topics:
+>>> > >
+>>> > >     1. Question about MASEM with categorical predictors (Catia
+>>> Oliveira)
+>>> > >
+>>> > >
+>>> ----------------------------------------------------------------------
+>>> > >
+>>> > > Message: 1
+>>> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+>>> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+>>> > > To: R meta <r-sig-meta-analysis at r-project.org>
+>>> > > Subject: [R-meta] Question about MASEM with categorical predictors
+>>> > > Message-ID:
+>>> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+>>> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+>>> > > Content-Type: text/plain; charset="utf-8"
+>>> > >
+>>> > > Dear all,
+>>> > >
+>>> > > Has any of you ever used MASEM with categorical predictors, where the
+>>> > path
+>>> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and V1
+>>> as a
+>>> > > categorical variable whilst V2 and V3 are continuous. If so, could
+>>> you
+>>> > > please point me to the paper/code? I have only found examples of how
+>>> to
+>>> > do
+>>> > > it with continuous predictors but never using categorical variables.
+>>> > >
+>>> > > Best wishes,
+>>> > >
+>>> > > Catia
+>>> > >
+>>> > >       [[alternative HTML version deleted]]
+>>> > >
+>>> > >
+>>> > >
+>>> > >
+>>> > > ------------------------------
+>>> > >
+>>> > > Subject: Digest Footer
+>>> > >
+>>> > > _______________________________________________
+>>> > > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>> > > To manage your subscription to this mailing list, go to:
+>>> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>> > >
+>>> > >
+>>> > > ------------------------------
+>>> > >
+>>> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+>>> > > **************************************************
+>>> >
+>>> > _______________________________________________
+>>> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>> > To manage your subscription to this mailing list, go to:
+>>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>> >
+>>>
+>>>         [[alternative HTML version deleted]]
+>>>
+>>> _______________________________________________
+>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>> To manage your subscription to this mailing list, go to:
+>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de  Tue Nov 22 11:19:52 2022
+From: |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de (Lukasz Stasielowicz)
+Date: Tue, 22 Nov 2022 11:19:52 +0100
+Subject: [R-meta] Questions About Multilevel Models
+In-Reply-To: <mailman.4266.13.1668510001.17105.r-sig-meta-analysis@r-project.org>
+References: <mailman.4266.13.1668510001.17105.r-sig-meta-analysis@r-project.org>
+Message-ID: <804679d3-168e-683a-ffb5-be7922aedd65@uni-osnabrueck.de>
+
+Dear Tori,
+
+In case you have not seen it already, Wolfgang's site has a vignette 
+showing how to apply the Hunter and Schmidt method using the metafor 
+package: https://www.metafor-project.org/doku.php/tips:hunter_schmidt_method
+As Wolfgang has explained, it is straightforward to generalize it to 
+models with multiple levels.
+
+
+Obligatory word of caution: Accounting for measurement error within the 
+Hunter and Schmidt framework relies on some bold assumptions.
+A couple of references:
+Brakenhoff, T. B., Van Smeden, M., Visseren, F. L. J., & Groenwold, R. 
+H. H. (2018). Random measurement error: Why worry? An example of 
+cardiovascular risk factors. PLoS ONE, 13(2), 1?8. 
+https://doi.org/10.1371/journal.pone.0192298
+Flegal, K. M., Keyl, P. M., & Nieto, F. J. (1991). Differential 
+misclassification arising from nondifferential errors in exposure 
+measurement. American Journal of Epidemiology, 134(10), 1233?1246. 
+https://doi.org/10.1093/oxfordjournals.aje.a116026
+Loken, E., & Gelman, A. (2017). Measurement error and the replication 
+crisis. Science, 355(6325), 584?585. https://doi.org/10.1126/science.aal3618
+van Smeden, M., Lash, T. L., & Groenwold, R. H. H. (2020). Reflection on 
+modern methods: Five myths about measurement error in epidemiological 
+research. International Journal of Epidemiology, 49(1), 338?347. 
+https://doi.org/10.1093/ije/dyz251
+
+
+Hox and colleagues (2017) chose a different approach and included 
+reliability as a moderator variable. This means that the corrected mean 
+effect size can be smaller than the uncorrected effect, which is 
+impossible within the Hunter and Schmidt framework when accounting for 
+measurement error. However, such regression-based adjustments can 
+sometimes lead to implausible estimates, e.g., corrected correlations 
+larger than 1.
+Hox, J. J., Moerbeek, M., & Van de Schoot, R. (2017). Multilevel 
+analysis: Techniques and applications. Routledge.
+
+
+Best,
+Lukasz
+-- 
+Lukasz Stasielowicz
+Osnabr?ck University
+Institute for Psychology
+Research methods, psychological assessment, and evaluation
+Lise-Meitner-Stra?e 3
+49076 Osnabr?ck (Germany)
+Twitter: https://twitter.com/l_stasielowicz
+
+On 15.11.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+> Send R-sig-meta-analysis mailing list submissions to
+> 	r-sig-meta-analysis at r-project.org
+> 
+> To subscribe or unsubscribe via the World Wide Web, visit
+> 	https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> or, via email, send a message with subject or body 'help' to
+> 	r-sig-meta-analysis-request at r-project.org
+> 
+> You can reach the person managing the list at
+> 	r-sig-meta-analysis-owner at r-project.org
+> 
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of R-sig-meta-analysis digest..."
+> 
+> 
+> Today's Topics:
+> 
+>     1. Re: Questions About Multilevel Models (Viechtbauer, Wolfgang (NP))
+> 
+> ----------------------------------------------------------------------
+> 
+> Message: 1
+> Date: Mon, 14 Nov 2022 11:12:22 +0000
+> From: "Viechtbauer, Wolfgang (NP)"
+> 	<wolfgang.viechtbauer at maastrichtuniversity.nl>
+> To: "r-sig-meta-analysis at r-project.org"
+> 	<r-sig-meta-analysis at r-project.org>
+> Subject: Re: [R-meta] Questions About Multilevel Models
+> Message-ID: <6537e0b3d22b456a9ed735ae51eb94de at UM-MAIL3213.unimaas.nl>
+> Content-Type: text/plain; charset="utf-8"
+> 
+> Dear Tori,
+> 
+> 1) Corrections like this are done typically on the effect size estimates (and corresponding sampling variances) before fitting the model (unless one uses methods like those described by Hunter and Schmidt using 'artifact distributions' and correcting estimates coming from the model, but this is really something very specific to the 'Hunter and Schmidt method'). So, you can apply any corrections you deem necessary and then use those in whatever model you like.
+> 
+> 2) Yes, predict() will provide those.
+> 
+> Best,
+> Wolfgang
+> 
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>> Behalf Of Tori Pe?a
+>> Sent: Friday, 11 November, 2022 17:23
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Questions About Multilevel Models
+>>
+>> Hi everyone -
+>>
+>> Thank you for all your guidance in advance!
+>>
+>> I have a couple of questions -- (1) is there a way to correct for range
+>> restriction and/or measurement error in multilevel analyses and (2) is
+>> there a way to calculate prediction intervals using the metafor package for
+>> multilevel models?  Thanks again for your help!
+>>
+>> Best,
+>> Tori
+>>
+>> --
+>> *Tori Pe?a <https://www.linkedin.com/in/toripena/> *(she/her/ella)
+>> Doctoral Candidate, Cognitive Psychology
+>> Dept. of Psychology
+>> Stony Brook University
+>> Stony Brook, NY 11790-2500
+>> [image: Stony Brook University logo]
+> 
+> 
+> ------------------------------
+> 
+> Subject: Digest Footer
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> 
+> ------------------------------
+> 
+> End of R-sig-meta-analysis Digest, Vol 66, Issue 6
+> **************************************************
+
+
+From c@t|@@o||ve|r@ @end|ng |rom york@@c@uk  Tue Nov 22 15:25:16 2022
+From: c@t|@@o||ve|r@ @end|ng |rom york@@c@uk (Catia Oliveira)
+Date: Tue, 22 Nov 2022 14:25:16 +0000
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CADF7-FM3wc708bN1mQR5REEp6TY7KDi17gxJBbBkHa1PLPxW0g@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+ <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+ <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+ <CACw+TffmDgMxGgV3CNoeV=xXWt1dUZUwusqMnxAEpU49ECF6Pg@mail.gmail.com>
+ <CADF7-FM3wc708bN1mQR5REEp6TY7KDi17gxJBbBkHa1PLPxW0g@mail.gmail.com>
+Message-ID: <CACw+Tfcm0gte=LdEfoT40Xf-QWiap5yor8PjJ_C-znB+isPeow@mail.gmail.com>
+
+Just to make sure I understand, I would start by getting the correlations
+per study using the hetcor() (maybe the polychoric() from the psych package
+would be better since it computes a polychoric correlation matrix). I would
+then use  tssem1() to pool the correlation matrices across studies and then
+fit the model (Outcome ~ categorical variable + numerical variable +
+numerical variable) using sem(). Is that what you mean? I am sorry for
+taking so much out of your time but I have not been able to find any
+resources about this.
+
+Thank you,
+
+Catia
+
+On Tue, 22 Nov 2022 at 02:32, Mike Cheung <mikewlcheung at gmail.com> wrote:
+
+> Dear Catia,
+>
+> You may use the wls() function to conduct the stage two analysis in the
+> metaSEM package.
+>
+> However, It appears that hetcor does not compute the asymptotic sampling
+> covariance matrix of the estimated correlations. Thus, the statistical
+> inferences may be incorrect.
+>
+> If you want to use this approach, it is better to use the sem() function
+> in the lavaan package. I believe that it can generate the asymptotic
+> sampling covariance matrix of the estimated correlations.
+>
+> Best,
+> Mike
+>
+> On Mon, Nov 21, 2022 at 11:40 PM Catia Oliveira <catia.oliveira at york.ac.uk>
+> wrote:
+>
+>> Dear professor Mike,
+>>
+>> Thank you for your response. Wouldn't it be possible to run the path
+>> model I described if I used the hetcor() function in R on the raw data per
+>> study, where I would gather all the correlations between variables,
+>> including between gender and the numeric variables? Wouldn't this allow me
+>> to use the two staged approach you describe in "metaSEM: an R package for
+>> meta-analysis using structural equation modeling"?
+>>
+>> Thank you!
+>>
+>> Best wishes,
+>>
+>> Catia
+>>
+>>
+>>
+>> On Sun, 13 Nov 2022 at 04:02, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>>
+>>> Dear Catia,
+>>>
+>>> If you have the raw data, you may use either a multiple-group SEM or
+>>> multilevel SEM (assuming all variables are in comparable scales across
+>>> studies). However, you may need to standardize or harmonize the variables
+>>> before the analyses if the variables are not directly comparable across
+>>> studies.
+>>>
+>>> It may be tricky to pool correlation matrices when there are categorical
+>>> variables.
+>>>
+>>> An alternative is to fit the regression model in each group and
+>>> meta-analyze the regression coefficients. There was some discussion in the
+>>> following paper.
+>>>
+>>> Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for
+>>> meta-analytic structural equation modeling: Review, issues, and
+>>> illustrations. Research Synthesis Methods, 7(2), 140?155.
+>>> https://doi.org/10.1002/jrsm.1166
+>>>
+>>> I hope it helps.
+>>>
+>>> Best,
+>>> Mike
+>>>
+>>> On Sun, Nov 13, 2022 at 11:00 AM Catia Oliveira <
+>>> catia.oliveira at york.ac.uk> wrote:
+>>>
+>>>> Thank you both for replying to my question.
+>>>>
+>>>> @Mike Cheung <mikewlcheung at nus.edu.sg> The categorical variable
+>>>> represents sex, so only female and male. We aim to include only studies
+>>>> that have reported all the predictors of interest in the meta-analysis, so
+>>>> we are not anticipating missing data. It is unclear whether we will have
+>>>> access to the raw data for all studies, as we will not be able to know
+>>>> until we start going through the literature, but first, we need to
+>>>> preregister the meta-analysis. However, we are trying to anticipate all
+>>>> situations. I have read about the work you have done with Susanne Jak, but
+>>>> it is not clear whether I could include categorical variables using that
+>>>> approach. It also seems to require a lot of data, which may not be our case.
+>>>> If we have access to the raw data and are able to fit the model on each
+>>>> dataset, do you have any suggestions for how to better analyse it? From
+>>>> what I've read it seems that we could analyse each factor loading on its
+>>>> own and run a meta-regression, would that be reasonable?
+>>>>
+>>>> Thank you.
+>>>>
+>>>> Best wishes,
+>>>>
+>>>> Catia
+>>>>
+>>>> On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com>
+>>>> wrote:
+>>>>
+>>>>> Dear Catia,
+>>>>>
+>>>>> Could you be more specific about how the data look like? For example,
+>>>>> do you have the raw data? If not, what types of summary statistics do
+>>>>> you
+>>>>> have?
+>>>>>
+>>>>> How many levels are in V1? How many groups are? Are there incomplete
+>>>>> data?
+>>>>>
+>>>>> --
+>>>>> ---------------------------------------------------------------------
+>>>>>  Mike W.L. Cheung               Phone: (65) 6516-3702
+>>>>>  Department of Psychology       Fax:   (65) 6773-1843
+>>>>>  National University of Singapore
+>>>>>  http://mikewlcheung.github.io/
+>>>>> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+>>>>> ---------------------------------------------------------------------
+>>>>>
+>>>>> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+>>>>> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+>>>>>
+>>>>> > Dear Catia,
+>>>>> >
+>>>>> > Disclaimer: I am not up-to-date with MASEM advances so perhaps there
+>>>>> is
+>>>>> > a more user-friendly solution. Consider checking recent work by Mike
+>>>>> > Cheung and Suzanne Jak for references about cutting-edge methods.
+>>>>> >
+>>>>> > If you have access to raw data then one could use the parameter-based
+>>>>> > MASEM approach. Since it is possible to use categorical predictors in
+>>>>> > lavaan/blavaan, one could fit the model separately for each sample
+>>>>> and
+>>>>> > then pool the estimates. This approach has a clear practical
+>>>>> limitation:
+>>>>> > all variables/categories need to be assessed in all studies, which is
+>>>>> > not always the case.
+>>>>> >
+>>>>> > Alternatively, one could fit separate models for each category (e.g.,
+>>>>> > women, men). After all, stratification is just another kind of
+>>>>> adjusting
+>>>>> > for variables.
+>>>>> >
+>>>>> > Some references about the parameter-based approach can be found in
+>>>>> this
+>>>>> > article:
+>>>>> > Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling.
+>>>>> > Oxford Research Encyclopedia of Business and Management, Oxford
+>>>>> > University Press.
+>>>>> https://doi.org/10.1093/acrefore/9780190224851.013.225
+>>>>> >
+>>>>> >
+>>>>> > Best,
+>>>>> > Lukasz
+>>>>> > --
+>>>>> > Lukasz Stasielowicz
+>>>>> > Osnabr?ck University
+>>>>> > Institute for Psychology
+>>>>> > Research methods, psychological assessment, and evaluation
+>>>>> > Lise-Meitner-Stra?e 3
+>>>>> > 49076 Osnabr?ck (Germany)
+>>>>> > Twitter: https://twitter.com/l_stasielowicz
+>>>>> >
+>>>>> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org
+>>>>> wrote:
+>>>>> > > Send R-sig-meta-analysis mailing list submissions to
+>>>>> > >       r-sig-meta-analysis at r-project.org
+>>>>> > >
+>>>>> > > To subscribe or unsubscribe via the World Wide Web, visit
+>>>>> > >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>> > > or, via email, send a message with subject or body 'help' to
+>>>>> > >       r-sig-meta-analysis-request at r-project.org
+>>>>> > >
+>>>>> > > You can reach the person managing the list at
+>>>>> > >       r-sig-meta-analysis-owner at r-project.org
+>>>>> > >
+>>>>> > > When replying, please edit your Subject line so it is more specific
+>>>>> > > than "Re: Contents of R-sig-meta-analysis digest..."
+>>>>> > >
+>>>>> > >
+>>>>> > > Today's Topics:
+>>>>> > >
+>>>>> > >     1. Question about MASEM with categorical predictors (Catia
+>>>>> Oliveira)
+>>>>> > >
+>>>>> > >
+>>>>> ----------------------------------------------------------------------
+>>>>> > >
+>>>>> > > Message: 1
+>>>>> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+>>>>> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+>>>>> > > To: R meta <r-sig-meta-analysis at r-project.org>
+>>>>> > > Subject: [R-meta] Question about MASEM with categorical predictors
+>>>>> > > Message-ID:
+>>>>> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+>>>>> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+>>>>> > > Content-Type: text/plain; charset="utf-8"
+>>>>> > >
+>>>>> > > Dear all,
+>>>>> > >
+>>>>> > > Has any of you ever used MASEM with categorical predictors, where
+>>>>> the
+>>>>> > path
+>>>>> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and
+>>>>> V1 as a
+>>>>> > > categorical variable whilst V2 and V3 are continuous. If so, could
+>>>>> you
+>>>>> > > please point me to the paper/code? I have only found examples of
+>>>>> how to
+>>>>> > do
+>>>>> > > it with continuous predictors but never using categorical
+>>>>> variables.
+>>>>> > >
+>>>>> > > Best wishes,
+>>>>> > >
+>>>>> > > Catia
+>>>>> > >
+>>>>> > >       [[alternative HTML version deleted]]
+>>>>> > >
+>>>>> > >
+>>>>> > >
+>>>>> > >
+>>>>> > > ------------------------------
+>>>>> > >
+>>>>> > > Subject: Digest Footer
+>>>>> > >
+>>>>> > > _______________________________________________
+>>>>> > > R-sig-meta-analysis mailing list @
+>>>>> R-sig-meta-analysis at r-project.org
+>>>>> > > To manage your subscription to this mailing list, go to:
+>>>>> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>> > >
+>>>>> > >
+>>>>> > > ------------------------------
+>>>>> > >
+>>>>> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+>>>>> > > **************************************************
+>>>>> >
+>>>>> > _______________________________________________
+>>>>> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>>>> > To manage your subscription to this mailing list, go to:
+>>>>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>> >
+>>>>>
+>>>>>         [[alternative HTML version deleted]]
+>>>>>
+>>>>> _______________________________________________
+>>>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>>>> To manage your subscription to this mailing list, go to:
+>>>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>
+>>>>
+>>>
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m|kew|cheung @end|ng |rom gm@||@com  Wed Nov 23 03:42:48 2022
+From: m|kew|cheung @end|ng |rom gm@||@com (Mike Cheung)
+Date: Wed, 23 Nov 2022 10:42:48 +0800
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CACw+Tfcm0gte=LdEfoT40Xf-QWiap5yor8PjJ_C-znB+isPeow@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+ <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+ <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+ <CACw+TffmDgMxGgV3CNoeV=xXWt1dUZUwusqMnxAEpU49ECF6Pg@mail.gmail.com>
+ <CADF7-FM3wc708bN1mQR5REEp6TY7KDi17gxJBbBkHa1PLPxW0g@mail.gmail.com>
+ <CACw+Tfcm0gte=LdEfoT40Xf-QWiap5yor8PjJ_C-znB+isPeow@mail.gmail.com>
+Message-ID: <CADF7-FM8vLaqoowtJQORaHN=9_Z+5VcWyhAvxoNXapFzfis5Jw@mail.gmail.com>
+
+Dear Catia,
+
+If I understand it correctly, you use hetcor() or other functions to
+estimate a "correlation matrix" of continuous and binary variables and use
+this correlation matrix in tssem1() and then tssem2().
+
+The part about continuous variables should be fine. But I am not sure about
+the part on binary and continuous variables. Moreover, the meaning of
+including a latent variable with a threshold on gender is questionable.
+
+The most defensible approach is (1) fitting the regression model in each
+study, (2) estimating the path coefficients and their sampling covariance
+matrix, and (3) conducting a multivariate meta-analysis on the path
+coefficients.
+
+Best,
+Mike
+
+
+On Tue, Nov 22, 2022 at 10:25 PM Catia Oliveira <catia.oliveira at york.ac.uk>
+wrote:
+
+> Just to make sure I understand, I would start by getting the correlations
+> per study using the hetcor() (maybe the polychoric() from the psych package
+> would be better since it computes a polychoric correlation matrix). I would
+> then use  tssem1() to pool the correlation matrices across studies and then
+> fit the model (Outcome ~ categorical variable + numerical variable +
+> numerical variable) using sem(). Is that what you mean? I am sorry for
+> taking so much out of your time but I have not been able to find any
+> resources about this.
+>
+> Thank you,
+>
+> Catia
+>
+> On Tue, 22 Nov 2022 at 02:32, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>
+>> Dear Catia,
+>>
+>> You may use the wls() function to conduct the stage two analysis in the
+>> metaSEM package.
+>>
+>> However, It appears that hetcor does not compute the asymptotic sampling
+>> covariance matrix of the estimated correlations. Thus, the statistical
+>> inferences may be incorrect.
+>>
+>> If you want to use this approach, it is better to use the sem() function
+>> in the lavaan package. I believe that it can generate the asymptotic
+>> sampling covariance matrix of the estimated correlations.
+>>
+>> Best,
+>> Mike
+>>
+>> On Mon, Nov 21, 2022 at 11:40 PM Catia Oliveira <
+>> catia.oliveira at york.ac.uk> wrote:
+>>
+>>> Dear professor Mike,
+>>>
+>>> Thank you for your response. Wouldn't it be possible to run the path
+>>> model I described if I used the hetcor() function in R on the raw data per
+>>> study, where I would gather all the correlations between variables,
+>>> including between gender and the numeric variables? Wouldn't this allow me
+>>> to use the two staged approach you describe in "metaSEM: an R package for
+>>> meta-analysis using structural equation modeling"?
+>>>
+>>> Thank you!
+>>>
+>>> Best wishes,
+>>>
+>>> Catia
+>>>
+>>>
+>>>
+>>> On Sun, 13 Nov 2022 at 04:02, Mike Cheung <mikewlcheung at gmail.com>
+>>> wrote:
+>>>
+>>>> Dear Catia,
+>>>>
+>>>> If you have the raw data, you may use either a multiple-group SEM or
+>>>> multilevel SEM (assuming all variables are in comparable scales across
+>>>> studies). However, you may need to standardize or harmonize the variables
+>>>> before the analyses if the variables are not directly comparable across
+>>>> studies.
+>>>>
+>>>> It may be tricky to pool correlation matrices when there are
+>>>> categorical variables.
+>>>>
+>>>> An alternative is to fit the regression model in each group and
+>>>> meta-analyze the regression coefficients. There was some discussion in the
+>>>> following paper.
+>>>>
+>>>> Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for
+>>>> meta-analytic structural equation modeling: Review, issues, and
+>>>> illustrations. Research Synthesis Methods, 7(2), 140?155.
+>>>> https://doi.org/10.1002/jrsm.1166
+>>>>
+>>>> I hope it helps.
+>>>>
+>>>> Best,
+>>>> Mike
+>>>>
+>>>> On Sun, Nov 13, 2022 at 11:00 AM Catia Oliveira <
+>>>> catia.oliveira at york.ac.uk> wrote:
+>>>>
+>>>>> Thank you both for replying to my question.
+>>>>>
+>>>>> @Mike Cheung <mikewlcheung at nus.edu.sg> The categorical variable
+>>>>> represents sex, so only female and male. We aim to include only studies
+>>>>> that have reported all the predictors of interest in the meta-analysis, so
+>>>>> we are not anticipating missing data. It is unclear whether we will have
+>>>>> access to the raw data for all studies, as we will not be able to know
+>>>>> until we start going through the literature, but first, we need to
+>>>>> preregister the meta-analysis. However, we are trying to anticipate all
+>>>>> situations. I have read about the work you have done with Susanne Jak, but
+>>>>> it is not clear whether I could include categorical variables using that
+>>>>> approach. It also seems to require a lot of data, which may not be our case.
+>>>>> If we have access to the raw data and are able to fit the model on
+>>>>> each dataset, do you have any suggestions for how to better analyse it?
+>>>>> From what I've read it seems that we could analyse each factor loading on
+>>>>> its own and run a meta-regression, would that be reasonable?
+>>>>>
+>>>>> Thank you.
+>>>>>
+>>>>> Best wishes,
+>>>>>
+>>>>> Catia
+>>>>>
+>>>>> On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com>
+>>>>> wrote:
+>>>>>
+>>>>>> Dear Catia,
+>>>>>>
+>>>>>> Could you be more specific about how the data look like? For example,
+>>>>>> do you have the raw data? If not, what types of summary statistics do
+>>>>>> you
+>>>>>> have?
+>>>>>>
+>>>>>> How many levels are in V1? How many groups are? Are there incomplete
+>>>>>> data?
+>>>>>>
+>>>>>> --
+>>>>>> ---------------------------------------------------------------------
+>>>>>>  Mike W.L. Cheung               Phone: (65) 6516-3702
+>>>>>>  Department of Psychology       Fax:   (65) 6773-1843
+>>>>>>  National University of Singapore
+>>>>>>  http://mikewlcheung.github.io/
+>>>>>> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+>>>>>> ---------------------------------------------------------------------
+>>>>>>
+>>>>>> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+>>>>>> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+>>>>>>
+>>>>>> > Dear Catia,
+>>>>>> >
+>>>>>> > Disclaimer: I am not up-to-date with MASEM advances so perhaps
+>>>>>> there is
+>>>>>> > a more user-friendly solution. Consider checking recent work by Mike
+>>>>>> > Cheung and Suzanne Jak for references about cutting-edge methods.
+>>>>>> >
+>>>>>> > If you have access to raw data then one could use the
+>>>>>> parameter-based
+>>>>>> > MASEM approach. Since it is possible to use categorical predictors
+>>>>>> in
+>>>>>> > lavaan/blavaan, one could fit the model separately for each sample
+>>>>>> and
+>>>>>> > then pool the estimates. This approach has a clear practical
+>>>>>> limitation:
+>>>>>> > all variables/categories need to be assessed in all studies, which
+>>>>>> is
+>>>>>> > not always the case.
+>>>>>> >
+>>>>>> > Alternatively, one could fit separate models for each category
+>>>>>> (e.g.,
+>>>>>> > women, men). After all, stratification is just another kind of
+>>>>>> adjusting
+>>>>>> > for variables.
+>>>>>> >
+>>>>>> > Some references about the parameter-based approach can be found in
+>>>>>> this
+>>>>>> > article:
+>>>>>> > Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling.
+>>>>>> > Oxford Research Encyclopedia of Business and Management, Oxford
+>>>>>> > University Press.
+>>>>>> https://doi.org/10.1093/acrefore/9780190224851.013.225
+>>>>>> >
+>>>>>> >
+>>>>>> > Best,
+>>>>>> > Lukasz
+>>>>>> > --
+>>>>>> > Lukasz Stasielowicz
+>>>>>> > Osnabr?ck University
+>>>>>> > Institute for Psychology
+>>>>>> > Research methods, psychological assessment, and evaluation
+>>>>>> > Lise-Meitner-Stra?e 3
+>>>>>> > 49076 Osnabr?ck (Germany)
+>>>>>> > Twitter: https://twitter.com/l_stasielowicz
+>>>>>> >
+>>>>>> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org
+>>>>>> wrote:
+>>>>>> > > Send R-sig-meta-analysis mailing list submissions to
+>>>>>> > >       r-sig-meta-analysis at r-project.org
+>>>>>> > >
+>>>>>> > > To subscribe or unsubscribe via the World Wide Web, visit
+>>>>>> > >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>> > > or, via email, send a message with subject or body 'help' to
+>>>>>> > >       r-sig-meta-analysis-request at r-project.org
+>>>>>> > >
+>>>>>> > > You can reach the person managing the list at
+>>>>>> > >       r-sig-meta-analysis-owner at r-project.org
+>>>>>> > >
+>>>>>> > > When replying, please edit your Subject line so it is more
+>>>>>> specific
+>>>>>> > > than "Re: Contents of R-sig-meta-analysis digest..."
+>>>>>> > >
+>>>>>> > >
+>>>>>> > > Today's Topics:
+>>>>>> > >
+>>>>>> > >     1. Question about MASEM with categorical predictors (Catia
+>>>>>> Oliveira)
+>>>>>> > >
+>>>>>> > >
+>>>>>> ----------------------------------------------------------------------
+>>>>>> > >
+>>>>>> > > Message: 1
+>>>>>> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+>>>>>> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+>>>>>> > > To: R meta <r-sig-meta-analysis at r-project.org>
+>>>>>> > > Subject: [R-meta] Question about MASEM with categorical predictors
+>>>>>> > > Message-ID:
+>>>>>> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+>>>>>> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+>>>>>> > > Content-Type: text/plain; charset="utf-8"
+>>>>>> > >
+>>>>>> > > Dear all,
+>>>>>> > >
+>>>>>> > > Has any of you ever used MASEM with categorical predictors, where
+>>>>>> the
+>>>>>> > path
+>>>>>> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and
+>>>>>> V1 as a
+>>>>>> > > categorical variable whilst V2 and V3 are continuous. If so,
+>>>>>> could you
+>>>>>> > > please point me to the paper/code? I have only found examples of
+>>>>>> how to
+>>>>>> > do
+>>>>>> > > it with continuous predictors but never using categorical
+>>>>>> variables.
+>>>>>> > >
+>>>>>> > > Best wishes,
+>>>>>> > >
+>>>>>> > > Catia
+>>>>>> > >
+>>>>>> > >       [[alternative HTML version deleted]]
+>>>>>> > >
+>>>>>> > >
+>>>>>> > >
+>>>>>> > >
+>>>>>> > > ------------------------------
+>>>>>> > >
+>>>>>> > > Subject: Digest Footer
+>>>>>> > >
+>>>>>> > > _______________________________________________
+>>>>>> > > R-sig-meta-analysis mailing list @
+>>>>>> R-sig-meta-analysis at r-project.org
+>>>>>> > > To manage your subscription to this mailing list, go to:
+>>>>>> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>> > >
+>>>>>> > >
+>>>>>> > > ------------------------------
+>>>>>> > >
+>>>>>> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+>>>>>> > > **************************************************
+>>>>>> >
+>>>>>> > _______________________________________________
+>>>>>> > R-sig-meta-analysis mailing list @
+>>>>>> R-sig-meta-analysis at r-project.org
+>>>>>> > To manage your subscription to this mailing list, go to:
+>>>>>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>> >
+>>>>>>
+>>>>>>         [[alternative HTML version deleted]]
+>>>>>>
+>>>>>> _______________________________________________
+>>>>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>>>>> To manage your subscription to this mailing list, go to:
+>>>>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>>
+>>>>>
+>>>>
+>>
+>>
+
+	[[alternative HTML version deleted]]
+
+
+From c@t|@@o||ve|r@ @end|ng |rom york@@c@uk  Wed Nov 23 04:16:30 2022
+From: c@t|@@o||ve|r@ @end|ng |rom york@@c@uk (Catia Oliveira)
+Date: Wed, 23 Nov 2022 03:16:30 +0000
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CADF7-FM8vLaqoowtJQORaHN=9_Z+5VcWyhAvxoNXapFzfis5Jw@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+ <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+ <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+ <CACw+TffmDgMxGgV3CNoeV=xXWt1dUZUwusqMnxAEpU49ECF6Pg@mail.gmail.com>
+ <CADF7-FM3wc708bN1mQR5REEp6TY7KDi17gxJBbBkHa1PLPxW0g@mail.gmail.com>
+ <CACw+Tfcm0gte=LdEfoT40Xf-QWiap5yor8PjJ_C-znB+isPeow@mail.gmail.com>
+ <CADF7-FM8vLaqoowtJQORaHN=9_Z+5VcWyhAvxoNXapFzfis5Jw@mail.gmail.com>
+Message-ID: <CACw+TfeK-7SOYhqgwcj-Mx4Qw-L9TL=ofbhFReEG+ZdBRoeHcw@mail.gmail.com>
+
+Dear Mike,
+
+Thank you again. I have to clarify that there are no latent variables in
+the model I am interested in, it's just a path analysis.
+
+Do you have resources for the regression analyses you suggested? It would
+be much easier to make sure I don't end up deviating from what is the
+recommended track if there's some sample code and a paper. Sorry again for
+all the questions.
+
+Best wishes,
+
+Catia
+
+
+On Wed, Nov 23, 2022, 2:43 AM Mike Cheung <mikewlcheung at gmail.com> wrote:
+
+> Dear Catia,
+>
+> If I understand it correctly, you use hetcor() or other functions to
+> estimate a "correlation matrix" of continuous and binary variables and use
+> this correlation matrix in tssem1() and then tssem2().
+>
+> The part about continuous variables should be fine. But I am not sure
+> about the part on binary and continuous variables. Moreover, the meaning of
+> including a latent variable with a threshold on gender is questionable.
+>
+> The most defensible approach is (1) fitting the regression model in each
+> study, (2) estimating the path coefficients and their sampling covariance
+> matrix, and (3) conducting a multivariate meta-analysis on the path
+> coefficients.
+>
+> Best,
+> Mike
+>
+>
+> On Tue, Nov 22, 2022 at 10:25 PM Catia Oliveira <catia.oliveira at york.ac.uk>
+> wrote:
+>
+>> Just to make sure I understand, I would start by getting the correlations
+>> per study using the hetcor() (maybe the polychoric() from the psych package
+>> would be better since it computes a polychoric correlation matrix). I would
+>> then use  tssem1() to pool the correlation matrices across studies and then
+>> fit the model (Outcome ~ categorical variable + numerical variable +
+>> numerical variable) using sem(). Is that what you mean? I am sorry for
+>> taking so much out of your time but I have not been able to find any
+>> resources about this.
+>>
+>> Thank you,
+>>
+>> Catia
+>>
+>> On Tue, 22 Nov 2022 at 02:32, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>>
+>>> Dear Catia,
+>>>
+>>> You may use the wls() function to conduct the stage two analysis in the
+>>> metaSEM package.
+>>>
+>>> However, It appears that hetcor does not compute the asymptotic sampling
+>>> covariance matrix of the estimated correlations. Thus, the statistical
+>>> inferences may be incorrect.
+>>>
+>>> If you want to use this approach, it is better to use the sem() function
+>>> in the lavaan package. I believe that it can generate the asymptotic
+>>> sampling covariance matrix of the estimated correlations.
+>>>
+>>> Best,
+>>> Mike
+>>>
+>>> On Mon, Nov 21, 2022 at 11:40 PM Catia Oliveira <
+>>> catia.oliveira at york.ac.uk> wrote:
+>>>
+>>>> Dear professor Mike,
+>>>>
+>>>> Thank you for your response. Wouldn't it be possible to run the path
+>>>> model I described if I used the hetcor() function in R on the raw data per
+>>>> study, where I would gather all the correlations between variables,
+>>>> including between gender and the numeric variables? Wouldn't this allow me
+>>>> to use the two staged approach you describe in "metaSEM: an R package for
+>>>> meta-analysis using structural equation modeling"?
+>>>>
+>>>> Thank you!
+>>>>
+>>>> Best wishes,
+>>>>
+>>>> Catia
+>>>>
+>>>>
+>>>>
+>>>> On Sun, 13 Nov 2022 at 04:02, Mike Cheung <mikewlcheung at gmail.com>
+>>>> wrote:
+>>>>
+>>>>> Dear Catia,
+>>>>>
+>>>>> If you have the raw data, you may use either a multiple-group SEM or
+>>>>> multilevel SEM (assuming all variables are in comparable scales across
+>>>>> studies). However, you may need to standardize or harmonize the variables
+>>>>> before the analyses if the variables are not directly comparable across
+>>>>> studies.
+>>>>>
+>>>>> It may be tricky to pool correlation matrices when there are
+>>>>> categorical variables.
+>>>>>
+>>>>> An alternative is to fit the regression model in each group and
+>>>>> meta-analyze the regression coefficients. There was some discussion in the
+>>>>> following paper.
+>>>>>
+>>>>> Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for
+>>>>> meta-analytic structural equation modeling: Review, issues, and
+>>>>> illustrations. Research Synthesis Methods, 7(2), 140?155.
+>>>>> https://doi.org/10.1002/jrsm.1166
+>>>>>
+>>>>> I hope it helps.
+>>>>>
+>>>>> Best,
+>>>>> Mike
+>>>>>
+>>>>> On Sun, Nov 13, 2022 at 11:00 AM Catia Oliveira <
+>>>>> catia.oliveira at york.ac.uk> wrote:
+>>>>>
+>>>>>> Thank you both for replying to my question.
+>>>>>>
+>>>>>> @Mike Cheung <mikewlcheung at nus.edu.sg> The categorical variable
+>>>>>> represents sex, so only female and male. We aim to include only studies
+>>>>>> that have reported all the predictors of interest in the meta-analysis, so
+>>>>>> we are not anticipating missing data. It is unclear whether we will have
+>>>>>> access to the raw data for all studies, as we will not be able to know
+>>>>>> until we start going through the literature, but first, we need to
+>>>>>> preregister the meta-analysis. However, we are trying to anticipate all
+>>>>>> situations. I have read about the work you have done with Susanne Jak, but
+>>>>>> it is not clear whether I could include categorical variables using that
+>>>>>> approach. It also seems to require a lot of data, which may not be our case.
+>>>>>> If we have access to the raw data and are able to fit the model on
+>>>>>> each dataset, do you have any suggestions for how to better analyse it?
+>>>>>> From what I've read it seems that we could analyse each factor loading on
+>>>>>> its own and run a meta-regression, would that be reasonable?
+>>>>>>
+>>>>>> Thank you.
+>>>>>>
+>>>>>> Best wishes,
+>>>>>>
+>>>>>> Catia
+>>>>>>
+>>>>>> On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com>
+>>>>>> wrote:
+>>>>>>
+>>>>>>> Dear Catia,
+>>>>>>>
+>>>>>>> Could you be more specific about how the data look like? For example,
+>>>>>>> do you have the raw data? If not, what types of summary statistics
+>>>>>>> do you
+>>>>>>> have?
+>>>>>>>
+>>>>>>> How many levels are in V1? How many groups are? Are there incomplete
+>>>>>>> data?
+>>>>>>>
+>>>>>>> --
+>>>>>>> ---------------------------------------------------------------------
+>>>>>>>  Mike W.L. Cheung               Phone: (65) 6516-3702
+>>>>>>>  Department of Psychology       Fax:   (65) 6773-1843
+>>>>>>>  National University of Singapore
+>>>>>>>  http://mikewlcheung.github.io/
+>>>>>>> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+>>>>>>> ---------------------------------------------------------------------
+>>>>>>>
+>>>>>>> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+>>>>>>> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+>>>>>>>
+>>>>>>> > Dear Catia,
+>>>>>>> >
+>>>>>>> > Disclaimer: I am not up-to-date with MASEM advances so perhaps
+>>>>>>> there is
+>>>>>>> > a more user-friendly solution. Consider checking recent work by
+>>>>>>> Mike
+>>>>>>> > Cheung and Suzanne Jak for references about cutting-edge methods.
+>>>>>>> >
+>>>>>>> > If you have access to raw data then one could use the
+>>>>>>> parameter-based
+>>>>>>> > MASEM approach. Since it is possible to use categorical predictors
+>>>>>>> in
+>>>>>>> > lavaan/blavaan, one could fit the model separately for each sample
+>>>>>>> and
+>>>>>>> > then pool the estimates. This approach has a clear practical
+>>>>>>> limitation:
+>>>>>>> > all variables/categories need to be assessed in all studies, which
+>>>>>>> is
+>>>>>>> > not always the case.
+>>>>>>> >
+>>>>>>> > Alternatively, one could fit separate models for each category
+>>>>>>> (e.g.,
+>>>>>>> > women, men). After all, stratification is just another kind of
+>>>>>>> adjusting
+>>>>>>> > for variables.
+>>>>>>> >
+>>>>>>> > Some references about the parameter-based approach can be found in
+>>>>>>> this
+>>>>>>> > article:
+>>>>>>> > Cheung, M. W.-L. (2021). Meta-analytic structural equation
+>>>>>>> modeling.
+>>>>>>> > Oxford Research Encyclopedia of Business and Management, Oxford
+>>>>>>> > University Press.
+>>>>>>> https://doi.org/10.1093/acrefore/9780190224851.013.225
+>>>>>>> >
+>>>>>>> >
+>>>>>>> > Best,
+>>>>>>> > Lukasz
+>>>>>>> > --
+>>>>>>> > Lukasz Stasielowicz
+>>>>>>> > Osnabr?ck University
+>>>>>>> > Institute for Psychology
+>>>>>>> > Research methods, psychological assessment, and evaluation
+>>>>>>> > Lise-Meitner-Stra?e 3
+>>>>>>> > 49076 Osnabr?ck (Germany)
+>>>>>>> > Twitter: https://twitter.com/l_stasielowicz
+>>>>>>> >
+>>>>>>> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org
+>>>>>>> wrote:
+>>>>>>> > > Send R-sig-meta-analysis mailing list submissions to
+>>>>>>> > >       r-sig-meta-analysis at r-project.org
+>>>>>>> > >
+>>>>>>> > > To subscribe or unsubscribe via the World Wide Web, visit
+>>>>>>> > >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>>> > > or, via email, send a message with subject or body 'help' to
+>>>>>>> > >       r-sig-meta-analysis-request at r-project.org
+>>>>>>> > >
+>>>>>>> > > You can reach the person managing the list at
+>>>>>>> > >       r-sig-meta-analysis-owner at r-project.org
+>>>>>>> > >
+>>>>>>> > > When replying, please edit your Subject line so it is more
+>>>>>>> specific
+>>>>>>> > > than "Re: Contents of R-sig-meta-analysis digest..."
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > > Today's Topics:
+>>>>>>> > >
+>>>>>>> > >     1. Question about MASEM with categorical predictors (Catia
+>>>>>>> Oliveira)
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> ----------------------------------------------------------------------
+>>>>>>> > >
+>>>>>>> > > Message: 1
+>>>>>>> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+>>>>>>> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+>>>>>>> > > To: R meta <r-sig-meta-analysis at r-project.org>
+>>>>>>> > > Subject: [R-meta] Question about MASEM with categorical
+>>>>>>> predictors
+>>>>>>> > > Message-ID:
+>>>>>>> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+>>>>>>> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+>>>>>>> > > Content-Type: text/plain; charset="utf-8"
+>>>>>>> > >
+>>>>>>> > > Dear all,
+>>>>>>> > >
+>>>>>>> > > Has any of you ever used MASEM with categorical predictors,
+>>>>>>> where the
+>>>>>>> > path
+>>>>>>> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable
+>>>>>>> and V1 as a
+>>>>>>> > > categorical variable whilst V2 and V3 are continuous. If so,
+>>>>>>> could you
+>>>>>>> > > please point me to the paper/code? I have only found examples of
+>>>>>>> how to
+>>>>>>> > do
+>>>>>>> > > it with continuous predictors but never using categorical
+>>>>>>> variables.
+>>>>>>> > >
+>>>>>>> > > Best wishes,
+>>>>>>> > >
+>>>>>>> > > Catia
+>>>>>>> > >
+>>>>>>> > >       [[alternative HTML version deleted]]
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > > ------------------------------
+>>>>>>> > >
+>>>>>>> > > Subject: Digest Footer
+>>>>>>> > >
+>>>>>>> > > _______________________________________________
+>>>>>>> > > R-sig-meta-analysis mailing list @
+>>>>>>> R-sig-meta-analysis at r-project.org
+>>>>>>> > > To manage your subscription to this mailing list, go to:
+>>>>>>> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > > ------------------------------
+>>>>>>> > >
+>>>>>>> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+>>>>>>> > > **************************************************
+>>>>>>> >
+>>>>>>> > _______________________________________________
+>>>>>>> > R-sig-meta-analysis mailing list @
+>>>>>>> R-sig-meta-analysis at r-project.org
+>>>>>>> > To manage your subscription to this mailing list, go to:
+>>>>>>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>>> >
+>>>>>>>
+>>>>>>>         [[alternative HTML version deleted]]
+>>>>>>>
+>>>>>>> _______________________________________________
+>>>>>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>>>>>> To manage your subscription to this mailing list, go to:
+>>>>>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>>>
+>>>>>>
+>>>>>
+>>>
+>>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m|kew|cheung @end|ng |rom gm@||@com  Tue Nov 22 03:32:35 2022
+From: m|kew|cheung @end|ng |rom gm@||@com (Mike Cheung)
+Date: Tue, 22 Nov 2022 10:32:35 +0800
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CACw+TffmDgMxGgV3CNoeV=xXWt1dUZUwusqMnxAEpU49ECF6Pg@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+ <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+ <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+ <CACw+TffmDgMxGgV3CNoeV=xXWt1dUZUwusqMnxAEpU49ECF6Pg@mail.gmail.com>
+Message-ID: <CADF7-FM3wc708bN1mQR5REEp6TY7KDi17gxJBbBkHa1PLPxW0g-7429@mail.gmail.com>
+
+Dear Catia,
+
+You may use the wls() function to conduct the stage two analysis in the
+metaSEM package.
+
+However, It appears that hetcor does not compute the asymptotic sampling
+covariance matrix of the estimated correlations. Thus, the statistical
+inferences may be incorrect.
+
+If you want to use this approach, it is better to use the sem() function in
+the lavaan package. I believe that it can generate the asymptotic sampling
+covariance matrix of the estimated correlations.
+
+Best,
+Mike
+
+On Mon, Nov 21, 2022 at 11:40 PM Catia Oliveira <catia.oliveira at york.ac.uk>
+wrote:
+
+> Dear professor Mike,
+>
+> Thank you for your response. Wouldn't it be possible to run the path model
+> I described if I used the hetcor() function in R on the raw data per study,
+> where I would gather all the correlations between variables, including
+> between gender and the numeric variables? Wouldn't this allow me to use the
+> two staged approach you describe in "metaSEM: an R package for
+> meta-analysis using structural equation modeling"?
+>
+> Thank you!
+>
+> Best wishes,
+>
+> Catia
+>
+>
+>
+> On Sun, 13 Nov 2022 at 04:02, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>
+>> Dear Catia,
+>>
+>> If you have the raw data, you may use either a multiple-group SEM or
+>> multilevel SEM (assuming all variables are in comparable scales across
+>> studies). However, you may need to standardize or harmonize the variables
+>> before the analyses if the variables are not directly comparable across
+>> studies.
+>>
+>> It may be tricky to pool correlation matrices when there are categorical
+>> variables.
+>>
+>> An alternative is to fit the regression model in each group and
+>> meta-analyze the regression coefficients. There was some discussion in the
+>> following paper.
+>>
+>> Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for
+>> meta-analytic structural equation modeling: Review, issues, and
+>> illustrations. Research Synthesis Methods, 7(2), 140?155.
+>> https://doi.org/10.1002/jrsm.1166
+>>
+>> I hope it helps.
+>>
+>> Best,
+>> Mike
+>>
+>> On Sun, Nov 13, 2022 at 11:00 AM Catia Oliveira <
+>> catia.oliveira at york.ac.uk> wrote:
+>>
+>>> Thank you both for replying to my question.
+>>>
+>>> @Mike Cheung <mikewlcheung at nus.edu.sg> The categorical variable
+>>> represents sex, so only female and male. We aim to include only studies
+>>> that have reported all the predictors of interest in the meta-analysis, so
+>>> we are not anticipating missing data. It is unclear whether we will have
+>>> access to the raw data for all studies, as we will not be able to know
+>>> until we start going through the literature, but first, we need to
+>>> preregister the meta-analysis. However, we are trying to anticipate all
+>>> situations. I have read about the work you have done with Susanne Jak, but
+>>> it is not clear whether I could include categorical variables using that
+>>> approach. It also seems to require a lot of data, which may not be our case.
+>>> If we have access to the raw data and are able to fit the model on each
+>>> dataset, do you have any suggestions for how to better analyse it? From
+>>> what I've read it seems that we could analyse each factor loading on its
+>>> own and run a meta-regression, would that be reasonable?
+>>>
+>>> Thank you.
+>>>
+>>> Best wishes,
+>>>
+>>> Catia
+>>>
+>>> On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com>
+>>> wrote:
+>>>
+>>>> Dear Catia,
+>>>>
+>>>> Could you be more specific about how the data look like? For example,
+>>>> do you have the raw data? If not, what types of summary statistics do
+>>>> you
+>>>> have?
+>>>>
+>>>> How many levels are in V1? How many groups are? Are there incomplete
+>>>> data?
+>>>>
+>>>> --
+>>>> ---------------------------------------------------------------------
+>>>>  Mike W.L. Cheung               Phone: (65) 6516-3702
+>>>>  Department of Psychology       Fax:   (65) 6773-1843
+>>>>  National University of Singapore
+>>>>  http://mikewlcheung.github.io/
+>>>> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+>>>> ---------------------------------------------------------------------
+>>>>
+>>>> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+>>>> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+>>>>
+>>>> > Dear Catia,
+>>>> >
+>>>> > Disclaimer: I am not up-to-date with MASEM advances so perhaps there
+>>>> is
+>>>> > a more user-friendly solution. Consider checking recent work by Mike
+>>>> > Cheung and Suzanne Jak for references about cutting-edge methods.
+>>>> >
+>>>> > If you have access to raw data then one could use the parameter-based
+>>>> > MASEM approach. Since it is possible to use categorical predictors in
+>>>> > lavaan/blavaan, one could fit the model separately for each sample and
+>>>> > then pool the estimates. This approach has a clear practical
+>>>> limitation:
+>>>> > all variables/categories need to be assessed in all studies, which is
+>>>> > not always the case.
+>>>> >
+>>>> > Alternatively, one could fit separate models for each category (e.g.,
+>>>> > women, men). After all, stratification is just another kind of
+>>>> adjusting
+>>>> > for variables.
+>>>> >
+>>>> > Some references about the parameter-based approach can be found in
+>>>> this
+>>>> > article:
+>>>> > Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling.
+>>>> > Oxford Research Encyclopedia of Business and Management, Oxford
+>>>> > University Press.
+>>>> https://doi.org/10.1093/acrefore/9780190224851.013.225
+>>>> >
+>>>> >
+>>>> > Best,
+>>>> > Lukasz
+>>>> > --
+>>>> > Lukasz Stasielowicz
+>>>> > Osnabr?ck University
+>>>> > Institute for Psychology
+>>>> > Research methods, psychological assessment, and evaluation
+>>>> > Lise-Meitner-Stra?e 3
+>>>> > 49076 Osnabr?ck (Germany)
+>>>> > Twitter: https://twitter.com/l_stasielowicz
+>>>> >
+>>>> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+>>>> > > Send R-sig-meta-analysis mailing list submissions to
+>>>> > >       r-sig-meta-analysis at r-project.org
+>>>> > >
+>>>> > > To subscribe or unsubscribe via the World Wide Web, visit
+>>>> > >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>> > > or, via email, send a message with subject or body 'help' to
+>>>> > >       r-sig-meta-analysis-request at r-project.org
+>>>> > >
+>>>> > > You can reach the person managing the list at
+>>>> > >       r-sig-meta-analysis-owner at r-project.org
+>>>> > >
+>>>> > > When replying, please edit your Subject line so it is more specific
+>>>> > > than "Re: Contents of R-sig-meta-analysis digest..."
+>>>> > >
+>>>> > >
+>>>> > > Today's Topics:
+>>>> > >
+>>>> > >     1. Question about MASEM with categorical predictors (Catia
+>>>> Oliveira)
+>>>> > >
+>>>> > >
+>>>> ----------------------------------------------------------------------
+>>>> > >
+>>>> > > Message: 1
+>>>> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+>>>> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+>>>> > > To: R meta <r-sig-meta-analysis at r-project.org>
+>>>> > > Subject: [R-meta] Question about MASEM with categorical predictors
+>>>> > > Message-ID:
+>>>> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+>>>> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+>>>> > > Content-Type: text/plain; charset="utf-8"
+>>>> > >
+>>>> > > Dear all,
+>>>> > >
+>>>> > > Has any of you ever used MASEM with categorical predictors, where
+>>>> the
+>>>> > path
+>>>> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and
+>>>> V1 as a
+>>>> > > categorical variable whilst V2 and V3 are continuous. If so, could
+>>>> you
+>>>> > > please point me to the paper/code? I have only found examples of
+>>>> how to
+>>>> > do
+>>>> > > it with continuous predictors but never using categorical variables.
+>>>> > >
+>>>> > > Best wishes,
+>>>> > >
+>>>> > > Catia
+>>>> > >
+>>>> > >       [[alternative HTML version deleted]]
+>>>> > >
+>>>> > >
+>>>> > >
+>>>> > >
+>>>> > > ------------------------------
+>>>> > >
+>>>> > > Subject: Digest Footer
+>>>> > >
+>>>> > > _______________________________________________
+>>>> > > R-sig-meta-analysis mailing list @
+>>>> R-sig-meta-analysis at r-project.org
+>>>> > > To manage your subscription to this mailing list, go to:
+>>>> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>> > >
+>>>> > >
+>>>> > > ------------------------------
+>>>> > >
+>>>> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+>>>> > > **************************************************
+>>>> >
+>>>> > _______________________________________________
+>>>> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>>> > To manage your subscription to this mailing list, go to:
+>>>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>> >
+>>>>
+>>>>         [[alternative HTML version deleted]]
+>>>>
+>>>> _______________________________________________
+>>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>>> To manage your subscription to this mailing list, go to:
+>>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>
+>>>
+>>
+
+	[[alternative HTML version deleted]]
+
+
+From roger@m@rt|ne@u @end|ng |rom AGR@GC@CA  Thu Nov 24 22:22:07 2022
+From: roger@m@rt|ne@u @end|ng |rom AGR@GC@CA (Martineau, Roger (AAFC/AAC))
+Date: Thu, 24 Nov 2022 21:22:07 +0000
+Subject: [R-meta] Interaction between a continuous variable and a 3-level
+ categorical variable
+Message-ID: <YT2PR01MB61100AA7F314336000BB368BB70F9@YT2PR01MB6110.CANPRD01.PROD.OUTLOOK.COM>
+
+Dear list-members,
+
+I have a large data set and I want to report the interaction term between a continuous variable and a 3-level categorical variable. My data are somewhat similar to the cake data set but the interactions are significant.
+
+With the example on cake, the lmer model 1 and the anova(m1) indicate that both the intercepts and the slopes are not different (P = 0.98 and 0.96, respectively) between levels of recipe (i.e. A, B and C). I use the rma.mv function and the robust function in my meta-analysis. The corresponding model to model 1 with rma.mv would be model m2 which gives the same coefficients and P-values as model m1. When I apply the robust function on model 2, I get the same coefficients and somewhat different P-values as expected.
+
+My question is: how can I get the interaction terms (P = 0.98 and 0.96; or others similar) from model 2 before and after using the robust function ?
+
+Best regards,
+
+Dr Roger Martineau, mv PhD
+Qu?bec, Canada
+
+str(cake)
+cake<- within(cake, {
+  ID      <- 1:nrow(cake)
+})
+
+m1 <- lmer(angle~-1+temp*recipe + (1|replicate), data=cake)
+summary(m1)
+anova(m1)
+
+m2 <- rma.mv(angle ~ -1 + temp*recipe, V=0, random = list(~ 1|replicate, ~ 1|ID), data=cake)
+summary(m2)
+robust(m2, cluster=cake$replicate)
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Nov 25 00:14:40 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 24 Nov 2022 23:14:40 +0000
+Subject: [R-meta] 
+ Interaction between a continuous variable and a 3-level
+ categorical variable
+In-Reply-To: <YT2PR01MB61100AA7F314336000BB368BB70F9@YT2PR01MB6110.CANPRD01.PROD.OUTLOOK.COM>
+References: <YT2PR01MB61100AA7F314336000BB368BB70F9@YT2PR01MB6110.CANPRD01.PROD.OUTLOOK.COM>
+Message-ID: <95bcc2488c4749e7b7c79830e6319f0d@UM-MAIL3213.unimaas.nl>
+
+Hi Roger,
+
+This should do it:
+
+m2 <- rma.mv(angle ~ -1 + temp*recipe, V=0, random = list(~ 1|replicate, ~ 1|ID), data=cake, test="t")
+summary(m2)
+anova(m2, btt="temp:recipe")
+
+sav <- robust(m2, cluster=cake$replicate)
+sav
+anova(sav, btt="temp:recipe")
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Martineau, Roger (AAFC/AAC)
+>Sent: Thursday, 24 November, 2022 22:22
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Interaction between a continuous variable and a 3-level
+>categorical variable
+>
+>Dear list-members,
+>
+>I have a large data set and I want to report the interaction term between a
+>continuous variable and a 3-level categorical variable. My data are somewhat
+>similar to the cake data set but the interactions are significant.
+>
+>With the example on cake, the lmer model 1 and the anova(m1) indicate that both
+>the intercepts and the slopes are not different (P = 0.98 and 0.96, respectively)
+>between levels of recipe (i.e. A, B and C). I use the rma.mv function and the
+>robust function in my meta-analysis. The corresponding model to model 1 with
+>rma.mv would be model m2 which gives the same coefficients and P-values as model
+>m1. When I apply the robust function on model 2, I get the same coefficients and
+>somewhat different P-values as expected.
+>
+>My question is: how can I get the interaction terms (P = 0.98 and 0.96; or others
+>similar) from model 2 before and after using the robust function ?
+>
+>Best regards,
+>
+>Dr Roger Martineau, mv PhD
+>Qu?bec, Canada
+>
+>str(cake)
+>cake<- within(cake, {
+>  ID      <- 1:nrow(cake)
+>})
+>
+>m1 <- lmer(angle~-1+temp*recipe + (1|replicate), data=cake)
+>summary(m1)
+>anova(m1)
+>
+>m2 <- rma.mv(angle ~ -1 + temp*recipe, V=0, random = list(~ 1|replicate, ~ 1|ID),
+>data=cake)
+>summary(m2)
+>robust(m2, cluster=cake$replicate)
+
+From c@t|@@o||ve|r@ @end|ng |rom york@@c@uk  Mon Nov 28 19:52:10 2022
+From: c@t|@@o||ve|r@ @end|ng |rom york@@c@uk (Catia Oliveira)
+Date: Mon, 28 Nov 2022 18:52:10 +0000
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CADF7-FM8vLaqoowtJQORaHN=9_Z+5VcWyhAvxoNXapFzfis5Jw@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+ <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+ <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+ <CACw+TffmDgMxGgV3CNoeV=xXWt1dUZUwusqMnxAEpU49ECF6Pg@mail.gmail.com>
+ <CADF7-FM3wc708bN1mQR5REEp6TY7KDi17gxJBbBkHa1PLPxW0g@mail.gmail.com>
+ <CACw+Tfcm0gte=LdEfoT40Xf-QWiap5yor8PjJ_C-znB+isPeow@mail.gmail.com>
+ <CADF7-FM8vLaqoowtJQORaHN=9_Z+5VcWyhAvxoNXapFzfis5Jw@mail.gmail.com>
+Message-ID: <CACw+Tff5O2M=KypyzObJWzjA6ccK-LZgpacKb-3JkgL4GuKPYg@mail.gmail.com>
+
+Dear Mike,
+
+I am sorry for bothering you again but I was informed my emails were
+not being received by the mailing list users. So what you are
+suggesting is for me to run the regression models on the raw data and
+then take the path coefficients. But how can I analyse them in a
+meta-analysis? Didn't you say it didn't work with categorical
+variables? Are you suggesting I use the sampling covariance matrix
+from the regression to run the two-staged analysis in the metaSEM
+package? I am a bit confused.
+
+Best wishes
+Catia
+
+On Wed, 23 Nov 2022 at 02:43, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>
+> Dear Catia,
+>
+> If I understand it correctly, you use hetcor() or other functions to estimate a "correlation matrix" of continuous and binary variables and use this correlation matrix in tssem1() and then tssem2().
+>
+> The part about continuous variables should be fine. But I am not sure about the part on binary and continuous variables. Moreover, the meaning of including a latent variable with a threshold on gender is questionable.
+>
+> The most defensible approach is (1) fitting the regression model in each study, (2) estimating the path coefficients and their sampling covariance matrix, and (3) conducting a multivariate meta-analysis on the path coefficients.
+>
+> Best,
+> Mike
+>
+>
+> On Tue, Nov 22, 2022 at 10:25 PM Catia Oliveira <catia.oliveira at york.ac.uk> wrote:
+>>
+>> Just to make sure I understand, I would start by getting the correlations per study using the hetcor() (maybe the polychoric() from the psych package would be better since it computes a polychoric correlation matrix). I would then use  tssem1() to pool the correlation matrices across studies and then fit the model (Outcome ~ categorical variable + numerical variable + numerical variable) using sem(). Is that what you mean? I am sorry for taking so much out of your time but I have not been able to find any resources about this.
+>>
+>> Thank you,
+>>
+>> Catia
+>>
+>> On Tue, 22 Nov 2022 at 02:32, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>>>
+>>> Dear Catia,
+>>>
+>>> You may use the wls() function to conduct the stage two analysis in the metaSEM package.
+>>>
+>>> However, It appears that hetcor does not compute the asymptotic sampling covariance matrix of the estimated correlations. Thus, the statistical inferences may be incorrect.
+>>>
+>>> If you want to use this approach, it is better to use the sem() function in the lavaan package. I believe that it can generate the asymptotic sampling covariance matrix of the estimated correlations.
+>>>
+>>> Best,
+>>> Mike
+>>>
+>>> On Mon, Nov 21, 2022 at 11:40 PM Catia Oliveira <catia.oliveira at york.ac.uk> wrote:
+>>>>
+>>>> Dear professor Mike,
+>>>>
+>>>> Thank you for your response. Wouldn't it be possible to run the path model I described if I used the hetcor() function in R on the raw data per study, where I would gather all the correlations between variables, including between gender and the numeric variables? Wouldn't this allow me to use the two staged approach you describe in "metaSEM: an R package for meta-analysis using structural equation modeling"?
+>>>>
+>>>> Thank you!
+>>>>
+>>>> Best wishes,
+>>>>
+>>>> Catia
+>>>>
+>>>>
+>>>>
+>>>> On Sun, 13 Nov 2022 at 04:02, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>>>>>
+>>>>> Dear Catia,
+>>>>>
+>>>>> If you have the raw data, you may use either a multiple-group SEM or multilevel SEM (assuming all variables are in comparable scales across studies). However, you may need to standardize or harmonize the variables before the analyses if the variables are not directly comparable across studies.
+>>>>>
+>>>>> It may be tricky to pool correlation matrices when there are categorical variables.
+>>>>>
+>>>>> An alternative is to fit the regression model in each group and meta-analyze the regression coefficients. There was some discussion in the following paper.
+>>>>>
+>>>>> Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for meta-analytic structural equation modeling: Review, issues, and illustrations. Research Synthesis Methods, 7(2), 140?155. https://doi.org/10.1002/jrsm.1166
+>>>>>
+>>>>> I hope it helps.
+>>>>>
+>>>>> Best,
+>>>>> Mike
+>>>>>
+>>>>> On Sun, Nov 13, 2022 at 11:00 AM Catia Oliveira <catia.oliveira at york.ac.uk> wrote:
+>>>>>>
+>>>>>> Thank you both for replying to my question.
+>>>>>>
+>>>>>> @Mike Cheung The categorical variable represents sex, so only female and male. We aim to include only studies that have reported all the predictors of interest in the meta-analysis, so we are not anticipating missing data. It is unclear whether we will have access to the raw data for all studies, as we will not be able to know until we start going through the literature, but first, we need to preregister the meta-analysis. However, we are trying to anticipate all situations. I have read about the work you have done with Susanne Jak, but it is not clear whether I could include categorical variables using that approach. It also seems to require a lot of data, which may not be our case.
+>>>>>> If we have access to the raw data and are able to fit the model on each dataset, do you have any suggestions for how to better analyse it? From what I've read it seems that we could analyse each factor loading on its own and run a meta-regression, would that be reasonable?
+>>>>>>
+>>>>>> Thank you.
+>>>>>>
+>>>>>> Best wishes,
+>>>>>>
+>>>>>> Catia
+>>>>>>
+>>>>>> On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>>>>>>>
+>>>>>>> Dear Catia,
+>>>>>>>
+>>>>>>> Could you be more specific about how the data look like? For example,
+>>>>>>> do you have the raw data? If not, what types of summary statistics do you
+>>>>>>> have?
+>>>>>>>
+>>>>>>> How many levels are in V1? How many groups are? Are there incomplete data?
+>>>>>>>
+>>>>>>> --
+>>>>>>> ---------------------------------------------------------------------
+>>>>>>>  Mike W.L. Cheung               Phone: (65) 6516-3702
+>>>>>>>  Department of Psychology       Fax:   (65) 6773-1843
+>>>>>>>  National University of Singapore
+>>>>>>>  http://mikewlcheung.github.io/
+>>>>>>> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+>>>>>>> ---------------------------------------------------------------------
+>>>>>>>
+>>>>>>> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+>>>>>>> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+>>>>>>>
+>>>>>>> > Dear Catia,
+>>>>>>> >
+>>>>>>> > Disclaimer: I am not up-to-date with MASEM advances so perhaps there is
+>>>>>>> > a more user-friendly solution. Consider checking recent work by Mike
+>>>>>>> > Cheung and Suzanne Jak for references about cutting-edge methods.
+>>>>>>> >
+>>>>>>> > If you have access to raw data then one could use the parameter-based
+>>>>>>> > MASEM approach. Since it is possible to use categorical predictors in
+>>>>>>> > lavaan/blavaan, one could fit the model separately for each sample and
+>>>>>>> > then pool the estimates. This approach has a clear practical limitation:
+>>>>>>> > all variables/categories need to be assessed in all studies, which is
+>>>>>>> > not always the case.
+>>>>>>> >
+>>>>>>> > Alternatively, one could fit separate models for each category (e.g.,
+>>>>>>> > women, men). After all, stratification is just another kind of adjusting
+>>>>>>> > for variables.
+>>>>>>> >
+>>>>>>> > Some references about the parameter-based approach can be found in this
+>>>>>>> > article:
+>>>>>>> > Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling.
+>>>>>>> > Oxford Research Encyclopedia of Business and Management, Oxford
+>>>>>>> > University Press. https://doi.org/10.1093/acrefore/9780190224851.013.225
+>>>>>>> >
+>>>>>>> >
+>>>>>>> > Best,
+>>>>>>> > Lukasz
+>>>>>>> > --
+>>>>>>> > Lukasz Stasielowicz
+>>>>>>> > Osnabr?ck University
+>>>>>>> > Institute for Psychology
+>>>>>>> > Research methods, psychological assessment, and evaluation
+>>>>>>> > Lise-Meitner-Stra?e 3
+>>>>>>> > 49076 Osnabr?ck (Germany)
+>>>>>>> > Twitter: https://twitter.com/l_stasielowicz
+>>>>>>> >
+>>>>>>> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+>>>>>>> > > Send R-sig-meta-analysis mailing list submissions to
+>>>>>>> > >       r-sig-meta-analysis at r-project.org
+>>>>>>> > >
+>>>>>>> > > To subscribe or unsubscribe via the World Wide Web, visit
+>>>>>>> > >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>>> > > or, via email, send a message with subject or body 'help' to
+>>>>>>> > >       r-sig-meta-analysis-request at r-project.org
+>>>>>>> > >
+>>>>>>> > > You can reach the person managing the list at
+>>>>>>> > >       r-sig-meta-analysis-owner at r-project.org
+>>>>>>> > >
+>>>>>>> > > When replying, please edit your Subject line so it is more specific
+>>>>>>> > > than "Re: Contents of R-sig-meta-analysis digest..."
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > > Today's Topics:
+>>>>>>> > >
+>>>>>>> > >     1. Question about MASEM with categorical predictors (Catia Oliveira)
+>>>>>>> > >
+>>>>>>> > > ----------------------------------------------------------------------
+>>>>>>> > >
+>>>>>>> > > Message: 1
+>>>>>>> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+>>>>>>> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+>>>>>>> > > To: R meta <r-sig-meta-analysis at r-project.org>
+>>>>>>> > > Subject: [R-meta] Question about MASEM with categorical predictors
+>>>>>>> > > Message-ID:
+>>>>>>> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+>>>>>>> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+>>>>>>> > > Content-Type: text/plain; charset="utf-8"
+>>>>>>> > >
+>>>>>>> > > Dear all,
+>>>>>>> > >
+>>>>>>> > > Has any of you ever used MASEM with categorical predictors, where the
+>>>>>>> > path
+>>>>>>> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and V1 as a
+>>>>>>> > > categorical variable whilst V2 and V3 are continuous. If so, could you
+>>>>>>> > > please point me to the paper/code? I have only found examples of how to
+>>>>>>> > do
+>>>>>>> > > it with continuous predictors but never using categorical variables.
+>>>>>>> > >
+>>>>>>> > > Best wishes,
+>>>>>>> > >
+>>>>>>> > > Catia
+>>>>>>> > >
+>>>>>>> > >       [[alternative HTML version deleted]]
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > > ------------------------------
+>>>>>>> > >
+>>>>>>> > > Subject: Digest Footer
+>>>>>>> > >
+>>>>>>> > > _______________________________________________
+>>>>>>> > > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>>>>>> > > To manage your subscription to this mailing list, go to:
+>>>>>>> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>>> > >
+>>>>>>> > >
+>>>>>>> > > ------------------------------
+>>>>>>> > >
+>>>>>>> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+>>>>>>> > > **************************************************
+>>>>>>> >
+>>>>>>> > _______________________________________________
+>>>>>>> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>>>>>> > To manage your subscription to this mailing list, go to:
+>>>>>>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>>> >
+>>>>>>>
+>>>>>>>         [[alternative HTML version deleted]]
+>>>>>>>
+>>>>>>> _______________________________________________
+>>>>>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>>>>>> To manage your subscription to this mailing list, go to:
+>>>>>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>>>
+>>>>>
+>>>
+>>>
+>
+
+
+From m|kew|cheung @end|ng |rom gm@||@com  Wed Nov 30 04:36:37 2022
+From: m|kew|cheung @end|ng |rom gm@||@com (Mike Cheung)
+Date: Wed, 30 Nov 2022 11:36:37 +0800
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CACw+Tff5O2M=KypyzObJWzjA6ccK-LZgpacKb-3JkgL4GuKPYg@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+ <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+ <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+ <CACw+TffmDgMxGgV3CNoeV=xXWt1dUZUwusqMnxAEpU49ECF6Pg@mail.gmail.com>
+ <CADF7-FM3wc708bN1mQR5REEp6TY7KDi17gxJBbBkHa1PLPxW0g@mail.gmail.com>
+ <CACw+Tfcm0gte=LdEfoT40Xf-QWiap5yor8PjJ_C-znB+isPeow@mail.gmail.com>
+ <CADF7-FM8vLaqoowtJQORaHN=9_Z+5VcWyhAvxoNXapFzfis5Jw@mail.gmail.com>
+ <CACw+Tff5O2M=KypyzObJWzjA6ccK-LZgpacKb-3JkgL4GuKPYg@mail.gmail.com>
+Message-ID: <CADF7-FOLXjJhJecdn8Chvfe0vjPs8VauYhTeacvSBMabg=2mFA@mail.gmail.com>
+
+Dear Catia,
+
+There are several ways to analyze the data. One approach is the so-called
+parameter-based MASEM in Cheung and Cheung (2016).
+
+Here are the steps:
+1) Run your regression model in each study in lavaan. The presence of
+binary and categorical variables is fine.
+2) Get the regression coefficients as effect sizes and their sampling
+covariance matrices with coef() and vcov().
+3) Conduct a multivariate meta-analysis on the computed effect sizes with
+their sampling covariance matrices.
+
+There are two illustrations in Cheung and Cheung (2016). The examples are
+in Github at
+https://github.com/mikewlcheung/code-in-articles/tree/master/Cheung%20and%20Cheung%202016
+The most relevant one is "Illustration 2: Theory of Planned Behavior."
+
+Cheung and Jak (2016) also use similar ideas. The data and R code are at
+https://github.com/mikewlcheung/code-in-articles/tree/master/Cheung%20and%20Jak%202016
+
+Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for
+meta-analytic structural equation modeling: Review, issues, and
+illustrations. Research Synthesis Methods, 7(2), 140?155.
+https://doi.org/10.1002/jrsm.1166
+Cheung, M. W.-L., & Jak, S. (2016). Analyzing big data in psychology: A
+split/analyze/meta-analyze approach. *Frontiers in Psychology*, *7*(738).
+https://doi.org/10.3389/fpsyg.2016.00738
+
+Best,
+Mike
+
+On Tue, Nov 29, 2022 at 2:52 AM Catia Oliveira <catia.oliveira at york.ac.uk>
+wrote:
+
+> Dear Mike,
+>
+> I am sorry for bothering you again but I was informed my emails were
+> not being received by the mailing list users. So what you are
+> suggesting is for me to run the regression models on the raw data and
+> then take the path coefficients. But how can I analyse them in a
+> meta-analysis? Didn't you say it didn't work with categorical
+> variables? Are you suggesting I use the sampling covariance matrix
+> from the regression to run the two-staged analysis in the metaSEM
+> package? I am a bit confused.
+>
+> Best wishes
+> Catia
+>
+> On Wed, 23 Nov 2022 at 02:43, Mike Cheung <mikewlcheung at gmail.com> wrote:
+> >
+> > Dear Catia,
+> >
+> > If I understand it correctly, you use hetcor() or other functions to
+> estimate a "correlation matrix" of continuous and binary variables and use
+> this correlation matrix in tssem1() and then tssem2().
+> >
+> > The part about continuous variables should be fine. But I am not sure
+> about the part on binary and continuous variables. Moreover, the meaning of
+> including a latent variable with a threshold on gender is questionable.
+> >
+> > The most defensible approach is (1) fitting the regression model in each
+> study, (2) estimating the path coefficients and their sampling covariance
+> matrix, and (3) conducting a multivariate meta-analysis on the path
+> coefficients.
+> >
+> > Best,
+> > Mike
+> >
+> >
+> > On Tue, Nov 22, 2022 at 10:25 PM Catia Oliveira <
+> catia.oliveira at york.ac.uk> wrote:
+> >>
+> >> Just to make sure I understand, I would start by getting the
+> correlations per study using the hetcor() (maybe the polychoric() from the
+> psych package would be better since it computes a polychoric correlation
+> matrix). I would then use  tssem1() to pool the correlation matrices across
+> studies and then fit the model (Outcome ~ categorical variable + numerical
+> variable + numerical variable) using sem(). Is that what you mean? I am
+> sorry for taking so much out of your time but I have not been able to find
+> any resources about this.
+> >>
+> >> Thank you,
+> >>
+> >> Catia
+> >>
+> >> On Tue, 22 Nov 2022 at 02:32, Mike Cheung <mikewlcheung at gmail.com>
+> wrote:
+> >>>
+> >>> Dear Catia,
+> >>>
+> >>> You may use the wls() function to conduct the stage two analysis in
+> the metaSEM package.
+> >>>
+> >>> However, It appears that hetcor does not compute the asymptotic
+> sampling covariance matrix of the estimated correlations. Thus, the
+> statistical inferences may be incorrect.
+> >>>
+> >>> If you want to use this approach, it is better to use the sem()
+> function in the lavaan package. I believe that it can generate the
+> asymptotic sampling covariance matrix of the estimated correlations.
+> >>>
+> >>> Best,
+> >>> Mike
+> >>>
+> >>> On Mon, Nov 21, 2022 at 11:40 PM Catia Oliveira <
+> catia.oliveira at york.ac.uk> wrote:
+> >>>>
+> >>>> Dear professor Mike,
+> >>>>
+> >>>> Thank you for your response. Wouldn't it be possible to run the path
+> model I described if I used the hetcor() function in R on the raw data per
+> study, where I would gather all the correlations between variables,
+> including between gender and the numeric variables? Wouldn't this allow me
+> to use the two staged approach you describe in "metaSEM: an R package for
+> meta-analysis using structural equation modeling"?
+> >>>>
+> >>>> Thank you!
+> >>>>
+> >>>> Best wishes,
+> >>>>
+> >>>> Catia
+> >>>>
+> >>>>
+> >>>>
+> >>>> On Sun, 13 Nov 2022 at 04:02, Mike Cheung <mikewlcheung at gmail.com>
+> wrote:
+> >>>>>
+> >>>>> Dear Catia,
+> >>>>>
+> >>>>> If you have the raw data, you may use either a multiple-group SEM or
+> multilevel SEM (assuming all variables are in comparable scales across
+> studies). However, you may need to standardize or harmonize the variables
+> before the analyses if the variables are not directly comparable across
+> studies.
+> >>>>>
+> >>>>> It may be tricky to pool correlation matrices when there are
+> categorical variables.
+> >>>>>
+> >>>>> An alternative is to fit the regression model in each group and
+> meta-analyze the regression coefficients. There was some discussion in the
+> following paper.
+> >>>>>
+> >>>>> Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for
+> meta-analytic structural equation modeling: Review, issues, and
+> illustrations. Research Synthesis Methods, 7(2), 140?155.
+> https://doi.org/10.1002/jrsm.1166
+> >>>>>
+> >>>>> I hope it helps.
+> >>>>>
+> >>>>> Best,
+> >>>>> Mike
+> >>>>>
+> >>>>> On Sun, Nov 13, 2022 at 11:00 AM Catia Oliveira <
+> catia.oliveira at york.ac.uk> wrote:
+> >>>>>>
+> >>>>>> Thank you both for replying to my question.
+> >>>>>>
+> >>>>>> @Mike Cheung The categorical variable represents sex, so only
+> female and male. We aim to include only studies that have reported all the
+> predictors of interest in the meta-analysis, so we are not anticipating
+> missing data. It is unclear whether we will have access to the raw data for
+> all studies, as we will not be able to know until we start going through
+> the literature, but first, we need to preregister the meta-analysis.
+> However, we are trying to anticipate all situations. I have read about the
+> work you have done with Susanne Jak, but it is not clear whether I could
+> include categorical variables using that approach. It also seems to require
+> a lot of data, which may not be our case.
+> >>>>>> If we have access to the raw data and are able to fit the model on
+> each dataset, do you have any suggestions for how to better analyse it?
+> From what I've read it seems that we could analyse each factor loading on
+> its own and run a meta-regression, would that be reasonable?
+> >>>>>>
+> >>>>>> Thank you.
+> >>>>>>
+> >>>>>> Best wishes,
+> >>>>>>
+> >>>>>> Catia
+> >>>>>>
+> >>>>>> On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com>
+> wrote:
+> >>>>>>>
+> >>>>>>> Dear Catia,
+> >>>>>>>
+> >>>>>>> Could you be more specific about how the data look like? For
+> example,
+> >>>>>>> do you have the raw data? If not, what types of summary statistics
+> do you
+> >>>>>>> have?
+> >>>>>>>
+> >>>>>>> How many levels are in V1? How many groups are? Are there
+> incomplete data?
+> >>>>>>>
+> >>>>>>> --
+> >>>>>>>
+> ---------------------------------------------------------------------
+> >>>>>>>  Mike W.L. Cheung               Phone: (65) 6516-3702
+> >>>>>>>  Department of Psychology       Fax:   (65) 6773-1843
+> >>>>>>>  National University of Singapore
+> >>>>>>>  http://mikewlcheung.github.io/
+> >>>>>>> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+> >>>>>>>
+> ---------------------------------------------------------------------
+> >>>>>>>
+> >>>>>>> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+> >>>>>>> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+> >>>>>>>
+> >>>>>>> > Dear Catia,
+> >>>>>>> >
+> >>>>>>> > Disclaimer: I am not up-to-date with MASEM advances so perhaps
+> there is
+> >>>>>>> > a more user-friendly solution. Consider checking recent work by
+> Mike
+> >>>>>>> > Cheung and Suzanne Jak for references about cutting-edge methods.
+> >>>>>>> >
+> >>>>>>> > If you have access to raw data then one could use the
+> parameter-based
+> >>>>>>> > MASEM approach. Since it is possible to use categorical
+> predictors in
+> >>>>>>> > lavaan/blavaan, one could fit the model separately for each
+> sample and
+> >>>>>>> > then pool the estimates. This approach has a clear practical
+> limitation:
+> >>>>>>> > all variables/categories need to be assessed in all studies,
+> which is
+> >>>>>>> > not always the case.
+> >>>>>>> >
+> >>>>>>> > Alternatively, one could fit separate models for each category
+> (e.g.,
+> >>>>>>> > women, men). After all, stratification is just another kind of
+> adjusting
+> >>>>>>> > for variables.
+> >>>>>>> >
+> >>>>>>> > Some references about the parameter-based approach can be found
+> in this
+> >>>>>>> > article:
+> >>>>>>> > Cheung, M. W.-L. (2021). Meta-analytic structural equation
+> modeling.
+> >>>>>>> > Oxford Research Encyclopedia of Business and Management, Oxford
+> >>>>>>> > University Press.
+> https://doi.org/10.1093/acrefore/9780190224851.013.225
+> >>>>>>> >
+> >>>>>>> >
+> >>>>>>> > Best,
+> >>>>>>> > Lukasz
+> >>>>>>> > --
+> >>>>>>> > Lukasz Stasielowicz
+> >>>>>>> > Osnabr?ck University
+> >>>>>>> > Institute for Psychology
+> >>>>>>> > Research methods, psychological assessment, and evaluation
+> >>>>>>> > Lise-Meitner-Stra?e 3
+> >>>>>>> > 49076 Osnabr?ck (Germany)
+> >>>>>>> > Twitter: https://twitter.com/l_stasielowicz
+> >>>>>>> >
+> >>>>>>> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org
+> wrote:
+> >>>>>>> > > Send R-sig-meta-analysis mailing list submissions to
+> >>>>>>> > >       r-sig-meta-analysis at r-project.org
+> >>>>>>> > >
+> >>>>>>> > > To subscribe or unsubscribe via the World Wide Web, visit
+> >>>>>>> > >
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >>>>>>> > > or, via email, send a message with subject or body 'help' to
+> >>>>>>> > >       r-sig-meta-analysis-request at r-project.org
+> >>>>>>> > >
+> >>>>>>> > > You can reach the person managing the list at
+> >>>>>>> > >       r-sig-meta-analysis-owner at r-project.org
+> >>>>>>> > >
+> >>>>>>> > > When replying, please edit your Subject line so it is more
+> specific
+> >>>>>>> > > than "Re: Contents of R-sig-meta-analysis digest..."
+> >>>>>>> > >
+> >>>>>>> > >
+> >>>>>>> > > Today's Topics:
+> >>>>>>> > >
+> >>>>>>> > >     1. Question about MASEM with categorical predictors (Catia
+> Oliveira)
+> >>>>>>> > >
+> >>>>>>> > >
+> ----------------------------------------------------------------------
+> >>>>>>> > >
+> >>>>>>> > > Message: 1
+> >>>>>>> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+> >>>>>>> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+> >>>>>>> > > To: R meta <r-sig-meta-analysis at r-project.org>
+> >>>>>>> > > Subject: [R-meta] Question about MASEM with categorical
+> predictors
+> >>>>>>> > > Message-ID:
+> >>>>>>> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+> >>>>>>> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+> >>>>>>> > > Content-Type: text/plain; charset="utf-8"
+> >>>>>>> > >
+> >>>>>>> > > Dear all,
+> >>>>>>> > >
+> >>>>>>> > > Has any of you ever used MASEM with categorical predictors,
+> where the
+> >>>>>>> > path
+> >>>>>>> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable
+> and V1 as a
+> >>>>>>> > > categorical variable whilst V2 and V3 are continuous. If so,
+> could you
+> >>>>>>> > > please point me to the paper/code? I have only found examples
+> of how to
+> >>>>>>> > do
+> >>>>>>> > > it with continuous predictors but never using categorical
+> variables.
+> >>>>>>> > >
+> >>>>>>> > > Best wishes,
+> >>>>>>> > >
+> >>>>>>> > > Catia
+> >>>>>>> > >
+> >>>>>>> > >       [[alternative HTML version deleted]]
+> >>>>>>> > >
+> >>>>>>> > >
+> >>>>>>> > >
+> >>>>>>> > >
+> >>>>>>> > > ------------------------------
+> >>>>>>> > >
+> >>>>>>> > > Subject: Digest Footer
+> >>>>>>> > >
+> >>>>>>> > > _______________________________________________
+> >>>>>>> > > R-sig-meta-analysis mailing list @
+> R-sig-meta-analysis at r-project.org
+> >>>>>>> > > To manage your subscription to this mailing list, go to:
+> >>>>>>> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >>>>>>> > >
+> >>>>>>> > >
+> >>>>>>> > > ------------------------------
+> >>>>>>> > >
+> >>>>>>> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+> >>>>>>> > > **************************************************
+> >>>>>>> >
+> >>>>>>> > _______________________________________________
+> >>>>>>> > R-sig-meta-analysis mailing list @
+> R-sig-meta-analysis at r-project.org
+> >>>>>>> > To manage your subscription to this mailing list, go to:
+> >>>>>>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >>>>>>> >
+> >>>>>>>
+> >>>>>>>         [[alternative HTML version deleted]]
+> >>>>>>>
+> >>>>>>> _______________________________________________
+> >>>>>>> R-sig-meta-analysis mailing list @
+> R-sig-meta-analysis at r-project.org
+> >>>>>>> To manage your subscription to this mailing list, go to:
+> >>>>>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >>>>>
+> >>>>>
+> >>>
+> >>>
+> >
+>
+
+	[[alternative HTML version deleted]]
+
+
+From c@t|@@o||ve|r@ @end|ng |rom york@@c@uk  Wed Nov 30 19:14:30 2022
+From: c@t|@@o||ve|r@ @end|ng |rom york@@c@uk (Catia Oliveira)
+Date: Wed, 30 Nov 2022 18:14:30 +0000
+Subject: [R-meta] Question about MASEM with categorical predictors
+In-Reply-To: <CADF7-FOLXjJhJecdn8Chvfe0vjPs8VauYhTeacvSBMabg=2mFA@mail.gmail.com>
+References: <mailman.4258.5.1667732401.2280.r-sig-meta-analysis@r-project.org>
+ <dc88a202-10b4-cbbe-e11c-9ced22fde5dd@uni-osnabrueck.de>
+ <CADF7-FOFc07Ke-sySovm6D1S5irTWEw4=OhQF9mb9vsfs4Zpxg@mail.gmail.com>
+ <CACw+TfdrwWDzdYQn737wppjNh17iB3VU8Eq6N4ttXyBcyv4ndQ@mail.gmail.com>
+ <CADF7-FMor5z1phkkZj2Rd_0Ng2N79T3CoyAP+OzhKu6jj7pf+A@mail.gmail.com>
+ <CACw+TffmDgMxGgV3CNoeV=xXWt1dUZUwusqMnxAEpU49ECF6Pg@mail.gmail.com>
+ <CADF7-FM3wc708bN1mQR5REEp6TY7KDi17gxJBbBkHa1PLPxW0g@mail.gmail.com>
+ <CACw+Tfcm0gte=LdEfoT40Xf-QWiap5yor8PjJ_C-znB+isPeow@mail.gmail.com>
+ <CADF7-FM8vLaqoowtJQORaHN=9_Z+5VcWyhAvxoNXapFzfis5Jw@mail.gmail.com>
+ <CACw+Tff5O2M=KypyzObJWzjA6ccK-LZgpacKb-3JkgL4GuKPYg@mail.gmail.com>
+ <CADF7-FOLXjJhJecdn8Chvfe0vjPs8VauYhTeacvSBMabg=2mFA@mail.gmail.com>
+Message-ID: <CACw+TfeBVQCa8BnN0UQFkqn=3qnECGGCz2EdcvE+WAWcLEMtTw@mail.gmail.com>
+
+Dear Mike,
+
+Thank you so much for these resources. They are very much appreciated.
+
+Best wishes,
+
+Catia
+
+
+On Wed, 30 Nov 2022 at 03:36, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>
+> Dear Catia,
+>
+> There are several ways to analyze the data. One approach is the so-called parameter-based MASEM in Cheung and Cheung (2016).
+>
+> Here are the steps:
+> 1) Run your regression model in each study in lavaan. The presence of binary and categorical variables is fine.
+> 2) Get the regression coefficients as effect sizes and their sampling covariance matrices with coef() and vcov().
+> 3) Conduct a multivariate meta-analysis on the computed effect sizes with their sampling covariance matrices.
+>
+> There are two illustrations in Cheung and Cheung (2016). The examples are in Github at https://github.com/mikewlcheung/code-in-articles/tree/master/Cheung%20and%20Cheung%202016
+> The most relevant one is "Illustration 2: Theory of Planned Behavior."
+>
+> Cheung and Jak (2016) also use similar ideas. The data and R code are at https://github.com/mikewlcheung/code-in-articles/tree/master/Cheung%20and%20Jak%202016
+>
+> Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for meta-analytic structural equation modeling: Review, issues, and illustrations. Research Synthesis Methods, 7(2), 140?155. https://doi.org/10.1002/jrsm.1166
+> Cheung, M. W.-L., & Jak, S. (2016). Analyzing big data in psychology: A split/analyze/meta-analyze approach. Frontiers in Psychology, 7(738). https://doi.org/10.3389/fpsyg.2016.00738
+>
+> Best,
+> Mike
+>
+> On Tue, Nov 29, 2022 at 2:52 AM Catia Oliveira <catia.oliveira at york.ac.uk> wrote:
+>>
+>> Dear Mike,
+>>
+>> I am sorry for bothering you again but I was informed my emails were
+>> not being received by the mailing list users. So what you are
+>> suggesting is for me to run the regression models on the raw data and
+>> then take the path coefficients. But how can I analyse them in a
+>> meta-analysis? Didn't you say it didn't work with categorical
+>> variables? Are you suggesting I use the sampling covariance matrix
+>> from the regression to run the two-staged analysis in the metaSEM
+>> package? I am a bit confused.
+>>
+>> Best wishes
+>> Catia
+>>
+>> On Wed, 23 Nov 2022 at 02:43, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>> >
+>> > Dear Catia,
+>> >
+>> > If I understand it correctly, you use hetcor() or other functions to estimate a "correlation matrix" of continuous and binary variables and use this correlation matrix in tssem1() and then tssem2().
+>> >
+>> > The part about continuous variables should be fine. But I am not sure about the part on binary and continuous variables. Moreover, the meaning of including a latent variable with a threshold on gender is questionable.
+>> >
+>> > The most defensible approach is (1) fitting the regression model in each study, (2) estimating the path coefficients and their sampling covariance matrix, and (3) conducting a multivariate meta-analysis on the path coefficients.
+>> >
+>> > Best,
+>> > Mike
+>> >
+>> >
+>> > On Tue, Nov 22, 2022 at 10:25 PM Catia Oliveira <catia.oliveira at york.ac.uk> wrote:
+>> >>
+>> >> Just to make sure I understand, I would start by getting the correlations per study using the hetcor() (maybe the polychoric() from the psych package would be better since it computes a polychoric correlation matrix). I would then use  tssem1() to pool the correlation matrices across studies and then fit the model (Outcome ~ categorical variable + numerical variable + numerical variable) using sem(). Is that what you mean? I am sorry for taking so much out of your time but I have not been able to find any resources about this.
+>> >>
+>> >> Thank you,
+>> >>
+>> >> Catia
+>> >>
+>> >> On Tue, 22 Nov 2022 at 02:32, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>> >>>
+>> >>> Dear Catia,
+>> >>>
+>> >>> You may use the wls() function to conduct the stage two analysis in the metaSEM package.
+>> >>>
+>> >>> However, It appears that hetcor does not compute the asymptotic sampling covariance matrix of the estimated correlations. Thus, the statistical inferences may be incorrect.
+>> >>>
+>> >>> If you want to use this approach, it is better to use the sem() function in the lavaan package. I believe that it can generate the asymptotic sampling covariance matrix of the estimated correlations.
+>> >>>
+>> >>> Best,
+>> >>> Mike
+>> >>>
+>> >>> On Mon, Nov 21, 2022 at 11:40 PM Catia Oliveira <catia.oliveira at york.ac.uk> wrote:
+>> >>>>
+>> >>>> Dear professor Mike,
+>> >>>>
+>> >>>> Thank you for your response. Wouldn't it be possible to run the path model I described if I used the hetcor() function in R on the raw data per study, where I would gather all the correlations between variables, including between gender and the numeric variables? Wouldn't this allow me to use the two staged approach you describe in "metaSEM: an R package for meta-analysis using structural equation modeling"?
+>> >>>>
+>> >>>> Thank you!
+>> >>>>
+>> >>>> Best wishes,
+>> >>>>
+>> >>>> Catia
+>> >>>>
+>> >>>>
+>> >>>>
+>> >>>> On Sun, 13 Nov 2022 at 04:02, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>> >>>>>
+>> >>>>> Dear Catia,
+>> >>>>>
+>> >>>>> If you have the raw data, you may use either a multiple-group SEM or multilevel SEM (assuming all variables are in comparable scales across studies). However, you may need to standardize or harmonize the variables before the analyses if the variables are not directly comparable across studies.
+>> >>>>>
+>> >>>>> It may be tricky to pool correlation matrices when there are categorical variables.
+>> >>>>>
+>> >>>>> An alternative is to fit the regression model in each group and meta-analyze the regression coefficients. There was some discussion in the following paper.
+>> >>>>>
+>> >>>>> Cheung, M. W.-L., & Cheung, S. F. (2016). Random-effects models for meta-analytic structural equation modeling: Review, issues, and illustrations. Research Synthesis Methods, 7(2), 140?155. https://doi.org/10.1002/jrsm.1166
+>> >>>>>
+>> >>>>> I hope it helps.
+>> >>>>>
+>> >>>>> Best,
+>> >>>>> Mike
+>> >>>>>
+>> >>>>> On Sun, Nov 13, 2022 at 11:00 AM Catia Oliveira <catia.oliveira at york.ac.uk> wrote:
+>> >>>>>>
+>> >>>>>> Thank you both for replying to my question.
+>> >>>>>>
+>> >>>>>> @Mike Cheung The categorical variable represents sex, so only female and male. We aim to include only studies that have reported all the predictors of interest in the meta-analysis, so we are not anticipating missing data. It is unclear whether we will have access to the raw data for all studies, as we will not be able to know until we start going through the literature, but first, we need to preregister the meta-analysis. However, we are trying to anticipate all situations. I have read about the work you have done with Susanne Jak, but it is not clear whether I could include categorical variables using that approach. It also seems to require a lot of data, which may not be our case.
+>> >>>>>> If we have access to the raw data and are able to fit the model on each dataset, do you have any suggestions for how to better analyse it? From what I've read it seems that we could analyse each factor loading on its own and run a meta-regression, would that be reasonable?
+>> >>>>>>
+>> >>>>>> Thank you.
+>> >>>>>>
+>> >>>>>> Best wishes,
+>> >>>>>>
+>> >>>>>> Catia
+>> >>>>>>
+>> >>>>>> On Sun, 13 Nov 2022 at 01:26, Mike Cheung <mikewlcheung at gmail.com> wrote:
+>> >>>>>>>
+>> >>>>>>> Dear Catia,
+>> >>>>>>>
+>> >>>>>>> Could you be more specific about how the data look like? For example,
+>> >>>>>>> do you have the raw data? If not, what types of summary statistics do you
+>> >>>>>>> have?
+>> >>>>>>>
+>> >>>>>>> How many levels are in V1? How many groups are? Are there incomplete data?
+>> >>>>>>>
+>> >>>>>>> --
+>> >>>>>>> ---------------------------------------------------------------------
+>> >>>>>>>  Mike W.L. Cheung               Phone: (65) 6516-3702
+>> >>>>>>>  Department of Psychology       Fax:   (65) 6773-1843
+>> >>>>>>>  National University of Singapore
+>> >>>>>>>  http://mikewlcheung.github.io/
+>> >>>>>>> <http://courses.nus.edu.sg/course/psycwlm/internet/>
+>> >>>>>>> ---------------------------------------------------------------------
+>> >>>>>>>
+>> >>>>>>> On Sat, Nov 12, 2022 at 9:17 PM Lukasz Stasielowicz <
+>> >>>>>>> lukasz.stasielowicz at uni-osnabrueck.de> wrote:
+>> >>>>>>>
+>> >>>>>>> > Dear Catia,
+>> >>>>>>> >
+>> >>>>>>> > Disclaimer: I am not up-to-date with MASEM advances so perhaps there is
+>> >>>>>>> > a more user-friendly solution. Consider checking recent work by Mike
+>> >>>>>>> > Cheung and Suzanne Jak for references about cutting-edge methods.
+>> >>>>>>> >
+>> >>>>>>> > If you have access to raw data then one could use the parameter-based
+>> >>>>>>> > MASEM approach. Since it is possible to use categorical predictors in
+>> >>>>>>> > lavaan/blavaan, one could fit the model separately for each sample and
+>> >>>>>>> > then pool the estimates. This approach has a clear practical limitation:
+>> >>>>>>> > all variables/categories need to be assessed in all studies, which is
+>> >>>>>>> > not always the case.
+>> >>>>>>> >
+>> >>>>>>> > Alternatively, one could fit separate models for each category (e.g.,
+>> >>>>>>> > women, men). After all, stratification is just another kind of adjusting
+>> >>>>>>> > for variables.
+>> >>>>>>> >
+>> >>>>>>> > Some references about the parameter-based approach can be found in this
+>> >>>>>>> > article:
+>> >>>>>>> > Cheung, M. W.-L. (2021). Meta-analytic structural equation modeling.
+>> >>>>>>> > Oxford Research Encyclopedia of Business and Management, Oxford
+>> >>>>>>> > University Press. https://doi.org/10.1093/acrefore/9780190224851.013.225
+>> >>>>>>> >
+>> >>>>>>> >
+>> >>>>>>> > Best,
+>> >>>>>>> > Lukasz
+>> >>>>>>> > --
+>> >>>>>>> > Lukasz Stasielowicz
+>> >>>>>>> > Osnabr?ck University
+>> >>>>>>> > Institute for Psychology
+>> >>>>>>> > Research methods, psychological assessment, and evaluation
+>> >>>>>>> > Lise-Meitner-Stra?e 3
+>> >>>>>>> > 49076 Osnabr?ck (Germany)
+>> >>>>>>> > Twitter: https://twitter.com/l_stasielowicz
+>> >>>>>>> >
+>> >>>>>>> > On 06.11.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+>> >>>>>>> > > Send R-sig-meta-analysis mailing list submissions to
+>> >>>>>>> > >       r-sig-meta-analysis at r-project.org
+>> >>>>>>> > >
+>> >>>>>>> > > To subscribe or unsubscribe via the World Wide Web, visit
+>> >>>>>>> > >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>> >>>>>>> > > or, via email, send a message with subject or body 'help' to
+>> >>>>>>> > >       r-sig-meta-analysis-request at r-project.org
+>> >>>>>>> > >
+>> >>>>>>> > > You can reach the person managing the list at
+>> >>>>>>> > >       r-sig-meta-analysis-owner at r-project.org
+>> >>>>>>> > >
+>> >>>>>>> > > When replying, please edit your Subject line so it is more specific
+>> >>>>>>> > > than "Re: Contents of R-sig-meta-analysis digest..."
+>> >>>>>>> > >
+>> >>>>>>> > >
+>> >>>>>>> > > Today's Topics:
+>> >>>>>>> > >
+>> >>>>>>> > >     1. Question about MASEM with categorical predictors (Catia Oliveira)
+>> >>>>>>> > >
+>> >>>>>>> > > ----------------------------------------------------------------------
+>> >>>>>>> > >
+>> >>>>>>> > > Message: 1
+>> >>>>>>> > > Date: Sat, 5 Nov 2022 23:21:10 +0000
+>> >>>>>>> > > From: Catia Oliveira <catia.oliveira at york.ac.uk>
+>> >>>>>>> > > To: R meta <r-sig-meta-analysis at r-project.org>
+>> >>>>>>> > > Subject: [R-meta] Question about MASEM with categorical predictors
+>> >>>>>>> > > Message-ID:
+>> >>>>>>> > >       <CACw+TfdnTK=kq4vLaJMQtS4rf9Ag=
+>> >>>>>>> > gRbHhcBV1T2bPbp1zPZTg at mail.gmail.com>
+>> >>>>>>> > > Content-Type: text/plain; charset="utf-8"
+>> >>>>>>> > >
+>> >>>>>>> > > Dear all,
+>> >>>>>>> > >
+>> >>>>>>> > > Has any of you ever used MASEM with categorical predictors, where the
+>> >>>>>>> > path
+>> >>>>>>> > > model is "X1 ~ V1 + V2 + V3", with X1 as the outcome variable and V1 as a
+>> >>>>>>> > > categorical variable whilst V2 and V3 are continuous. If so, could you
+>> >>>>>>> > > please point me to the paper/code? I have only found examples of how to
+>> >>>>>>> > do
+>> >>>>>>> > > it with continuous predictors but never using categorical variables.
+>> >>>>>>> > >
+>> >>>>>>> > > Best wishes,
+>> >>>>>>> > >
+>> >>>>>>> > > Catia
+>> >>>>>>> > >
+>> >>>>>>> > >       [[alternative HTML version deleted]]
+>> >>>>>>> > >
+>> >>>>>>> > >
+>> >>>>>>> > >
+>> >>>>>>> > >
+>> >>>>>>> > > ------------------------------
+>> >>>>>>> > >
+>> >>>>>>> > > Subject: Digest Footer
+>> >>>>>>> > >
+>> >>>>>>> > > _______________________________________________
+>> >>>>>>> > > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> >>>>>>> > > To manage your subscription to this mailing list, go to:
+>> >>>>>>> > > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>> >>>>>>> > >
+>> >>>>>>> > >
+>> >>>>>>> > > ------------------------------
+>> >>>>>>> > >
+>> >>>>>>> > > End of R-sig-meta-analysis Digest, Vol 66, Issue 1
+>> >>>>>>> > > **************************************************
+>> >>>>>>> >
+>> >>>>>>> > _______________________________________________
+>> >>>>>>> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> >>>>>>> > To manage your subscription to this mailing list, go to:
+>> >>>>>>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>> >>>>>>> >
+>> >>>>>>>
+>> >>>>>>>         [[alternative HTML version deleted]]
+>> >>>>>>>
+>> >>>>>>> _______________________________________________
+>> >>>>>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> >>>>>>> To manage your subscription to this mailing list, go to:
+>> >>>>>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>> >>>>>
+>> >>>>>
+>> >>>
+>> >>>
+>> >
+>
+>
+
+

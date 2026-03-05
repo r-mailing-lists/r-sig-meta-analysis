@@ -1,0 +1,2684 @@
+From Mwu2 @end|ng |rom |uc@edu  Fri Feb  1 17:36:46 2019
+From: Mwu2 @end|ng |rom |uc@edu (Wu, Meng-Jia)
+Date: Fri, 1 Feb 2019 16:36:46 +0000
+Subject: [R-meta] Data for GeMTC (Network mtea-analysis)
+Message-ID: <1549039005132.78892@luc.edu>
+
+Hello everyone,
+
+
+
+I have been working on a network meta-analysis project and recently I started to use the r package GeMTC. I found it's a very useful package. Even though the learning curve for using it is a little steep especially at the very beginning, I plan to explore it more as I can see the benefit of using it.
+
+
+
+I have a question that I hope people with more experiences don't mind to share your thoughts. The project I am working on is related to the effectiveness of different learning modes (face-to-face (A) vs. blended (B) vs. fully online (C)). I have a small collection of studies that seem to meet the assumption of using network meta-analysis for comparing the effectiveness among A, B, and C groups. When setting up my dataset to be read to GeMTC, I have some studies report outcome mean/SD for each group separately (i.e., "arm-based data") and some studies I can only get contrast data (i.e., the effect size for A-B, B-C, or AC). My question is:
+
+
+
+For the arm-base data, does the outcome have to be measured using the same scale in different studies? For example, one studies use the test with the range 0-100 points (with the outcome mean 87) while the another use the test with the range 200-800 (with the outcome mean 680). Can I import the mean/SD from these studies in their original scale to GeMTC? Or, should I calculate the ES between groups from different studies that report the arm-based data and just use the contrast data (I.e, the effect size  that shows the comparison between A, B, and C groups)?
+
+
+
+Any thoughts would be much appreciated. Also, if you know any example that shows how to use GeMTC, please kindly share it. Otherwise, I will try to write one - once I figure most of the things out. :)
+
+
+
+Thanks,
+
+Meng-Jia
+
+
+
+Meng-Jia Wu, Associate Professor
+
+Research Methodology, Loyola University Chicago
+
+	[[alternative HTML version deleted]]
+
+
+From @rne@j@n@@en @end|ng |rom uv@@n|  Mon Feb  4 16:15:55 2019
+From: @rne@j@n@@en @end|ng |rom uv@@n| (Arne Janssen)
+Date: Mon, 04 Feb 2019 16:15:55 +0100
+Subject: [R-meta] Redundant predictors
+Message-ID: <5C58572B.8050504@uva.nl>
+
+Dear Wolfgang,
+
+I am running an rma.rv with two categorical and one continuous moderator 
+plus their interactions. Analysis of the full model give a Warning 
+message: In rma.mv ( ...)  : Redundant predictors dropped from the model.
+Based on the model output, I guess this is caused by the absence of all 
+combinations of the two categorical moderators, is that correct? If so, 
+is this something to worry about?
+
+Best wishes,
+Arne
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Feb  4 16:58:39 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 4 Feb 2019 15:58:39 +0000
+Subject: [R-meta] Redundant predictors
+In-Reply-To: <5C58572B.8050504@uva.nl>
+References: <5C58572B.8050504@uva.nl>
+Message-ID: <1bd1883d4b2d47999bd0f7245e858456@UM-MAIL3214.unimaas.nl>
+
+Dear Arne,
+
+I would have to see your data/model, but yes, if the model matrix is not of full rank (which could be because certain combinations of two factors do not occur in a model that allows the two factors to interact), then rma.mv() will drop predictors so the model matrix is of full rank. Here is an example with two factors:
+
+set.seed(1234)
+yi <- rnorm(9)
+F. <- factor(c("a","a","a","b","b","b","c","c","c"))
+G. <- factor(c("1","2","2","1","2","2","1","1","1"))
+vi <- rep(1, 9)
+rma.mv(yi, vi, mods = ~ F.*G.)
+
+Note that the combination c-2 never occurs. So, the interaction term for this term is dropped from the model.
+
+Is this a problem? Well, it does mean that we cannot estimate certain coefficients. In the example above, we cannot test whether the difference between F.c and F.a is different for the two levels of factor G (essentially, the difference between F.c and F.a is assumed to be the same for both levels of factor G, that is, 0.6451). But this aside, the model is still ok.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Arne Janssen
+Sent: Monday, 04 February, 2019 16:16
+To: 'r-sig-meta-analysis at r-project.org'
+Subject: [R-meta] Redundant predictors
+
+Dear Wolfgang,
+
+I am running an rma.rv with two categorical and one continuous moderator 
+plus their interactions. Analysis of the full model give a Warning 
+message: In rma.mv ( ...)  : Redundant predictors dropped from the model.
+Based on the model output, I guess this is caused by the absence of all 
+combinations of the two categorical moderators, is that correct? If so, 
+is this something to worry about?
+
+Best wishes,
+Arne
+
+
+From h@med@q@hr|@@@rem| @end|ng |rom gm@||@com  Mon Feb  4 20:51:34 2019
+From: h@med@q@hr|@@@rem| @end|ng |rom gm@||@com (Hamed Qahri-Saremi)
+Date: Mon, 4 Feb 2019 13:51:34 -0600
+Subject: [R-meta] Addressing multicollinearity among moderators in a
+ meta-regression (metafor package)
+Message-ID: <CALqZ_rgJ4p8AJAh=XijNTvW11fV50-KjD+Ff7_c68b4L05VCqQ@mail.gmail.com>
+
+Greetings everyone;
+
+I hope my message finds you well.
+
+I am conducting a series of moderation tests using meta-regression in the
+metafor package. I have six numeric (continuous) moderators, which are
+different cultural dimensions. In my data, several of these six moderators
+are moderately to very highly correlated (0.40 - 0.80). As a result, to
+avoid any biases in meta-regression analyses due to multicollinearity, I am
+testing these moderators separately (i.e., six univariate meta-regressions)
+rather than including all of them in one multivariate meta-regression with
+six moderators. While this solution prevents the multicollinearity from
+biasing the results, it introduces a major limitation in my tests because
+essentially I am not controlling for the relations among moderators by
+testing them separately. Therefore, I was wondering if there is a better
+solution to rectify or reduce the effects of multicollinearity among
+moderators while running a multivariate meta-regression in metafor.
+
+I appreciate any advice you might have,
+
+Warm regards,
+Hamed
+
+*QAHRI-SAREMI, HAMED*, Ph.D.
+Assistant Professor of Information Systems | College of Computing and
+Digital Media, DePaul University | SAP Certified Associate &
+Instructor | Chicago,
+IL 60604 | Phone: 312-362-5841 | Email: hamed.saremi at depaul.edu | Webpage:
+http://facsrv.cdm.depaul.edu/~hqahrisa/
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Feb  6 13:09:22 2019
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 6 Feb 2019 12:09:22 +0000
+Subject: [R-meta] Addressing multicollinearity among moderators in a
+ meta-regression (metafor package)
+In-Reply-To: <CALqZ_rgJ4p8AJAh=XijNTvW11fV50-KjD+Ff7_c68b4L05VCqQ@mail.gmail.com>
+References: <CALqZ_rgJ4p8AJAh=XijNTvW11fV50-KjD+Ff7_c68b4L05VCqQ@mail.gmail.com>
+Message-ID: <cf09b97d-1280-506b-adab-68d7dacfcb27@dewey.myzen.co.uk>
+
+Dear Hamed
+
+I think there are a number of possible ways forward.
+
+1 - put all the moderators in at once. I do not think collinearity is an 
+important issues for the fitting software, these days methods are 
+tolerant of what you throw at them. This approach would be appropriate 
+if you wanted to take out the effect of the moderators and see what 
+heterogeneity was left afterwards. I sense this is in fact not your goal.
+
+2 - since theory suggests that these moderators are in fact manifest 
+variables measuring some underlying latent construct then derive a score 
+for tat latent variable either formally using PCA and friends or 
+informally by adding them up.
+
+3 - examine the possible models using subsets following the approach 
+outlined in
+http://www.metafor-project.org/doku.php/tips:model_selection_with_glmulti
+I am not convinced that this answers your scientific question but worth 
+a thought perhaps.
+
+Michael
+
+On 04/02/2019 19:51, Hamed Qahri-Saremi wrote:
+> Greetings everyone;
+> 
+> I hope my message finds you well.
+> 
+> I am conducting a series of moderation tests using meta-regression in the
+> metafor package. I have six numeric (continuous) moderators, which are
+> different cultural dimensions. In my data, several of these six moderators
+> are moderately to very highly correlated (0.40 - 0.80). As a result, to
+> avoid any biases in meta-regression analyses due to multicollinearity, I am
+> testing these moderators separately (i.e., six univariate meta-regressions)
+> rather than including all of them in one multivariate meta-regression with
+> six moderators. While this solution prevents the multicollinearity from
+> biasing the results, it introduces a major limitation in my tests because
+> essentially I am not controlling for the relations among moderators by
+> testing them separately. Therefore, I was wondering if there is a better
+> solution to rectify or reduce the effects of multicollinearity among
+> moderators while running a multivariate meta-regression in metafor.
+> 
+> I appreciate any advice you might have,
+> 
+> Warm regards,
+> Hamed
+> 
+> *QAHRI-SAREMI, HAMED*, Ph.D.
+> Assistant Professor of Information Systems | College of Computing and
+> Digital Media, DePaul University | SAP Certified Associate &
+> Instructor | Chicago,
+> IL 60604 | Phone: 312-362-5841 | Email: hamed.saremi at depaul.edu | Webpage:
+> http://facsrv.cdm.depaul.edu/~hqahrisa/
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From mb @end|ng |rom |e|bn|z-p@ycho|ogy@org  Wed Feb  6 16:25:22 2019
+From: mb @end|ng |rom |e|bn|z-p@ycho|ogy@org (Michael Bosnjak)
+Date: Wed, 6 Feb 2019 23:25:22 +0800
+Subject: [R-meta] Research Synthesis in Psych 2019 - incl. Big Data
+ Symposium (Dubrovnik, May): Registrations now accepted, preliminary program
+Message-ID: <CABzoa8gT7EWnL2iw8eRZuww0qVtCYZG7vJX42AAZVSPqRnPkdQ@mail.gmail.com>
+
+Dear colleagues,
+
+this is to let you know that the preliminary program for the Research
+Synthesis in Psychology 2019 Conference, which will be held in
+Dubrovnik (Croatia) end of May and includes a pre-conference symposium
+on "Big Data in Psychology", is now available (early bird
+registrations are currently accepted):
+
+http://researchsynthesis2019.leibniz-psychology.org
+
+The overall aim of Research Synthesis 2019 is to address
+methodological advances in the area of systematic reviews and
+meta-analysis. Moreover, hotspot topics addressed with the aid of
+research synthesis methods in all subfields of psychology and related
+areas are also being presented.
+
+Invited keynote speakers include:
+
+- Christina Bergmann, Max Planck Institute for Psycholinguistics:
+"Dynamically aggregating evidence in community-augmented meta-analyses"
+
+- Larry Hedges, Northwestern University:
+"Meta-analytic perspectives when studying replication"
+
+- Terri Pigott, Loyola University Chicago:
+"Power analysis in meta-analysis"
+
+- Wolfgang Viechtbauer, Maastricht University:
+"The R package metafor: Past, present and future"
+
+The overall aim of the pre-conference symposium on "Big Data in
+Psychology" is to present innovative methods and applications using
+big data in psychology.
+
+Invited keynote speakers include:
+
+- Ross Jacobucci, University of Notre Dame:
+"Flexible Specification of Large Structural Equation Models with Regularization"
+
+- Joop Hox, Utrecht University:
+"Computational social and behavioral science methodology: Current
+issues in using big data"
+
+Registrations are now accepted (places are limited, early registration
+is strongly recommended). The early bird fee applies until March 15,
+2019.
+
+For more information and to register, please visit the conference website:
+
+http://researchsynthesis2019.leibniz-psychology.org
+
+Best wishes,
+
+Michael Bosnjak
+
+-- 
+----------------------------------------------------------
+Univ.-Prof. Dr. Michael Bosnjak
+Director, Leibniz Institute for Psychology Information (ZPID)
+www.leibniz-psychology.org
+----------------------------------------------------------
+University of Trier, Department of Psychology, D-54286 Trier, Germany
+www.bosnjak.uni-trier.de
+
+
+From gr@ce@h@ye@3 @end|ng |rom my@cu@edu@@u  Mon Feb 11 07:47:58 2019
+From: gr@ce@h@ye@3 @end|ng |rom my@cu@edu@@u (Grace Hayes)
+Date: Mon, 11 Feb 2019 06:47:58 +0000
+Subject: [R-meta] Dependent Measure Modelling Question
+Message-ID: <B91E2C30-8803-4502-9AAE-0D1866ECCC40@myacu.edu.au>
+
+Hi all,
+
+
+I have a question regarding a meta-analysis of multiple dependent outcomes that I would like to conduct using metafor.
+
+
+For this meta-analysis of emotion recognition in ageing, I'm interested in age-effects (young adults vs. older adults) on four different emotion recognition tasks (Task A, Task B, Task C, Task D). Studies in this area typically compare older adults' performance to younger adults' performance on more than one of these emotion recognition task.
+
+
+For each task there are also multiple outcomes.  Each task produces an accuracy age-effect for each emotion type included (I.e., anger, sadness, fear). Up to 6 different emotions are included (Emotion 1, Emotion 2, Emotion 3, Emotion 4, Emotion 5, Emotion 6). I therefore have some studies with, for example, 6 different age-effects from 3 different emotions tasks; a total of 18 dependent outcomes.
+
+
+Ideally I would like to investigate age-effects for each of the six emotion types seperately (with Tasks A, B, C and D combined), and age-effects for each task type seperately (with Emotions 1-6 combined). I would then like to compare the effects for each emotion type (Emotions 1-6 separately) produced by each task  (Measure A, B, C, D separately).
+
+
+My question is, can I have a model that analyses emotion type and task type all together? Is this possible and statistically appropriate? Will it tell me the age-effects produced for each emotion by each task, or will it only tell me if task type and emotion type are significant moderators?
+
+
+I am also interested to know if I can add additional moderators such as number of emotions included in the task and year of publication?
+
+
+One concern that has been brought to my attention is overfitting from too many factors. Another is that output would be difficult too interpret, and thus it has been recommended that I perhaps run separately analyses for each task.
+
+
+Any advice would be much appreciated.
+
+
+Sincerely,
+
+Grace Hayes
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Tue Feb 12 03:37:54 2019
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Mon, 11 Feb 2019 20:37:54 -0600
+Subject: [R-meta] Dependent Measure Modelling Question
+In-Reply-To: <B91E2C30-8803-4502-9AAE-0D1866ECCC40@myacu.edu.au>
+References: <B91E2C30-8803-4502-9AAE-0D1866ECCC40@myacu.edu.au>
+Message-ID: <CAFUVuJy5f60Jyig_9R=5i8C2Zwu-VbKAPmt89djsWzzN3zMX1Q@mail.gmail.com>
+
+Grace,
+
+It sounds like the data that you're describing has two factors, emotion
+type and task type, and that both are within-study factors (in other words,
+a given study might report results for multiple emotion types and/or
+multiple task types). Are the emotion types and task types also measured
+within-participant, such that a given participant in a study gets assessed
+with multiple task types, on multiple emotion types, or both? If so, then
+one challenge in analyzing this data structure is that the effect size
+estimates will be statistically dependent. There are several ways to handle
+this (multivariate meta-analysis, robust variance estimation), which we've
+discussed in many previous posts on the listserv.
+
+Other than this issue, it sounds to me like it would be possible
+to  analyze both factors---emotion type and task type---together in one big
+model. The major advantage of doing so is that the joint model would let
+you examine differences in emotion types *while controlling for task
+types*, as well as examining differences in task types *while controlling
+for emotion types*. Controlling for the other factor (and maybe other
+covariates that are associated with effect size magnitude) should provide
+clearer, more interpretable results for differences on a given factor.
+There is also evidence that using a multivariate meta-analysis model can
+potentially mitigate outcome reporting bias to some extent (see Kirkham,
+Riley, & Williamson, 2012; Hwang & Desantis, 2018).
+
+A further advantage of using one big model is that it would let you adjust
+for other potential moderators that might have similar associations for
+each emotion type and each task type. If you conduct separate analyses for
+each emotion type (for example), you would have to analyze these moderators
+separately, so you'd end up with 6 sets of moderator analyses instead of
+just one.
+
+The main challenge in the "one big meta-analysis model" approach is that it
+requires careful checking of the model's assumptions. For example, you
+would need to assess whether the between-study heterogeneity is similar
+across the six emotion types and, if not, fit a model that allows for
+different heterogeneity levels for each emotion.
+
+James
+
+
+Hwang, H., & DeSantis, S. M. (2018). Multivariate network meta?analysis to
+mitigate the effects of outcome reporting bias. *Statistics in medicine*.
+
+Kirkham, J. J., Riley, R. D., & Williamson, P. R. (2012). A multivariate
+meta?analysis approach for reducing the impact of outcome reporting bias in
+systematic reviews. *Statistics in medicine*, *31*(20), 2179-2195.
+
+On Mon, Feb 11, 2019 at 3:16 AM Grace Hayes <grace.hayes3 at myacu.edu.au>
+wrote:
+
+> Hi all,
+>
+>
+> I have a question regarding a meta-analysis of multiple dependent outcomes
+> that I would like to conduct using metafor.
+>
+>
+> For this meta-analysis of emotion recognition in ageing, I'm interested in
+> age-effects (young adults vs. older adults) on four different emotion
+> recognition tasks (Task A, Task B, Task C, Task D). Studies in this area
+> typically compare older adults' performance to younger adults' performance
+> on more than one of these emotion recognition task.
+>
+>
+> For each task there are also multiple outcomes.  Each task produces an
+> accuracy age-effect for each emotion type included (I.e., anger, sadness,
+> fear). Up to 6 different emotions are included (Emotion 1, Emotion 2,
+> Emotion 3, Emotion 4, Emotion 5, Emotion 6). I therefore have some studies
+> with, for example, 6 different age-effects from 3 different emotions tasks;
+> a total of 18 dependent outcomes.
+>
+>
+> Ideally I would like to investigate age-effects for each of the six
+> emotion types seperately (with Tasks A, B, C and D combined), and
+> age-effects for each task type seperately (with Emotions 1-6 combined). I
+> would then like to compare the effects for each emotion type (Emotions 1-6
+> separately) produced by each task  (Measure A, B, C, D separately).
+>
+>
+> My question is, can I have a model that analyses emotion type and task
+> type all together? Is this possible and statistically appropriate? Will it
+> tell me the age-effects produced for each emotion by each task, or will it
+> only tell me if task type and emotion type are significant moderators?
+>
+>
+> I am also interested to know if I can add additional moderators such as
+> number of emotions included in the task and year of publication?
+>
+>
+> One concern that has been brought to my attention is overfitting from too
+> many factors. Another is that output would be difficult too interpret, and
+> thus it has been recommended that I perhaps run separately analyses for
+> each task.
+>
+>
+> Any advice would be much appreciated.
+>
+>
+> Sincerely,
+>
+> Grace Hayes
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m@rt|n_b@uer96 @end|ng |rom web@de  Tue Feb 12 08:17:53 2019
+From: m@rt|n_b@uer96 @end|ng |rom web@de (Martin Bauer)
+Date: Tue, 12 Feb 2019 08:17:53 +0100
+Subject: [R-meta] Forest plot
+Message-ID: <trinity-b3c4c7c6-ea22-4ea3-9607-d2c1e9faa936-1549955873306@3c-app-webde-bap26>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190212/754e1275/attachment.html>
+
+From @||gner@79 @end|ng |rom gm@||@com  Tue Feb 12 22:05:40 2019
+From: @||gner@79 @end|ng |rom gm@||@com (Awais Wahab)
+Date: Tue, 12 Feb 2019 23:05:40 +0200
+Subject: [R-meta] Meta Analysis with HR values
+Message-ID: <CAHdcJs5t_Mds3Fc+-FY9Sx2+wYAigT-80QWgjTVvY=3NmiaHBw@mail.gmail.com>
+
+Hello Sir/Madam!
+I am starting meta analysis on HR values of studies along with their CIs.
+It is kind request to please let me know the steps in R etc. If possible I
+need explainatory notes along with the codes for understanding.
+
+I will be muh grateful.
+best regards,
+Awais
+
+	[[alternative HTML version deleted]]
+
+
+From m@|||ng@||@t@ @end|ng |rom y@|etown@|o  Wed Feb 13 11:28:23 2019
+From: m@|||ng@||@t@ @end|ng |rom y@|etown@|o (Chris Rose)
+Date: Wed, 13 Feb 2019 11:28:23 +0100
+Subject: [R-meta] 
+ Network meta-analysis with randomized and non-randomized
+ studies in metafor
+In-Reply-To: <665fffe2911a4821a4be7ea238dee2c8@UM-MAIL3214.unimaas.nl>
+References: <1A8B023A-2B2B-43F5-9497-AC9846A68E99@yaletown.io>
+ <665fffe2911a4821a4be7ea238dee2c8@UM-MAIL3214.unimaas.nl>
+Message-ID: <2A3DD36F-B574-41E9-9741-62B283641080@yaletown.io>
+
+Hi Wolfgang
+
+A couple of months ago you provided some help with a network meta-analysis that adjusts for possible differences between randomised and non-randomised studies (for which, thanks again). I?m now at the stage of reporting results, and would like to provide prediction intervals. I?m aware of the predict.rma function, but I?m struggling to get it to work!
+
+Taking an example from your original reply (based on the Hasselblad 1998 data, to which you added a study type factor [called type] to identify randomised [?RS?] vs nonrandomised [?NRS?] studies), one of the models you suggested was:
+
+res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+
+I can run predict(res) and see predictions for each arm of each study (i.e., each row of the original data frame, dat). This works fine.
+
+However, I want to make predictions for specific values of the trt and type variables. I have tried:
+
+predict(res, newmods = c(trt = "trt self_help", type = "RS?))
+
+and
+
+predict(res, newmods = c(trt = "trt self_help", type = "RS"), tau2.levels = "RS", gamma2.levels = "RS?)
+
+and
+
+predict(res, newmods = c(trt = " self_help", type = "RS"), tau2.levels = "RS", gamma2.levels = "RS?)
+# Note the space at the start of " self_help?.
+
+and
+
+predict(res, newmods = res$X) # Here I?m trying to use the same dummy coding as rma.mv.
+
+But these all give the error:
+
+Error in dimnames(x) <- dn : 
+  length of 'dimnames' [2] not equal to array extent
+
+I have read the documentation for the predict.rma function, but I must be misunderstanding a key piece of information (or missing something very obvious and stupid!). I am aware that newmods should be a matrix, and have tried various versions of the above by constructing matrices. I have also searched the web and this list, but have not found something that has helped.
+
+Thanks very much in advance,
+
+? Chris
+
+
+
+> On 19 Dec 2018, at 10:42, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> Hi Chris,
+> 
+> Why don't you just include a moderator that distinguishes RS from NRS? The model should already include fixed/random effects for studies and random effects for estimates, so adding a moderator is sufficient. Here is an example, using the data from help(dat.hasselblad1998):
+> 
+> ### copy data into 'dat'
+> dat <- dat.hasselblad1998
+> 
+> ### calculate log odds for each study arm
+> dat <- escalc(measure="PLO", xi=xi, ni=ni, add=1/2, to="all", data=dat)
+> dat
+> 
+> ### convert trt variable to factor with desired ordering of levels
+> dat$trt <- factor(dat$trt, levels=c("no_contact", "self_help", "ind_counseling", "grp_counseling"))
+> 
+> ### add a space before each level (this makes the output a bit more legible)
+> levels(dat$trt) <- paste0(" ", levels(dat$trt))
+> 
+> ### network meta-analysis using an arm-based model
+> res <- rma.mv(yi, vi, mods = ~ trt, random = ~ 1 | study/id, data=dat)
+> res
+> 
+> ### simulate a RS/NRS moderator (type)
+> set.seed(1234)
+> dat$type <- rep(sample(c("RS", "NRS"), length(unique(dat$study)), replace=TRUE), times=tapply(dat$study, dat$study, length))
+> 
+> ### adding type (RS/NRS) to the model
+> res <- rma.mv(yi, vi, mods = ~ trt + type, random = ~ 1 | study/id, data=dat)
+> res
+> 
+> This last model assumes that the amount of heterogeneity at the study and estimate level is the same for RS and NRS. This might not be true; we may suspect that NRS are more heterogeneous. We can allow for this:
+> 
+> ### allowing for different amounts of heterogeneity for RS vs NRS
+> res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+> res
+> 
+> This is already a pretty complex model, so let's check on the identifiability of the variance components:
+> 
+> profile(res)
+> 
+> Looks good -- all profile plots have a clear peak (one being at 0, but that is fine).
+> 
+> Finally, one may not just want to distinguish between RS/NRS, but actually allow the effect of the treatment to differ depending on the type of study. Then we allow type and trt to interact:
+> 
+> res <- rma.mv(yi, vi, mods = ~ type * trt, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+> res
+> 
+> I hope this gives you some ideas on how to model your data.
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Chris Rose
+> Sent: Wednesday, 21 November, 2018 10:25
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Network meta-analysis with randomized and non-randomized studies in metafor
+> 
+> Hi
+> 
+> I'm working on a network meta-analysis (NMA) that will include randomized studies (RS) and non-randomized studies (NRS). I anticipate that the NRS may be biased, and that magnitude and direction of bias may vary unpredictably across the NRS. I am less concerned that the NRS may be overly precise (though I may be wrong!). It is also possible that I will have to include fixed effects for moderators (i.e., do a network meta-regression). I'm considering using the metafor package (see the end of this email for my reasoning).
+> 
+> How should I model the distinction between the RS and NRS in metafor? I?m considering using a random effect (intercept) for each NRS. I.e., each effect estimate would be supported by some mixture of direct and indirect evidence that is (hopefully) unbiased in the case of the RS, and potentially biased in the case of the NRS (with that bias explained by the random effects).
+> 
+> How would I specify this model in metafor? I.e., how do I specify that the random effects are conditional on a study being a NRS? Could I use a factor variable that has the same value for all the randomized studies, and distinct values for the non-randomized studies? Is there a better way to do this?
+> 
+> Thanks in advance,
+> 
+> Chris
+> 
+> Why metafor?
+> 
+> I?m aware of various NMA packages available for R, and I'm able to implement bespoke Bayesian models in JAGS and Stan. I?m considering metafor because:
+> 
+> 1. I need to use R.
+> 2. I have multiple outcomes to analyze and need to do various sensitivity analyses, so run-time is a consideration and MCMC is less attractive for this reason.
+> 3. I'd prefer to use a well-tested model implementation (I'm experienced enough with JAGS and Stan to know it's possible to make programming errors).
+> 4. I think the existing NMA-specific packages do not support modeling the distinction between RS and NRS (but I could be wrong).
+> 5. I think the existing NMA packages either do not support regression, or only support a single covariate or continuous covariates. I think this means they do not allow me to adjust for the randomized/non-randomized designs as well as other covariates if that was necessary. Again, I could be wrong.
+
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Wed Feb 13 12:44:34 2019
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Wed, 13 Feb 2019 12:44:34 +0100
+Subject: [R-meta] Meta Analysis with HR values
+In-Reply-To: <CAHdcJs5t_Mds3Fc+-FY9Sx2+wYAigT-80QWgjTVvY=3NmiaHBw@mail.gmail.com>
+References: <CAHdcJs5t_Mds3Fc+-FY9Sx2+wYAigT-80QWgjTVvY=3NmiaHBw@mail.gmail.com>
+Message-ID: <a01e4bea-d1d8-a6a4-52ca-7f118a7b0c52@imbi.uni-freiburg.de>
+
+Dear Awais,
+
+Survival data using the hazard ratio as effect measure are typically 
+meta-analysed using the inverse variance method. The following general R 
+packages for meta-analysis provide this method: *epiR*, *meta*, 
+*metafor*, *rmeta* (see 
+https://cran.r-project.org/web/views/MetaAnalysis.html).
+
+The inverse variance method needs, for each study, the _log_ hazard 
+ratio and its standard error as input. You write that you have hazard 
+ratios and CIs which is sufficient as standard errors can be calculated 
+from CIs (see Parmar et al., 1999).
+
+Please find attached R code using R package *meta* which conducts a 
+meta-analysis for survival data from a Cochrane review I was involved. 
+Note, the minor differences in the results of the two meta-analyses can 
+be explained by rounding hazard ratios and confidence limits to only two 
+significant digits; we would get identical results with more significant 
+digits.
+
+Best wishes, Guido
+
+Reference: Parmar MK, Torri V, Stewart L. Extracting summary statistics 
+to perform meta-analyses of the published literature for survival 
+endpoints. Statistics in Medicine. 1998;17(24):2815?34.
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190213/7ba5f504/attachment.html>
+
+-------------- next part --------------
+An embedded and charset-unspecified text was scrubbed...
+Name: survival.R
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190213/7ba5f504/attachment.ksh>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: survival.pdf
+Type: application/pdf
+Size: 6973 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190213/7ba5f504/attachment.pdf>
+
+From @||gner@79 @end|ng |rom gm@||@com  Wed Feb 13 13:41:39 2019
+From: @||gner@79 @end|ng |rom gm@||@com (Awais Wahab)
+Date: Wed, 13 Feb 2019 14:41:39 +0200
+Subject: [R-meta] Meta Analysis with HR values
+In-Reply-To: <a01e4bea-d1d8-a6a4-52ca-7f118a7b0c52@imbi.uni-freiburg.de>
+References: <CAHdcJs5t_Mds3Fc+-FY9Sx2+wYAigT-80QWgjTVvY=3NmiaHBw@mail.gmail.com>
+ <a01e4bea-d1d8-a6a4-52ca-7f118a7b0c52@imbi.uni-freiburg.de>
+Message-ID: <CAHdcJs4Cta5EywXeEHKKR5SZ4Qvmu7QWGZ=cSVOQtBPT-M2f6Q@mail.gmail.com>
+
+Dear Doctor Guido!
+Thank you very much for your much valuable e-mail.
+
+I will start working on it and will let you know if there is any concern.
+
+best regards,
+Awais
+
+On Wed, Feb 13, 2019 at 1:44 PM Guido Schwarzer <sc at imbi.uni-freiburg.de>
+wrote:
+
+> Dear Awais,
+>
+> Survival data using the hazard ratio as effect measure are typically
+> meta-analysed using the inverse variance method. The following general R
+> packages for meta-analysis provide this method: *epiR*, *meta*, *metafor*,
+> *rmeta* (see https://cran.r-project.org/web/views/MetaAnalysis.html).
+>
+> The inverse variance method needs, for each study, the *log* hazard ratio
+> and its standard error as input. You write that you have hazard ratios and
+> CIs which is sufficient as standard errors can be calculated from CIs (see
+> Parmar et al., 1999).
+>
+> Please find attached R code using R package *meta* which conducts a
+> meta-analysis for survival data from a Cochrane review I was involved.
+> Note, the minor differences in the results of the two meta-analyses can be
+> explained by rounding hazard ratios and confidence limits to only two
+> significant digits; we would get identical results with more significant
+> digits.
+>
+> Best wishes, Guido
+>
+> Reference: Parmar MK, Torri V, Stewart L. Extracting summary statistics to
+> perform meta-analyses of the published literature for survival endpoints.
+> Statistics in Medicine. 1998;17(24):2815?34.
+>
+> --
+> Dr. Guido Schwarzer
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+>
+> Phone: +49/761/203-6668
+> Mail: sc at imbi.uni-freiburg.de
+> Homepage: http://www.imbi.uni-freiburg.de
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From petrett@ @end|ng |rom un|n@@|t  Thu Feb 14 17:25:42 2019
+From: petrett@ @end|ng |rom un|n@@|t (Prof. Mario Petretta)
+Date: Thu, 14 Feb 2019 17:25:42 +0100
+Subject: [R-meta] R: R-sig-meta-analysis Digest, Vol 21, Issue 8
+In-Reply-To: <mailman.1417.15.1550142001.40550.r-sig-meta-analysis@r-project.org>
+References: <mailman.1417.15.1550142001.40550.r-sig-meta-analysis@r-project.org>
+Message-ID: <005d01d4c481$eef3d710$ccdb8530$@unina.it>
+
+DOMANI Inoltrare i file per AV
+
+-----Messaggio originale-----
+Da: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] Per conto di r-sig-meta-analysis-request at r-project.org
+Inviato: gioved? 14 febbraio 2019 12.00
+A: r-sig-meta-analysis at r-project.org
+Oggetto: R-sig-meta-analysis Digest, Vol 21, Issue 8
+
+Send R-sig-meta-analysis mailing list submissions to
+	r-sig-meta-analysis at r-project.org
+
+To subscribe or unsubscribe via the World Wide Web, visit
+	https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+or, via email, send a message with subject or body 'help' to
+	r-sig-meta-analysis-request at r-project.org
+
+You can reach the person managing the list at
+	r-sig-meta-analysis-owner at r-project.org
+
+When replying, please edit your Subject line so it is more specific than "Re: Contents of R-sig-meta-analysis digest..."
+
+
+Today's Topics:
+
+   1. Re: Meta Analysis with HR values (Guido Schwarzer)
+   2. Re: Meta Analysis with HR values (Awais Wahab)
+
+----------------------------------------------------------------------
+
+Message: 1
+Date: Wed, 13 Feb 2019 12:44:34 +0100
+From: Guido Schwarzer <sc at imbi.uni-freiburg.de>
+To: Awais Wahab <aligners79 at gmail.com>,
+	r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Meta Analysis with HR values
+Message-ID:
+	<a01e4bea-d1d8-a6a4-52ca-7f118a7b0c52 at imbi.uni-freiburg.de>
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+
+Dear Awais,
+
+Survival data using the hazard ratio as effect measure are typically meta-analysed using the inverse variance method. The following general R packages for meta-analysis provide this method: *epiR*, *meta*, *metafor*, *rmeta* (see https://cran.r-project.org/web/views/MetaAnalysis.html).
+
+The inverse variance method needs, for each study, the _log_ hazard ratio and its standard error as input. You write that you have hazard ratios and CIs which is sufficient as standard errors can be calculated from CIs (see Parmar et al., 1999).
+
+Please find attached R code using R package *meta* which conducts a meta-analysis for survival data from a Cochrane review I was involved. 
+Note, the minor differences in the results of the two meta-analyses can be explained by rounding hazard ratios and confidence limits to only two significant digits; we would get identical results with more significant digits.
+
+Best wishes, Guido
+
+Reference: Parmar MK, Torri V, Stewart L. Extracting summary statistics to perform meta-analyses of the published literature for survival endpoints. Statistics in Medicine. 1998;17(24):2815?34.
+
+--
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics, Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190213/7ba5f504/attachment-0001.html>
+
+-------------- next part --------------
+An embedded and charset-unspecified text was scrubbed...
+Name: survival.R
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190213/7ba5f504/attachment-0001.ksh>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: survival.pdf
+Type: application/pdf
+Size: 6973 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190213/7ba5f504/attachment-0001.pdf>
+
+
+------------------------------
+
+Message: 2
+Date: Wed, 13 Feb 2019 14:41:39 +0200
+From: Awais Wahab <aligners79 at gmail.com>
+To: Guido Schwarzer <sc at imbi.uni-freiburg.de>
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Meta Analysis with HR values
+Message-ID:
+	<CAHdcJs4Cta5EywXeEHKKR5SZ4Qvmu7QWGZ=cSVOQtBPT-M2f6Q at mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+
+Dear Doctor Guido!
+Thank you very much for your much valuable e-mail.
+
+I will start working on it and will let you know if there is any concern.
+
+best regards,
+Awais
+
+On Wed, Feb 13, 2019 at 1:44 PM Guido Schwarzer <sc at imbi.uni-freiburg.de>
+wrote:
+
+> Dear Awais,
+>
+> Survival data using the hazard ratio as effect measure are typically 
+> meta-analysed using the inverse variance method. The following general 
+> R packages for meta-analysis provide this method: *epiR*, *meta*, 
+> *metafor*,
+> *rmeta* (see https://cran.r-project.org/web/views/MetaAnalysis.html).
+>
+> The inverse variance method needs, for each study, the *log* hazard 
+> ratio and its standard error as input. You write that you have hazard 
+> ratios and CIs which is sufficient as standard errors can be 
+> calculated from CIs (see Parmar et al., 1999).
+>
+> Please find attached R code using R package *meta* which conducts a 
+> meta-analysis for survival data from a Cochrane review I was involved.
+> Note, the minor differences in the results of the two meta-analyses 
+> can be explained by rounding hazard ratios and confidence limits to 
+> only two significant digits; we would get identical results with more 
+> significant digits.
+>
+> Best wishes, Guido
+>
+> Reference: Parmar MK, Torri V, Stewart L. Extracting summary 
+> statistics to perform meta-analyses of the published literature for survival endpoints.
+> Statistics in Medicine. 1998;17(24):2815?34.
+>
+> --
+> Dr. Guido Schwarzer
+> Institute of Medical Biometry and Statistics, Faculty of Medicine and 
+> Medical Center - University of Freiburg
+>
+> Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+>
+> Phone: +49/761/203-6668
+> Mail: sc at imbi.uni-freiburg.de
+> Homepage: http://www.imbi.uni-freiburg.de
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+
+
+------------------------------
+
+Subject: Digest Footer
+
+_______________________________________________
+R-sig-meta-analysis mailing list
+R-sig-meta-analysis at r-project.org
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+------------------------------
+
+End of R-sig-meta-analysis Digest, Vol 21, Issue 8
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Thu Feb 14 18:05:22 2019
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 14 Feb 2019 17:05:22 +0000
+Subject: [R-meta] 
+ Network meta-analysis with randomized and non-randomized
+ studies in metafor
+In-Reply-To: <2A3DD36F-B574-41E9-9741-62B283641080@yaletown.io>
+References: <1A8B023A-2B2B-43F5-9497-AC9846A68E99@yaletown.io>
+ <665fffe2911a4821a4be7ea238dee2c8@UM-MAIL3214.unimaas.nl>
+ <2A3DD36F-B574-41E9-9741-62B283641080@yaletown.io>
+Message-ID: <9dfc983a-df2d-71b0-84ff-501bedc86a23@dewey.myzen.co.uk>
+
+Dear Chris
+
+I suspect the problem may be that when it converts the character vector 
+which you are supplying as newmods it makes it a 1-column matrix rather 
+than a 1-row matrix. What happens if you explicitly create a matrix?
+
+Michael
+
+On 13/02/2019 10:28, Chris Rose wrote:
+> Hi Wolfgang
+> 
+> A couple of months ago you provided some help with a network meta-analysis that adjusts for possible differences between randomised and non-randomised studies (for which, thanks again). I?m now at the stage of reporting results, and would like to provide prediction intervals. I?m aware of the predict.rma function, but I?m struggling to get it to work!
+> 
+> Taking an example from your original reply (based on the Hasselblad 1998 data, to which you added a study type factor [called type] to identify randomised [?RS?] vs nonrandomised [?NRS?] studies), one of the models you suggested was:
+> 
+> res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+> 
+> I can run predict(res) and see predictions for each arm of each study (i.e., each row of the original data frame, dat). This works fine.
+> 
+> However, I want to make predictions for specific values of the trt and type variables. I have tried:
+> 
+> predict(res, newmods = c(trt = "trt self_help", type = "RS?))
+> 
+> and
+> 
+> predict(res, newmods = c(trt = "trt self_help", type = "RS"), tau2.levels = "RS", gamma2.levels = "RS?)
+> 
+> and
+> 
+> predict(res, newmods = c(trt = " self_help", type = "RS"), tau2.levels = "RS", gamma2.levels = "RS?)
+> # Note the space at the start of " self_help?.
+> 
+> and
+> 
+> predict(res, newmods = res$X) # Here I?m trying to use the same dummy coding as rma.mv.
+> 
+> But these all give the error:
+> 
+> Error in dimnames(x) <- dn :
+>    length of 'dimnames' [2] not equal to array extent
+> 
+> I have read the documentation for the predict.rma function, but I must be misunderstanding a key piece of information (or missing something very obvious and stupid!). I am aware that newmods should be a matrix, and have tried various versions of the above by constructing matrices. I have also searched the web and this list, but have not found something that has helped.
+> 
+> Thanks very much in advance,
+> 
+> ? Chris
+> 
+> 
+> 
+>> On 19 Dec 2018, at 10:42, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>>
+>> Hi Chris,
+>>
+>> Why don't you just include a moderator that distinguishes RS from NRS? The model should already include fixed/random effects for studies and random effects for estimates, so adding a moderator is sufficient. Here is an example, using the data from help(dat.hasselblad1998):
+>>
+>> ### copy data into 'dat'
+>> dat <- dat.hasselblad1998
+>>
+>> ### calculate log odds for each study arm
+>> dat <- escalc(measure="PLO", xi=xi, ni=ni, add=1/2, to="all", data=dat)
+>> dat
+>>
+>> ### convert trt variable to factor with desired ordering of levels
+>> dat$trt <- factor(dat$trt, levels=c("no_contact", "self_help", "ind_counseling", "grp_counseling"))
+>>
+>> ### add a space before each level (this makes the output a bit more legible)
+>> levels(dat$trt) <- paste0(" ", levels(dat$trt))
+>>
+>> ### network meta-analysis using an arm-based model
+>> res <- rma.mv(yi, vi, mods = ~ trt, random = ~ 1 | study/id, data=dat)
+>> res
+>>
+>> ### simulate a RS/NRS moderator (type)
+>> set.seed(1234)
+>> dat$type <- rep(sample(c("RS", "NRS"), length(unique(dat$study)), replace=TRUE), times=tapply(dat$study, dat$study, length))
+>>
+>> ### adding type (RS/NRS) to the model
+>> res <- rma.mv(yi, vi, mods = ~ trt + type, random = ~ 1 | study/id, data=dat)
+>> res
+>>
+>> This last model assumes that the amount of heterogeneity at the study and estimate level is the same for RS and NRS. This might not be true; we may suspect that NRS are more heterogeneous. We can allow for this:
+>>
+>> ### allowing for different amounts of heterogeneity for RS vs NRS
+>> res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+>> res
+>>
+>> This is already a pretty complex model, so let's check on the identifiability of the variance components:
+>>
+>> profile(res)
+>>
+>> Looks good -- all profile plots have a clear peak (one being at 0, but that is fine).
+>>
+>> Finally, one may not just want to distinguish between RS/NRS, but actually allow the effect of the treatment to differ depending on the type of study. Then we allow type and trt to interact:
+>>
+>> res <- rma.mv(yi, vi, mods = ~ type * trt, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+>> res
+>>
+>> I hope this gives you some ideas on how to model your data.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Chris Rose
+>> Sent: Wednesday, 21 November, 2018 10:25
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Network meta-analysis with randomized and non-randomized studies in metafor
+>>
+>> Hi
+>>
+>> I'm working on a network meta-analysis (NMA) that will include randomized studies (RS) and non-randomized studies (NRS). I anticipate that the NRS may be biased, and that magnitude and direction of bias may vary unpredictably across the NRS. I am less concerned that the NRS may be overly precise (though I may be wrong!). It is also possible that I will have to include fixed effects for moderators (i.e., do a network meta-regression). I'm considering using the metafor package (see the end of this email for my reasoning).
+>>
+>> How should I model the distinction between the RS and NRS in metafor? I?m considering using a random effect (intercept) for each NRS. I.e., each effect estimate would be supported by some mixture of direct and indirect evidence that is (hopefully) unbiased in the case of the RS, and potentially biased in the case of the NRS (with that bias explained by the random effects).
+>>
+>> How would I specify this model in metafor? I.e., how do I specify that the random effects are conditional on a study being a NRS? Could I use a factor variable that has the same value for all the randomized studies, and distinct values for the non-randomized studies? Is there a better way to do this?
+>>
+>> Thanks in advance,
+>>
+>> Chris
+>>
+>> Why metafor?
+>>
+>> I?m aware of various NMA packages available for R, and I'm able to implement bespoke Bayesian models in JAGS and Stan. I?m considering metafor because:
+>>
+>> 1. I need to use R.
+>> 2. I have multiple outcomes to analyze and need to do various sensitivity analyses, so run-time is a consideration and MCMC is less attractive for this reason.
+>> 3. I'd prefer to use a well-tested model implementation (I'm experienced enough with JAGS and Stan to know it's possible to make programming errors).
+>> 4. I think the existing NMA-specific packages do not support modeling the distinction between RS and NRS (but I could be wrong).
+>> 5. I think the existing NMA packages either do not support regression, or only support a single covariate or continuous covariates. I think this means they do not allow me to adjust for the randomized/non-randomized designs as well as other covariates if that was necessary. Again, I could be wrong.
+> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From m@|||ng@||@t@ @end|ng |rom y@|etown@|o  Thu Feb 14 20:47:02 2019
+From: m@|||ng@||@t@ @end|ng |rom y@|etown@|o (Chris Rose)
+Date: Thu, 14 Feb 2019 20:47:02 +0100
+Subject: [R-meta] 
+ Network meta-analysis with randomized and non-randomized
+ studies in metafor
+In-Reply-To: <9dfc983a-df2d-71b0-84ff-501bedc86a23@dewey.myzen.co.uk>
+References: <1A8B023A-2B2B-43F5-9497-AC9846A68E99@yaletown.io>
+ <665fffe2911a4821a4be7ea238dee2c8@UM-MAIL3214.unimaas.nl>
+ <2A3DD36F-B574-41E9-9741-62B283641080@yaletown.io>
+ <9dfc983a-df2d-71b0-84ff-501bedc86a23@dewey.myzen.co.uk>
+Message-ID: <4D01DE72-4553-48E2-B427-8B552735D559@yaletown.io>
+
+Hi Michael, all
+
+I think I had actually tried your suggestion of constructing a matrix but did not include it my attempt in my original email. After exhausting a few alternatives that seemed sensible based on my reading of the docs, I started to try some ?random stuff" in the hope that I would learn something purely by experimentation ? unfortunately not.
+
+I?ve included below an example from the beginning, which includes what I think you mean towards the end. It?d be great if you could have a look and tell me where I?m going wrong.
+
+Best,
+
+? Chris
+
+
+### load the library
+library(metafor)
+
+### copy data into 'dat'
+dat <- dat.hasselblad1998
+
+### calculate log odds for each study arm
+dat <- escalc(measure="PLO", xi=xi, ni=ni, add=1/2, to="all", data=dat)
+
+### convert trt variable to factor with desired ordering of levels
+dat$trt <- factor(dat$trt, levels=c("no_contact", "self_help", "ind_counseling", "grp_counseling"))
+
+### add a space before each level (this makes the output a bit more legible)
+levels(dat$trt) <- paste0(" ", levels(dat$trt))
+
+### simulate a RS/NRS moderator (type)
+set.seed(1234)
+dat$type <- rep(sample(c("RS", "NRS"), length(unique(dat$study)), replace=TRUE), times=tapply(dat$study, dat$study, length))
+
+### fit a meta-regression model
+res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+
+### call predict without additional arguments
+predict(res) # This works!
+
+### make a matrix of moderator values at which to predict, and try to predict
+newvals <- as.matrix(c(trt = " self_help", type = "RS"))
+predict(res, newmods = newvals) # fails with...
+# Error in predict.rma(res, newmods = newvals) : 
+#   Dimensions of 'newmods' do not match dimensions of the model.
+
+### try to specify the tau and gamma levels
+predict(res, newmods = newvals, tau2.levels = "RS", gamma2.levels = "RS") # fails with...
+# Error in predict.rma(res, newmods = newvals, tau2.levels = "RS", gamma2.levels = "RS") : 
+#   Dimensions of 'newmods' do not match dimensions of the model.
+
+### is the matrix moderators incorrectly transposed?
+predict(res, newmods = t(newvals), tau2.levels = "RS", gamma2.levels = "RS") # fails with...
+# Error in dimnames(x) <- dn : 
+#   length of 'dimnames' [2] not equal to array extent
+
+
+> On 14 Feb 2019, at 18:05, Michael Dewey <lists at dewey.myzen.co.uk> wrote:
+> 
+> Dear Chris
+> 
+> I suspect the problem may be that when it converts the character vector which you are supplying as newmods it makes it a 1-column matrix rather than a 1-row matrix. What happens if you explicitly create a matrix?
+> 
+> Michael
+> 
+> On 13/02/2019 10:28, Chris Rose wrote:
+>> Hi Wolfgang
+>> A couple of months ago you provided some help with a network meta-analysis that adjusts for possible differences between randomised and non-randomised studies (for which, thanks again). I?m now at the stage of reporting results, and would like to provide prediction intervals. I?m aware of the predict.rma function, but I?m struggling to get it to work!
+>> Taking an example from your original reply (based on the Hasselblad 1998 data, to which you added a study type factor [called type] to identify randomised [?RS?] vs nonrandomised [?NRS?] studies), one of the models you suggested was:
+>> res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+>> I can run predict(res) and see predictions for each arm of each study (i.e., each row of the original data frame, dat). This works fine.
+>> However, I want to make predictions for specific values of the trt and type variables. I have tried:
+>> predict(res, newmods = c(trt = "trt self_help", type = "RS?))
+>> and
+>> predict(res, newmods = c(trt = "trt self_help", type = "RS"), tau2.levels = "RS", gamma2.levels = "RS?)
+>> and
+>> predict(res, newmods = c(trt = " self_help", type = "RS"), tau2.levels = "RS", gamma2.levels = "RS?)
+>> # Note the space at the start of " self_help?.
+>> and
+>> predict(res, newmods = res$X) # Here I?m trying to use the same dummy coding as rma.mv.
+>> But these all give the error:
+>> Error in dimnames(x) <- dn :
+>>   length of 'dimnames' [2] not equal to array extent
+>> I have read the documentation for the predict.rma function, but I must be misunderstanding a key piece of information (or missing something very obvious and stupid!). I am aware that newmods should be a matrix, and have tried various versions of the above by constructing matrices. I have also searched the web and this list, but have not found something that has helped.
+>> Thanks very much in advance,
+>> ? Chris
+>>> On 19 Dec 2018, at 10:42, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>>> 
+>>> Hi Chris,
+>>> 
+>>> Why don't you just include a moderator that distinguishes RS from NRS? The model should already include fixed/random effects for studies and random effects for estimates, so adding a moderator is sufficient. Here is an example, using the data from help(dat.hasselblad1998):
+>>> 
+>>> ### copy data into 'dat'
+>>> dat <- dat.hasselblad1998
+>>> 
+>>> ### calculate log odds for each study arm
+>>> dat <- escalc(measure="PLO", xi=xi, ni=ni, add=1/2, to="all", data=dat)
+>>> dat
+>>> 
+>>> ### convert trt variable to factor with desired ordering of levels
+>>> dat$trt <- factor(dat$trt, levels=c("no_contact", "self_help", "ind_counseling", "grp_counseling"))
+>>> 
+>>> ### add a space before each level (this makes the output a bit more legible)
+>>> levels(dat$trt) <- paste0(" ", levels(dat$trt))
+>>> 
+>>> ### network meta-analysis using an arm-based model
+>>> res <- rma.mv(yi, vi, mods = ~ trt, random = ~ 1 | study/id, data=dat)
+>>> res
+>>> 
+>>> ### simulate a RS/NRS moderator (type)
+>>> set.seed(1234)
+>>> dat$type <- rep(sample(c("RS", "NRS"), length(unique(dat$study)), replace=TRUE), times=tapply(dat$study, dat$study, length))
+>>> 
+>>> ### adding type (RS/NRS) to the model
+>>> res <- rma.mv(yi, vi, mods = ~ trt + type, random = ~ 1 | study/id, data=dat)
+>>> res
+>>> 
+>>> This last model assumes that the amount of heterogeneity at the study and estimate level is the same for RS and NRS. This might not be true; we may suspect that NRS are more heterogeneous. We can allow for this:
+>>> 
+>>> ### allowing for different amounts of heterogeneity for RS vs NRS
+>>> res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+>>> res
+>>> 
+>>> This is already a pretty complex model, so let's check on the identifiability of the variance components:
+>>> 
+>>> profile(res)
+>>> 
+>>> Looks good -- all profile plots have a clear peak (one being at 0, but that is fine).
+>>> 
+>>> Finally, one may not just want to distinguish between RS/NRS, but actually allow the effect of the treatment to differ depending on the type of study. Then we allow type and trt to interact:
+>>> 
+>>> res <- rma.mv(yi, vi, mods = ~ type * trt, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+>>> res
+>>> 
+>>> I hope this gives you some ideas on how to model your data.
+>>> 
+>>> Best,
+>>> Wolfgang
+>>> 
+>>> -----Original Message-----
+>>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Chris Rose
+>>> Sent: Wednesday, 21 November, 2018 10:25
+>>> To: r-sig-meta-analysis at r-project.org
+>>> Subject: [R-meta] Network meta-analysis with randomized and non-randomized studies in metafor
+>>> 
+>>> Hi
+>>> 
+>>> I'm working on a network meta-analysis (NMA) that will include randomized studies (RS) and non-randomized studies (NRS). I anticipate that the NRS may be biased, and that magnitude and direction of bias may vary unpredictably across the NRS. I am less concerned that the NRS may be overly precise (though I may be wrong!). It is also possible that I will have to include fixed effects for moderators (i.e., do a network meta-regression). I'm considering using the metafor package (see the end of this email for my reasoning).
+>>> 
+>>> How should I model the distinction between the RS and NRS in metafor? I?m considering using a random effect (intercept) for each NRS. I.e., each effect estimate would be supported by some mixture of direct and indirect evidence that is (hopefully) unbiased in the case of the RS, and potentially biased in the case of the NRS (with that bias explained by the random effects).
+>>> 
+>>> How would I specify this model in metafor? I.e., how do I specify that the random effects are conditional on a study being a NRS? Could I use a factor variable that has the same value for all the randomized studies, and distinct values for the non-randomized studies? Is there a better way to do this?
+>>> 
+>>> Thanks in advance,
+>>> 
+>>> Chris
+>>> 
+>>> Why metafor?
+>>> 
+>>> I?m aware of various NMA packages available for R, and I'm able to implement bespoke Bayesian models in JAGS and Stan. I?m considering metafor because:
+>>> 
+>>> 1. I need to use R.
+>>> 2. I have multiple outcomes to analyze and need to do various sensitivity analyses, so run-time is a consideration and MCMC is less attractive for this reason.
+>>> 3. I'd prefer to use a well-tested model implementation (I'm experienced enough with JAGS and Stan to know it's possible to make programming errors).
+>>> 4. I think the existing NMA-specific packages do not support modeling the distinction between RS and NRS (but I could be wrong).
+>>> 5. I think the existing NMA packages either do not support regression, or only support a single covariate or continuous covariates. I think this means they do not allow me to adjust for the randomized/non-randomized designs as well as other covariates if that was necessary. Again, I could be wrong.
+>> 	[[alternative HTML version deleted]]
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> -- 
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+
+
+	[[alternative HTML version deleted]]
+
+
+From m||orm|gue| @end|ng |rom gm@||@com  Thu Feb 14 20:52:11 2019
+From: m||orm|gue| @end|ng |rom gm@||@com (florencia miguel)
+Date: Thu, 14 Feb 2019 16:52:11 -0300
+Subject: [R-meta] Error: Ratio of largest to smallest sampling variance
+ extremely large
+Message-ID: <CAG-y=kN8cyYseibZzxU6s7km3srdQPb-3WCuXFw6QvvNgYT+0g@mail.gmail.com>
+
+Dear all, I am running a meta analysis with the main aim of comparing three
+different kind of interventions and four kind of outcomes. I want to
+perform different models for interventions and outcomes. I could run random
+effects models using the package meta but, as I need to include moderators
+in the models I tryed the metafor package.
+
+The problem is that I obtained this error when running rma.uni and
+rma.mv functions:
+"Error in rma.mv(yi = lrr, V = var.es, mods = ~aridity.index, method =
+"REML", : Ratio of largest to smallest sampling variance extremely large.
+Cannot obtain stable results."
+
+I am using Log response ratio as effect sizes. I know that data are very
+heterogeneous (some rows with high variances values and other with low
+variances) because I am comparing different kind of measures. So, I
+performed models by subgroups (subsetting by interventions), and I obtained
+the same type of error.
+
+Here are some codes:
+
+mod1 <- rma(lrr, var.es, mods= aridity.index, data=mdata.all,
+subset=intervention=="vegetation")
+
+mod.2<-rma.mv(yi=lrr, V=var.es, mods= aridity.index, method = "REML",
+test="t", random = ~ 1 | ID, data=mdata.all, sparse=TRUE)
+
+mod.3 <- rma(lrr, var.es, mods=  ~intervention, data = mdata.all, subset =
+paradigm == "active")
+
+##filtering by interventions
+mdata.veg <- mydata %>%
+  filter(intervention=="vegetation") %>%
+  filter(!is.na(lrr)) %>%
+  filter(!is.na(var.es))
+
+mod<-rma(lrr,var.es, mods= aridity.index, digits=4,data=mdata.veg)
+
+I dont know why i getting the same error after subsetting or filtering by
+groups.
+
+Thank you in advance!
+Florencia
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Thu Feb 14 22:45:49 2019
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 14 Feb 2019 15:45:49 -0600
+Subject: [R-meta] Error: Ratio of largest to smallest sampling variance
+ extremely large
+In-Reply-To: <CAG-y=kN8cyYseibZzxU6s7km3srdQPb-3WCuXFw6QvvNgYT+0g@mail.gmail.com>
+References: <CAG-y=kN8cyYseibZzxU6s7km3srdQPb-3WCuXFw6QvvNgYT+0g@mail.gmail.com>
+Message-ID: <CAFUVuJzewq=PQ0MFf0FA4o+9tK5K0Mex9Hp=3ybzo=8qJUik1Q@mail.gmail.com>
+
+Florencia,
+
+I think the issue might have more to do with your data than with the
+estimation procedures. Could you try running one or all of the following
+lines:
+
+summary(mdata.all$var.es)
+plot(density(mdata.all$var.es)
+bottom_n(mdata.all, 5, var.es)
+
+This will provide a five-number summary of the sampling variances of your
+effect size estimates. If you have some that are very very small, this will
+cause the error you seem to have encountered. It might be worth checking
+the summary statistics for the effect sizes with very small variances, to
+see if there are data entry errors, or reporting errors in the primary
+sources.
+
+James
+
+On Thu, Feb 14, 2019 at 1:57 PM florencia miguel <mflormiguel at gmail.com>
+wrote:
+
+> Dear all, I am running a meta analysis with the main aim of comparing three
+> different kind of interventions and four kind of outcomes. I want to
+> perform different models for interventions and outcomes. I could run random
+> effects models using the package meta but, as I need to include moderators
+> in the models I tryed the metafor package.
+>
+> The problem is that I obtained this error when running rma.uni and
+> rma.mv functions:
+> "Error in rma.mv(yi = lrr, V = var.es, mods = ~aridity.index, method =
+> "REML", : Ratio of largest to smallest sampling variance extremely large.
+> Cannot obtain stable results."
+>
+> I am using Log response ratio as effect sizes. I know that data are very
+> heterogeneous (some rows with high variances values and other with low
+> variances) because I am comparing different kind of measures. So, I
+> performed models by subgroups (subsetting by interventions), and I obtained
+> the same type of error.
+>
+> Here are some codes:
+>
+> mod1 <- rma(lrr, var.es, mods= aridity.index, data=mdata.all,
+> subset=intervention=="vegetation")
+>
+> mod.2<-rma.mv(yi=lrr, V=var.es, mods= aridity.index, method = "REML",
+> test="t", random = ~ 1 | ID, data=mdata.all, sparse=TRUE)
+>
+> mod.3 <- rma(lrr, var.es, mods=  ~intervention, data = mdata.all, subset =
+> paradigm == "active")
+>
+> ##filtering by interventions
+> mdata.veg <- mydata %>%
+>   filter(intervention=="vegetation") %>%
+>   filter(!is.na(lrr)) %>%
+>   filter(!is.na(var.es))
+>
+> mod<-rma(lrr,var.es, mods= aridity.index, digits=4,data=mdata.veg)
+>
+> I dont know why i getting the same error after subsetting or filtering by
+> groups.
+>
+> Thank you in advance!
+> Florencia
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Feb 14 23:23:12 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 14 Feb 2019 22:23:12 +0000
+Subject: [R-meta] Error: Ratio of largest to smallest sampling variance
+ extremely large
+In-Reply-To: <CAFUVuJzewq=PQ0MFf0FA4o+9tK5K0Mex9Hp=3ybzo=8qJUik1Q@mail.gmail.com>
+References: <CAG-y=kN8cyYseibZzxU6s7km3srdQPb-3WCuXFw6QvvNgYT+0g@mail.gmail.com>
+ <CAFUVuJzewq=PQ0MFf0FA4o+9tK5K0Mex9Hp=3ybzo=8qJUik1Q@mail.gmail.com>
+Message-ID: <bdd87b2f44e844bf9edc245ae8456edd@UM-MAIL3214.unimaas.nl>
+
+Hi Florencia,
+
+If you install the 'devel' version of metafor (https://wviechtb.github.io/metafor/#installation), then you should get a warning but no longer an error. However, the warning is there for a reason; the results might not be trustworthy.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of James Pustejovsky
+Sent: Thursday, 14 February, 2019 22:46
+To: florencia miguel
+Cc: R meta
+Subject: Re: [R-meta] Error: Ratio of largest to smallest sampling variance extremely large
+
+Florencia,
+
+I think the issue might have more to do with your data than with the
+estimation procedures. Could you try running one or all of the following
+lines:
+
+summary(mdata.all$var.es)
+plot(density(mdata.all$var.es)
+bottom_n(mdata.all, 5, var.es)
+
+This will provide a five-number summary of the sampling variances of your
+effect size estimates. If you have some that are very very small, this will
+cause the error you seem to have encountered. It might be worth checking
+the summary statistics for the effect sizes with very small variances, to
+see if there are data entry errors, or reporting errors in the primary
+sources.
+
+James
+
+On Thu, Feb 14, 2019 at 1:57 PM florencia miguel <mflormiguel at gmail.com>
+wrote:
+
+> Dear all, I am running a meta analysis with the main aim of comparing three
+> different kind of interventions and four kind of outcomes. I want to
+> perform different models for interventions and outcomes. I could run random
+> effects models using the package meta but, as I need to include moderators
+> in the models I tryed the metafor package.
+>
+> The problem is that I obtained this error when running rma.uni and
+> rma.mv functions:
+> "Error in rma.mv(yi = lrr, V = var.es, mods = ~aridity.index, method =
+> "REML", : Ratio of largest to smallest sampling variance extremely large.
+> Cannot obtain stable results."
+>
+> I am using Log response ratio as effect sizes. I know that data are very
+> heterogeneous (some rows with high variances values and other with low
+> variances) because I am comparing different kind of measures. So, I
+> performed models by subgroups (subsetting by interventions), and I obtained
+> the same type of error.
+>
+> Here are some codes:
+>
+> mod1 <- rma(lrr, var.es, mods= aridity.index, data=mdata.all,
+> subset=intervention=="vegetation")
+>
+> mod.2<-rma.mv(yi=lrr, V=var.es, mods= aridity.index, method = "REML",
+> test="t", random = ~ 1 | ID, data=mdata.all, sparse=TRUE)
+>
+> mod.3 <- rma(lrr, var.es, mods=  ~intervention, data = mdata.all, subset =
+> paradigm == "active")
+>
+> ##filtering by interventions
+> mdata.veg <- mydata %>%
+>   filter(intervention=="vegetation") %>%
+>   filter(!is.na(lrr)) %>%
+>   filter(!is.na(var.es))
+>
+> mod<-rma(lrr,var.es, mods= aridity.index, digits=4,data=mdata.veg)
+>
+> I dont know why i getting the same error after subsetting or filtering by
+> groups.
+>
+> Thank you in advance!
+> Florencia
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Feb 14 23:32:41 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 14 Feb 2019 22:32:41 +0000
+Subject: [R-meta] 
+ Network meta-analysis with randomized and non-randomized
+ studies in metafor
+In-Reply-To: <4D01DE72-4553-48E2-B427-8B552735D559@yaletown.io>
+References: <1A8B023A-2B2B-43F5-9497-AC9846A68E99@yaletown.io>
+ <665fffe2911a4821a4be7ea238dee2c8@UM-MAIL3214.unimaas.nl>
+ <2A3DD36F-B574-41E9-9741-62B283641080@yaletown.io>
+ <9dfc983a-df2d-71b0-84ff-501bedc86a23@dewey.myzen.co.uk>
+ <4D01DE72-4553-48E2-B427-8B552735D559@yaletown.io>
+Message-ID: <b10c85ce187f4d049250e9a4b728dcc1@UM-MAIL3214.unimaas.nl>
+
+Hi Chris,
+
+That's not how 'newmods' works. This will work:
+
+newvals <- c(1, 0, 0, 1)
+predict(res, newmods = newvals)
+
+newvals <- c(1, 0, 0, 1)
+predict(res, newmods = newvals, tau2.levels="RS", gamma2.levels="RS")
+
+To be more explicit:
+
+newvals <- c("trt self_help" = 1, "trt ind_counseling" = 0, "trt grp_counseling" = 0, "typeRS" = 1)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Chris Rose
+Sent: Thursday, 14 February, 2019 20:47
+To: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Network meta-analysis with randomized and non-randomized studies in metafor
+
+Hi Michael, all
+
+I think I had actually tried your suggestion of constructing a matrix but did not include it my attempt in my original email. After exhausting a few alternatives that seemed sensible based on my reading of the docs, I started to try some ?random stuff" in the hope that I would learn something purely by experimentation ? unfortunately not.
+
+I?ve included below an example from the beginning, which includes what I think you mean towards the end. It?d be great if you could have a look and tell me where I?m going wrong.
+
+Best,
+
+? Chris
+
+### load the library
+library(metafor)
+
+### copy data into 'dat'
+dat <- dat.hasselblad1998
+
+### calculate log odds for each study arm
+dat <- escalc(measure="PLO", xi=xi, ni=ni, add=1/2, to="all", data=dat)
+
+### convert trt variable to factor with desired ordering of levels
+dat$trt <- factor(dat$trt, levels=c("no_contact", "self_help", "ind_counseling", "grp_counseling"))
+
+### add a space before each level (this makes the output a bit more legible)
+levels(dat$trt) <- paste0(" ", levels(dat$trt))
+
+### simulate a RS/NRS moderator (type)
+set.seed(1234)
+dat$type <- rep(sample(c("RS", "NRS"), length(unique(dat$study)), replace=TRUE), times=tapply(dat$study, dat$study, length))
+
+### fit a meta-regression model
+res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+
+### call predict without additional arguments
+predict(res) # This works!
+
+### make a matrix of moderator values at which to predict, and try to predict
+newvals <- as.matrix(c(trt = " self_help", type = "RS"))
+predict(res, newmods = newvals) # fails with...
+# Error in predict.rma(res, newmods = newvals) : 
+#   Dimensions of 'newmods' do not match dimensions of the model.
+
+### try to specify the tau and gamma levels
+predict(res, newmods = newvals, tau2.levels = "RS", gamma2.levels = "RS") # fails with...
+# Error in predict.rma(res, newmods = newvals, tau2.levels = "RS", gamma2.levels = "RS") : 
+#   Dimensions of 'newmods' do not match dimensions of the model.
+
+### is the matrix moderators incorrectly transposed?
+predict(res, newmods = t(newvals), tau2.levels = "RS", gamma2.levels = "RS") # fails with...
+# Error in dimnames(x) <- dn : 
+#   length of 'dimnames' [2] not equal to array extent
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Feb 14 23:51:09 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 14 Feb 2019 22:51:09 +0000
+Subject: [R-meta] Forest plot
+In-Reply-To: <trinity-b3c4c7c6-ea22-4ea3-9607-d2c1e9faa936-1549955873306@3c-app-webde-bap26>
+References: <trinity-b3c4c7c6-ea22-4ea3-9607-d2c1e9faa936-1549955873306@3c-app-webde-bap26>
+Message-ID: <9303f417c736421d86b06fc166aed86e@UM-MAIL3214.unimaas.nl>
+
+Hi Martin,
+
+You could synthesize the effects within studies and then create a forest plot using those aggregates. For example, using the dataset from Konstantopoulos (2011) (where 'district' takes the role of 'study' here):
+
+dat <- dat.konstantopoulos2011
+
+res <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat)
+res
+forest(res)
+
+sav <- lapply(split(dat, dat$district), function(x) {
+   res <- rma(yi, vi, data=x)
+   return(c(coef(res), vcov(res)))
+})
+
+sav <- data.frame(do.call(rbind, sav))
+names(sav) <- c("yi", "vi")
+
+forest(sav$yi, sav$vi, slab=rownames(sav))
+
+This isn't entirely correct, since the model fitted assumes constant heterogeneity between the estimates within districts, while synthesizing estimates within districts for each district separately allows for different amounts of heterogeneity. A forest plot fully in line with the model that is fitted would be (where I force the amount of heterogeneity within districts to be equal to the estimate from the fitted model):
+
+sav <- lapply(split(dat, dat$district), function(x) {
+   res <- rma(yi, vi, data=x, tau2=res$sigma2[2])
+   return(c(coef(res), vcov(res)))
+})
+
+sav <- data.frame(do.call(rbind, sav))
+names(sav) <- c("yi", "vi")
+
+forest(sav$yi, sav$vi, slab=rownames(sav))
+
+In fact, if we now meta-analyze the aggregated values, then we get *exactly* the same results as those from the full model:
+
+rma(yi, vi, data=sav)
+res
+
+Pretty neat!
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Martin Bauer
+Sent: Tuesday, 12 February, 2019 8:18
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Forest plot
+
+Hi there,?
+I am doing a meta analysis right now and I have about 41 studies. Every study does contain between 2-200 information and results. In total there are 1745 observations. Now I want to create a forest plot but just for the 41 studies. How can I do it?
+?
+I tried it that way:?
+forest(res, slab=paste(StudiesSponsorship$studien_name, as.character(StudiesSponsorship$studien_ID), sep =",")
+
+However, the result was, that every study is included a couple of times depending how much results they deliver. So if the study has 10 results, it is represented 10 times in the forest plot. So the forest plot is very confusing.
+?
+My data set is called: StudiesSponsorship
+The Random Effect Modell is called: res
+?
+I hope that someone can help me :)
+
+Thanks for your time.
+Greets,?
+Martin
+
+From m@|||ng@||@t@ @end|ng |rom y@|etown@|o  Fri Feb 15 09:28:43 2019
+From: m@|||ng@||@t@ @end|ng |rom y@|etown@|o (Chris Rose)
+Date: Fri, 15 Feb 2019 09:28:43 +0100
+Subject: [R-meta] 
+ Network meta-analysis with randomized and non-randomized
+ studies in metafor
+In-Reply-To: <b10c85ce187f4d049250e9a4b728dcc1@UM-MAIL3214.unimaas.nl>
+References: <1A8B023A-2B2B-43F5-9497-AC9846A68E99@yaletown.io>
+ <665fffe2911a4821a4be7ea238dee2c8@UM-MAIL3214.unimaas.nl>
+ <2A3DD36F-B574-41E9-9741-62B283641080@yaletown.io>
+ <9dfc983a-df2d-71b0-84ff-501bedc86a23@dewey.myzen.co.uk>
+ <4D01DE72-4553-48E2-B427-8B552735D559@yaletown.io>
+ <b10c85ce187f4d049250e9a4b728dcc1@UM-MAIL3214.unimaas.nl>
+Message-ID: <E2A7D4DA-E80F-4D9F-9A97-0D6C98BAB44D@yaletown.io>
+
+Many thanks, Wolfgang! I had tried something like that, but not exactly that :-)
+
+Have a good weekend,
+
+? Chris
+
+> On 14 Feb 2019, at 23:32, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> Hi Chris,
+> 
+> That's not how 'newmods' works. This will work:
+> 
+> newvals <- c(1, 0, 0, 1)
+> predict(res, newmods = newvals)
+> 
+> newvals <- c(1, 0, 0, 1)
+> predict(res, newmods = newvals, tau2.levels="RS", gamma2.levels="RS")
+> 
+> To be more explicit:
+> 
+> newvals <- c("trt self_help" = 1, "trt ind_counseling" = 0, "trt grp_counseling" = 0, "typeRS" = 1)
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Chris Rose
+> Sent: Thursday, 14 February, 2019 20:47
+> To: r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] Network meta-analysis with randomized and non-randomized studies in metafor
+> 
+> Hi Michael, all
+> 
+> I think I had actually tried your suggestion of constructing a matrix but did not include it my attempt in my original email. After exhausting a few alternatives that seemed sensible based on my reading of the docs, I started to try some ?random stuff" in the hope that I would learn something purely by experimentation ? unfortunately not.
+> 
+> I?ve included below an example from the beginning, which includes what I think you mean towards the end. It?d be great if you could have a look and tell me where I?m going wrong.
+> 
+> Best,
+> 
+> ? Chris
+> 
+> ### load the library
+> library(metafor)
+> 
+> ### copy data into 'dat'
+> dat <- dat.hasselblad1998
+> 
+> ### calculate log odds for each study arm
+> dat <- escalc(measure="PLO", xi=xi, ni=ni, add=1/2, to="all", data=dat)
+> 
+> ### convert trt variable to factor with desired ordering of levels
+> dat$trt <- factor(dat$trt, levels=c("no_contact", "self_help", "ind_counseling", "grp_counseling"))
+> 
+> ### add a space before each level (this makes the output a bit more legible)
+> levels(dat$trt) <- paste0(" ", levels(dat$trt))
+> 
+> ### simulate a RS/NRS moderator (type)
+> set.seed(1234)
+> dat$type <- rep(sample(c("RS", "NRS"), length(unique(dat$study)), replace=TRUE), times=tapply(dat$study, dat$study, length))
+> 
+> ### fit a meta-regression model
+> res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+> 
+> ### call predict without additional arguments
+> predict(res) # This works!
+> 
+> ### make a matrix of moderator values at which to predict, and try to predict
+> newvals <- as.matrix(c(trt = " self_help", type = "RS"))
+> predict(res, newmods = newvals) # fails with...
+> # Error in predict.rma(res, newmods = newvals) : 
+> #   Dimensions of 'newmods' do not match dimensions of the model.
+> 
+> ### try to specify the tau and gamma levels
+> predict(res, newmods = newvals, tau2.levels = "RS", gamma2.levels = "RS") # fails with...
+> # Error in predict.rma(res, newmods = newvals, tau2.levels = "RS", gamma2.levels = "RS") : 
+> #   Dimensions of 'newmods' do not match dimensions of the model.
+> 
+> ### is the matrix moderators incorrectly transposed?
+> predict(res, newmods = t(newvals), tau2.levels = "RS", gamma2.levels = "RS") # fails with...
+> # Error in dimnames(x) <- dn : 
+> #   length of 'dimnames' [2] not equal to array extent
+
+
+	[[alternative HTML version deleted]]
+
+
+From m||orm|gue| @end|ng |rom gm@||@com  Fri Feb 15 16:11:10 2019
+From: m||orm|gue| @end|ng |rom gm@||@com (florencia miguel)
+Date: Fri, 15 Feb 2019 12:11:10 -0300
+Subject: [R-meta] Error: Ratio of largest to smallest sampling variance
+ extremely large
+In-Reply-To: <bdd87b2f44e844bf9edc245ae8456edd@UM-MAIL3214.unimaas.nl>
+References: <CAG-y=kN8cyYseibZzxU6s7km3srdQPb-3WCuXFw6QvvNgYT+0g@mail.gmail.com>
+ <CAFUVuJzewq=PQ0MFf0FA4o+9tK5K0Mex9Hp=3ybzo=8qJUik1Q@mail.gmail.com>
+ <bdd87b2f44e844bf9edc245ae8456edd@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAG-y=kPOjbKfey0pEzUEuwS47i2u7V0nSQzeeVWwXHuMVMpFXw@mail.gmail.com>
+
+Thanks James and Wolfgang.
+
+James, I?ve checked data and I have some very small sampling variances.
+BUT, these are not errors, it is the structure of data we are working with.
+
+Wolfgang, I installed that version of metafor, i did get warnings when
+running models, is that ok?
+
+Best
+Florencia
+
+El jue., 14 de feb. de 2019 a la(s) 19:29, Viechtbauer, Wolfgang (SP) (
+wolfgang.viechtbauer at maastrichtuniversity.nl) escribi?:
+
+> Hi Florencia,
+>
+> If you install the 'devel' version of metafor (
+> https://wviechtb.github.io/metafor/#installation), then you should get a
+> warning but no longer an error. However, the warning is there for a reason;
+> the results might not be trustworthy.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of James Pustejovsky
+> Sent: Thursday, 14 February, 2019 22:46
+> To: florencia miguel
+> Cc: R meta
+> Subject: Re: [R-meta] Error: Ratio of largest to smallest sampling
+> variance extremely large
+>
+> Florencia,
+>
+> I think the issue might have more to do with your data than with the
+> estimation procedures. Could you try running one or all of the following
+> lines:
+>
+> summary(mdata.all$var.es)
+> plot(density(mdata.all$var.es)
+> bottom_n(mdata.all, 5, var.es)
+>
+> This will provide a five-number summary of the sampling variances of your
+> effect size estimates. If you have some that are very very small, this will
+> cause the error you seem to have encountered. It might be worth checking
+> the summary statistics for the effect sizes with very small variances, to
+> see if there are data entry errors, or reporting errors in the primary
+> sources.
+>
+> James
+>
+> On Thu, Feb 14, 2019 at 1:57 PM florencia miguel <mflormiguel at gmail.com>
+> wrote:
+>
+> > Dear all, I am running a meta analysis with the main aim of comparing
+> three
+> > different kind of interventions and four kind of outcomes. I want to
+> > perform different models for interventions and outcomes. I could run
+> random
+> > effects models using the package meta but, as I need to include
+> moderators
+> > in the models I tryed the metafor package.
+> >
+> > The problem is that I obtained this error when running rma.uni and
+> > rma.mv functions:
+> > "Error in rma.mv(yi = lrr, V = var.es, mods = ~aridity.index, method =
+> > "REML", : Ratio of largest to smallest sampling variance extremely large.
+> > Cannot obtain stable results."
+> >
+> > I am using Log response ratio as effect sizes. I know that data are very
+> > heterogeneous (some rows with high variances values and other with low
+> > variances) because I am comparing different kind of measures. So, I
+> > performed models by subgroups (subsetting by interventions), and I
+> obtained
+> > the same type of error.
+> >
+> > Here are some codes:
+> >
+> > mod1 <- rma(lrr, var.es, mods= aridity.index, data=mdata.all,
+> > subset=intervention=="vegetation")
+> >
+> > mod.2<-rma.mv(yi=lrr, V=var.es, mods= aridity.index, method = "REML",
+> > test="t", random = ~ 1 | ID, data=mdata.all, sparse=TRUE)
+> >
+> > mod.3 <- rma(lrr, var.es, mods=  ~intervention, data = mdata.all,
+> subset =
+> > paradigm == "active")
+> >
+> > ##filtering by interventions
+> > mdata.veg <- mydata %>%
+> >   filter(intervention=="vegetation") %>%
+> >   filter(!is.na(lrr)) %>%
+> >   filter(!is.na(var.es))
+> >
+> > mod<-rma(lrr,var.es, mods= aridity.index, digits=4,data=mdata.veg)
+> >
+> > I dont know why i getting the same error after subsetting or filtering by
+> > groups.
+> >
+> > Thank you in advance!
+> > Florencia
+>
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Fri Feb 15 18:20:43 2019
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Fri, 15 Feb 2019 11:20:43 -0600
+Subject: [R-meta] Error: Ratio of largest to smallest sampling variance
+ extremely large
+In-Reply-To: <6ffdaf65c6b24a07b2c4e69d465219ef@UM-MAIL3214.unimaas.nl>
+References: <CAG-y=kN8cyYseibZzxU6s7km3srdQPb-3WCuXFw6QvvNgYT+0g@mail.gmail.com>
+ <CAFUVuJzewq=PQ0MFf0FA4o+9tK5K0Mex9Hp=3ybzo=8qJUik1Q@mail.gmail.com>
+ <bdd87b2f44e844bf9edc245ae8456edd@UM-MAIL3214.unimaas.nl>
+ <CAG-y=kPOjbKfey0pEzUEuwS47i2u7V0nSQzeeVWwXHuMVMpFXw@mail.gmail.com>
+ <6ffdaf65c6b24a07b2c4e69d465219ef@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAFUVuJxEHAqgMDba2UuqvgAHkYuqz2gBsL8PKD=vbMV5KpsOpA@mail.gmail.com>
+
+I agree with Wolfgang's suggestion that it would be important to conduct
+sensitivity analysis here. Specifically, I would want to see what happens
+if the smallest sampling variances are set to some lower bound. For
+example, if there is just one effect size with a very small sampling
+variance, try replacing the actual sampling variance with the next largest
+sampling variance (or if there are several very small, outlying variances,
+replace them all with the minimum of the remaining sampling variances.
+Hopefully this won't have much consequence on the overall average effect
+size. But I would anticipate that the between-study heterogeneity estimate
+could be quite sensitive.
+
+James
+
+On Fri, Feb 15, 2019 at 10:08 AM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Hi Florencia,
+>
+> As the warning says, the results may not be stable. To be precise, the
+> function checks if:
+>
+> max(vi) / min(vi) >= 1e7
+>
+> So, that would be the case for example if the largest sampling variance is
+> 1 and the smallest is .0000001 (or even smaller). For many effect size
+> measures, such a discrepancy would usually be pretty indicative of a data
+> entry/coding error, so this is why James was suggesting to check the data.
+>
+> You mentioned using log response ratios, where the usual equation for the
+> sampling variance is:
+>
+> vi <- sd1i^2/(n1i*m1i^2) + sd2i^2/(n2i*m2i^2)
+>
+> Another way to write this is:
+>
+> vi <- cv1i^2 / n1i + cv2i^2 / n2i
+>
+> where cv1i and cv2i are the coefficient of variation values for the two
+> groups. So, either the sample sizes vary by many many magnitudes over
+> studies in your data (e.g., one study with 10 observations, another with
+> 100000000) or the coefficient of variation values differ greatly (or a
+> combination of the two). The former seems unlikely to me, the latter would
+> make me question whether the corresponding lrr values should even be
+> combined.
+>
+> This aside, I cannot tell you whether the warning can be ignored or not in
+> your particular case. The reason why I put in the check is that I saw some
+> numerical issues with the internal algorithms in rma.mv() that were
+> sometimes triggered by having a V matrix that is very ill-conditioned (
+> https://en.wikipedia.org/wiki/Condition_number). Using max(vi) / min(vi)
+> >= 1e7 is a very simplified check for this.
+>
+> If you have just a few cases where vi is very very small (or large), you
+> could see what happens with the results if you shrink those vi values a bit
+> up (or down). Hopefully results do not change drastically. That would be a
+> good sign that things are alright.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: florencia miguel [mailto:mflormiguel at gmail.com]
+> Sent: Friday, 15 February, 2019 16:11
+> To: Viechtbauer, Wolfgang (SP)
+> Cc: James Pustejovsky; R meta
+> Subject: Re: [R-meta] Error: Ratio of largest to smallest sampling
+> variance extremely large
+>
+> Thanks James and Wolfgang.
+>
+> James, I?ve checked data and I have some very small sampling variances.
+> BUT, these are not errors, it is the structure of data we are working with.
+>
+> Wolfgang, I installed that version of metafor, i did get warnings when
+> running models, is that ok?
+>
+> Best
+> Florencia
+>
+> El jue., 14 de feb. de 2019 a la(s) 19:29, Viechtbauer, Wolfgang (SP) (
+> wolfgang.viechtbauer at maastrichtuniversity.nl) escribi?:
+> Hi Florencia,
+>
+> If you install the 'devel' version of metafor (
+> https://wviechtb.github.io/metafor/#installation), then you should get a
+> warning but no longer an error. However, the warning is there for a reason;
+> the results might not be trustworthy.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of James Pustejovsky
+> Sent: Thursday, 14 February, 2019 22:46
+> To: florencia miguel
+> Cc: R meta
+> Subject: Re: [R-meta] Error: Ratio of largest to smallest sampling
+> variance extremely large
+>
+> Florencia,
+>
+> I think the issue might have more to do with your data than with the
+> estimation procedures. Could you try running one or all of the following
+> lines:
+>
+> summary(mdata.all$var.es)
+> plot(density(mdata.all$var.es)
+> bottom_n(mdata.all, 5, var.es)
+>
+> This will provide a five-number summary of the sampling variances of your
+> effect size estimates. If you have some that are very very small, this will
+> cause the error you seem to have encountered. It might be worth checking
+> the summary statistics for the effect sizes with very small variances, to
+> see if there are data entry errors, or reporting errors in the primary
+> sources.
+>
+> James
+>
+> On Thu, Feb 14, 2019 at 1:57 PM florencia miguel <mflormiguel at gmail.com>
+> wrote:
+>
+> > Dear all, I am running a meta analysis with the main aim of comparing
+> three
+> > different kind of interventions and four kind of outcomes. I want to
+> > perform different models for interventions and outcomes. I could run
+> random
+> > effects models using the package meta but, as I need to include
+> moderators
+> > in the models I tryed the metafor package.
+> >
+> > The problem is that I obtained this error when running rma.uni and
+> > rma.mv functions:
+> > "Error in rma.mv(yi = lrr, V = var.es, mods = ~aridity.index, method =
+> > "REML", : Ratio of largest to smallest sampling variance extremely large.
+> > Cannot obtain stable results."
+> >
+> > I am using Log response ratio as effect sizes. I know that data are very
+> > heterogeneous (some rows with high variances values and other with low
+> > variances) because I am comparing different kind of measures. So, I
+> > performed models by subgroups (subsetting by interventions), and I
+> obtained
+> > the same type of error.
+> >
+> > Here are some codes:
+> >
+> > mod1 <- rma(lrr, var.es, mods= aridity.index, data=mdata.all,
+> > subset=intervention=="vegetation")
+> >
+> > mod.2<-rma.mv(yi=lrr, V=var.es, mods= aridity.index, method = "REML",
+> > test="t", random = ~ 1 | ID, data=mdata.all, sparse=TRUE)
+> >
+> > mod.3 <- rma(lrr, var.es, mods=  ~intervention, data = mdata.all,
+> subset =
+> > paradigm == "active")
+> >
+> > ##filtering by interventions
+> > mdata.veg <- mydata %>%
+> >   filter(intervention=="vegetation") %>%
+> >   filter(!is.na(lrr)) %>%
+> >   filter(!is.na(var.es))
+> >
+> > mod<-rma(lrr,var.es, mods= aridity.index, digits=4,data=mdata.veg)
+> >
+> > I dont know why i getting the same error after subsetting or filtering by
+> > groups.
+> >
+> > Thank you in advance!
+> > Florencia
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m||orm|gue| @end|ng |rom gm@||@com  Fri Feb 15 18:40:10 2019
+From: m||orm|gue| @end|ng |rom gm@||@com (florencia miguel)
+Date: Fri, 15 Feb 2019 14:40:10 -0300
+Subject: [R-meta] Error: Ratio of largest to smallest sampling variance
+ extremely large
+In-Reply-To: <CAFUVuJxEHAqgMDba2UuqvgAHkYuqz2gBsL8PKD=vbMV5KpsOpA@mail.gmail.com>
+References: <CAG-y=kN8cyYseibZzxU6s7km3srdQPb-3WCuXFw6QvvNgYT+0g@mail.gmail.com>
+ <CAFUVuJzewq=PQ0MFf0FA4o+9tK5K0Mex9Hp=3ybzo=8qJUik1Q@mail.gmail.com>
+ <bdd87b2f44e844bf9edc245ae8456edd@UM-MAIL3214.unimaas.nl>
+ <CAG-y=kPOjbKfey0pEzUEuwS47i2u7V0nSQzeeVWwXHuMVMpFXw@mail.gmail.com>
+ <6ffdaf65c6b24a07b2c4e69d465219ef@UM-MAIL3214.unimaas.nl>
+ <CAFUVuJxEHAqgMDba2UuqvgAHkYuqz2gBsL8PKD=vbMV5KpsOpA@mail.gmail.com>
+Message-ID: <CAG-y=kPXGFS_gM0tGbY9Oummnv94Z=FrRu4oTht0BqBWVT4EYw@mail.gmail.com>
+
+I understand. Thanks so much for the feedback.
+
+Best
+Florencia
+
+El vie., 15 de feb. de 2019 a la(s) 14:21, James Pustejovsky (
+jepusto at gmail.com) escribi?:
+
+> I agree with Wolfgang's suggestion that it would be important to conduct
+> sensitivity analysis here. Specifically, I would want to see what happens
+> if the smallest sampling variances are set to some lower bound. For
+> example, if there is just one effect size with a very small sampling
+> variance, try replacing the actual sampling variance with the next largest
+> sampling variance (or if there are several very small, outlying variances,
+> replace them all with the minimum of the remaining sampling variances.
+> Hopefully this won't have much consequence on the overall average effect
+> size. But I would anticipate that the between-study heterogeneity estimate
+> could be quite sensitive.
+>
+> James
+>
+> On Fri, Feb 15, 2019 at 10:08 AM Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+>> Hi Florencia,
+>>
+>> As the warning says, the results may not be stable. To be precise, the
+>> function checks if:
+>>
+>> max(vi) / min(vi) >= 1e7
+>>
+>> So, that would be the case for example if the largest sampling variance
+>> is 1 and the smallest is .0000001 (or even smaller). For many effect size
+>> measures, such a discrepancy would usually be pretty indicative of a data
+>> entry/coding error, so this is why James was suggesting to check the data.
+>>
+>> You mentioned using log response ratios, where the usual equation for the
+>> sampling variance is:
+>>
+>> vi <- sd1i^2/(n1i*m1i^2) + sd2i^2/(n2i*m2i^2)
+>>
+>> Another way to write this is:
+>>
+>> vi <- cv1i^2 / n1i + cv2i^2 / n2i
+>>
+>> where cv1i and cv2i are the coefficient of variation values for the two
+>> groups. So, either the sample sizes vary by many many magnitudes over
+>> studies in your data (e.g., one study with 10 observations, another with
+>> 100000000) or the coefficient of variation values differ greatly (or a
+>> combination of the two). The former seems unlikely to me, the latter would
+>> make me question whether the corresponding lrr values should even be
+>> combined.
+>>
+>> This aside, I cannot tell you whether the warning can be ignored or not
+>> in your particular case. The reason why I put in the check is that I saw
+>> some numerical issues with the internal algorithms in rma.mv() that were
+>> sometimes triggered by having a V matrix that is very ill-conditioned (
+>> https://en.wikipedia.org/wiki/Condition_number). Using max(vi) / min(vi)
+>> >= 1e7 is a very simplified check for this.
+>>
+>> If you have just a few cases where vi is very very small (or large), you
+>> could see what happens with the results if you shrink those vi values a bit
+>> up (or down). Hopefully results do not change drastically. That would be a
+>> good sign that things are alright.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: florencia miguel [mailto:mflormiguel at gmail.com]
+>> Sent: Friday, 15 February, 2019 16:11
+>> To: Viechtbauer, Wolfgang (SP)
+>> Cc: James Pustejovsky; R meta
+>> Subject: Re: [R-meta] Error: Ratio of largest to smallest sampling
+>> variance extremely large
+>>
+>> Thanks James and Wolfgang.
+>>
+>> James, I?ve checked data and I have some very small sampling variances.
+>> BUT, these are not errors, it is the structure of data we are working with.
+>>
+>> Wolfgang, I installed that version of metafor, i did get warnings when
+>> running models, is that ok?
+>>
+>> Best
+>> Florencia
+>>
+>> El jue., 14 de feb. de 2019 a la(s) 19:29, Viechtbauer, Wolfgang (SP) (
+>> wolfgang.viechtbauer at maastrichtuniversity.nl) escribi?:
+>> Hi Florencia,
+>>
+>> If you install the 'devel' version of metafor (
+>> https://wviechtb.github.io/metafor/#installation), then you should get a
+>> warning but no longer an error. However, the warning is there for a reason;
+>> the results might not be trustworthy.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:
+>> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of James Pustejovsky
+>> Sent: Thursday, 14 February, 2019 22:46
+>> To: florencia miguel
+>> Cc: R meta
+>> Subject: Re: [R-meta] Error: Ratio of largest to smallest sampling
+>> variance extremely large
+>>
+>> Florencia,
+>>
+>> I think the issue might have more to do with your data than with the
+>> estimation procedures. Could you try running one or all of the following
+>> lines:
+>>
+>> summary(mdata.all$var.es)
+>> plot(density(mdata.all$var.es)
+>> bottom_n(mdata.all, 5, var.es)
+>>
+>> This will provide a five-number summary of the sampling variances of your
+>> effect size estimates. If you have some that are very very small, this
+>> will
+>> cause the error you seem to have encountered. It might be worth checking
+>> the summary statistics for the effect sizes with very small variances, to
+>> see if there are data entry errors, or reporting errors in the primary
+>> sources.
+>>
+>> James
+>>
+>> On Thu, Feb 14, 2019 at 1:57 PM florencia miguel <mflormiguel at gmail.com>
+>> wrote:
+>>
+>> > Dear all, I am running a meta analysis with the main aim of comparing
+>> three
+>> > different kind of interventions and four kind of outcomes. I want to
+>> > perform different models for interventions and outcomes. I could run
+>> random
+>> > effects models using the package meta but, as I need to include
+>> moderators
+>> > in the models I tryed the metafor package.
+>> >
+>> > The problem is that I obtained this error when running rma.uni and
+>> > rma.mv functions:
+>> > "Error in rma.mv(yi = lrr, V = var.es, mods = ~aridity.index, method =
+>> > "REML", : Ratio of largest to smallest sampling variance extremely
+>> large.
+>> > Cannot obtain stable results."
+>> >
+>> > I am using Log response ratio as effect sizes. I know that data are very
+>> > heterogeneous (some rows with high variances values and other with low
+>> > variances) because I am comparing different kind of measures. So, I
+>> > performed models by subgroups (subsetting by interventions), and I
+>> obtained
+>> > the same type of error.
+>> >
+>> > Here are some codes:
+>> >
+>> > mod1 <- rma(lrr, var.es, mods= aridity.index, data=mdata.all,
+>> > subset=intervention=="vegetation")
+>> >
+>> > mod.2<-rma.mv(yi=lrr, V=var.es, mods= aridity.index, method = "REML",
+>> > test="t", random = ~ 1 | ID, data=mdata.all, sparse=TRUE)
+>> >
+>> > mod.3 <- rma(lrr, var.es, mods=  ~intervention, data = mdata.all,
+>> subset =
+>> > paradigm == "active")
+>> >
+>> > ##filtering by interventions
+>> > mdata.veg <- mydata %>%
+>> >   filter(intervention=="vegetation") %>%
+>> >   filter(!is.na(lrr)) %>%
+>> >   filter(!is.na(var.es))
+>> >
+>> > mod<-rma(lrr,var.es, mods= aridity.index, digits=4,data=mdata.veg)
+>> >
+>> > I dont know why i getting the same error after subsetting or filtering
+>> by
+>> > groups.
+>> >
+>> > Thank you in advance!
+>> > Florencia
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @||gner@79 @end|ng |rom gm@||@com  Sun Feb 17 20:32:01 2019
+From: @||gner@79 @end|ng |rom gm@||@com (Awais Wahab)
+Date: Sun, 17 Feb 2019 21:32:01 +0200
+Subject: [R-meta] Meta Analysis with HR values
+In-Reply-To: <CAHdcJs5t_Mds3Fc+-FY9Sx2+wYAigT-80QWgjTVvY=3NmiaHBw@mail.gmail.com>
+References: <CAHdcJs5t_Mds3Fc+-FY9Sx2+wYAigT-80QWgjTVvY=3NmiaHBw@mail.gmail.com>
+Message-ID: <CAHdcJs5p7yWziRRNLxCOLBTnS5TghGBsh_FT4U0qm5CaY+vA8g@mail.gmail.com>
+
+Dear Sir/Madam!
+I am doing meta analysis in R, and have HR and CIs values of different
+studies. There are couple of studies which have reported Disease specific
+survival (DSS) and Disease free survival (DFS) and overall survival
+analysis is presented in percentages in different studies. .
+
+So, is there any method to convert these percentages into Hazard Ratios to
+do meta analysis by combining them with studies having similar results like
+(DSS, DFS and OSS).
+
+I did try by conversion of percentage into ratio, but it does not seem to
+be correct.
+I will be grateful for some possible suggestion, if possible.
+best regards,
+Imran
+
+
+
+On Tue, Feb 12, 2019 at 11:05 PM Awais Wahab <aligners79 at gmail.com> wrote:
+
+> Hello Sir/Madam!
+> I am starting meta analysis on HR values of studies along with their CIs.
+> It is kind request to please let me know the steps in R etc. If possible I
+> need explainatory notes along with the codes for understanding.
+>
+> I will be muh grateful.
+> best regards,
+> Awais
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @||gner@79 @end|ng |rom gm@||@com  Sun Feb 17 22:33:05 2019
+From: @||gner@79 @end|ng |rom gm@||@com (Awais Wahab)
+Date: Sun, 17 Feb 2019 23:33:05 +0200
+Subject: [R-meta] Meta Analysis with HR values
+In-Reply-To: <CAHdcJs5p7yWziRRNLxCOLBTnS5TghGBsh_FT4U0qm5CaY+vA8g@mail.gmail.com>
+References: <CAHdcJs5t_Mds3Fc+-FY9Sx2+wYAigT-80QWgjTVvY=3NmiaHBw@mail.gmail.com>
+ <CAHdcJs5p7yWziRRNLxCOLBTnS5TghGBsh_FT4U0qm5CaY+vA8g@mail.gmail.com>
+Message-ID: <CAHdcJs6jne2r6UtZ7xL-t9=49MvYX++nBgm=cEFy7UvDY4Xetw@mail.gmail.com>
+
+Adding further, the studies does have p-values for specific percentsges,
+and I think we can get effect size or HR through p-values.
+best regards,
+Imran
+
+On Sunday, February 17, 2019, Awais Wahab <aligners79 at gmail.com> wrote:
+
+>
+> Dear Sir/Madam!
+> I am doing meta analysis in R, and have HR and CIs values of different
+> studies. There are couple of studies which have reported Disease specific
+> survival (DSS) and Disease free survival (DFS) and overall survival
+> analysis is presented in percentages in different studies. .
+>
+> So, is there any method to convert these percentages into Hazard Ratios to
+> do meta analysis by combining them with studies having similar results like
+> (DSS, DFS and OSS).
+>
+> I did try by conversion of percentage into ratio, but it does not seem to
+> be correct.
+> I will be grateful for some possible suggestion, if possible.
+> best regards,
+> Imran
+>
+>
+>
+> On Tue, Feb 12, 2019 at 11:05 PM Awais Wahab <aligners79 at gmail.com> wrote:
+>
+>> Hello Sir/Madam!
+>> I am starting meta analysis on HR values of studies along with their CIs.
+>> It is kind request to please let me know the steps in R etc. If possible
+>> I need explainatory notes along with the codes for understanding.
+>>
+>> I will be muh grateful.
+>> best regards,
+>> Awais
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Mon Feb 18 12:17:02 2019
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Mon, 18 Feb 2019 12:17:02 +0100
+Subject: [R-meta] Meta Analysis with HR values
+In-Reply-To: <CAHdcJs5p7yWziRRNLxCOLBTnS5TghGBsh_FT4U0qm5CaY+vA8g@mail.gmail.com>
+References: <CAHdcJs5t_Mds3Fc+-FY9Sx2+wYAigT-80QWgjTVvY=3NmiaHBw@mail.gmail.com>
+ <CAHdcJs5p7yWziRRNLxCOLBTnS5TghGBsh_FT4U0qm5CaY+vA8g@mail.gmail.com>
+Message-ID: <c3ed9218-3f8b-9c48-d419-9f4464b20248@imbi.uni-freiburg.de>
+
+Am 17.02.19 um 20:32 schrieb Awais Wahab:
+> Dear Sir/Madam!
+> I am doing meta analysis in R, and have HR and CIs values of different
+> studies. There are couple of studies which have reported Disease specific
+> survival (DSS) and Disease free survival (DFS) and overall survival
+> analysis is presented in percentages in different studies. .
+>
+> So, is there any method to convert these percentages into Hazard Ratios to
+> do meta analysis by combining them with studies having similar results like
+> (DSS, DFS and OSS).
+
+Methods exist to approximate a hazard ratio from Kaplan-Meier curves, 
+e.g. Tierney et al. (2007), which provide several survival probabilities 
+/ percentages.
+
+However, I am not aware of any reliable method to approximate a hazard 
+ratio from a single time point, e.g., 5 year survival probability in 
+experimental and control group.
+
+Best wishes, Guido
+
+Reference:
+Tierney JF, Stewart LA, Ghersi D, Burdett S, Sydes MR. Practical methods 
+for incorporating summary time-to-event data into meta-analysis. Trials. 
+2007;8:16.
+
+	[[alternative HTML version deleted]]
+
+
+From k@thr|n@kuhr @end|ng |rom un|-koe|n@de  Thu Feb 21 15:17:37 2019
+From: k@thr|n@kuhr @end|ng |rom un|-koe|n@de (Kathrin Kuhr)
+Date: Thu, 21 Feb 2019 15:17:37 +0100
+Subject: [R-meta] Combine HR from multiple groups?
+Message-ID: <ec073c97-e8b5-4ae7-808d-6c083b087fc6@uni-koeln.de>
+
+Hi all,
+
+our situation: In a network meta-analysis, we want to pool two nodes 
+(two doses of the same treatment). Outcome of interest is overall 
+survival (Hazard ratios). To include a three-arm study (arm A: treatment 
+dose A; arm B: treatment dose B, arm C: placebo), we have to combine the 
+two treament arms. We only have relative treatment effect, i.e. HR A vs. 
+B, HR A vs. C, HR B vs. C. Is there a possibility to pool HR A vs. C and 
+B vs. C? As we use the same comparator C, we cannot easily calculate a 
+pooled meta-analysis estimate, right? And as we only have relative 
+effects, we cannot easily pool arm A and B as for binary data or mean 
+values, right? Or do we think too complicated?
+
+We are happy for any ideas or examples.
+
+Thanks,
+
+Kathrin and Anne
+
+-- 
+Dr. rer. medic. Kathrin Kuhr, Dipl.-Stat.
+AG Medizinische Statistik
+
+Das IMSB ist umgezogen:
+
+Universit?tsklinikum K?ln
+Institut f?r Medizinische Statistik und Bioinformatik
+Robert-Koch-Str. 10 (Geb?ude 55, Gartenhaus; 2.OG, Raum 2.004)
+D-50931 K?ln
+
+fon +49 (0)221 478-33410
+fax +49 (0)221 478-33420
+kathrin.kuhr at uni-koeln.de
+http://imsieweb.uni-koeln.de/
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Thu Feb 21 16:29:21 2019
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Thu, 21 Feb 2019 16:29:21 +0100
+Subject: [R-meta] Combine HR from multiple groups?
+In-Reply-To: <ec073c97-e8b5-4ae7-808d-6c083b087fc6@uni-koeln.de>
+References: <ec073c97-e8b5-4ae7-808d-6c083b087fc6@uni-koeln.de>
+Message-ID: <c32dea77-ffa2-9098-a085-18a6eeba99d1@imbi.uni-freiburg.de>
+
+Dear Kathrin, dear all,
+
+you may have a look into R?cker G, Cates CJ, Schwarzer G. Methods for 
+including information from multi?arm trials in pairwise meta?analysis. 
+/Res Syn Meth/. 2017;8:392?403. https://doi.org/10.1002/jrsm.1259
+
+In Table 3 there you find an example very similar to yours. Methods to 
+pool these data are given in subsection 4.2, with results presented in 
+Figures 9 (approximate adjustment) and 10 (exact adjustment) of this paper.
+
+If you don't have access to the article or need further information, 
+please ask.
+
+Kind regards,
+
+Gerta
+
+
+Am 21.02.2019 um 15:17 schrieb Kathrin Kuhr:
+> Hi all,
+>
+> our situation: In a network meta-analysis, we want to pool two nodes 
+> (two doses of the same treatment). Outcome of interest is overall 
+> survival (Hazard ratios). To include a three-arm study (arm A: 
+> treatment dose A; arm B: treatment dose B, arm C: placebo), we have to 
+> combine the two treament arms. We only have relative treatment effect, 
+> i.e. HR A vs. B, HR A vs. C, HR B vs. C. Is there a possibility to 
+> pool HR A vs. C and B vs. C? As we use the same comparator C, we 
+> cannot easily calculate a pooled meta-analysis estimate, right? And as 
+> we only have relative effects, we cannot easily pool arm A and B as 
+> for binary data or mean values, right? Or do we think too complicated?
+>
+> We are happy for any ideas or examples.
+>
+> Thanks,
+>
+> Kathrin and Anne
+>
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+	[[alternative HTML version deleted]]
+
+
+From k@thr|n@kuhr @end|ng |rom un|-koe|n@de  Mon Feb 25 14:43:49 2019
+From: k@thr|n@kuhr @end|ng |rom un|-koe|n@de (Kathrin Kuhr)
+Date: Mon, 25 Feb 2019 14:43:49 +0100
+Subject: [R-meta] Combine HR from multiple groups?
+In-Reply-To: <c32dea77-ffa2-9098-a085-18a6eeba99d1@imbi.uni-freiburg.de>
+References: <ec073c97-e8b5-4ae7-808d-6c083b087fc6@uni-koeln.de>
+ <c32dea77-ffa2-9098-a085-18a6eeba99d1@imbi.uni-freiburg.de>
+Message-ID: <523c31bb-43eb-48a2-7d42-025bf731381e@uni-koeln.de>
+
+Dear Gerta,
+
+thank you for your helpful answer - we could solve our problem using the 
+paper mentioned by you.
+
+Best,
+
+Kathrin
+
+
+
+Am 21.02.2019 um 16:29 schrieb Gerta Ruecker:
+>
+> Dear Kathrin, dear all,
+>
+> you may have a look into R?cker G, Cates CJ, Schwarzer G. Methods for 
+> including information from multi?arm trials in pairwise meta?analysis. 
+> /Res Syn Meth/. 2017;8:392?403. https://doi.org/10.1002/jrsm.1259
+>
+> In Table 3 there you find an example very similar to yours. Methods to 
+> pool these data are given in subsection 4.2, with results presented in 
+> Figures 9 (approximate adjustment) and 10 (exact adjustment) of this 
+> paper.
+>
+> If you don't have access to the article or need further information, 
+> please ask.
+>
+> Kind regards,
+>
+> Gerta
+>
+>
+> Am 21.02.2019 um 15:17 schrieb Kathrin Kuhr:
+>> Hi all,
+>>
+>> our situation: In a network meta-analysis, we want to pool two nodes 
+>> (two doses of the same treatment). Outcome of interest is overall 
+>> survival (Hazard ratios). To include a three-arm study (arm A: 
+>> treatment dose A; arm B: treatment dose B, arm C: placebo), we have 
+>> to combine the two treament arms. We only have relative treatment 
+>> effect, i.e. HR A vs. B, HR A vs. C, HR B vs. C. Is there a 
+>> possibility to pool HR A vs. C and B vs. C? As we use the same 
+>> comparator C, we cannot easily calculate a pooled meta-analysis 
+>> estimate, right? And as we only have relative effects, we cannot 
+>> easily pool arm A and B as for binary data or mean values, right? Or 
+>> do we think too complicated?
+>>
+>> We are happy for any ideas or examples.
+>>
+>> Thanks,
+>>
+>> Kathrin and Anne
+>>
+> -- 
+>
+> Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+>
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+>
+> Phone:    +49/761/203-6673
+> Fax:      +49/761/203-6680
+> Mail:ruecker at imbi.uni-freiburg.de
+> Homepage:https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+-- 
+Dr. rer. medic. Kathrin Kuhr, Dipl.-Stat.
+AG Medizinische Statistik
+
+Das IMSB ist umgezogen:
+
+Universit?tsklinikum K?ln
+Institut f?r Medizinische Statistik und Bioinformatik
+Robert-Koch-Str. 10 (Geb?ude 55, Gartenhaus; 2.OG, Raum 2.004)
+D-50931 K?ln
+
+fon +49 (0)221 478-33410
+fax +49 (0)221 478-33420
+kathrin.kuhr at uni-koeln.de
+http://imsieweb.uni-koeln.de/
+
+
+From m@rt|n_b@uer96 @end|ng |rom web@de  Wed Feb 27 13:10:48 2019
+From: m@rt|n_b@uer96 @end|ng |rom web@de (Martin Bauer)
+Date: Wed, 27 Feb 2019 13:10:48 +0100
+Subject: [R-meta] Funnel Plot
+Message-ID: <trinity-a2a43e1e-6801-4fe2-a7a0-a544770e3367-1551269447962@3c-app-webde-bs28>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190227/2ff31fe8/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Rplot02.jpeg
+Type: image/jpeg
+Size: 112611 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190227/2ff31fe8/attachment-0001.jpeg>
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Wed Feb 27 13:23:57 2019
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Wed, 27 Feb 2019 13:23:57 +0100
+Subject: [R-meta] Funnel Plot
+In-Reply-To: <trinity-a2a43e1e-6801-4fe2-a7a0-a544770e3367-1551269447962@3c-app-webde-bs28>
+References: <trinity-a2a43e1e-6801-4fe2-a7a0-a544770e3367-1551269447962@3c-app-webde-bs28>
+Message-ID: <a2f8dbff-1e8b-161c-267a-eceda94ade83@imbi.uni-freiburg.de>
+
+Am 27.02.19 um 13:10 schrieb Martin Bauer:
+
+> Hi there,
+> I am not quite sure, if this funnel plot is symmetrical and if there 
+> are any bias. [...]
+
+I would suggest that you have a look at Sterne et al. (2011).
+
+According to the recommendations, you could conduct a linear regression 
+test for funnel plot asymmetry, e.g., using regtest() in R package 
+*metafor* or metabias() in *meta*.
+
+Best wishes, Guido
+
+Reference: Sterne JAC, Sutton AJ, Ioannidis JPA, Terrin N, Jones DR, Lau 
+J, et al. Recommendations for examining and interpreting funnel plot 
+asymmetry in meta-analyses of randomised controlled trials. BMJ. 
+2011;343(jul22 1):d4002.
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Feb 27 14:42:03 2019
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 27 Feb 2019 13:42:03 +0000
+Subject: [R-meta] Funnel Plot
+In-Reply-To: <a2f8dbff-1e8b-161c-267a-eceda94ade83@imbi.uni-freiburg.de>
+References: <trinity-a2a43e1e-6801-4fe2-a7a0-a544770e3367-1551269447962@3c-app-webde-bs28>
+ <a2f8dbff-1e8b-161c-267a-eceda94ade83@imbi.uni-freiburg.de>
+Message-ID: <3d31a3fc-8bda-59ad-ae62-6f3f1ac8dc49@dewey.myzen.co.uk>
+
+Dear Martin
+
+In addition to Guido's advice you might consider simulating funnel plots 
+without asymmetry and then seeing if your looks different against that 
+background, preferably by showing them to someone else. Fortunately you 
+do not have to write this your self as the good authors of the metaviz 
+package (on CRAN) have done it for you and written a helpful vignette.
+
+Michael
+
+On 27/02/2019 12:23, Guido Schwarzer wrote:
+> Am 27.02.19 um 13:10 schrieb Martin Bauer:
+> 
+>> Hi there,
+>> I am not quite sure, if this funnel plot is symmetrical and if there
+>> are any bias. [...]
+> 
+> I would suggest that you have a look at Sterne et al. (2011).
+> 
+> According to the recommendations, you could conduct a linear regression
+> test for funnel plot asymmetry, e.g., using regtest() in R package
+> *metafor* or metabias() in *meta*.
+> 
+> Best wishes, Guido
+> 
+> Reference: Sterne JAC, Sutton AJ, Ioannidis JPA, Terrin N, Jones DR, Lau
+> J, et al. Recommendations for examining and interpreting funnel plot
+> asymmetry in meta-analyses of randomised controlled trials. BMJ.
+> 2011;343(jul22 1):d4002.
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+

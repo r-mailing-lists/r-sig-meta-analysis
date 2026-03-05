@@ -1,0 +1,3176 @@
+From Tor|@Pen@ @end|ng |rom @tonybrook@edu  Wed Jun  1 17:02:53 2022
+From: Tor|@Pen@ @end|ng |rom @tonybrook@edu (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+Date: Wed, 1 Jun 2022 11:02:53 -0400
+Subject: [R-meta] Influential Cases for MLM Meta
+Message-ID: <CAEmuQj-5q+_Azg2NKWzX_bXN1GeXhvLaSCo=eg9K16NqWbQr5Q@mail.gmail.com>
+
+Hi folks,
+
+I'm curious if there is a specific threshold for effect sizes to be
+considered influential and/or outlier cases using Cook's Distance, Hat
+Values, and DF Betas measures.  I've seen examples of this done for MLM
+meta analyses, but I wasn't sure if there is a hard cutoff to use as a
+reference.  Thanks in advance for all your help!
+
+-- 
+*Tori Pe?a <https://www.linkedin.com/in/toripena/> *(she/her/ella)
+Doctoral Candidate, Cognitive Psychology
+Dept. of Psychology
+Stony Brook University
+Stony Brook, NY 11790-2500
+[image: Stony Brook University logo]
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Jun  1 17:20:15 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 1 Jun 2022 16:20:15 +0100
+Subject: [R-meta] Influential Cases for MLM Meta
+In-Reply-To: <CAEmuQj-5q+_Azg2NKWzX_bXN1GeXhvLaSCo=eg9K16NqWbQr5Q@mail.gmail.com>
+References: <CAEmuQj-5q+_Azg2NKWzX_bXN1GeXhvLaSCo=eg9K16NqWbQr5Q@mail.gmail.com>
+Message-ID: <6896bac6-6d46-9673-593c-3f12b4385a34@dewey.myzen.co.uk>
+
+Dear Tori
+
+If you have the R package installed you can go
+
+ >influence.rma.uni
+
+then page down a bit for the details
+
+I will not copy them for you, not because I want to be unhelpful but 
+because formulae do not sit easily in e-mail text.
+
+Michael
+
+On 01/06/2022 16:02, Tori Pe?a wrote:
+> Hi folks,
+> 
+> I'm curious if there is a specific threshold for effect sizes to be
+> considered influential and/or outlier cases using Cook's Distance, Hat
+> Values, and DF Betas measures.  I've seen examples of this done for MLM
+> meta analyses, but I wasn't sure if there is a hard cutoff to use as a
+> reference.  Thanks in advance for all your help!
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From @ndrew@mc@|e@vey @end|ng |rom gm@||@com  Fri Jun 10 11:24:14 2022
+From: @ndrew@mc@|e@vey @end|ng |rom gm@||@com (Andrew McAleavey)
+Date: Fri, 10 Jun 2022 11:24:14 +0200
+Subject: [R-meta] Transformation for ICC as outcome?
+Message-ID: <CANgPp9nW-cAgBqiBF48O0VPBKEckVceX5tPHLn0iJ-8VLtb-kg@mail.gmail.com>
+
+Hi,
+
+tl;dr: What is the proper transformation to apply to ICC values as the
+outcome of a meta-analysis?
+
+More detail:
+
+I work in an area where it is substantively interesting to evaluate the
+intraclass correlation coefficient (ICC) from hierarchical models as an
+estimate of the relative impact of clustering level. Most frequently my
+field looks at patient outcomes in psychotherapy clustered within
+psychotherapists, but the same design is often used for group effects of
+group psychotherapy, clinic/center effects etc. The ICC, computed through
+variance components, is a conventional way to indicate whether these
+clustering levels make a difference in treatment outcome.
+
+From what I can tell, previous meta-analyses of these ICCs have not
+transformed the outcome variable at all, and the values tend to be quite
+low in published papers (.003 to .04 are common, slightly larger values
+occasionally). The lack of transformation seems strange to me, given that
+these ICCs are ratios of variance components. In fact, not only are these
+ICC values are bounded at (or close to) 0, but when estimates are this
+small, publication bias should be a huge factor due to non-convergence of
+ML estimates (primary studies would tend to simply omit this clustering
+factor if the model didn't converge or the effect was extremely small, so
+the file-drawer is essentially infinitely large). Without transforming the
+outcome, tests for publication bias would also be problematic, since there
+is no possibility for symmetry in a funnel plot (for example), right?
+
+Despite this, I haven't seen any examples of meta-analyses of ICC values in
+other fields that transform the ICC values first. So maybe this is not a
+big deal? Admittedly, it is hard to search for meta-analyses of ICC values
+as the outcome, and I haven't found that many outside my area at all -
+probably there are more I am not familiar with.
+
+My question is this:
+
+Does it make sense to transform ICC values prior to meta-analytic
+aggregation, and if so, what transformation makes the most sense?
+
+I've had logit and double-arcsine transformations recommended already since
+they apply for ratio/proportion outcomes. I am just not sure if I am
+missing some reason why ICC values should not be treated that way.
+
+Any advice or links would be appreciated!
+
+Best,
+Andrew McAleavey
+Helse F?rde, Norway
+
+-- 
+Andrew McAleavey
+andrew.mcaleavey at gmail.com
+He / him
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Jun 10 12:56:24 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 10 Jun 2022 10:56:24 +0000
+Subject: [R-meta] Transformation for ICC as outcome?
+In-Reply-To: <CANgPp9nW-cAgBqiBF48O0VPBKEckVceX5tPHLn0iJ-8VLtb-kg@mail.gmail.com>
+References: <CANgPp9nW-cAgBqiBF48O0VPBKEckVceX5tPHLn0iJ-8VLtb-kg@mail.gmail.com>
+Message-ID: <c18b21098a0d4bd18494b66f601ca47d@UM-MAIL3214.unimaas.nl>
+
+Dear Andrew,
+
+We did a meta-analysis of ICC(1) values here:
+
+Nicola?, S. P. A., Viechtbauer, W., Kruidenier, L. M., Candel, M. J. J. M., Prins, M. H. & Teijink, J. A. W. (2009). Reliability of treadmill testing in peripheral arterial disease: A meta-regression analysis. Journal of Vascular Surgery, 50(2), 322-329. https://doi.org/10.1016/j.jvs.2009.01.042 
+
+For ICC(1) values, there is a version of Fisher's r-to-z transformation that is directly applicable.
+
+However, note that there are many types of ICCs. An often given reference here is:
+
+McGraw, K. O. & Wong, S. P. (1996). Forming inferences about some intraclass correlation coefficients. Psychological Methods, 1(1), 30-46. https://doi.org/10.1037/1082-989x.1.1.30 
+
+It seems like you are dealing with ICCs that come from a multilevel model of the form:
+
+lme(y ~ 1, random = ~ 1 | group)
+
+and then computing ICC = var(group) / (var(group) + var(error)).
+
+This is identical to the ICC(1) discussed above as long as var(group) > 0 and as long as the groups are all of equal size. So in that case, the r-to-z transformation for ICC(1) values is equally applicable. If group sizes differ, then this equivalence breaks down, but one can think of the ICC above as a sort of average ICC(1) (in McGraw & Wong, 1996, the k in the equation for the ICC(1) on page 35 is the number of subjects per group and if this differs, then we could plug in the average group size and end up with something that will typically be quite similar to the ICC above).
+
+So, this is what I would go with in this scenario. So, using
+
+yi = 1/2 * ln((1 + (n-1) * ICC) / (1 - ICC))
+vi = n / (2*(n-1) * (p-2))
+
+where n is the (average) group size and p is the number of groups.
+
+Any other approach would require knowing the variance of the ICC values (or of some transformation thereof). I am not aware of any closed-form derivation thereof.
+
+One difficulty (that we glossed over in the MA article) with the transformation above is that the yi values inherently estimate different parameters when n differs across studies. Back then, I did some convoluted transformation based on some simulations to 'equate' the transformed ICC(1) values calculated based on 3 assessments to those from 2 assessments. Instead, I would now include n as a predictor (and probably higher polynomial terms thereof, since the impact of n is non-linear) to account for this.
+
+Best,
+Wolfgang
+
+-- 
+Wolfgang Viechtbauer, PhD, Statistician | Department of Psychiatry and    
+Neuropsychology | Maastricht University | PO Box 616 (VIJV1) | 6200 MD    
+Maastricht, The Netherlands | +31(43)3884170 | https://www.wvbauer.com    
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Andrew McAleavey
+>Sent: Friday, 10 June, 2022 11:24
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Transformation for ICC as outcome?
+>
+>Hi,
+>
+>tl;dr: What is the proper transformation to apply to ICC values as the
+>outcome of a meta-analysis?
+>
+>More detail:
+>
+>I work in an area where it is substantively interesting to evaluate the
+>intraclass correlation coefficient (ICC) from hierarchical models as an
+>estimate of the relative impact of clustering level. Most frequently my
+>field looks at patient outcomes in psychotherapy clustered within
+>psychotherapists, but the same design is often used for group effects of
+>group psychotherapy, clinic/center effects etc. The ICC, computed through
+>variance components, is a conventional way to indicate whether these
+>clustering levels make a difference in treatment outcome.
+>
+>From what I can tell, previous meta-analyses of these ICCs have not
+>transformed the outcome variable at all, and the values tend to be quite
+>low in published papers (.003 to .04 are common, slightly larger values
+>occasionally). The lack of transformation seems strange to me, given that
+>these ICCs are ratios of variance components. In fact, not only are these
+>ICC values are bounded at (or close to) 0, but when estimates are this
+>small, publication bias should be a huge factor due to non-convergence of
+>ML estimates (primary studies would tend to simply omit this clustering
+>factor if the model didn't converge or the effect was extremely small, so
+>the file-drawer is essentially infinitely large). Without transforming the
+>outcome, tests for publication bias would also be problematic, since there
+>is no possibility for symmetry in a funnel plot (for example), right?
+>
+>Despite this, I haven't seen any examples of meta-analyses of ICC values in
+>other fields that transform the ICC values first. So maybe this is not a
+>big deal? Admittedly, it is hard to search for meta-analyses of ICC values
+>as the outcome, and I haven't found that many outside my area at all -
+>probably there are more I am not familiar with.
+>
+>My question is this:
+>
+>Does it make sense to transform ICC values prior to meta-analytic
+>aggregation, and if so, what transformation makes the most sense?
+>
+>I've had logit and double-arcsine transformations recommended already since
+>they apply for ratio/proportion outcomes. I am just not sure if I am
+>missing some reason why ICC values should not be treated that way.
+>
+>Any advice or links would be appreciated!
+>
+>Best,
+>Andrew McAleavey
+>Helse F?rde, Norway
+>
+>--
+>Andrew McAleavey
+>andrew.mcaleavey at gmail.com
+>He / him
+
+From @ndrew@mc@|e@vey @end|ng |rom gm@||@com  Fri Jun 10 14:41:39 2022
+From: @ndrew@mc@|e@vey @end|ng |rom gm@||@com (Andrew McAleavey)
+Date: Fri, 10 Jun 2022 14:41:39 +0200
+Subject: [R-meta] Transformation for ICC as outcome?
+In-Reply-To: <c18b21098a0d4bd18494b66f601ca47d@UM-MAIL3214.unimaas.nl>
+References: <CANgPp9nW-cAgBqiBF48O0VPBKEckVceX5tPHLn0iJ-8VLtb-kg@mail.gmail.com>
+ <c18b21098a0d4bd18494b66f601ca47d@UM-MAIL3214.unimaas.nl>
+Message-ID: <CANgPp9=fp7mMvBtBxLN-ULAubvRjKHFTBV5WOtBDhm7javbX2g@mail.gmail.com>
+
+Thank you for the fast response!
+
+Your guesses about my meaning seem very accurate, so I think I could use
+your suggestion for a quick re-analysis of existing studies, though you
+highlight a number of issues that make interpretation of these values very
+hard. Indeed, sample sizes vary widely in these studies (not to mention
+many other substantive variables), so a more complete accounting for the
+sources of variability would really be necessary to fully understand this I
+guess.
+
+I wonder what exactly you mean by "the yi values inherently estimate
+different parameters when n differs across studies," though. I have seen
+estimates from education where smaller group sizes tend to produce smaller
+ICC values, but is this what you mean? Is there some other effect to
+consider?
+
+Thanks again, this is very helpful to see.
+
+Andrew
+
+On Fri, Jun 10, 2022 at 12:56 PM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Andrew,
+>
+> We did a meta-analysis of ICC(1) values here:
+>
+> Nicola?, S. P. A., Viechtbauer, W., Kruidenier, L. M., Candel, M. J. J.
+> M., Prins, M. H. & Teijink, J. A. W. (2009). Reliability of treadmill
+> testing in peripheral arterial disease: A meta-regression analysis. Journal
+> of Vascular Surgery, 50(2), 322-329.
+> https://doi.org/10.1016/j.jvs.2009.01.042
+>
+> For ICC(1) values, there is a version of Fisher's r-to-z transformation
+> that is directly applicable.
+>
+> However, note that there are many types of ICCs. An often given reference
+> here is:
+>
+> McGraw, K. O. & Wong, S. P. (1996). Forming inferences about some
+> intraclass correlation coefficients. Psychological Methods, 1(1), 30-46.
+> https://doi.org/10.1037/1082-989x.1.1.30
+>
+> It seems like you are dealing with ICCs that come from a multilevel model
+> of the form:
+>
+> lme(y ~ 1, random = ~ 1 | group)
+>
+> and then computing ICC = var(group) / (var(group) + var(error)).
+>
+> This is identical to the ICC(1) discussed above as long as var(group) > 0
+> and as long as the groups are all of equal size. So in that case, the
+> r-to-z transformation for ICC(1) values is equally applicable. If group
+> sizes differ, then this equivalence breaks down, but one can think of the
+> ICC above as a sort of average ICC(1) (in McGraw & Wong, 1996, the k in the
+> equation for the ICC(1) on page 35 is the number of subjects per group and
+> if this differs, then we could plug in the average group size and end up
+> with something that will typically be quite similar to the ICC above).
+>
+> So, this is what I would go with in this scenario. So, using
+>
+> yi = 1/2 * ln((1 + (n-1) * ICC) / (1 - ICC))
+> vi = n / (2*(n-1) * (p-2))
+>
+> where n is the (average) group size and p is the number of groups.
+>
+> Any other approach would require knowing the variance of the ICC values
+> (or of some transformation thereof). I am not aware of any closed-form
+> derivation thereof.
+>
+> One difficulty (that we glossed over in the MA article) with the
+> transformation above is that the yi values inherently estimate different
+> parameters when n differs across studies. Back then, I did some convoluted
+> transformation based on some simulations to 'equate' the transformed ICC(1)
+> values calculated based on 3 assessments to those from 2 assessments.
+> Instead, I would now include n as a predictor (and probably higher
+> polynomial terms thereof, since the impact of n is non-linear) to account
+> for this.
+>
+> Best,
+> Wolfgang
+>
+> --
+> Wolfgang Viechtbauer, PhD, Statistician | Department of Psychiatry and
+> Neuropsychology | Maastricht University | PO Box 616 (VIJV1) | 6200 MD
+> Maastricht, The Netherlands | +31(43)3884170 | https://www.wvbauer.com
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On
+> >Behalf Of Andrew McAleavey
+> >Sent: Friday, 10 June, 2022 11:24
+> >To: r-sig-meta-analysis at r-project.org
+> >Subject: [R-meta] Transformation for ICC as outcome?
+> >
+> >Hi,
+> >
+> >tl;dr: What is the proper transformation to apply to ICC values as the
+> >outcome of a meta-analysis?
+> >
+> >More detail:
+> >
+> >I work in an area where it is substantively interesting to evaluate the
+> >intraclass correlation coefficient (ICC) from hierarchical models as an
+> >estimate of the relative impact of clustering level. Most frequently my
+> >field looks at patient outcomes in psychotherapy clustered within
+> >psychotherapists, but the same design is often used for group effects of
+> >group psychotherapy, clinic/center effects etc. The ICC, computed through
+> >variance components, is a conventional way to indicate whether these
+> >clustering levels make a difference in treatment outcome.
+> >
+> >From what I can tell, previous meta-analyses of these ICCs have not
+> >transformed the outcome variable at all, and the values tend to be quite
+> >low in published papers (.003 to .04 are common, slightly larger values
+> >occasionally). The lack of transformation seems strange to me, given that
+> >these ICCs are ratios of variance components. In fact, not only are these
+> >ICC values are bounded at (or close to) 0, but when estimates are this
+> >small, publication bias should be a huge factor due to non-convergence of
+> >ML estimates (primary studies would tend to simply omit this clustering
+> >factor if the model didn't converge or the effect was extremely small, so
+> >the file-drawer is essentially infinitely large). Without transforming the
+> >outcome, tests for publication bias would also be problematic, since there
+> >is no possibility for symmetry in a funnel plot (for example), right?
+> >
+> >Despite this, I haven't seen any examples of meta-analyses of ICC values
+> in
+> >other fields that transform the ICC values first. So maybe this is not a
+> >big deal? Admittedly, it is hard to search for meta-analyses of ICC values
+> >as the outcome, and I haven't found that many outside my area at all -
+> >probably there are more I am not familiar with.
+> >
+> >My question is this:
+> >
+> >Does it make sense to transform ICC values prior to meta-analytic
+> >aggregation, and if so, what transformation makes the most sense?
+> >
+> >I've had logit and double-arcsine transformations recommended already
+> since
+> >they apply for ratio/proportion outcomes. I am just not sure if I am
+> >missing some reason why ICC values should not be treated that way.
+> >
+> >Any advice or links would be appreciated!
+> >
+> >Best,
+> >Andrew McAleavey
+> >Helse F?rde, Norway
+> >
+> >--
+> >Andrew McAleavey
+> >andrew.mcaleavey at gmail.com
+> >He / him
+>
+
+
+-- 
+Andrew McAleavey
+andrew.mcaleavey at gmail.com
+He / him
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Jun 10 15:16:56 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 10 Jun 2022 13:16:56 +0000
+Subject: [R-meta] Transformation for ICC as outcome?
+In-Reply-To: <CANgPp9=fp7mMvBtBxLN-ULAubvRjKHFTBV5WOtBDhm7javbX2g@mail.gmail.com>
+References: <CANgPp9nW-cAgBqiBF48O0VPBKEckVceX5tPHLn0iJ-8VLtb-kg@mail.gmail.com>
+ <c18b21098a0d4bd18494b66f601ca47d@UM-MAIL3214.unimaas.nl>
+ <CANgPp9=fp7mMvBtBxLN-ULAubvRjKHFTBV5WOtBDhm7javbX2g@mail.gmail.com>
+Message-ID: <7035f8c6dac24e0f86e37b8d8468389f@UM-MAIL3214.unimaas.nl>
+
+The r-to-z transformation for ICC(1) values involves n. So the parameter that is estimated by a transformed value is:
+
+1/2 * ln((1 + (n_i-1) * rho_i) / (1 - rho_i)),
+
+where rho_i is the true ICC in the ith study. When the n_i values differ across studies, the r-to-z transformed values are estimating different parameters (even if rho_i is constant across studies) and therefore are inherently heterogeneous. Adding n_i (and n_i^2, n_i^3, ...) as predictors can be used to account for this to some extent.
+
+In contrast, this is not an issue for the r-to-z transformation for plain-old Pearson product-moment correlations, which is:
+
+1/2 * ln((1 + r_i) / (1 - r_i)),
+
+since this estimates
+
+1/2 * ln((1 + rho_i) / (1 - rho_i)),
+
+so if the rho_i values are homogeneous across studies, so are the transformed parameters.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Andrew McAleavey [mailto:andrew.mcaleavey at gmail.com]
+>Sent: Friday, 10 June, 2022 14:42
+>To: Viechtbauer, Wolfgang (NP)
+>Cc: r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] Transformation for ICC as outcome?
+>
+>Thank you for the fast response!
+>
+>Your guesses about my meaning seem very accurate, so I think I could use your
+>suggestion for a quick re-analysis of existing studies, though you highlight a
+>number of issues that make interpretation of these values very hard. Indeed,
+>sample sizes vary widely in these studies (not to mention many other substantive
+>variables), so a more complete accounting for the sources of variability would
+>really be necessary to fully understand this I guess.
+>
+>I wonder what exactly you mean by "the yi values inherently estimate different
+>parameters when n differs across studies," though. I have seen estimates from
+>education where smaller group sizes tend to produce smaller ICC values, but is
+>this what you mean? Is there some other effect to consider?
+>
+>Thanks again, this is very?helpful to see.
+>
+>Andrew
+>
+>On Fri, Jun 10, 2022 at 12:56 PM Viechtbauer, Wolfgang (NP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>Dear Andrew,
+>
+>We did a meta-analysis of ICC(1) values here:
+>
+>Nicola?, S. P. A., Viechtbauer, W., Kruidenier, L. M., Candel, M. J. J. M.,
+>Prins, M. H. & Teijink, J. A. W. (2009). Reliability of treadmill testing in
+>peripheral arterial disease: A meta-regression analysis. Journal of Vascular
+>Surgery, 50(2), 322-329. https://doi.org/10.1016/j.jvs.2009.01.042
+>
+>For ICC(1) values, there is a version of Fisher's r-to-z transformation that is
+>directly applicable.
+>
+>However, note that there are many types of ICCs. An often given reference here
+>is:
+>
+>McGraw, K. O. & Wong, S. P. (1996). Forming inferences about some intraclass
+>correlation coefficients. Psychological Methods, 1(1), 30-46.
+>https://doi.org/10.1037/1082-989x.1.1.30
+>
+>It seems like you are dealing with ICCs that come from a multilevel model of the
+>form:
+>
+>lme(y ~ 1, random = ~ 1 | group)
+>
+>and then computing ICC = var(group) / (var(group) + var(error)).
+>
+>This is identical to the ICC(1) discussed above as long as var(group) > 0 and as
+>long as the groups are all of equal size. So in that case, the r-to-z
+>transformation for ICC(1) values is equally applicable. If group sizes differ,
+>then this equivalence breaks down, but one can think of the ICC above as a sort
+>of average ICC(1) (in McGraw & Wong, 1996, the k in the equation for the ICC(1)
+>on page 35 is the number of subjects per group and if this differs, then we could
+>plug in the average group size and end up with something that will typically be
+>quite similar to the ICC above).
+>
+>So, this is what I would go with in this scenario. So, using
+>
+>yi = 1/2 * ln((1 + (n-1) * ICC) / (1 - ICC))
+>vi = n / (2*(n-1) * (p-2))
+>
+>where n is the (average) group size and p is the number of groups.
+>
+>Any other approach would require knowing the variance of the ICC values (or of
+>some transformation thereof). I am not aware of any closed-form derivation
+>thereof.
+>
+>One difficulty (that we glossed over in the MA article) with the transformation
+>above is that the yi values inherently estimate different parameters when n
+>differs across studies. Back then, I did some convoluted transformation based on
+>some simulations to 'equate' the transformed ICC(1) values calculated based on 3
+>assessments to those from 2 assessments. Instead, I would now include n as a
+>predictor (and probably higher polynomial terms thereof, since the impact of n is
+>non-linear) to account for this.
+>
+>Best,
+>Wolfgang
+>
+>--
+>Wolfgang Viechtbauer, PhD, Statistician | Department of Psychiatry and
+>Neuropsychology | Maastricht University | PO Box 616 (VIJV1) | 6200 MD
+>Maastricht, The Netherlands | +31(43)3884170 | https://www.wvbauer.com
+>
+>>-----Original Message-----
+>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>Behalf Of Andrew McAleavey
+>>Sent: Friday, 10 June, 2022 11:24
+>>To: r-sig-meta-analysis at r-project.org
+>>Subject: [R-meta] Transformation for ICC as outcome?
+>>
+>>Hi,
+>>
+>>tl;dr: What is the proper transformation to apply to ICC values as the
+>>outcome of a meta-analysis?
+>>
+>>More detail:
+>>
+>>I work in an area where it is substantively interesting to evaluate the
+>>intraclass correlation coefficient (ICC) from hierarchical models as an
+>>estimate of the relative impact of clustering level. Most frequently my
+>>field looks at patient outcomes in psychotherapy clustered within
+>>psychotherapists, but the same design is often used for group effects of
+>>group psychotherapy, clinic/center effects etc. The ICC, computed through
+>>variance components, is a conventional way to indicate whether these
+>>clustering levels make a difference in treatment outcome.
+>>
+>>From what I can tell, previous meta-analyses of these ICCs have not
+>>transformed the outcome variable at all, and the values tend to be quite
+>>low in published papers (.003 to .04 are common, slightly larger values
+>>occasionally). The lack of transformation seems strange to me, given that
+>>these ICCs are ratios of variance components. In fact, not only are these
+>>ICC values are bounded at (or close to) 0, but when estimates are this
+>>small, publication bias should be a huge factor due to non-convergence of
+>>ML estimates (primary studies would tend to simply omit this clustering
+>>factor if the model didn't converge or the effect was extremely small, so
+>>the file-drawer is essentially infinitely large). Without transforming the
+>>outcome, tests for publication bias would also be problematic, since there
+>>is no possibility for symmetry in a funnel plot (for example), right?
+>>
+>>Despite this, I haven't seen any examples of meta-analyses of ICC values in
+>>other fields that transform the ICC values first. So maybe this is not a
+>>big deal? Admittedly, it is hard to search for meta-analyses of ICC values
+>>as the outcome, and I haven't found that many outside my area at all -
+>>probably there are more I am not familiar with.
+>>
+>>My question is this:
+>>
+>>Does it make sense to transform ICC values prior to meta-analytic
+>>aggregation, and if so, what transformation makes the most sense?
+>>
+>>I've had logit and double-arcsine transformations recommended already since
+>>they apply for ratio/proportion outcomes. I am just not sure if I am
+>>missing some reason why ICC values should not be treated that way.
+>>
+>>Any advice or links would be appreciated!
+>>
+>>Best,
+>>Andrew McAleavey
+>>Helse F?rde, Norway
+>>
+>>--
+>>Andrew McAleavey
+>>andrew.mcaleavey at gmail.com
+>>He / him
+
+From m|obo4370 @end|ng |rom hotm@||@com  Sat Jun 11 17:30:48 2022
+From: m|obo4370 @end|ng |rom hotm@||@com (Martin Lobo)
+Date: Sat, 11 Jun 2022 15:30:48 +0000
+Subject: [R-meta] Different methods and measures of measurement of
+ continuous variables
+Message-ID: <BL1PR22MB3681E4B6B7603A2FAD4567B2ACA99@BL1PR22MB3681.namprd22.prod.outlook.com>
+
+Hello everyone.
+
+ I have a perhaps recurring query. I am analyzing the amount of fat in an organ, the problem is that this amount is reported with different methods (tomography, ultrasound, etc.) and the units are different. There are units reported as cubic centimeters, millimeters, square centimeters, milliliters, and logarithmic conversion of cm3.
+The question is: would it be methodologically and mathematically correct to use the standardized mean difference or would it be necessary to use some other method of meta-analysis or stratify by type of measurement.
+From already thank you very much.
+
+
+
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital Militar Campo de Mayo.
+Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Ex Miembro del Area de Investigaci?n de la SAC
+Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+
+Experto en Lipidos de la Sociedad Argentina de Lipidos.
+Miembro de la Sociedad Argentina de Lipidos.
+Instructor de ACLS de la American Heart Association
+
+
+	[[alternative HTML version deleted]]
+
+
+From ||||ppo@g@mb@rot@ @end|ng |rom gm@||@com  Wed Jun 15 13:44:15 2022
+From: ||||ppo@g@mb@rot@ @end|ng |rom gm@||@com (Filippo Gambarota)
+Date: Wed, 15 Jun 2022 13:44:15 +0200
+Subject: [R-meta] simulating three-level meta-analysis
+Message-ID: <CAKWaqjZ4JzF3GzjqdiFh3-=f-323d_Ev7=8UNu9p3L0SU9pRqA@mail.gmail.com>
+
+Hello!
+I'm trying to simulate a three-level meta-analysis model but I'm stuck
+on understanding how to generate sampling variances that will be
+associated with a certain value of tau2 (level 2) and tau3 (level 3).
+My approach so far is setting values for population parameters and
+generating sampling variances for the effect ij:
+
+```
+library(metafor)
+
+b0 <- 0.3 # effect
+ni <- 100 # number of papers
+nj <- 5 # number of effects within each paper
+
+taui <- 0.3 # level 3 tau
+tauj <- 0.1 # level 2 tau
+icc <- taui^2 / sum(taui^2 + tauj^2) # real ICC
+
+# i-level data
+dati <- data.frame(paper = 1:ni,
+                   b0_i = rnorm(ni, 0, taui))
+
+# j-level data
+datj <- data.frame(paper = rep(1:ni, nj),
+                   study = 1:sum(nj),
+                   b0_j = rnorm(sum(nj), 0, tauj))
+
+
+dat <- merge(dati, datj, by = "paper") # combine
+dat$vi <- runif(nrow(dat), 0, 0.3) # sampling variances at level 1
+dat$yi <- b0 + dat$b0_i + dat$b0_j + rnorm(nrow(dat), 0, dat$vi)
+
+fit <- rma.mv(yi, vi, random = ~study|paper, data = dat)
+```
+However, I'm sure that I'm doing wrong because taus are estimated
+using vi and the vis are not sampled with specific criteria.
+Does someone have some hints? Or in general suggestions about to setup
+a simulation like this?
+Thanks!
+
+-- 
+Filippo Gambarota
+PhD Student - University of Padova
+Department of Developmental and Social Psychology
+Website: filippogambarota
+Research Group: Colab   Psicostat
+
+
+From ||||ppo@g@mb@rot@ @end|ng |rom gm@||@com  Thu Jun 16 10:10:52 2022
+From: ||||ppo@g@mb@rot@ @end|ng |rom gm@||@com (Filippo Gambarota)
+Date: Thu, 16 Jun 2022 10:10:52 +0200
+Subject: [R-meta] simulating three-level meta-analysis
+In-Reply-To: <c0e31bd429544e06add993bd1ac7feb1@UM-MAIL3214.unimaas.nl>
+References: <CAKWaqjZ4JzF3GzjqdiFh3-=f-323d_Ev7=8UNu9p3L0SU9pRqA@mail.gmail.com>
+ <c0e31bd429544e06add993bd1ac7feb1@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAKWaqjZs5ZZUEVZ90Yy3Ga+mvPQhU=H185MP3qEV41=By7ckjg@mail.gmail.com>
+
+Thank you Wolfgang this is very helpful.
+With that sentence about sampling variances, I meant that (if I
+remember correctly) for tau estimation I have to use effect size weights
+(thus sampling variances) so I was afraid that I need to sample values
+according to some criteria (and not runif(...) as in my simulation) in
+order to recover my parameters.
+
+On Wed, 15 Jun 2022 at 19:36, Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Well, it doesn't want to go through, at least so far both of my replies
+> are not showing up on the mailing list. No idea why. In case you reply,
+> please still include the mailing list.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Viechtbauer, Wolfgang (NP)
+> >Sent: Wednesday, 15 June, 2022 17:33
+> >To: R meta
+> >Cc: 'Filippo Gambarota'
+> >Subject: RE: [R-meta] simulating three-level meta-analysis
+> >
+> >(I don't know why, but occasionally my posts to the mailing list do not go
+> >through. This seems to be happening again, so let me try to resend this.)
+> >
+> >Hi Filippo,
+> >
+> >Not sure what you mean by "sampling variances that will be associated
+> with a
+> >certain value of tau2 (level 2) and tau3 (level 3)". But in any case,
+> your code
+> >isn't quite simulating data according to the three level model. This does:
+> >
+> >dat <- data.frame(paper = rep(1:ni, each=nj), study = 1:nj)
+> >dat$b0_i <- rep(rnorm(ni, 0, taui), each=nj)
+> >dat$b0_j <- rnorm(nrow(dat), 0, tauj)
+> >dat$vi   <- runif(nrow(dat), 0, 0.3)
+> >dat$yi   <- b0 + dat$b0_i + dat$b0_j + rnorm(nrow(dat), 0, sqrt(dat$vi))
+> >
+> >fit <- rma.mv(yi, vi, random = ~ study | paper, data = dat)
+> >fit
+> >
+> >Best,
+> >Wolfgang
+> >
+> >>-----Original Message-----
+> >>From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On
+> >>Behalf Of Filippo Gambarota
+> >>Sent: Wednesday, 15 June, 2022 13:44
+> >>To: R meta
+> >>Subject: [R-meta] simulating three-level meta-analysis
+> >>
+> >>Hello!
+> >>I'm trying to simulate a three-level meta-analysis model but I'm stuck
+> >>on understanding how to generate sampling variances that will be
+> >>associated with a certain value of tau2 (level 2) and tau3 (level 3).
+> >>My approach so far is setting values for population parameters and
+> >>generating sampling variances for the effect ij:
+> >>
+> >>```
+> >>library(metafor)
+> >>
+> >>b0 <- 0.3 # effect
+> >>ni <- 100 # number of papers
+> >>nj <- 5 # number of effects within each paper
+> >>
+> >>taui <- 0.3 # level 3 tau
+> >>tauj <- 0.1 # level 2 tau
+> >>icc <- taui^2 / sum(taui^2 + tauj^2) # real ICC
+> >>
+> >># i-level data
+> >>dati <- data.frame(paper = 1:ni,
+> >>                   b0_i = rnorm(ni, 0, taui))
+> >>
+> >># j-level data
+> >>datj <- data.frame(paper = rep(1:ni, nj),
+> >>                   study = 1:sum(nj),
+> >>                   b0_j = rnorm(sum(nj), 0, tauj))
+> >>
+> >>
+> >>dat <- merge(dati, datj, by = "paper") # combine
+> >>dat$vi <- runif(nrow(dat), 0, 0.3) # sampling variances at level 1
+> >>dat$yi <- b0 + dat$b0_i + dat$b0_j + rnorm(nrow(dat), 0, dat$vi)
+> >>
+> >>fit <- rma.mv(yi, vi, random = ~study|paper, data = dat)
+> >>```
+> >>However, I'm sure that I'm doing wrong because taus are estimated
+> >>using vi and the vis are not sampled with specific criteria.
+> >>Does someone have some hints? Or in general suggestions about to setup
+> >>a simulation like this?
+> >>Thanks!
+> >>
+> >>--
+> >>Filippo Gambarota
+> >>PhD Student - University of Padova
+> >>Department of Developmental and Social Psychology
+> >>Website: filippogambarota
+> >>Research Group: Colab   Psicostat
+>
+
+
+-- 
+*Filippo Gambarota*
+PhD Student - University of Padova
+Department of Developmental and Social Psychology
+Website: filippogambarota <https://filippogambarota.netlify.app/>
+Research Group: Colab <http://colab.psy.unipd.it/>   Psicostat
+<https://psicostat.dpss.psy.unipd.it/>
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Thu Jun 16 16:07:04 2022
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 16 Jun 2022 09:07:04 -0500
+Subject: [R-meta] simulating three-level meta-analysis
+In-Reply-To: <CAKWaqjZs5ZZUEVZ90Yy3Ga+mvPQhU=H185MP3qEV41=By7ckjg@mail.gmail.com>
+References: <CAKWaqjZ4JzF3GzjqdiFh3-=f-323d_Ev7=8UNu9p3L0SU9pRqA@mail.gmail.com>
+ <c0e31bd429544e06add993bd1ac7feb1@UM-MAIL3214.unimaas.nl>
+ <CAKWaqjZs5ZZUEVZ90Yy3Ga+mvPQhU=H185MP3qEV41=By7ckjg@mail.gmail.com>
+Message-ID: <CAFUVuJxUZU6PT2VJ+CA0h9tAej7N=ZG-3qWhkPqo1g+SmXg_0A@mail.gmail.com>
+
+Hi Filippo,
+
+To add to Wolfgang's notes, here is a blog post where I walk through
+simulating a meta-analysis of standardized mean differences:
+https://www.jepusto.com/simulating-correlated-smds/
+It covers a more general case than the 3-level meta-analysis, in which
+effect size estimates from a given study may be correlated at the sampling
+level, so it might be overkill for what you're doing.
+
+With Wolfgang's notes, your code is a reasonable way to simulate a
+three-level meta-analysis, especially if the purpose of your simulation is
+exploratory or pedagogical. There are a few ways that I think it could be
+improved in terms of its realism. These might be important if the
+simulation is for methodological research--as David Hoaglin (2015;
+https://doi.org/10.1002/jrsm.1146) argues, for research simulations, it's
+important to consider the ways in which the meta-analysis model is a
+simplification or idealization of plausible data-generating models. So, in
+that spirit, here are a few suggestions:
+
+* Drawing the standard errors from a uniform distribution on (0, 0.3)
+implies a certain distribution of study sizes, which might or might not be
+plausible for the context that you're thinking about. For a meta-analysis
+of group differences with equally sized groups, a standard error of 0.3
+implies a total sample size of about 44. Using a uniform distribution
+implies that you will have many quite large studies:
+study_sizes <- 4 / runif(1000, 0, 0.3)^2
+summary(study_sizes)
+    Min.  1st Qu.   Median     Mean  3rd Qu.     Max.
+      45       77      170    22732      830 11996245
+An alternative approach would be to draw the standard errors from the
+empirical distribution of standard errors in a previous conducted synthesis
+that resembles the context you're interested in. Or, if there are studies
+on the distribution of sample sizes or typical power levels of studies in
+your area, you could use that to find a more realistic distribution of
+sample sizes/standard errors from which to simulate.
+
+* Your simulation involves generating a structure where every study has the
+same number of effect sizes. This "balanced" structure is a best-case
+scenario for the performance of the 3-level meta-analysis model. Simulating
+studies with varying numbers of effect sizes would be more realistic and
+might be important for performance. A simple way to do that is just
+studies_per_paper <- sample(1:10, size = ni, replace = TRUE)
+dat <- data.frame(paper = rep(1:ni, studies_per_paper), study =
+1:sum(studies_per_paper))
+table(dat$paper)
+One step better would be to use a distribution that is motivated by
+empirical data. You could do this by looking at the distribution of effect
+sizes per study from one or more previously conducted syntheses that have
+open data.
+
+* Your simulation generates effect size estimates that are exactly normally
+distributed. For most effect size metrics, this is a simplification that
+works reasonably well when sample sizes are large but less well when sample
+sizes are small, and which sometimes also depends on other features of the
+studies (e.g., for odds ratios, the adequacy of the normality approximation
+depends on the number of positive outcomes, not just the sample size). If
+you're in a context with small studies or effect sizes that aren't truly
+normally distributed, it would be more realistic to generate effect size
+estimates following a three-step process:
+1) simulate the true effect size parameters by adding up the random effects
+at the paper level and study level;
+2) simulate any other relevant study features (sample sizes, event rates in
+the control condition); and then
+3) simulate the effect size estimates based on a realistic data-generating
+process, such as by sampling from a t distribution for standardized mean
+differences or sampling from binomial distributions for log-odds ratios.
+The blog post linked above demonstrates this process for correlated
+standardized mean difference effect sizes.
+
+Of course, this might be way more technical detail and way more nuance than
+you need. I offer it just in case it's useful to you or others working on
+simulations.
+
+James
+
+On Thu, Jun 16, 2022 at 3:11 AM Filippo Gambarota <
+filippo.gambarota at gmail.com> wrote:
+
+> Thank you Wolfgang this is very helpful.
+> With that sentence about sampling variances, I meant that (if I
+> remember correctly) for tau estimation I have to use effect size weights
+> (thus sampling variances) so I was afraid that I need to sample values
+> according to some criteria (and not runif(...) as in my simulation) in
+> order to recover my parameters.
+>
+> On Wed, 15 Jun 2022 at 19:36, Viechtbauer, Wolfgang (NP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+> > Well, it doesn't want to go through, at least so far both of my replies
+> > are not showing up on the mailing list. No idea why. In case you reply,
+> > please still include the mailing list.
+> >
+> > Best,
+> > Wolfgang
+> >
+> > >-----Original Message-----
+> > >From: Viechtbauer, Wolfgang (NP)
+> > >Sent: Wednesday, 15 June, 2022 17:33
+> > >To: R meta
+> > >Cc: 'Filippo Gambarota'
+> > >Subject: RE: [R-meta] simulating three-level meta-analysis
+> > >
+> > >(I don't know why, but occasionally my posts to the mailing list do not
+> go
+> > >through. This seems to be happening again, so let me try to resend
+> this.)
+> > >
+> > >Hi Filippo,
+> > >
+> > >Not sure what you mean by "sampling variances that will be associated
+> > with a
+> > >certain value of tau2 (level 2) and tau3 (level 3)". But in any case,
+> > your code
+> > >isn't quite simulating data according to the three level model. This
+> does:
+> > >
+> > >dat <- data.frame(paper = rep(1:ni, each=nj), study = 1:nj)
+> > >dat$b0_i <- rep(rnorm(ni, 0, taui), each=nj)
+> > >dat$b0_j <- rnorm(nrow(dat), 0, tauj)
+> > >dat$vi   <- runif(nrow(dat), 0, 0.3)
+> > >dat$yi   <- b0 + dat$b0_i + dat$b0_j + rnorm(nrow(dat), 0, sqrt(dat$vi))
+> > >
+> > >fit <- rma.mv(yi, vi, random = ~ study | paper, data = dat)
+> > >fit
+> > >
+> > >Best,
+> > >Wolfgang
+> > >
+> > >>-----Original Message-----
+> > >>From: R-sig-meta-analysis [mailto:
+> > r-sig-meta-analysis-bounces at r-project.org] On
+> > >>Behalf Of Filippo Gambarota
+> > >>Sent: Wednesday, 15 June, 2022 13:44
+> > >>To: R meta
+> > >>Subject: [R-meta] simulating three-level meta-analysis
+> > >>
+> > >>Hello!
+> > >>I'm trying to simulate a three-level meta-analysis model but I'm stuck
+> > >>on understanding how to generate sampling variances that will be
+> > >>associated with a certain value of tau2 (level 2) and tau3 (level 3).
+> > >>My approach so far is setting values for population parameters and
+> > >>generating sampling variances for the effect ij:
+> > >>
+> > >>```
+> > >>library(metafor)
+> > >>
+> > >>b0 <- 0.3 # effect
+> > >>ni <- 100 # number of papers
+> > >>nj <- 5 # number of effects within each paper
+> > >>
+> > >>taui <- 0.3 # level 3 tau
+> > >>tauj <- 0.1 # level 2 tau
+> > >>icc <- taui^2 / sum(taui^2 + tauj^2) # real ICC
+> > >>
+> > >># i-level data
+> > >>dati <- data.frame(paper = 1:ni,
+> > >>                   b0_i = rnorm(ni, 0, taui))
+> > >>
+> > >># j-level data
+> > >>datj <- data.frame(paper = rep(1:ni, nj),
+> > >>                   study = 1:sum(nj),
+> > >>                   b0_j = rnorm(sum(nj), 0, tauj))
+> > >>
+> > >>
+> > >>dat <- merge(dati, datj, by = "paper") # combine
+> > >>dat$vi <- runif(nrow(dat), 0, 0.3) # sampling variances at level 1
+> > >>dat$yi <- b0 + dat$b0_i + dat$b0_j + rnorm(nrow(dat), 0, dat$vi)
+> > >>
+> > >>fit <- rma.mv(yi, vi, random = ~study|paper, data = dat)
+> > >>```
+> > >>However, I'm sure that I'm doing wrong because taus are estimated
+> > >>using vi and the vis are not sampled with specific criteria.
+> > >>Does someone have some hints? Or in general suggestions about to setup
+> > >>a simulation like this?
+> > >>Thanks!
+> > >>
+> > >>--
+> > >>Filippo Gambarota
+> > >>PhD Student - University of Padova
+> > >>Department of Developmental and Social Psychology
+> > >>Website: filippogambarota
+> > >>Research Group: Colab   Psicostat
+> >
+>
+>
+> --
+> *Filippo Gambarota*
+> PhD Student - University of Padova
+> Department of Developmental and Social Psychology
+> Website: filippogambarota <https://filippogambarota.netlify.app/>
+> Research Group: Colab <http://colab.psy.unipd.it/>   Psicostat
+> <https://psicostat.dpss.psy.unipd.it/>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Thu Jun 16 17:15:36 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 16 Jun 2022 16:15:36 +0100
+Subject: [R-meta] Different methods and measures of measurement of
+ continuous variables
+In-Reply-To: <BL1PR22MB3681E4B6B7603A2FAD4567B2ACA99@BL1PR22MB3681.namprd22.prod.outlook.com>
+References: <BL1PR22MB3681E4B6B7603A2FAD4567B2ACA99@BL1PR22MB3681.namprd22.prod.outlook.com>
+Message-ID: <330b5f1c-1bc9-615e-7fc1-72eb484cfda8@dewey.myzen.co.uk>
+
+Dear Martin
+
+Nobody seems to have replied yet a far as I can see. My take on this is 
+that with that variety of measurement methods and units you will not be 
+able to synthesise all those studies.
+
+Michael
+
+On 11/06/2022 16:30, Martin Lobo wrote:
+> Hello everyone.
+> 
+>   I have a perhaps recurring query. I am analyzing the amount of fat in an organ, the problem is that this amount is reported with different methods (tomography, ultrasound, etc.) and the units are different. There are units reported as cubic centimeters, millimeters, square centimeters, milliliters, and logarithmic conversion of cm3.
+> The question is: would it be methodologically and mathematically correct to use the standardized mean difference or would it be necessary to use some other method of meta-analysis or stratify by type of measurement.
+>>From already thank you very much.
+> 
+> 
+> 
+> 
+> Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+> Especialista Jerarquizado en Cardiolog?a
+> Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital Militar Campo de Mayo.
+> Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+> Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+> Miembro Titular de la Sociedad Argentina de Cardiolog?a
+> Fellow American College of Cardiology
+> Fellow European Society of Cardiology
+> Ex Miembro del Area de Investigaci?n de la SAC
+> Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+> Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+> Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+> 
+> Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+> 
+> 
+> Experto en Lipidos de la Sociedad Argentina de Lipidos.
+> Miembro de la Sociedad Argentina de Lipidos.
+> Instructor de ACLS de la American Heart Association
+> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> 
+> 
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From Tor|@Pen@ @end|ng |rom @tonybrook@edu  Thu Jun 16 17:30:17 2022
+From: Tor|@Pen@ @end|ng |rom @tonybrook@edu (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+Date: Thu, 16 Jun 2022 11:30:17 -0400
+Subject: [R-meta] Heterogeneity of Multilevel Moderator Analysis
+Message-ID: <CAEmuQj9Hb5zqAF61SubA3DXjjASgDRoSTjZvYzSWmWUy9gquGA@mail.gmail.com>
+
+Hi folks,
+
+Thanks for all your help!
+
+I was curious if there is a way to get the variance composition of a
+moderator analysis across the different categorical levels?
+
+For example, I have a three-level meta-analysis with publication status as
+the predictor below. When I enter the model into var.comp, I get the
+overall I^2 across the different levels, but not between published versus
+unpublished studies.
+
+m_1_pub <- rma.mv(yi = yi,
+                     V = vi,
+                     mods = ~ DISSERTATION,
+                     slab = STUDY_ID,
+                     data = Relationship,
+                     random = ~ 1 | STUDY_ID/EFFECT_SIZE_ID,
+                     test = "t",
+                     method = "REML")
+
+i2_m_1_pub <- var.comp(m_1_pub)
+summary(i2_m_1_pub)
+print(m_1_pub$tau2)
+
+Thanks again,
+Tori
+
+	[[alternative HTML version deleted]]
+
+
+From pedro@@c @end|ng |rom @t@||@un|-m@rburg@de  Thu Jun 16 21:43:42 2022
+From: pedro@@c @end|ng |rom @t@||@un|-m@rburg@de (David Pedrosa)
+Date: Thu, 16 Jun 2022 21:43:42 +0200
+Subject: [R-meta] Collate event/proportion data from Pretest-Posttest
+ controlled studies and one-group Pretest-Posttest studies
+Message-ID: <b02d7492-7827-5740-f892-83bd6f17a39d@staff.uni-marburg.de>
+
+Dear list,
+
+in extension of the help by Wolfgang Viechtbauer from March this year 
+(https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-March/003918.html), 
+we wonder about an additional aspect in our data (so far we have 
+restricted our analyses to the effects of different agents on PD 
+symptoms). The question we now have is whether we can do a similar 
+three-level hierarchical meta-analysis for events/proportions. To 
+briefly summarize, we would like to model the occurrence of adverse 
+events for all agents and use the study type as a moderator. However, we 
+are aware that "RR" or "OR" are poor choices and wanted to ask if 
+someone could point us at an alternative or if we should just stick with 
+the controlled studies.
+
+Thanks again for the help,
+
+David
+
+-- 
+
+
+;
+<http://www.ukgm.de>;
+
+	
+	
+	
+	
+PD Dr. David Pedrosa
+Leiter der Sektion Bewegungsst?rungen, Universit?tsklinikum Gie?en und 
+Marburg
+
+Tel.: (+49) 6421-58 65299 Fax: (+49) 6421-58 67055
+
+;
+Adresse: Baldingerstr., 35043 Marburg
+
+Web: https://www.ukgm.de/ugm_2/deu/umr_neu/index.html
+
+
+	[[alternative HTML version deleted]]
+
+
+From rnorouz|@n @end|ng |rom gm@||@com  Fri Jun 17 07:46:12 2022
+From: rnorouz|@n @end|ng |rom gm@||@com (Reza Norouzian)
+Date: Fri, 17 Jun 2022 00:46:12 -0500
+Subject: [R-meta] Heterogeneity of Multilevel Moderator Analysis
+In-Reply-To: <CAEmuQj9Hb5zqAF61SubA3DXjjASgDRoSTjZvYzSWmWUy9gquGA@mail.gmail.com>
+References: <CAEmuQj9Hb5zqAF61SubA3DXjjASgDRoSTjZvYzSWmWUy9gquGA@mail.gmail.com>
+Message-ID: <CAKt3tzkSAYZRbj64XTuEHEA9MZftT9jjA-=eusE8kT1d2DuWNw@mail.gmail.com>
+
+Dear Tori,
+
+Purely theoretically (not knowing your data, goals etc.) the
+following allows you to differentiate and estimate the random variation in
+the true effects across the categories of DISSERTATION at the study and the
+effect size levels:
+
+t1 = rma.mv(yi = yi,
+             V = vi,
+       mods = ~DISSERTATION-1,
+         slab = STUDY_ID,
+        data = Relationship,
+       random = list(~DISSERTATION | STUDY_ID,
+~DISSERTATION|EFFECT_SIZE_ID),
+        test = "t",
+       struct = c("DIAG","DIAG"))
+
+It's nice that metafor allows doing this so complactly using a single model
+(but at no more than two levels). For one thing, otherwise, you would have
+needed to fit as many models as there are categories in your categorical
+variable.
+
+For example, if DISSERTATION, has two categories (yes and no), then the
+above compact model will be equivalent to running the following two models:
+
+t2 = rma.mv(yi, vi,
+  random = ~1|STUDY_ID/EFFECT_SIZE_ID,
+       data = Relationship,
+   subset = DISSERTATION == "yes",
+       test = "t")
+
+t3 = rma.mv(yi, vi,
+  random = ~1|STUDY_ID/EFFECT_SIZE_ID,
+       data =  Relationship,
+   subset = DISSERTATION == "no",
+        test = "t")
+
+For another thing at least in metafor (try the clubSandwich package as this
+may or may not be true there), using a single compact model would use the
+entire data for the purpose of inferential conclusions which if you use a
+t-distribution (which you currently do) for inferential purposes can affect
+the p-values and the CIs that you get for your fixed effects from the
+compact model versus the separate individual models.
+
+Kind regards,
+Reza
+
+
+On Thu, Jun 16, 2022 at 10:31 AM Tori Pe?a <Tori.Pena at stonybrook.edu> wrote:
+
+> Hi folks,
+>
+> Thanks for all your help!
+>
+> I was curious if there is a way to get the variance composition of a
+> moderator analysis across the different categorical levels?
+>
+> For example, I have a three-level meta-analysis with publication status as
+> the predictor below. When I enter the model into var.comp, I get the
+> overall I^2 across the different levels, but not between published versus
+> unpublished studies.
+>
+> m_1_pub <- rma.mv(yi = yi,
+>                      V = vi,
+>                      mods = ~ DISSERTATION,
+>                      slab = STUDY_ID,
+>                      data = Relationship,
+>                      random = ~ 1 | STUDY_ID/EFFECT_SIZE_ID,
+>                      test = "t",
+>                      method = "REML")
+>
+> i2_m_1_pub <- var.comp(m_1_pub)
+> summary(i2_m_1_pub)
+> print(m_1_pub$tau2)
+>
+> Thanks again,
+> Tori
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m|obo4370 @end|ng |rom hotm@||@com  Sat Jun 18 18:27:53 2022
+From: m|obo4370 @end|ng |rom hotm@||@com (Martin Lobo)
+Date: Sat, 18 Jun 2022 16:27:53 +0000
+Subject: [R-meta] Different methods and measures of measurement of
+ continuous variables
+In-Reply-To: <330b5f1c-1bc9-615e-7fc1-72eb484cfda8@dewey.myzen.co.uk>
+References: <BL1PR22MB3681E4B6B7603A2FAD4567B2ACA99@BL1PR22MB3681.namprd22.prod.outlook.com>
+ <330b5f1c-1bc9-615e-7fc1-72eb484cfda8@dewey.myzen.co.uk>
+Message-ID: <BL1PR22MB368134231C0E1778E13F8432ACAE9@BL1PR22MB3681.namprd22.prod.outlook.com>
+
+thanks michael, and what would be the best way to synthesize these results?
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital Militar Campo de Mayo.
+Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Ex Miembro del Area de Investigaci?n de la SAC
+Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+
+Experto en Lipidos de la Sociedad Argentina de Lipidos.
+Miembro de la Sociedad Argentina de Lipidos.
+Instructor de ACLS de la American Heart Association
+
+
+________________________________
+De: Michael Dewey <lists at dewey.myzen.co.uk>
+Enviado: jueves, 16 de junio de 2022 12:15
+Para: Martin Lobo <mlobo4370 at hotmail.com>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Asunto: Re: [R-meta] Different methods and measures of measurement of continuous variables
+
+Dear Martin
+
+Nobody seems to have replied yet a far as I can see. My take on this is
+that with that variety of measurement methods and units you will not be
+able to synthesise all those studies.
+
+Michael
+
+On 11/06/2022 16:30, Martin Lobo wrote:
+> Hello everyone.
+>
+>   I have a perhaps recurring query. I am analyzing the amount of fat in an organ, the problem is that this amount is reported with different methods (tomography, ultrasound, etc.) and the units are different. There are units reported as cubic centimeters, millimeters, square centimeters, milliliters, and logarithmic conversion of cm3.
+> The question is: would it be methodologically and mathematically correct to use the standardized mean difference or would it be necessary to use some other method of meta-analysis or stratify by type of measurement.
+>>From already thank you very much.
+>
+>
+>
+>
+> Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+> Especialista Jerarquizado en Cardiolog?a
+> Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital Militar Campo de Mayo.
+> Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+> Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+> Miembro Titular de la Sociedad Argentina de Cardiolog?a
+> Fellow American College of Cardiology
+> Fellow European Society of Cardiology
+> Ex Miembro del Area de Investigaci?n de la SAC
+> Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+> Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+> Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+>
+> Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+>
+>
+> Experto en Lipidos de la Sociedad Argentina de Lipidos.
+> Miembro de la Sociedad Argentina de Lipidos.
+> Instructor de ACLS de la American Heart Association
+>
+>
+>        [[alternative HTML version deleted]]
+>
+>
+>
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7C%7C39d85aa7aa184f83285908da4fab1439%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637909893437772711%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=4PdumJs3IJ46XeqW1RlHDH16CPOuU4L2o2I8MCtNfBc%3D&amp;reserved=0
+>
+
+--
+Michael
+https://nam12.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7C%7C39d85aa7aa184f83285908da4fab1439%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637909893437772711%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=X4SKXOIh%2FmWQGhv2LIFRu0cEBIwKJpRJaWtXzjtz13c%3D&amp;reserved=0
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Sat Jun 18 18:57:15 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Sat, 18 Jun 2022 17:57:15 +0100
+Subject: [R-meta] Different methods and measures of measurement of
+ continuous variables
+In-Reply-To: <BL1PR22MB368134231C0E1778E13F8432ACAE9@BL1PR22MB3681.namprd22.prod.outlook.com>
+References: <BL1PR22MB3681E4B6B7603A2FAD4567B2ACA99@BL1PR22MB3681.namprd22.prod.outlook.com>
+ <330b5f1c-1bc9-615e-7fc1-72eb484cfda8@dewey.myzen.co.uk>
+ <BL1PR22MB368134231C0E1778E13F8432ACAE9@BL1PR22MB3681.namprd22.prod.outlook.com>
+Message-ID: <d4d0691c-940c-63c2-9e38-4bba4c09a81c@dewey.myzen.co.uk>
+
+As I said, I do not think you can. Perhaps carry out separate analyses 
+for each combination of outcome type and measurement technique.
+
+Michael
+
+On 18/06/2022 17:27, Martin Lobo wrote:
+> thanks michael, and what would be the best way to synthesize these results?
+> 
+> */Lorenzo Mart?n Lobo /**/^MTSAC, FACC, FESC /*
+> /*Especialista Jerarquizado?en Cardiolog?a*/
+> /*/*Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital 
+> Militar Campo de Mayo.*/
+> */
+> /*/*Jefe de Cardiolog?a *//*Hospital Militar Campo de Mayo*/
+> */
+> /*Ex?Jefe de Unidad Coronaria *//*Hospital Militar Campo de Mayo*/
+> /
+> /*Miembro Titular de la Sociedad Argentina de Cardiolog?a*/
+> /
+> /
+> /*Fellow American College of Cardiology*/
+> /
+> /
+> /*Fellow European Society of Cardiology*/
+> /
+> /
+> /*/*Ex Miembro del Area de Investigaci?n de la SAC*/*/
+> /
+> /*Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC*/
+> /*Miembro Asesor /*del Consejo de Aterosclerosis y Trombosis de la SAC*/*/
+> /*/
+> /*/
+> /*Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular 
+> de la SAC*/
+> /*/
+> /*/
+> /*/
+> /*//*/
+> /*/
+> /*Miembro Asesor?del Consejo de Epidemiolog?a y Prevenci?n 
+> Cardiovascular de la SAC*/
+> /*/
+> /*/
+> /*/
+> /*/
+> /*Experto en Lipidos de la Sociedad Argentina de Lipidos.*/
+> /*Miembro de la Sociedad Argentina de Lipidos.*/
+> /
+> /*Instructor de ACLS de la American Heart Association*/
+> /
+> 
+> ------------------------------------------------------------------------
+> *De:* Michael Dewey <lists at dewey.myzen.co.uk>
+> *Enviado:* jueves, 16 de junio de 2022 12:15
+> *Para:* Martin Lobo <mlobo4370 at hotmail.com>; 
+> r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+> *Asunto:* Re: [R-meta] Different methods and measures of measurement of 
+> continuous variables
+> Dear Martin
+> 
+> Nobody seems to have replied yet a far as I can see. My take on this is
+> that with that variety of measurement methods and units you will not be
+> able to synthesise all those studies.
+> 
+> Michael
+> 
+> On 11/06/2022 16:30, Martin Lobo wrote:
+>> Hello everyone.
+>> 
+>>?? I have a perhaps recurring query. I am analyzing the amount of fat in an organ, the problem is that this amount is reported with different methods (tomography, ultrasound, etc.) and the units are different. There are units reported as cubic centimeters,  millimeters, square centimeters, milliliters, and logarithmic 
+> conversion of cm3.
+>> The question is: would it be methodologically and mathematically correct to use the standardized mean difference or would it be necessary to use some other method of meta-analysis or stratify by type of measurement.
+>>>From already thank you very much.
+>> 
+>> 
+>> 
+>> 
+>> Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+>> Especialista Jerarquizado en Cardiolog?a
+>> Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital Militar Campo de Mayo.
+>> Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+>> Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+>> Miembro Titular de la Sociedad Argentina de Cardiolog?a
+>> Fellow American College of Cardiology
+>> Fellow European Society of Cardiology
+>> Ex Miembro del Area de Investigaci?n de la SAC
+>> Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+>> Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+>> Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+>> 
+>> Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+>> 
+>> 
+>> Experto en Lipidos de la Sociedad Argentina de Lipidos.
+>> Miembro de la Sociedad Argentina de Lipidos.
+>> Instructor de ACLS de la American Heart Association
+>> 
+>> 
+>>??????? [[alternative HTML version deleted]]
+>> 
+>> 
+>> 
+>> 
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7C%7C39d85aa7aa184f83285908da4fab1439%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637909893437772711%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=4PdumJs3IJ46XeqW1RlHDH16CPOuU4L2o2I8MCtNfBc%3D&amp;reserved=0 
+> <https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7C%7C39d85aa7aa184f83285908da4fab1439%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637909893437772711%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=4PdumJs3IJ46XeqW1RlHDH16CPOuU4L2o2I8MCtNfBc%3D&amp;reserved=0>
+>> 
+> 
+> -- 
+> Michael
+> https://nam12.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7C%7C39d85aa7aa184f83285908da4fab1439%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637909893437772711%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=X4SKXOIh%2FmWQGhv2LIFRu0cEBIwKJpRJaWtXzjtz13c%3D&amp;reserved=0 
+> <https://nam12.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7C%7C39d85aa7aa184f83285908da4fab1439%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637909893437772711%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=X4SKXOIh%2FmWQGhv2LIFRu0cEBIwKJpRJaWtXzjtz13c%3D&amp;reserved=0>
+> 
+> <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient> 
+> 	Virus-free. www.avg.com 
+> <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient> 
+> 
+> 
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From m|obo4370 @end|ng |rom hotm@||@com  Sat Jun 18 20:31:47 2022
+From: m|obo4370 @end|ng |rom hotm@||@com (Martin Lobo)
+Date: Sat, 18 Jun 2022 18:31:47 +0000
+Subject: [R-meta] Different methods and measures of measurement of
+ continuous variables
+In-Reply-To: <d4d0691c-940c-63c2-9e38-4bba4c09a81c@dewey.myzen.co.uk>
+References: <BL1PR22MB3681E4B6B7603A2FAD4567B2ACA99@BL1PR22MB3681.namprd22.prod.outlook.com>
+ <330b5f1c-1bc9-615e-7fc1-72eb484cfda8@dewey.myzen.co.uk>
+ <BL1PR22MB368134231C0E1778E13F8432ACAE9@BL1PR22MB3681.namprd22.prod.outlook.com>
+ <d4d0691c-940c-63c2-9e38-4bba4c09a81c@dewey.myzen.co.uk>
+Message-ID: <BL1PR22MB368160DB06AF1142867A02EFACAE9@BL1PR22MB3681.namprd22.prod.outlook.com>
+
+and then the difference of standardized means when it would be used, I didn't think it was for these cases,
+ greetings.
+
+
+
+
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital Militar Campo de Mayo.
+Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Ex Miembro del Area de Investigaci?n de la SAC
+Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+
+Experto en Lipidos de la Sociedad Argentina de Lipidos.
+Miembro de la Sociedad Argentina de Lipidos.
+Instructor de ACLS de la American Heart Association
+
+
+________________________________
+De: Michael Dewey <lists at dewey.myzen.co.uk>
+Enviado: s?bado, 18 de junio de 2022 13:57
+Para: Martin Lobo <mlobo4370 at hotmail.com>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Asunto: Re: [R-meta] Different methods and measures of measurement of continuous variables
+
+As I said, I do not think you can. Perhaps carry out separate analyses
+for each combination of outcome type and measurement technique.
+
+Michael
+
+On 18/06/2022 17:27, Martin Lobo wrote:
+> thanks michael, and what would be the best way to synthesize these results?
+>
+> */Lorenzo Mart?n Lobo /**/^MTSAC, FACC, FESC /*
+> /*Especialista Jerarquizado en Cardiolog?a*/
+> /*/*Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital
+> Militar Campo de Mayo.*/
+> */
+> /*/*Jefe de Cardiolog?a *//*Hospital Militar Campo de Mayo*/
+> */
+> /*Ex Jefe de Unidad Coronaria *//*Hospital Militar Campo de Mayo*/
+> /
+> /*Miembro Titular de la Sociedad Argentina de Cardiolog?a*/
+> /
+> /
+> /*Fellow American College of Cardiology*/
+> /
+> /
+> /*Fellow European Society of Cardiology*/
+> /
+> /
+> /*/*Ex Miembro del Area de Investigaci?n de la SAC*/*/
+> /
+> /*Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC*/
+> /*Miembro Asesor /*del Consejo de Aterosclerosis y Trombosis de la SAC*/*/
+> /*/
+> /*/
+> /*Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular
+> de la SAC*/
+> /*/
+> /*/
+> /*/
+> /*//*/
+> /*/
+> /*Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n
+> Cardiovascular de la SAC*/
+> /*/
+> /*/
+> /*/
+> /*/
+> /*Experto en Lipidos de la Sociedad Argentina de Lipidos.*/
+> /*Miembro de la Sociedad Argentina de Lipidos.*/
+> /
+> /*Instructor de ACLS de la American Heart Association*/
+> /
+>
+> ------------------------------------------------------------------------
+> *De:* Michael Dewey <lists at dewey.myzen.co.uk>
+> *Enviado:* jueves, 16 de junio de 2022 12:15
+> *Para:* Martin Lobo <mlobo4370 at hotmail.com>;
+> r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+> *Asunto:* Re: [R-meta] Different methods and measures of measurement of
+> continuous variables
+> Dear Martin
+>
+> Nobody seems to have replied yet a far as I can see. My take on this is
+> that with that variety of measurement methods and units you will not be
+> able to synthesise all those studies.
+>
+> Michael
+>
+> On 11/06/2022 16:30, Martin Lobo wrote:
+>> Hello everyone.
+>>
+>>   I have a perhaps recurring query. I am analyzing the amount of fat in an organ, the problem is that this amount is reported with different methods (tomography, ultrasound, etc.) and the units are different. There are units reported as cubic centimeters,  millimeters, square centimeters, milliliters, and logarithmic
+> conversion of cm3.
+>> The question is: would it be methodologically and mathematically correct to use the standardized mean difference or would it be necessary to use some other method of meta-analysis or stratify by type of measurement.
+>>>From already thank you very much.
+>>
+>>
+>>
+>>
+>> Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+>> Especialista Jerarquizado en Cardiolog?a
+>> Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital Militar Campo de Mayo.
+>> Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+>> Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+>> Miembro Titular de la Sociedad Argentina de Cardiolog?a
+>> Fellow American College of Cardiology
+>> Fellow European Society of Cardiology
+>> Ex Miembro del Area de Investigaci?n de la SAC
+>> Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+>> Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+>> Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+>>
+>> Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+>>
+>>
+>> Experto en Lipidos de la Sociedad Argentina de Lipidos.
+>> Miembro de la Sociedad Argentina de Lipidos.
+>> Instructor de ACLS de la American Heart Association
+>>
+>>
+>>        [[alternative HTML version deleted]]
+>>
+>>
+>>
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7C%7Cdcb476474b6a42278b9808da514b993e%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637911682382854010%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=RKECUnNrbu9%2BqIzsg9iVwXI1ycAfL6rQMmWPntLoU38%3D&amp;reserved=0
+> <https://nam12.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7C%7Cdcb476474b6a42278b9808da514b993e%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637911682382854010%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=RKECUnNrbu9%2BqIzsg9iVwXI1ycAfL6rQMmWPntLoU38%3D&amp;reserved=0>
+>>
+>
+> --
+> Michael
+> https://nam12.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7C%7Cdcb476474b6a42278b9808da514b993e%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637911682382854010%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=Zj3zhLWkBMWwJ9x1UEX1vN7rKjM24jvn8lY8x82%2F1Ng%3D&amp;reserved=0
+> <https://nam12.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7C%7Cdcb476474b6a42278b9808da514b993e%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637911682382854010%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=Zj3zhLWkBMWwJ9x1UEX1vN7rKjM24jvn8lY8x82%2F1Ng%3D&amp;reserved=0>
+>
+> <https://nam12.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.avg.com%2Femail-signature%3Futm_medium%3Demail%26utm_source%3Dlink%26utm_campaign%3Dsig-email%26utm_content%3Demailclient&amp;data=05%7C01%7C%7Cdcb476474b6a42278b9808da514b993e%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637911682382854010%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=G7nL%2BqXNoiuriD%2FxuzzaRZpHpJRiHeLwERrmEPBmWCo%3D&amp;reserved=0>
+>        Virus-free. https://nam12.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.avg.com%2F&amp;data=05%7C01%7C%7Cdcb476474b6a42278b9808da514b993e%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637911682382854010%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=Vp4OVgKRZ1uhfsyMn1M3u4BN9nsRjsvKMWef3I71tCY%3D&amp;reserved=0
+> <https://nam12.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.avg.com%2Femail-signature%3Futm_medium%3Demail%26utm_source%3Dlink%26utm_campaign%3Dsig-email%26utm_content%3Demailclient&amp;data=05%7C01%7C%7Cdcb476474b6a42278b9808da514b993e%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637911682382854010%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=G7nL%2BqXNoiuriD%2FxuzzaRZpHpJRiHeLwERrmEPBmWCo%3D&amp;reserved=0>
+>
+>
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+
+--
+Michael
+https://nam12.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7C%7Cdcb476474b6a42278b9808da514b993e%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C637911682382854010%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=Zj3zhLWkBMWwJ9x1UEX1vN7rKjM24jvn8lY8x82%2F1Ng%3D&amp;reserved=0
+
+	[[alternative HTML version deleted]]
+
+
+From Se|cuk@Ac@r @end|ng |rom unt@edu  Sun Jun 19 00:14:02 2022
+From: Se|cuk@Ac@r @end|ng |rom unt@edu (Acar, Selcuk)
+Date: Sat, 18 Jun 2022 22:14:02 +0000
+Subject: [R-meta] Interpreting meta-regression results for dummy-coded
+ variables
+Message-ID: <DM4PR01MB78838D1356203EE7CCEB50CCF7AE9@DM4PR01MB7883.prod.exchangelabs.com>
+
+Hi,
+
+I ran a meta-regression in metafor package with both continuous and dummy-coded moderators. In some of the moderators, when we had only one dummy-code significant, we interpreted this as this moderator with several categories being significant. For example, we had "participant group" moderator consisting of  "elementary" "middle" "high" and "undergraduate" categories, and used "undergraduates" as the reference group. We thought this moderator would be significant even when only one of dummy codes "undergraduates vs elementary" is significant without a separate test (linear hypothesis testing).
+
+One of the reviewers provided the following feedback:
+
+"Because of the dummy-coding these coefficients are differences in Fisher-z-transformed correlations between the coded category and the reference category. Hence, this reporting could be more accurately reflect this. In addition, these tests of coefficients are not a substitute for an overall test of the moderator. In other words, the fact that one coefficient related to a moderator is significant, does not imply that the moderator is significant. For example, an overall test for Index of Creativity can be non-significant even when a single coefficient such as the one for flexibility vs. fluency is significant. Overall, moderator tests could be done by means of linear hypothesis testing, for example."
+
+In my opinion, running separate tests for each moderator kills the point of a meta-regression, and meta-regression should be the basis of the interpretation including these dummy-coded variables. I thought a categorical moderator would be significant even when one of the dummy codes turn out significant.
+
+Who is correct here? Is there a good source that I could cite\?
+
+I would appreciate input on this.
+
+Selcuk Acar, Ph.D.
+Associate Professor
+Department of Educational Psychology
+University of North Texas
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Sun Jun 19 14:30:52 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Sun, 19 Jun 2022 13:30:52 +0100
+Subject: [R-meta] Interpreting meta-regression results for dummy-coded
+ variables
+In-Reply-To: <DM4PR01MB78838D1356203EE7CCEB50CCF7AE9@DM4PR01MB7883.prod.exchangelabs.com>
+References: <DM4PR01MB78838D1356203EE7CCEB50CCF7AE9@DM4PR01MB7883.prod.exchangelabs.com>
+Message-ID: <e12cf436-9aaf-5df2-b586-af5d5cb946f9@dewey.myzen.co.uk>
+
+Coments in-line
+
+On 18/06/2022 23:14, Acar, Selcuk wrote:
+> Hi,
+> 
+> I ran a meta-regression in metafor package with both continuous and dummy-coded moderators. In some of the moderators, when we had only one dummy-code significant, we interpreted this as this moderator with several categories being significant. For example, we had "participant group" moderator consisting of  "elementary" "middle" "high" and "undergraduate" categories, and used "undergraduates" as the reference group. We thought this moderator would be significant even when only one of dummy codes "undergraduates vs elementary" is significant without a separate test (linear hypothesis testing).
+> 
+> One of the reviewers provided the following feedback:
+> 
+> "Because of the dummy-coding these coefficients are differences in Fisher-z-transformed correlations between the coded category and the reference category. Hence, this reporting could be more accurately reflect this. In addition, these tests of coefficients are not a substitute for an overall test of the moderator. In other words, the fact that one coefficient related to a moderator is significant, does not imply that the moderator is significant. For example, an overall test for Index of Creativity can be non-significant even when a single coefficient such as the one for flexibility vs. fluency is significant. Overall, moderator tests could be done by means of linear hypothesis testing, for example."
+> 
+
+That is correct. an overall test of the moderator is needed.
+
+> In my opinion, running separate tests for each moderator kills the point of a meta-regression, and meta-regression should be the basis of the interpretation including these dummy-coded variables. I thought a categorical moderator would be significant even when one of the dummy codes turn out significant.
+> 
+
+I am afraid your thought is a mis-conception, albeit a common one.
+
+Michael
+
+> Who is correct here? Is there a good source that I could cite\?
+> 
+> I would appreciate input on this.
+> 
+> Selcuk Acar, Ph.D.
+> Associate Professor
+> Department of Educational Psychology
+> University of North Texas
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Mon Jun 20 14:43:53 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 20 Jun 2022 13:43:53 +0100
+Subject: [R-meta] [EXT] Re: Interpreting meta-regression results for
+ dummy-coded variables
+In-Reply-To: <DM4PR01MB7883E7100FA801949A6C83ABF7B09@DM4PR01MB7883.prod.exchangelabs.com>
+References: <DM4PR01MB78838D1356203EE7CCEB50CCF7AE9@DM4PR01MB7883.prod.exchangelabs.com>
+ <e12cf436-9aaf-5df2-b586-af5d5cb946f9@dewey.myzen.co.uk>
+ <DM4PR01MB7883E7100FA801949A6C83ABF7B09@DM4PR01MB7883.prod.exchangelabs.com>
+Message-ID: <f85979b7-37e1-57f7-fdf3-5a07076a269a@dewey.myzen.co.uk>
+
+Please keep the list in all correspondence (I have added it) as someone 
+else on the list may understand your reply, which, sadly, I do not and 
+be able to answer.
+
+Michael
+
+On 20/06/2022 08:42, Acar, Selcuk wrote:
+> Michael,
+> 
+> Thanks for your response--I am glad to have it corrected.
+> 
+> I do not do univariate analyses when I do meta-regression, but with this 
+> perspective, they could help me figure if a moderator?is significant or 
+> not rather than a specific pair of categories is significantly from each 
+> other. I do not do it because meta-regression provides more stringent 
+> evidence than univariate analyses and when they conflict, I would still 
+> go with the meta-regression results for interpretation. So, I question 
+> the usefulness of such univariate analyses beyond checking if a 
+> moderator is significant whose sub-categories turned out significant in 
+> meta-regression.
+> 
+> Am I correct in my thinking/understanding of it?
+> 
+> Selcuk Acar, Ph.D.
+> Associate Professor
+> Department of Educational Psychology
+> University of North Texas
+> ------------------------------------------------------------------------
+> *From:* Michael Dewey <lists at dewey.myzen.co.uk>
+> *Sent:* Sunday, June 19, 2022 7:30 AM
+> *To:* Acar, Selcuk <Selcuk.Acar at unt.edu>; 
+> r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+> *Subject:* [EXT] Re: [R-meta] Interpreting meta-regression results for 
+> dummy-coded variables
+> Coments in-line
+> 
+> On 18/06/2022 23:14, Acar, Selcuk wrote:
+>> Hi,
+>> 
+>> I ran a meta-regression in metafor package with both continuous and dummy-coded moderators. In some of the moderators, when we had only one dummy-code significant, we interpreted this as this moderator with several categories being significant. For example,  we had "participant group" moderator consisting of? "elementary" 
+> "middle" "high" and "undergraduate" categories, and used 
+> "undergraduates" as the reference group. We thought this moderator would 
+> be significant even when only one of dummy codes "undergraduates vs 
+> elementary" is significant without a separate test (linear hypothesis 
+> testing).
+>> 
+>> One of the reviewers provided the following feedback:
+>> 
+>> "Because of the dummy-coding these coefficients are differences in Fisher-z-transformed correlations between the coded category and the reference category. Hence, this reporting could be more accurately reflect this. In addition, these tests of coefficients  are not a substitute for an overall test of the moderator. In other 
+> words, the fact that one coefficient related to a moderator is 
+> significant, does not imply that the moderator is significant. For 
+> example, an overall test for Index of Creativity can be non-significant 
+> even when a single coefficient such as the one for flexibility vs. 
+> fluency is significant. Overall, moderator tests could be done by means 
+> of linear hypothesis testing, for example."
+>> 
+> 
+> That is correct. an overall test of the moderator is needed.
+> 
+>> In my opinion, running separate tests for each moderator kills the point of a meta-regression, and meta-regression should be the basis of the interpretation including these dummy-coded variables. I thought a categorical moderator would be significant even  when one of the dummy codes turn out significant.
+>> 
+> 
+> I am afraid your thought is a mis-conception, albeit a common one.
+> 
+> Michael
+> 
+>> Who is correct here? Is there a good source that I could cite\?
+>> 
+>> I would appreciate input on this.
+>> 
+>> Selcuk Acar, Ph.D.
+>> Associate Professor
+>> Department of Educational Psychology
+>> University of North Texas
+>> 
+>>??????? [[alternative HTML version deleted]]
+>> 
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=UPv%2B7wy%2Bpfu5%2B2pGC0iF8Dn6lvi5qDSRE1EBxN7iNpU%3D&amp;reserved=0 
+> <https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=UPv%2B7wy%2Bpfu5%2B2pGC0iF8Dn6lvi5qDSRE1EBxN7iNpU%3D&amp;reserved=0>
+>> 
+> 
+> -- 
+> Michael
+> https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=gYh189T0Z1gkDf%2FnovOR3FDro5dGysGQr5M5qXk68fc%3D&amp;reserved=0 
+> <https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=gYh189T0Z1gkDf%2FnovOR3FDro5dGysGQr5M5qXk68fc%3D&amp;reserved=0>
+> 
+> 
+> ------------------------------------------------------------------------
+> AVG logo <https://www.avg.com/internet-security> 	
+> 
+> This email has been checked for viruses by AVG antivirus software.
+> www.avg.com <https://www.avg.com/internet-security>
+> 
+> 
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Jun 20 15:20:58 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 20 Jun 2022 13:20:58 +0000
+Subject: [R-meta] [EXT] Re: Interpreting meta-regression results for
+ dummy-coded variables
+In-Reply-To: <f85979b7-37e1-57f7-fdf3-5a07076a269a@dewey.myzen.co.uk>
+References: <DM4PR01MB78838D1356203EE7CCEB50CCF7AE9@DM4PR01MB7883.prod.exchangelabs.com>
+ <e12cf436-9aaf-5df2-b586-af5d5cb946f9@dewey.myzen.co.uk>
+ <DM4PR01MB7883E7100FA801949A6C83ABF7B09@DM4PR01MB7883.prod.exchangelabs.com>
+ <f85979b7-37e1-57f7-fdf3-5a07076a269a@dewey.myzen.co.uk>
+Message-ID: <678442867f554dddaac94faf386993d8@UM-MAIL3214.unimaas.nl>
+
+I just added a discussion to the metafor package website that discusses the difference (and possible discrepancy) between the omnibus test of a factor as a whole and the individual contrasts. See here:
+
+https://www.metafor-project.org/doku.php/tips:diff_omnibus_vs_indiviual_tests
+
+Maybe this helps to address the question.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Michael Dewey
+>Sent: Monday, 20 June, 2022 14:44
+>To: Acar, Selcuk; r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] [EXT] Re: Interpreting meta-regression results for dummy-
+>coded variables
+>
+>Please keep the list in all correspondence (I have added it) as someone
+>else on the list may understand your reply, which, sadly, I do not and
+>be able to answer.
+>
+>Michael
+>
+>On 20/06/2022 08:42, Acar, Selcuk wrote:
+>> Michael,
+>>
+>> Thanks for your response--I am glad to have it corrected.
+>>
+>> I do not do univariate analyses when I do meta-regression, but with this
+>> perspective, they could help me figure if a moderator?is significant or
+>> not rather than a specific pair of categories is significantly from each
+>> other. I do not do it because meta-regression provides more stringent
+>> evidence than univariate analyses and when they conflict, I would still
+>> go with the meta-regression results for interpretation. So, I question
+>> the usefulness of such univariate analyses beyond checking if a
+>> moderator is significant whose sub-categories turned out significant in
+>> meta-regression.
+>>
+>> Am I correct in my thinking/understanding of it?
+>>
+>> Selcuk Acar, Ph.D.
+>> Associate Professor
+>> Department of Educational Psychology
+>> University of North Texas
+>> ------------------------------------------------------------------------
+>> *From:* Michael Dewey <lists at dewey.myzen.co.uk>
+>> *Sent:* Sunday, June 19, 2022 7:30 AM
+>> *To:* Acar, Selcuk <Selcuk.Acar at unt.edu>;
+>> r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+>> *Subject:* [EXT] Re: [R-meta] Interpreting meta-regression results for
+>> dummy-coded variables
+>> Coments in-line
+>>
+>> On 18/06/2022 23:14, Acar, Selcuk wrote:
+>>> Hi,
+>>>
+>>> I ran a meta-regression in metafor package with both continuous and dummy-
+>coded moderators. In some of the moderators, when we had only one dummy-code
+>significant, we interpreted this as this moderator with several categories being
+>significant. For example,  we had "participant group" moderator consisting
+>of? "elementary"
+>> "middle" "high" and "undergraduate" categories, and used
+>> "undergraduates" as the reference group. We thought this moderator would
+>> be significant even when only one of dummy codes "undergraduates vs
+>> elementary" is significant without a separate test (linear hypothesis
+>> testing).
+>>>
+>>> One of the reviewers provided the following feedback:
+>>>
+>>> "Because of the dummy-coding these coefficients are differences in Fisher-z-
+>transformed correlations between the coded category and the reference category.
+>Hence, this reporting could be more accurately reflect this. In addition, these
+>tests of coefficients  are not a substitute for an overall test of the moderator.
+>In other
+>> words, the fact that one coefficient related to a moderator is
+>> significant, does not imply that the moderator is significant. For
+>> example, an overall test for Index of Creativity can be non-significant
+>> even when a single coefficient such as the one for flexibility vs.
+>> fluency is significant. Overall, moderator tests could be done by means
+>> of linear hypothesis testing, for example."
+>>
+>> That is correct. an overall test of the moderator is needed.
+>>
+>>> In my opinion, running separate tests for each moderator kills the point of a
+>meta-regression, and meta-regression should be the basis of the interpretation
+>including these dummy-coded variables. I thought a categorical moderator would be
+>significant even  when one of the dummy codes turn out significant.
+>>
+>> I am afraid your thought is a mis-conception, albeit a common one.
+>>
+>> Michael
+>>
+>>> Who is correct here? Is there a good source that I could cite\?
+>>>
+>>> I would appreciate input on this.
+>>>
+>>> Selcuk Acar, Ph.D.
+>>> Associate Professor
+>>> Department of Educational Psychology
+>>> University of North Texas
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Jun 20 15:33:29 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 20 Jun 2022 13:33:29 +0000
+Subject: [R-meta] Collate event/proportion data from Pretest-Posttest
+ controlled studies and one-group Pretest-Posttest studies
+In-Reply-To: <b02d7492-7827-5740-f892-83bd6f17a39d@staff.uni-marburg.de>
+References: <b02d7492-7827-5740-f892-83bd6f17a39d@staff.uni-marburg.de>
+Message-ID: <f0cf4fcaf9394fed96b1d26b6c0afdf3@UM-MAIL3214.unimaas.nl>
+
+Dear David,
+
+If I understand your query correctly, you are asking if one can combine studies that provide 2x2 table data (for which one can compute measures such as RR and OR) and studies that provide pre-test post-test counts for a single group. If so, for the latter, one can compute measures such as the marginal log risk ratio and the marginal log odds ratio:
+
+https://wviechtb.github.io/metafor/reference/escalc.html#outcome-measures-for-change-or-matched-pairs
+
+Note that you will either need the paired 2?2 tables for such studies or the marginal table but then you have to make a guestimate of the correlation in the paired 2x2 table data.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of David Pedrosa
+>Sent: Thursday, 16 June, 2022 21:44
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Collate event/proportion data from Pretest-Posttest controlled
+>studies and one-group Pretest-Posttest studies
+>
+>Dear list,
+>
+>in extension of the help by Wolfgang Viechtbauer from March this year
+>(https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-March/003918.html),
+>we wonder about an additional aspect in our data (so far we have
+>restricted our analyses to the effects of different agents on PD
+>symptoms). The question we now have is whether we can do a similar
+>three-level hierarchical meta-analysis for events/proportions. To
+>briefly summarize, we would like to model the occurrence of adverse
+>events for all agents and use the study type as a moderator. However, we
+>are aware that "RR" or "OR" are poor choices and wanted to ask if
+>someone could point us at an alternative or if we should just stick with
+>the controlled studies.
+>
+>Thanks again for the help,
+>
+>David
+>
+>--
+>
+>;
+><http://www.ukgm.de>;
+>
+>PD Dr. David Pedrosa
+>Leiter der Sektion Bewegungsst?rungen, Universit?tsklinikum Gie?en und
+>Marburg
+>
+>Tel.: (+49) 6421-58 65299 Fax: (+49) 6421-58 67055
+>
+>;
+>Adresse: Baldingerstr., 35043 Marburg
+>
+>Web: https://www.ukgm.de/ugm_2/deu/umr_neu/index.html
+
+From jepu@to @end|ng |rom gm@||@com  Mon Jun 20 16:58:29 2022
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Mon, 20 Jun 2022 09:58:29 -0500
+Subject: [R-meta] [EXT] Re: Interpreting meta-regression results for
+ dummy-coded variables
+In-Reply-To: <f85979b7-37e1-57f7-fdf3-5a07076a269a@dewey.myzen.co.uk>
+References: <DM4PR01MB78838D1356203EE7CCEB50CCF7AE9@DM4PR01MB7883.prod.exchangelabs.com>
+ <e12cf436-9aaf-5df2-b586-af5d5cb946f9@dewey.myzen.co.uk>
+ <DM4PR01MB7883E7100FA801949A6C83ABF7B09@DM4PR01MB7883.prod.exchangelabs.com>
+ <f85979b7-37e1-57f7-fdf3-5a07076a269a@dewey.myzen.co.uk>
+Message-ID: <CAFUVuJy8Ctvn2yF17Tz5AJzRWbg7oqLqTzUsysv+ADZmLHq_sg@mail.gmail.com>
+
+Hi Selcuk,
+
+I think the key issue behind Michael's response was how to draw an
+inference about whether the moderator explains variation in the
+outcome, not about whether this was done in the context of a univariate
+analysis or a meta-regression analysis involving multiple predictors.
+
+Testing a categorical predictor with more than two levels can be done as
+part of a meta-regression involving other predictors as well. It's just
+that the results of such a test aren't automatically displayed in the
+meta-regression output---instead, you have to ask for them. There's a few
+ways to do so. I'll demonstrate with a meta-regression on the bcg data,
+following the post that Wolfgang linked to in his reply.:
+library(metafor)
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg,
+data=dat.bcg)
+res <- rma(yi, vi, mods = ~ year + ablat + factor(alloc), data=dat)
+
+One is to use metafor::anova() to perform a Q test, as demonstrated in
+Wolfgang's post:
+anova(res, btt = 4:5)
+anova(res, btt = "alloc") # equivalent to the above, but using a regular
+expression
+
+Alternately, you can use the btt argument in rma.uni() or rma.mv() to
+specify a set of coefficients to test (using the same type of Q-test). If
+you specify a btt argument, then the results will be reported in the
+metafor output under the Q-M test. See ?rma.uni in the section titled
+"Omnibus Tests of Moderators."
+rma(yi, vi, mods = ~ year + ablat + factor(alloc), data=dat, btt = "alloc")
+
+A further alternative, if you're using robust variance estimation, is to
+use the Wald_test() function from clubSandwich. Here' you'll need to
+specify a constraint matrix that describes which coefficients you want to
+test. The constrain_zero() helper function makes this easier, with a syntax
+very similar to the btt argument in metafor:
+Wald_test(res, vcov = "CR2", cluster = dat$author, constraints =
+constrain_zero(4:5))
+Wald_test(res, vcov = "CR2", cluster = dat$author, constraints =
+constrain_zero("alloc", reg_ex = TRUE))
+
+One thing to watch out for here is that the coding of the constraint matrix
+depends on whether you're using a reference level for the categorical
+moderator. That's how the above example was coded (the reference level is
+'alternate'). If you've instead specified a model with separate intercepts,
+then you can use the constrain_equal() helper function to construct a
+constraint matrix:
+res_intercepts <- rma(yi, vi, mods = ~ 0 + factor(alloc) + year + ablat,
+data=dat)
+Wald_test(res_intercepts, vcov = "CR2", cluster = dat$author, constraints =
+constrain_equal(1:3))
+Wald_test(res_intercepts, vcov = "CR2", cluster = dat$author, constraints =
+constrain_equal("alloc", reg_ex = TRUE))
+
+The difference in coding is purely a matter of preference/aesthetics. It
+will not matter for the test results. (If it does make a difference in the
+p-values, then you know some part of the code must be wrong.)
+
+James
+
+
+> > Michael,
+> >
+> > Thanks for your response--I am glad to have it corrected.
+> >
+> > I do not do univariate analyses when I do meta-regression, but with this
+> > perspective, they could help me figure if a moderator is significant or
+> > not rather than a specific pair of categories is significantly from each
+> > other. I do not do it because meta-regression provides more stringent
+> > evidence than univariate analyses and when they conflict, I would still
+> > go with the meta-regression results for interpretation. So, I question
+> > the usefulness of such univariate analyses beyond checking if a
+> > moderator is significant whose sub-categories turned out significant in
+> > meta-regression.
+> >
+> > Am I correct in my thinking/understanding of it?
+> >
+> > Selcuk Acar, Ph.D.
+> > Associate Professor
+> > Department of Educational Psychology
+> > University of North Texas
+> > ------------------------------------------------------------------------
+> > *From:* Michael Dewey <lists at dewey.myzen.co.uk>
+> > *Sent:* Sunday, June 19, 2022 7:30 AM
+> > *To:* Acar, Selcuk <Selcuk.Acar at unt.edu>;
+> > r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+> > *Subject:* [EXT] Re: [R-meta] Interpreting meta-regression results for
+> > dummy-coded variables
+> > Coments in-line
+> >
+> > On 18/06/2022 23:14, Acar, Selcuk wrote:
+> >> Hi,
+> >>
+> >> I ran a meta-regression in metafor package with both continuous and
+> dummy-coded moderators. In some of the moderators, when we had only one
+> dummy-code significant, we interpreted this as this moderator with several
+> categories being significant. For example,  we had "participant group"
+> moderator consisting of  "elementary"
+> > "middle" "high" and "undergraduate" categories, and used
+> > "undergraduates" as the reference group. We thought this moderator would
+> > be significant even when only one of dummy codes "undergraduates vs
+> > elementary" is significant without a separate test (linear hypothesis
+> > testing).
+> >>
+> >> One of the reviewers provided the following feedback:
+> >>
+> >> "Because of the dummy-coding these coefficients are differences in
+> Fisher-z-transformed correlations between the coded category and the
+> reference category. Hence, this reporting could be more accurately reflect
+> this. In addition, these tests of coefficients  are not a substitute for an
+> overall test of the moderator. In other
+> > words, the fact that one coefficient related to a moderator is
+> > significant, does not imply that the moderator is significant. For
+> > example, an overall test for Index of Creativity can be non-significant
+> > even when a single coefficient such as the one for flexibility vs.
+> > fluency is significant. Overall, moderator tests could be done by means
+> > of linear hypothesis testing, for example."
+> >>
+> >
+> > That is correct. an overall test of the moderator is needed.
+> >
+> >> In my opinion, running separate tests for each moderator kills the
+> point of a meta-regression, and meta-regression should be the basis of the
+> interpretation including these dummy-coded variables. I thought a
+> categorical moderator would be significant even  when one of the dummy
+> codes turn out significant.
+> >>
+> >
+> > I am afraid your thought is a mis-conception, albeit a common one.
+> >
+> > Michael
+> >
+> >> Who is correct here? Is there a good source that I could cite\?
+> >>
+> >> I would appreciate input on this.
+> >>
+> >> Selcuk Acar, Ph.D.
+> >> Associate Professor
+> >> Department of Educational Psychology
+> >> University of North Texas
+> >>
+> >>        [[alternative HTML version deleted]]
+> >>
+> >> _______________________________________________
+> >> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> >> To manage your subscription to this mailing list, go to:
+> >>
+> https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=UPv%2B7wy%2Bpfu5%2B2pGC0iF8Dn6lvi5qDSRE1EBxN7iNpU%3D&amp;reserved=0
+> > <
+> https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=UPv%2B7wy%2Bpfu5%2B2pGC0iF8Dn6lvi5qDSRE1EBxN7iNpU%3D&amp;reserved=0
+> >
+> >>
+> >
+> > --
+> > Michael
+> >
+> https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=gYh189T0Z1gkDf%2FnovOR3FDro5dGysGQr5M5qXk68fc%3D&amp;reserved=0
+> > <
+> https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=gYh189T0Z1gkDf%2FnovOR3FDro5dGysGQr5M5qXk68fc%3D&amp;reserved=0
+> >
+> >
+> >
+> > ------------------------------------------------------------------------
+> > AVG logo <https://www.avg.com/internet-security>
+> >
+> > This email has been checked for viruses by AVG antivirus software.
+> > www.avg.com <https://www.avg.com/internet-security>
+> >
+> >
+> > <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From Se|cuk@Ac@r @end|ng |rom unt@edu  Tue Jun 21 08:10:02 2022
+From: Se|cuk@Ac@r @end|ng |rom unt@edu (Acar, Selcuk)
+Date: Tue, 21 Jun 2022 06:10:02 +0000
+Subject: [R-meta] [EXT] Re: Interpreting meta-regression results for
+ dummy-coded variables
+In-Reply-To: <CAFUVuJy8Ctvn2yF17Tz5AJzRWbg7oqLqTzUsysv+ADZmLHq_sg@mail.gmail.com>
+References: <DM4PR01MB78838D1356203EE7CCEB50CCF7AE9@DM4PR01MB7883.prod.exchangelabs.com>
+ <e12cf436-9aaf-5df2-b586-af5d5cb946f9@dewey.myzen.co.uk>
+ <DM4PR01MB7883E7100FA801949A6C83ABF7B09@DM4PR01MB7883.prod.exchangelabs.com>
+ <f85979b7-37e1-57f7-fdf3-5a07076a269a@dewey.myzen.co.uk>
+ <CAFUVuJy8Ctvn2yF17Tz5AJzRWbg7oqLqTzUsysv+ADZmLHq_sg@mail.gmail.com>
+Message-ID: <DM4PR01MB7883F8E231731F5ACAE5D4A8F7B39@DM4PR01MB7883.prod.exchangelabs.com>
+
+Wolfgang,
+
+Thank you for sharing the link on the discrepancies. It is quite helpful.
+
+James,
+
+Indeed, I am using RVE, so this part of it is especially useful to have. I appreciate your time and explanation on it.
+
+Selcuk Acar, Ph.D.
+Associate Professor
+Department of Educational Psychology
+University of North Texas
+________________________________
+From: James Pustejovsky <jepusto at gmail.com>
+Sent: Monday, June 20, 2022 9:58 AM
+To: Michael Dewey <lists at dewey.myzen.co.uk>
+Cc: Acar, Selcuk <Selcuk.Acar at unt.edu>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] [EXT] Re: Interpreting meta-regression results for dummy-coded variables
+
+Hi Selcuk,
+
+I think the key issue behind Michael's response was how to draw an inference about whether the moderator explains variation in the outcome, not about whether this was done in the context of a univariate analysis or a meta-regression analysis involving multiple predictors.
+
+Testing a categorical predictor with more than two levels can be done as part of a meta-regression involving other predictors as well. It's just that the results of such a test aren't automatically displayed in the meta-regression output---instead, you have to ask for them. There's a few ways to do so. I'll demonstrate with a meta-regression on the bcg data, following the post that Wolfgang linked to in his reply.:
+library(metafor)
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+res <- rma(yi, vi, mods = ~ year + ablat + factor(alloc), data=dat)
+
+One is to use metafor::anova() to perform a Q test, as demonstrated in Wolfgang's post:
+anova(res, btt = 4:5)
+anova(res, btt = "alloc") # equivalent to the above, but using a regular expression
+
+Alternately, you can use the btt argument in rma.uni() or rma.mv<https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Frma.mv%2F&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=8BOX0z1Y0Zg2rmAUB1iziH80BLYItex30JyH3Ag4YyE%3D&reserved=0>() to specify a set of coefficients to test (using the same type of Q-test). If you specify a btt argument, then the results will be reported in the metafor output under the Q-M test. See ?rma.uni in the section titled "Omnibus Tests of Moderators."
+rma(yi, vi, mods = ~ year + ablat + factor(alloc), data=dat, btt = "alloc")
+
+A further alternative, if you're using robust variance estimation, is to use the Wald_test() function from clubSandwich. Here' you'll need to specify a constraint matrix that describes which coefficients you want to test. The constrain_zero() helper function makes this easier, with a syntax very similar to the btt argument in metafor:
+Wald_test(res, vcov = "CR2", cluster = dat$author, constraints = constrain_zero(4:5))
+Wald_test(res, vcov = "CR2", cluster = dat$author, constraints = constrain_zero("alloc", reg_ex = TRUE))
+
+One thing to watch out for here is that the coding of the constraint matrix depends on whether you're using a reference level for the categorical moderator. That's how the above example was coded (the reference level is 'alternate'). If you've instead specified a model with separate intercepts, then you can use the constrain_equal() helper function to construct a constraint matrix:
+res_intercepts <- rma(yi, vi, mods = ~ 0 + factor(alloc) + year + ablat, data=dat)
+Wald_test(res_intercepts, vcov = "CR2", cluster = dat$author, constraints = constrain_equal(1:3))
+Wald_test(res_intercepts, vcov = "CR2", cluster = dat$author, constraints = constrain_equal("alloc", reg_ex = TRUE))
+
+The difference in coding is purely a matter of preference/aesthetics. It will not matter for the test results. (If it does make a difference in the p-values, then you know some part of the code must be wrong.)
+
+James
+
+
+> Michael,
+>
+> Thanks for your response--I am glad to have it corrected.
+>
+> I do not do univariate analyses when I do meta-regression, but with this
+> perspective, they could help me figure if a moderator is significant or
+> not rather than a specific pair of categories is significantly from each
+> other. I do not do it because meta-regression provides more stringent
+> evidence than univariate analyses and when they conflict, I would still
+> go with the meta-regression results for interpretation. So, I question
+> the usefulness of such univariate analyses beyond checking if a
+> moderator is significant whose sub-categories turned out significant in
+> meta-regression.
+>
+> Am I correct in my thinking/understanding of it?
+>
+> Selcuk Acar, Ph.D.
+> Associate Professor
+> Department of Educational Psychology
+> University of North Texas
+> ------------------------------------------------------------------------
+> *From:* Michael Dewey <lists at dewey.myzen.co.uk<mailto:lists at dewey.myzen.co.uk>>
+> *Sent:* Sunday, June 19, 2022 7:30 AM
+> *To:* Acar, Selcuk <Selcuk.Acar at unt.edu<mailto:Selcuk.Acar at unt.edu>>;
+> r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org> <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>>
+> *Subject:* [EXT] Re: [R-meta] Interpreting meta-regression results for
+> dummy-coded variables
+> Coments in-line
+>
+> On 18/06/2022 23:14, Acar, Selcuk wrote:
+>> Hi,
+>>
+>> I ran a meta-regression in metafor package with both continuous and dummy-coded moderators. In some of the moderators, when we had only one dummy-code significant, we interpreted this as this moderator with several categories being significant. For example,  we had "participant group" moderator consisting of  "elementary"
+> "middle" "high" and "undergraduate" categories, and used
+> "undergraduates" as the reference group. We thought this moderator would
+> be significant even when only one of dummy codes "undergraduates vs
+> elementary" is significant without a separate test (linear hypothesis
+> testing).
+>>
+>> One of the reviewers provided the following feedback:
+>>
+>> "Because of the dummy-coding these coefficients are differences in Fisher-z-transformed correlations between the coded category and the reference category. Hence, this reporting could be more accurately reflect this. In addition, these tests of coefficients  are not a substitute for an overall test of the moderator. In other
+> words, the fact that one coefficient related to a moderator is
+> significant, does not imply that the moderator is significant. For
+> example, an overall test for Index of Creativity can be non-significant
+> even when a single coefficient such as the one for flexibility vs.
+> fluency is significant. Overall, moderator tests could be done by means
+> of linear hypothesis testing, for example."
+>>
+>
+> That is correct. an overall test of the moderator is needed.
+>
+>> In my opinion, running separate tests for each moderator kills the point of a meta-regression, and meta-regression should be the basis of the interpretation including these dummy-coded variables. I thought a categorical moderator would be significant even  when one of the dummy codes turn out significant.
+>>
+>
+> I am afraid your thought is a mis-conception, albeit a common one.
+>
+> Michael
+>
+>> Who is correct here? Is there a good source that I could cite\?
+>>
+>> I would appreciate input on this.
+>>
+>> Selcuk Acar, Ph.D.
+>> Associate Professor
+>> Department of Educational Psychology
+>> University of North Texas
+>>
+>>        [[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+>> To manage your subscription to this mailing list, go to:
+>> https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=UPv%2B7wy%2Bpfu5%2B2pGC0iF8Dn6lvi5qDSRE1EBxN7iNpU%3D&amp;reserved=0<https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=IF9eBhNCxluERH7vd3XN0uREQdktJ7Lp1Hv238Fnxsw%3D&reserved=0>
+> <https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=UPv%2B7wy%2Bpfu5%2B2pGC0iF8Dn6lvi5qDSRE1EBxN7iNpU%3D&amp;reserved=0<https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=IF9eBhNCxluERH7vd3XN0uREQdktJ7Lp1Hv238Fnxsw%3D&reserved=0>>
+>>
+>
+> --
+> Michael
+> https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=gYh189T0Z1gkDf%2FnovOR3FDro5dGysGQr5M5qXk68fc%3D&amp;reserved=0<https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=8vR2GThLuxJRXkOLwSQymm4K4DuQ%2Bw3AXw9pPaX7P3M%3D&reserved=0>
+> <https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=05%7C01%7CSelcuk.Acar%40unt.edu%7C322f70b684c046ff8ae108da51ef8f4a%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637912386722870865%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&amp;sdata=gYh189T0Z1gkDf%2FnovOR3FDro5dGysGQr5M5qXk68fc%3D&amp;reserved=0<https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=8vR2GThLuxJRXkOLwSQymm4K4DuQ%2Bw3AXw9pPaX7P3M%3D&reserved=0>>
+>
+>
+> ------------------------------------------------------------------------
+> AVG logo <https://www.avg.com/internet-security<https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.avg.com%2Finternet-security&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3%2BHCKUCLYouk9wSXMMCphredC7270uDMiPj4RKBYHig%3D&reserved=0>>
+>
+> This email has been checked for viruses by AVG antivirus software.
+> www.avg.com<https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.avg.com%2F&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=bzFeiErz0dsMA2%2FaNprBmz9zBCQShUYFQ2JD09681cE%3D&reserved=0> <https://www.avg.com/internet-security<https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fwww.avg.com%2Finternet-security&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=3%2BHCKUCLYouk9wSXMMCphredC7270uDMiPj4RKBYHig%3D&reserved=0>>
+>
+>
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+
+--
+Michael
+http://www.dewey.myzen.co.uk/home.html<https://nam04.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=8vR2GThLuxJRXkOLwSQymm4K4DuQ%2Bw3AXw9pPaX7P3M%3D&reserved=0>
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis<https://nam04.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&data=05%7C01%7CSelcuk.Acar%40unt.edu%7Cea9bdddabd444c443a6708da52cd5d29%7C70de199207c6480fa318a1afcba03983%7C0%7C0%7C637913339245641069%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=IF9eBhNCxluERH7vd3XN0uREQdktJ7Lp1Hv238Fnxsw%3D&reserved=0>
+
+	[[alternative HTML version deleted]]
+
+
+From ||||ppo@g@mb@rot@ @end|ng |rom gm@||@com  Wed Jun 22 09:57:51 2022
+From: ||||ppo@g@mb@rot@ @end|ng |rom gm@||@com (Filippo Gambarota)
+Date: Wed, 22 Jun 2022 09:57:51 +0200
+Subject: [R-meta] simulating three-level meta-analysis
+In-Reply-To: <CAFUVuJxUZU6PT2VJ+CA0h9tAej7N=ZG-3qWhkPqo1g+SmXg_0A@mail.gmail.com>
+References: <CAKWaqjZ4JzF3GzjqdiFh3-=f-323d_Ev7=8UNu9p3L0SU9pRqA@mail.gmail.com>
+ <c0e31bd429544e06add993bd1ac7feb1@UM-MAIL3214.unimaas.nl>
+ <CAKWaqjZs5ZZUEVZ90Yy3Ga+mvPQhU=H185MP3qEV41=By7ckjg@mail.gmail.com>
+ <CAFUVuJxUZU6PT2VJ+CA0h9tAej7N=ZG-3qWhkPqo1g+SmXg_0A@mail.gmail.com>
+Message-ID: <CAKWaqjYzROJYpSVfwOHTPb8vavPetMcPdaidUC7Xw52yXCdTeQ@mail.gmail.com>
+
+Thank you James! this is very helpful!
+
+On Thu, 16 Jun 2022 at 16:07, James Pustejovsky <jepusto at gmail.com> wrote:
+
+> Hi Filippo,
+>
+> To add to Wolfgang's notes, here is a blog post where I walk through
+> simulating a meta-analysis of standardized mean differences:
+> https://www.jepusto.com/simulating-correlated-smds/
+> It covers a more general case than the 3-level meta-analysis, in which
+> effect size estimates from a given study may be correlated at the sampling
+> level, so it might be overkill for what you're doing.
+>
+> With Wolfgang's notes, your code is a reasonable way to simulate a
+> three-level meta-analysis, especially if the purpose of your simulation is
+> exploratory or pedagogical. There are a few ways that I think it could be
+> improved in terms of its realism. These might be important if the
+> simulation is for methodological research--as David Hoaglin (2015;
+> https://doi.org/10.1002/jrsm.1146) argues, for research simulations, it's
+> important to consider the ways in which the meta-analysis model is a
+> simplification or idealization of plausible data-generating models. So, in
+> that spirit, here are a few suggestions:
+>
+> * Drawing the standard errors from a uniform distribution on (0, 0.3)
+> implies a certain distribution of study sizes, which might or might not be
+> plausible for the context that you're thinking about. For a meta-analysis
+> of group differences with equally sized groups, a standard error of 0.3
+> implies a total sample size of about 44. Using a uniform distribution
+> implies that you will have many quite large studies:
+> study_sizes <- 4 / runif(1000, 0, 0.3)^2
+> summary(study_sizes)
+>     Min.  1st Qu.   Median     Mean  3rd Qu.     Max.
+>       45       77      170    22732      830 11996245
+> An alternative approach would be to draw the standard errors from the
+> empirical distribution of standard errors in a previous conducted synthesis
+> that resembles the context you're interested in. Or, if there are studies
+> on the distribution of sample sizes or typical power levels of studies in
+> your area, you could use that to find a more realistic distribution of
+> sample sizes/standard errors from which to simulate.
+>
+> * Your simulation involves generating a structure where every study has
+> the same number of effect sizes. This "balanced" structure is a best-case
+> scenario for the performance of the 3-level meta-analysis model. Simulating
+> studies with varying numbers of effect sizes would be more realistic and
+> might be important for performance. A simple way to do that is just
+> studies_per_paper <- sample(1:10, size = ni, replace = TRUE)
+> dat <- data.frame(paper = rep(1:ni, studies_per_paper), study =
+> 1:sum(studies_per_paper))
+> table(dat$paper)
+> One step better would be to use a distribution that is motivated by
+> empirical data. You could do this by looking at the distribution of effect
+> sizes per study from one or more previously conducted syntheses that have
+> open data.
+>
+> * Your simulation generates effect size estimates that are exactly
+> normally distributed. For most effect size metrics, this is a
+> simplification that works reasonably well when sample sizes are large but
+> less well when sample sizes are small, and which sometimes also depends on
+> other features of the studies (e.g., for odds ratios, the adequacy of the
+> normality approximation depends on the number of positive outcomes, not
+> just the sample size). If you're in a context with small studies or effect
+> sizes that aren't truly normally distributed, it would be more realistic to
+> generate effect size estimates following a three-step process:
+> 1) simulate the true effect size parameters by adding up the random
+> effects at the paper level and study level;
+> 2) simulate any other relevant study features (sample sizes, event rates
+> in the control condition); and then
+> 3) simulate the effect size estimates based on a realistic data-generating
+> process, such as by sampling from a t distribution for standardized mean
+> differences or sampling from binomial distributions for log-odds ratios.
+> The blog post linked above demonstrates this process for correlated
+> standardized mean difference effect sizes.
+>
+> Of course, this might be way more technical detail and way more nuance
+> than you need. I offer it just in case it's useful to you or others working
+> on simulations.
+>
+> James
+>
+> On Thu, Jun 16, 2022 at 3:11 AM Filippo Gambarota <
+> filippo.gambarota at gmail.com> wrote:
+>
+>> Thank you Wolfgang this is very helpful.
+>> With that sentence about sampling variances, I meant that (if I
+>> remember correctly) for tau estimation I have to use effect size weights
+>> (thus sampling variances) so I was afraid that I need to sample values
+>> according to some criteria (and not runif(...) as in my simulation) in
+>> order to recover my parameters.
+>>
+>> On Wed, 15 Jun 2022 at 19:36, Viechtbauer, Wolfgang (NP) <
+>> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>>
+>> > Well, it doesn't want to go through, at least so far both of my replies
+>> > are not showing up on the mailing list. No idea why. In case you reply,
+>> > please still include the mailing list.
+>> >
+>> > Best,
+>> > Wolfgang
+>> >
+>> > >-----Original Message-----
+>> > >From: Viechtbauer, Wolfgang (NP)
+>> > >Sent: Wednesday, 15 June, 2022 17:33
+>> > >To: R meta
+>> > >Cc: 'Filippo Gambarota'
+>> > >Subject: RE: [R-meta] simulating three-level meta-analysis
+>> > >
+>> > >(I don't know why, but occasionally my posts to the mailing list do
+>> not go
+>> > >through. This seems to be happening again, so let me try to resend
+>> this.)
+>> > >
+>> > >Hi Filippo,
+>> > >
+>> > >Not sure what you mean by "sampling variances that will be associated
+>> > with a
+>> > >certain value of tau2 (level 2) and tau3 (level 3)". But in any case,
+>> > your code
+>> > >isn't quite simulating data according to the three level model. This
+>> does:
+>> > >
+>> > >dat <- data.frame(paper = rep(1:ni, each=nj), study = 1:nj)
+>> > >dat$b0_i <- rep(rnorm(ni, 0, taui), each=nj)
+>> > >dat$b0_j <- rnorm(nrow(dat), 0, tauj)
+>> > >dat$vi   <- runif(nrow(dat), 0, 0.3)
+>> > >dat$yi   <- b0 + dat$b0_i + dat$b0_j + rnorm(nrow(dat), 0,
+>> sqrt(dat$vi))
+>> > >
+>> > >fit <- rma.mv(yi, vi, random = ~ study | paper, data = dat)
+>> > >fit
+>> > >
+>> > >Best,
+>> > >Wolfgang
+>> > >
+>> > >>-----Original Message-----
+>> > >>From: R-sig-meta-analysis [mailto:
+>> > r-sig-meta-analysis-bounces at r-project.org] On
+>> > >>Behalf Of Filippo Gambarota
+>> > >>Sent: Wednesday, 15 June, 2022 13:44
+>> > >>To: R meta
+>> > >>Subject: [R-meta] simulating three-level meta-analysis
+>> > >>
+>> > >>Hello!
+>> > >>I'm trying to simulate a three-level meta-analysis model but I'm stuck
+>> > >>on understanding how to generate sampling variances that will be
+>> > >>associated with a certain value of tau2 (level 2) and tau3 (level 3).
+>> > >>My approach so far is setting values for population parameters and
+>> > >>generating sampling variances for the effect ij:
+>> > >>
+>> > >>```
+>> > >>library(metafor)
+>> > >>
+>> > >>b0 <- 0.3 # effect
+>> > >>ni <- 100 # number of papers
+>> > >>nj <- 5 # number of effects within each paper
+>> > >>
+>> > >>taui <- 0.3 # level 3 tau
+>> > >>tauj <- 0.1 # level 2 tau
+>> > >>icc <- taui^2 / sum(taui^2 + tauj^2) # real ICC
+>> > >>
+>> > >># i-level data
+>> > >>dati <- data.frame(paper = 1:ni,
+>> > >>                   b0_i = rnorm(ni, 0, taui))
+>> > >>
+>> > >># j-level data
+>> > >>datj <- data.frame(paper = rep(1:ni, nj),
+>> > >>                   study = 1:sum(nj),
+>> > >>                   b0_j = rnorm(sum(nj), 0, tauj))
+>> > >>
+>> > >>
+>> > >>dat <- merge(dati, datj, by = "paper") # combine
+>> > >>dat$vi <- runif(nrow(dat), 0, 0.3) # sampling variances at level 1
+>> > >>dat$yi <- b0 + dat$b0_i + dat$b0_j + rnorm(nrow(dat), 0, dat$vi)
+>> > >>
+>> > >>fit <- rma.mv(yi, vi, random = ~study|paper, data = dat)
+>> > >>```
+>> > >>However, I'm sure that I'm doing wrong because taus are estimated
+>> > >>using vi and the vis are not sampled with specific criteria.
+>> > >>Does someone have some hints? Or in general suggestions about to setup
+>> > >>a simulation like this?
+>> > >>Thanks!
+>> > >>
+>> > >>--
+>> > >>Filippo Gambarota
+>> > >>PhD Student - University of Padova
+>> > >>Department of Developmental and Social Psychology
+>> > >>Website: filippogambarota
+>> > >>Research Group: Colab   Psicostat
+>> >
+>>
+>>
+>> --
+>> *Filippo Gambarota*
+>> PhD Student - University of Padova
+>> Department of Developmental and Social Psychology
+>> Website: filippogambarota <https://filippogambarota.netlify.app/>
+>> Research Group: Colab <http://colab.psy.unipd.it/>   Psicostat
+>> <https://psicostat.dpss.psy.unipd.it/>
+>>
+>>         [[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>
+
+-- 
+*Filippo Gambarota*
+PhD Student - University of Padova
+Department of Developmental and Social Psychology
+Website: filippogambarota <https://filippogambarota.netlify.app/>
+Research Group: Colab <http://colab.psy.unipd.it/>   Psicostat
+<https://psicostat.dpss.psy.unipd.it/>
+
+	[[alternative HTML version deleted]]
+
+
+From pedro@@c @end|ng |rom @t@||@un|-m@rburg@de  Wed Jun 22 13:53:35 2022
+From: pedro@@c @end|ng |rom @t@||@un|-m@rburg@de (David Pedrosa)
+Date: Wed, 22 Jun 2022 13:53:35 +0200
+Subject: [R-meta] Collate event/proportion data from Pretest-Posttest
+ controlled studies and one-group Pretest-Posttest studies
+In-Reply-To: <f0cf4fcaf9394fed96b1d26b6c0afdf3@UM-MAIL3214.unimaas.nl>
+References: <b02d7492-7827-5740-f892-83bd6f17a39d@staff.uni-marburg.de>
+ <f0cf4fcaf9394fed96b1d26b6c0afdf3@UM-MAIL3214.unimaas.nl>
+Message-ID: <01303d46-bf07-5fc3-0bad-1d86d1d57a62@staff.uni-marburg.de>
+
+Thanks Wolfgang.
+
+I had not seen those parts of the documentary yet. This makes things 
+much clearer for me.
+
+Best,
+
+David
+
+
+Am 20.06.2022 um 15:33 schrieb Viechtbauer, Wolfgang (NP):
+> Dear David,
+>
+> If I understand your query correctly, you are asking if one can combine studies that provide 2x2 table data (for which one can compute measures such as RR and OR) and studies that provide pre-test post-test counts for a single group. If so, for the latter, one can compute measures such as the marginal log risk ratio and the marginal log odds ratio:
+>
+> https://wviechtb.github.io/metafor/reference/escalc.html#outcome-measures-for-change-or-matched-pairs
+>
+> Note that you will either need the paired 2?2 tables for such studies or the marginal table but then you have to make a guestimate of the correlation in the paired 2x2 table data.
+>
+> Best,
+> Wolfgang
+>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>> Behalf Of David Pedrosa
+>> Sent: Thursday, 16 June, 2022 21:44
+>> To:r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Collate event/proportion data from Pretest-Posttest controlled
+>> studies and one-group Pretest-Posttest studies
+>>
+>> Dear list,
+>>
+>> in extension of the help by Wolfgang Viechtbauer from March this year
+>> (https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-March/003918.html),
+>> we wonder about an additional aspect in our data (so far we have
+>> restricted our analyses to the effects of different agents on PD
+>> symptoms). The question we now have is whether we can do a similar
+>> three-level hierarchical meta-analysis for events/proportions. To
+>> briefly summarize, we would like to model the occurrence of adverse
+>> events for all agents and use the study type as a moderator. However, we
+>> are aware that "RR" or "OR" are poor choices and wanted to ask if
+>> someone could point us at an alternative or if we should just stick with
+>> the controlled studies.
+>>
+>> Thanks again for the help,
+>>
+>> David
+>>
+>> --
+>>
+>> ;
+>> <http://www.ukgm.de>;
+>>
+>> PD Dr. David Pedrosa
+>> Leiter der Sektion Bewegungsst?rungen, Universit?tsklinikum Gie?en und
+>> Marburg
+>>
+>> Tel.: (+49) 6421-58 65299 Fax: (+49) 6421-58 67055
+>>
+>> ;
+>> Adresse: Baldingerstr., 35043 Marburg
+>>
+>> Web:https://www.ukgm.de/ugm_2/deu/umr_neu/index.html
+-- 
+
+;
+<http://www.ukgm.de>;
+
+	
+	
+	
+	
+PD Dr. David Pedrosa
+Leitender Oberarzt der Klinik f?r Neurologie,
+Leiter der Sektion Bewegungsst?rungen, Universit?tsklinikum Gie?en und 
+Marburg
+
+Tel.: (+49) 6421-58 65299 Fax: (+49) 6421-58 67055
+
+;
+Adresse: Baldingerstr., 35043 Marburg
+
+Web: https://www.ukgm.de/ugm_2/deu/umr_neu/index.html
+
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Thu Jun 23 16:17:26 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 23 Jun 2022 15:17:26 +0100
+Subject: [R-meta] Update on the CRAN Task View on MetaAnalysis
+Message-ID: <d1572eda-24fa-f9f7-cacf-cb6b8db0bb68@dewey.myzen.co.uk>
+
+I email the list approximately annually to update on the task view. 
+Since the last update the number of new packages has been more or less 
+balanced by the number archived so we still have about 150+ in the view.
+
+Happy to hear of anything I have missed. The list is quite long which 
+explains the brevity of the entries.
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From m@w|ert@em@ @end|ng |rom rug@n|  Fri Jun 24 14:20:49 2022
+From: m@w|ert@em@ @end|ng |rom rug@n| (Wiertsema, M.)
+Date: Fri, 24 Jun 2022 14:20:49 +0200
+Subject: [R-meta] Exclude answer category from moderation test
+Message-ID: <CAPTeNy7rRUv8EduKFRaQNqJrb-UtBC+sdOXKWY4iLMqsSf_qaA@mail.gmail.com>
+
+Hi everyone,
+
+Perhaps a silly question, but I cannot seem to find the answer I need.
+So here's my question: I have a certain variable with three answer
+categories (x, y, and z). Now, I want to perform a moderation test
+based on this variable but I only want to compare Y and Z in this
+moderation test. Is there a way to exclude answer option 'x' in the
+moderator analysis via code?
+I know I can also adjust my data set and create a new variable with
+only the options 'y' and 'z', but I was wondering if it could be
+easier with the metafor package.
+
+I hope anyone knows this!
+Many thanks in advance!
+
+Best,
+Maria Wiertsema
+
+
+-- 
+PhD student | University of Groningen | Youth Studies | Grote
+Rozenstraat 38 | email: m.wiertsema at rug.nl | phone: 050 - 363 3182
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Jun 24 15:28:54 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 24 Jun 2022 13:28:54 +0000
+Subject: [R-meta] Exclude answer category from moderation test
+In-Reply-To: <CAPTeNy7rRUv8EduKFRaQNqJrb-UtBC+sdOXKWY4iLMqsSf_qaA@mail.gmail.com>
+References: <CAPTeNy7rRUv8EduKFRaQNqJrb-UtBC+sdOXKWY4iLMqsSf_qaA@mail.gmail.com>
+Message-ID: <0dbcba5692c747ba90d10487ea91af72@UM-MAIL3213.unimaas.nl>
+
+Dear Maria,
+
+If you want to exclude the studies where the moderator is equal to 'x' from the analysis, then you could use the 'subset' argument (e.g., subset=moderator!="x").
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Wiertsema, M.
+>Sent: Friday, 24 June, 2022 14:21
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Exclude answer category from moderation test
+>
+>Hi everyone,
+>
+>Perhaps a silly question, but I cannot seem to find the answer I need.
+>So here's my question: I have a certain variable with three answer
+>categories (x, y, and z). Now, I want to perform a moderation test
+>based on this variable but I only want to compare Y and Z in this
+>moderation test. Is there a way to exclude answer option 'x' in the
+>moderator analysis via code?
+>I know I can also adjust my data set and create a new variable with
+>only the options 'y' and 'z', but I was wondering if it could be
+>easier with the metafor package.
+>
+>I hope anyone knows this!
+>Many thanks in advance!
+>
+>Best,
+>Maria Wiertsema
+>
+>--
+>PhD student | University of Groningen | Youth Studies | Grote
+>Rozenstraat 38 | email: m.wiertsema at rug.nl | phone: 050 - 363 3182
+
+
+From m@w|ert@em@ @end|ng |rom rug@n|  Fri Jun 24 16:31:01 2022
+From: m@w|ert@em@ @end|ng |rom rug@n| (Wiertsema, M.)
+Date: Fri, 24 Jun 2022 16:31:01 +0200
+Subject: [R-meta] Exclude answer category from moderation test
+In-Reply-To: <0dbcba5692c747ba90d10487ea91af72@UM-MAIL3213.unimaas.nl>
+References: <CAPTeNy7rRUv8EduKFRaQNqJrb-UtBC+sdOXKWY4iLMqsSf_qaA@mail.gmail.com>
+ <0dbcba5692c747ba90d10487ea91af72@UM-MAIL3213.unimaas.nl>
+Message-ID: <CAPTeNy5W3ym2R4FoOQhHPF53JyxFTNjq9dm_HjiPSO8CJQw43A@mail.gmail.com>
+
+Great, thank you so much!
+
+Op vr 24 jun. 2022 om 15:28 schreef Viechtbauer, Wolfgang (NP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl>:
+>
+> Dear Maria,
+>
+> If you want to exclude the studies where the moderator is equal to 'x' from the analysis, then you could use the 'subset' argument (e.g., subset=moderator!="x").
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+> >Behalf Of Wiertsema, M.
+> >Sent: Friday, 24 June, 2022 14:21
+> >To: r-sig-meta-analysis at r-project.org
+> >Subject: [R-meta] Exclude answer category from moderation test
+> >
+> >Hi everyone,
+> >
+> >Perhaps a silly question, but I cannot seem to find the answer I need.
+> >So here's my question: I have a certain variable with three answer
+> >categories (x, y, and z). Now, I want to perform a moderation test
+> >based on this variable but I only want to compare Y and Z in this
+> >moderation test. Is there a way to exclude answer option 'x' in the
+> >moderator analysis via code?
+> >I know I can also adjust my data set and create a new variable with
+> >only the options 'y' and 'z', but I was wondering if it could be
+> >easier with the metafor package.
+> >
+> >I hope anyone knows this!
+> >Many thanks in advance!
+> >
+> >Best,
+> >Maria Wiertsema
+> >
+> >--
+> >PhD student | University of Groningen | Youth Studies | Grote
+> >Rozenstraat 38 | email: m.wiertsema at rug.nl | phone: 050 - 363 3182
+
+
+
+-- 
+PhD student | University of Groningen | Youth Studies | Grote
+Rozenstraat 38 | email: m.wiertsema at rug.nl | phone: 050 - 363 3182
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Fri Jun 24 16:50:06 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Fri, 24 Jun 2022 15:50:06 +0100
+Subject: [R-meta] Exclude answer category from moderation test
+In-Reply-To: <0dbcba5692c747ba90d10487ea91af72@UM-MAIL3213.unimaas.nl>
+References: <CAPTeNy7rRUv8EduKFRaQNqJrb-UtBC+sdOXKWY4iLMqsSf_qaA@mail.gmail.com>
+ <0dbcba5692c747ba90d10487ea91af72@UM-MAIL3213.unimaas.nl>
+Message-ID: <ad68bfaf-708a-0cb9-cf65-b89fadb43a40@dewey.myzen.co.uk>
+
+Dear Maria
+
+Do you want to test on a restricted subset of the data (as Wolfgang has 
+shown you) or do you want to test if the coefficient of Y is equal to 
+that of Z? In the latter case I think you are looking to use anova.rma() 
+after your initial fit.
+
+Michael
+
+On 24/06/2022 14:28, Viechtbauer, Wolfgang (NP) wrote:
+> Dear Maria,
+> 
+> If you want to exclude the studies where the moderator is equal to 'x' from the analysis, then you could use the 'subset' argument (e.g., subset=moderator!="x").
+> 
+> Best,
+> Wolfgang
+> 
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>> Behalf Of Wiertsema, M.
+>> Sent: Friday, 24 June, 2022 14:21
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Exclude answer category from moderation test
+>>
+>> Hi everyone,
+>>
+>> Perhaps a silly question, but I cannot seem to find the answer I need.
+>> So here's my question: I have a certain variable with three answer
+>> categories (x, y, and z). Now, I want to perform a moderation test
+>> based on this variable but I only want to compare Y and Z in this
+>> moderation test. Is there a way to exclude answer option 'x' in the
+>> moderator analysis via code?
+>> I know I can also adjust my data set and create a new variable with
+>> only the options 'y' and 'z', but I was wondering if it could be
+>> easier with the metafor package.
+>>
+>> I hope anyone knows this!
+>> Many thanks in advance!
+>>
+>> Best,
+>> Maria Wiertsema
+>>
+>> --
+>> PhD student | University of Groningen | Youth Studies | Grote
+>> Rozenstraat 38 | email: m.wiertsema at rug.nl | phone: 050 - 363 3182
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From m|obo4370 @end|ng |rom hotm@||@com  Tue Jun 28 15:43:59 2022
+From: m|obo4370 @end|ng |rom hotm@||@com (Martin Lobo)
+Date: Tue, 28 Jun 2022 13:43:59 +0000
+Subject: [R-meta] High heterogeneity and publication bias in mean difference
+ meta-analysis
+Message-ID: <BL1PR22MB36815970ED7F184A503250C2ACB89@BL1PR22MB3681.namprd22.prod.outlook.com>
+
+Hi everyone,
+I recently asked about doing a mean difference meta-analysis where I had 3 different measurements, cm3, mm, and cm2. They told me to carry out a stratified meta-analysis, although I did not understand why a meta-analysis of standardized differences could not work, carry out the stratification by the 3 measures.
+
+The problem that I have found is the high heterogeneity and the asymmetry in the funnel plot. Although one group has k=5 and another k=2, so I have not evaluated the publication bias, in the third group with k=14 the bias is positive. Could this be due to the high heterogeneity? How should I report the results?
+I copy to show the results with prediction interval. Sensitivity analysis works fine. The study of influence gives that 3 studies are influential. The study of out-liers is very rare, there are about 8 studies with out-liers.
+
+Number of studies combined: k = 5
+
+                          MD              95%-CI    z p-value
+Fixed effect model    0.0050 [ -0.0869;  0.0969] 0.11  0.9149
+Random effects model 10.4453 [  1.7681; 19.1224] 2.36  0.0183
+Prediction interval          [-20.2018; 41.0923]
+
+Quantifying heterogeneity:
+ tau^2 = 73.1374 [18.7590; >829.7896]; tau = 8.5520 [4.3312; >28.8061]
+ I^2 = 95.3% [91.7%; 97.4%]; H = 4.63 [3.47; 6.17]
+
+Test of heterogeneity:
+     Q d.f.  p-value
+ 85.63    4 < 0.0001
+
+Number of studies combined: k = 14
+
+                         MD           95%-CI     z  p-value
+Fixed effect model   0.1997 [0.1724; 0.2270] 14.33 < 0.0001
+Random effects model 1.0164 [0.7829; 1.2499]  8.53 < 0.0001
+Prediction interval         [0.1733; 1.8595]
+
+Quantifying heterogeneity:
+ tau^2 = 0.1355 [0.2216; 2.3742]; tau = 0.3682 [0.4708; 1.5409]
+ I^2 = 95.6% [94.0%; 96.8%]; H = 4.78 [4.08; 5.60]
+
+Test of heterogeneity:
+      Q d.f.  p-value
+ 296.49   13 < 0.0001
+
+Leave-One-Out Analysis (Sorted by I2)
+ -----------------------------------
+                                           Effect  LLCI  ULCI    I2
+Omitting Lima-Mart?nez b et al. (2014)20**  0.197 0.169 0.224 0.948
+Omitting Bacaks?z et al. (2014)21           0.190 0.163 0.218 0.948
+Omitting Bulbul  et al. (2013)19            0.186 0.159 0.214 0.953
+Omitting Lima-Mart?nez a et al. (2014)20**  0.198 0.171 0.225 0.956
+Omitting Temiz et al. (2015)24              0.197 0.169 0.224 0.957
+Omitting Resorlu et al. (2015)25            0.197 0.170 0.224 0.957
+Omitting Uysal et al.  (2016)28             0.196 0.169 0.223 0.957
+Omitting Surucu et al. (2019)31             0.228 0.197 0.258 0.957
+Omitting Fatma et al. (2015)26              0.198 0.171 0.225 0.958
+Omitting Demir et al. (2021)32              0.197 0.170 0.225 0.958
+Omitting Ekmen et al. (2021)34              0.287 0.233 0.341 0.958
+Omitting Saha et al. (2022)36               0.197 0.170 0.224 0.958
+Omitting Akyildiz et al. (2014)23           0.199 0.172 0.226 0.959
+Omitting Girisha et al. (2021)35            0.199 0.171 0.226 0.959
+
+
+Influence Diagnostics
+ -------------------
+                                           rstudent dffits cook.d cov.r  QE.del   hat weight infl
+Omitting Bulbul  et al. (2013)19              6.454  0.967  0.935 1.022 254.847 0.022  2.197    *
+Omitting Lima-Mart?nez a et al. (2014)20**    4.884  0.112  0.013 1.001 272.639 0.001  0.053
+Omitting Lima-Mart?nez b et al. (2014)20**    8.065  0.220  0.048 1.001 231.453 0.001  0.074
+Omitting Bacaks?z et al. (2014)21             8.224  0.673  0.453 1.007 228.868 0.007  0.666
+Omitting Akyildiz et al. (2014)23             1.913  0.046  0.002 1.001 292.834 0.001  0.059
+Omitting Temiz et al. (2015)24                4.413  0.209  0.044 1.002 277.024 0.002  0.223
+Omitting Resorlu et al. (2015)25              3.895  0.189  0.036 1.002 281.326 0.002  0.234
+Omitting Fatma et al. (2015)26                2.921  0.119  0.014 1.002 287.960 0.002  0.165
+Omitting Uysal et al.  (2016)28               4.402  0.262  0.069 1.004 277.113 0.004  0.354
+Omitting Surucu et al. (2019)31              -4.157 -2.012  4.049 1.234 279.212 0.190 18.982    *
+Omitting Demir et al. (2021)32                2.847  0.179  0.032 1.004 288.390 0.004  0.395
+Omitting Ekmen et al. (2021)34               -3.656 -6.268 39.288 3.939 283.129 0.746 74.615    *
+Omitting Girisha et al. (2021)35              0.618  0.076  0.006 1.015 296.113 0.015  1.480
+Omitting Saha et al. (2022)36                 2.809  0.200  0.040 1.005 288.604 0.005  0.504
+
+
+Baujat Diagnostics (sorted by Heterogeneity Contribution)
+ -------------------------------------------------------
+                                           HetContrib InfluenceEffectSize
+Omitting Bacaks?z et al. (2014)21              67.176               0.450
+Omitting Lima-Mart?nez b et al. (2014)20**     64.994               0.048
+Omitting Bulbul  et al. (2013)19               40.733               0.915
+Omitting Lima-Mart?nez a et al. (2014)20**     23.843               0.013
+Omitting Temiz et al. (2015)24                 19.428               0.043
+Omitting Uysal et al.  (2016)28                19.313               0.069
+Omitting Resorlu et al. (2015)25               15.133               0.036
+Omitting Surucu et al. (2019)31                14.002               3.281
+Omitting Fatma et al. (2015)26                  8.520               0.014
+Omitting Demir et al. (2021)32                  8.073               0.032
+Omitting Saha et al. (2022)36                   7.851               0.040
+Omitting Akyildiz et al. (2014)23               3.659               0.002
+Omitting Ekmen et al. (2021)34                  3.393               9.973
+Omitting Girisha et al. (2021)35                0.376               0.006
+
+Bulbul  et al. (2013)19                    0.8000 [ 0.6157;  0.9843]        6.4
+Lima-Mart?nez a et al. (2014)20**          3.1700 [ 1.9778;  4.3622]        2.5
+Lima-Mart?nez b et al. (2014)20**          4.3200 [ 3.3183;  5.3217]        3.1
+Bacaksiz et al. (2014)21                   1.6000 [ 1.2651;  1.9349]        5.9
+Akyildiz et al. (2014)23                   1.3000 [ 0.1726;  2.4274]        2.7
+Temiz et al. (2015)24                      1.5000 [ 0.9218;  2.0782]        4.8
+Resorlu et al. (2015)25                    1.3200 [ 0.7556;  1.8844]        4.9
+Fatma et al. (2015)26                      1.2000 [ 0.5284;  1.8716]        4.4
+Uysal et al.  (2016)28                     1.2300 [ 0.7705;  1.6895]        5.4
+Surucu et al. (2019)31                     0.0800 [ 0.0173;  0.1427]        6.6
+Demir et al. (2021)32                      0.8300 [ 0.3952;  1.2648]        5.5
+Ekmen et al. (2021)34                      0.1700 [ 0.1384;  0.2016]        6.7
+Girisha et al. (2021)35                    0.2700 [ 0.0454;  0.4946]        6.3
+Saha et al. (2022)36                       0.7500 [ 0.3651;  1.1349]        5.7
+Filled: Uysal et al.  (2016)28            -0.8789 [-1.3384; -0.4194]        5.4
+Filled: Akyildiz et al. (2014)23          -0.9489 [-2.0763;  0.1785]        2.7
+Filled: Resorlu et al. (2015)25           -0.9689 [-1.5333; -0.4045]        4.9
+Filled: Temiz et al. (2015)24             -1.1489 [-1.7271; -0.5707]        4.8
+Filled: Bacaksiz et al. (2014)21          -1.2489 [-1.5837; -0.9140]        5.9
+Filled: Lima-Mart?nez a et al. (2014)20** -2.8189 [-4.0111; -1.6266]        2.5
+Filled: Lima-Mart?nez b et al. (2014)20** -3.9689 [-4.9706; -2.9672]        3.1
+
+Number of studies combined: k = 21 (with 7 added studies)
+
+                         MD            95%-CI    z p-value
+Random effects model 0.3282 [ 0.0886; 0.5678] 2.68  0.0073
+Prediction interval         [-0.6951; 1.3515]
+
+Quantifying heterogeneity:
+ tau^2 = 0.2241 [0.4633; 3.3918]; tau = 0.4734 [0.6807; 1.8417]
+ I^2 = 96.1% [95.1%; 97.0%]; H = 5.09 [4.51; 5.76]
+
+Test of heterogeneity:
+      Q d.f.  p-value
+ 519.01   20 < 0.0001
+
+I have used the random effects model due to the great heterogeneity. In principle I could say that in the group k=5, future studies might not find an increase in volume because the prediction interval is negative to positive. In the K=14 group, future studies would give in the same direction, not being able to specify the mean value. This is correct?
+Should I not analyze biases due to high heterogeneity?
+
+[[elided Hotmail spam]]
+
+
+
+
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital Militar Campo de Mayo.
+Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Ex Miembro del Area de Investigaci?n de la SAC
+Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+
+Experto en Lipidos de la Sociedad Argentina de Lipidos.
+Miembro de la Sociedad Argentina de Lipidos.
+Instructor de ACLS de la American Heart Association
+
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Wed Jun 29 21:43:04 2022
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Wed, 29 Jun 2022 21:43:04 +0200
+Subject: [R-meta] 
+ High heterogeneity and publication bias in mean difference
+ meta-analysis
+In-Reply-To: <BL1PR22MB36815970ED7F184A503250C2ACB89@BL1PR22MB3681.namprd22.prod.outlook.com>
+References: <BL1PR22MB36815970ED7F184A503250C2ACB89@BL1PR22MB3681.namprd22.prod.outlook.com>
+Message-ID: <610f7019-de10-ff7d-62ab-554758bc4c6f@imbi.uni-freiburg.de>
+
+Dear Martin,
+
+First some comments on posts to r-sig-meta-analysis. Please only send 
+emails to the address used in my reply (see 
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis). Furthermore, 
+as Gerta, Matthias and Wolfgang are all subscribers of this list, there 
+is no need to send the email twice to them.
+
+As I do not know the specifics of your data I can only make some general 
+comments.
+
+You have considerable between-study heterogeneity with I2 values above 
+90%. The first step is to check whether your study data is correct. For 
+example, taking a standard error as a standard deviation can result in a 
+very narrow confidence interval in a study leading to excessive 
+between-study heterogeneity.
+
+The funnel plot asymmetry in the third group is due to smaller / 
+imprecise studies having different results than larger / more precise 
+studies. This could either be due to clinical heterogeneity or bias. You 
+could conduct meta-regression if you have data for potential effect 
+modifiers. A contour-enhanced funnel plot could be used to evaluate 
+whether the funnel plot asymmetry is due to publication bias, i.e., 
+small studies are only published if they are statistically significant.
+
+There are several other possibilities to evaluate small study effects 
+using R (see sections "Investigating small study bias" and "Unobserved 
+studies" on https://cran.r-project.org/web/views/MetaAnalysis.html).
+
+Best,
+
+Guido
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Zinkmattenstr. 6a, D-79108 Freiburg
+
+Mail: sc at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+

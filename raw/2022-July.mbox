@@ -1,0 +1,1425 @@
+From th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com  Tue Jul  5 16:56:58 2022
+From: th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com (Tharaka S. Priyadarshana)
+Date: Tue, 5 Jul 2022 22:56:58 +0800
+Subject: [R-meta] Adding a 0.5 continuity correction
+Message-ID: <CADWK9cd1iR3fyBvOPMfr7VFq3oDQMgBbCdCz_AARAG8EEMTpBw@mail.gmail.com>
+
+Hello, everyone,
+
+Is it a common practice to add a 0.5 continuity correction for zero cells
+when measuring MD or SMD as the outcome measure?
+I have seen people use it when the outcome is measured as the RR or ROM,
+but not sure is it applicable when the outcome is measured as MD or SMD.
+
+Thank you,
+Tharaka
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Tue Jul  5 17:25:06 2022
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Tue, 5 Jul 2022 17:25:06 +0200
+Subject: [R-meta] Adding a 0.5 continuity correction
+In-Reply-To: <CADWK9cd1iR3fyBvOPMfr7VFq3oDQMgBbCdCz_AARAG8EEMTpBw@mail.gmail.com>
+References: <CADWK9cd1iR3fyBvOPMfr7VFq3oDQMgBbCdCz_AARAG8EEMTpBw@mail.gmail.com>
+Message-ID: <b63ce925-1104-bf5c-99ca-0674fec80fde@imbi.uni-freiburg.de>
+
+Am 05.07.22 um 16:56 schrieb Tharaka S. Priyadarshana:
+
+> Hello, everyone,
+>
+> Is it a common practice to add a 0.5 continuity correction for zero cells
+> when measuring MD or SMD as the outcome measure?
+
+Hi Tharaka,
+
+For ratio measures like OR, RR or ROM one does not want to have a zero 
+in the nominator or denominator. Accordingly, a continuity correction is 
+typically used.? Measures based on differences like MD or SMD do not 
+have this problem.
+
+library(meta)
+m.noincr <- metabin(rep(0, 2), 100:101, 1:2, 100:101, sm = "RR",
+ ? incr = 0, overall = FALSE, overall.hetstat = FALSE)
+summary(m.noincr)
+m.withincr <- update(m.noincr, incr = 0.5)
+print(summary(m.withincr), ma = FALSE)
+
+Best,
+
+Guido
+
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Zinkmattenstr. 6a, D-79108 Freiburg
+
+Mail: sc at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+From @te||@|@qu|nto @end|ng |rom gm@||@com  Tue Jul  5 20:22:20 2022
+From: @te||@|@qu|nto @end|ng |rom gm@||@com (Stefi Iaquinto)
+Date: Tue, 5 Jul 2022 20:22:20 +0200
+Subject: [R-meta] Exact confidence intervals meta-analysis estimate
+Message-ID: <73B64855-4A96-4EF3-8DA2-CE02527B907C@gmail.com>
+
+Hi everyone, 
+
+I?m currently running a simulation study with a single proportion as outcome. 
+As I want to use some ?extreme" true proportions (0.95, 0.97 ?), I was wondering, if there is an option with rma.uni() to calculate exact confidence intervals for the overall effect estimate from a meta-analysis (If I?m not mistaken, the default is calculating wald-type confidence intervals)?
+
+Thank you! 
+
+Best, 
+Stefi 
+
+
+From |en@ @end|ng |rom po||erho||@de  Thu Jul  7 08:00:51 2022
+From: |en@ @end|ng |rom po||erho||@de (Lena Pollerhoff)
+Date: Thu, 7 Jul 2022 08:00:51 +0200
+Subject: [R-meta] Adjusted effects p- and z-value
+Message-ID: <52FDB41C-709D-4126-9BF7-36BBD30CDBD2@pollerhoff.de>
+
+Hey everyone, 
+
+I?m currently computing adjusted effects based on meta-regression models (based on this tutorial https://www.metafor-project.org/doku.php/tips:computing_adjusted_effects <https://www.metafor-project.org/doku.php/tips:computing_adjusted_effects>). 
+When I am computing the effect with predict(res, newmods = mean(continuous variable)) I receive the estimated average effect size (pred), the CI and PI. 
+Now I was wondering whether it would be also possible to receive the p-value and z-value for the adjusted effect (similar to the output of a random-effect model)? 
+
+Further I was wondering whether it is possible to include the PI in the forest plot (as the dotted lines around the diamond shaped effect) when I am manually including the adjusted effect in the forest plot with e.g.,
+sav <- predict(res, newmods = mean(continuous variable))
+Addpoly(sav$pred, sei=sav$se)
+
+Normally one could add it with addpred = TRUE, but this does not work in this specific case.
+
+Thanks in advance and best wishes
+Lena 
+
+
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul  7 10:14:01 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 7 Jul 2022 08:14:01 +0000
+Subject: [R-meta] Adjusted effects p- and z-value
+In-Reply-To: <52FDB41C-709D-4126-9BF7-36BBD30CDBD2@pollerhoff.de>
+References: <52FDB41C-709D-4126-9BF7-36BBD30CDBD2@pollerhoff.de>
+Message-ID: <a4b4d4cb9f744e27a565d10c29c7c607@UM-MAIL3214.unimaas.nl>
+
+Hi Lena,
+
+See below for my responses.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Lena Pollerhoff
+>Sent: Thursday, 07 July, 2022 8:01
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Adjusted effects p- and z-value
+>
+>Hey everyone,
+>
+>I?m currently computing adjusted effects based on meta-regression models (based
+>on this tutorial https://www.metafor-
+>project.org/doku.php/tips:computing_adjusted_effects <https://www.metafor-
+>project.org/doku.php/tips:computing_adjusted_effects>).
+>When I am computing the effect with predict(res, newmods = mean(continuous
+>variable)) I receive the estimated average effect size (pred), the CI and PI.
+>Now I was wondering whether it would be also possible to receive the p-value and
+>z-value for the adjusted effect (similar to the output of a random-effect model)?
+
+You can use anova() for this. Using the same example from the tutorial:
+
+predict(res, newmods = mean(dat$ablat), transf=exp, digits=2)
+
+anova(res, X = c(1,mean(dat$ablat)))
+
+In contrast to predict() (where the 'intercept' argument controls whether the intercept is included in the linear contrast), with anova() this is done as part of X. Also, there is no 'transf' argument for anova(), but this is not relevant anyway, since the testing is done on the original (in this case, log) scale.
+
+>Further I was wondering whether it is possible to include the PI in the forest
+>plot (as the dotted lines around the diamond shaped effect) when I am manually
+>including the adjusted effect in the forest plot with e.g.,
+>sav <- predict(res, newmods = mean(continuous variable))
+>Addpoly(sav$pred, sei=sav$se)
+>
+>Normally one could add it with addpred = TRUE, but this does not work in this
+>specific case.
+
+There is actually an addpoly() method for 'predict.rma' objects now. So you can do:
+
+pred <- predict(res, newmods = mean(dat$ablat))
+addpoly(pred, addpred=TRUE)
+
+For this to work, don't use transf=exp in predict(). If transf=exp was used as part of the call to forest(), then the addpoly() method will automatically use the same transformation automatically.
+
+dat <- dat.bcg
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat,
+              slab=paste0(author, ", ", year))
+
+res <- rma(yi, vi, data=dat)
+forest(res, xlim=c(-6.8,3.8), header=TRUE, top=2, atransf=exp, cex=0.9, addpred=TRUE,
+       at=log(c(1/16, 1/8, 1/4, 1/2, 1, 2, 4, 8)), digits=c(2L,4L), ylim=c(-2,15))
+res <- rma(yi, vi, mods = ~ ablat, data=dat)
+pred <- predict(res, newmods = mean(dat$ablat))
+addpoly(pred, addpred=TRUE)
+
+I need to update the tutorial to show this.
+
+>Thanks in advance and best wishes
+>Lena
+
+From N|e|@@Sten@ @end|ng |rom r@dboudumc@n|  Thu Jul  7 10:54:17 2022
+From: N|e|@@Sten@ @end|ng |rom r@dboudumc@n| (Stens, Niels)
+Date: Thu, 7 Jul 2022 08:54:17 +0000
+Subject: [R-meta] Changing reference level dose-response association
+Message-ID: <A8397F55-C259-476E-8D9F-44527822C5CC@radboudumc.nl>
+
+Dear members of the R Sig Meta-analysis community,
+
+I am currently performing a meta-analysis on the association between step count versus mortality and the incidence of cardiovascular diseases in the general population. For this, I have modelled a non-linear dose response association with cubic splines (see down below for reproducible example). Within the analysis I would ideally change the reference level. For example, current reference levels in the analysis are ~7000 and ~5000 steps/day for mortality and incident CVD respectively, but ideally I want to change this to the same reference level (e.g. 2500 steps/day). I have tried performing this using datadist (from rms package), but this did not change the reference level. How can I achieve this?
+
+set.seed(42)
+library("metafor")
+library("rms")
+
+steps_day = seq(1500, 16000, 500) #number of steps someone takes on a day, ranging from 1500 to 16000, split up per 500 step increment
+lnHR_AC = runif(1, 0, 1.5)*exp(-runif(1,0.01,0.05)*steps_day) + rnorm(30, 0, 0.5) #ln-transformed hazard ratios for all-cause mortality
+SE_AC = rnorm(lnHR_AC, 0.5) #corresponding SE
+lnHR_CVD = runif(1, 0, 1.5)*exp(-runif(1,0.01,0.05)*steps_day) + rnorm(30, 0, 0.5) - 0.25 #ln-transformed hazard ratios for cardiovascular diseases
+SE_CVD = rnorm(lnHR_CVD, 0.6) #corresponding SE
+
+dat = data.frame(steps_day, lnHR_AC, SE_AC, lnHR_CVD, SE_CVD) #make dataframe
+
+#All-cause Mortality
+xs <- seq(1500, 16000, length=30) #range of step counts, per 500 step increment
+knots = quantile(dat$steps_day, p = c(0.05, 0.5, 0.95)) #specify the number and location of knots
+res.rcs_AC <- rma(yi = lnHR_AC, sei = SE_AC, mods = ~rcs(steps_day, knots), data= dat, method = "REML") #create cubic spline object
+
+#change reference level
+#ddist = datadist(dat$steps_day)
+#ddist$limits["Adjust to",2500]
+#options(datadist = "ddist")
+
+layout(matrix(c(1,2),1,2, byrow = TRUE))
+
+plot(dat$steps_day, dat$lnHR_AC, col="white", xlab="Steps per day", ylab="Hazard Ratio", main="Cubic Spline Model for Mortality", ylim = c(0, 2), xlim = c(0, 15000)) #for making empty plot
+
+sav_AC <- predict(res.rcs_AC, newmods=rcspline.eval(xs, knots = knots, inclx=TRUE), transf = exp)
+polygon(c(xs, rev(xs)), c(sav_AC$ci.lb, rev(sav_AC$ci.ub)), col=rgb(0,0,0,.2), border=NA)
+lines(xs, sav_AC$pred, lwd=3)
+
+#CVD
+res.rcs_CVD <- rma(yi = lnHR_CVD, sei = SE_CVD, mods = ~rcs(steps_day, knots), data=dat, method = "REML")
+
+plot(dat$steps_day, dat$lnHR_CVD, col="white", xlab="Steps per day", ylab="Hazard Ratio", main="Cubic Spline Model for CVD", ylim = c(0, 2)) #for making empty plot
+
+sav_CVD <- predict(res.rcs_CVD, newmods=rcspline.eval(xs, knots = knots, inclx=TRUE), transf = exp)
+polygon(c(xs, rev(xs)), c(sav_CVD$ci.lb, rev(sav_CVD$ci.ub)), col=rgb(0,0,0,.2), border=NA)
+lines(xs, sav_CVD$pred, lwd=3)
+
+
+Many thanks in advance.
+
+Kind regards,
+
+Niels Stens, MSc
+PhD candidate, departments of Cardiology and Physiology, Radboud University Medical Center, Nijmegen, The Netherlands
+
+
+De informatie in dit bericht is uitsluitend bestemd voor de geadresseerde. Aan dit bericht en de bijlagen kunnen geen rechten worden ontleend. Heeft u deze e-mail onbedoeld ontvangen? Dan verzoeken wij u het te vernietigen en de afzender te informeren. Openbaar maken, kopi?ren en verspreiden van deze e-mail of informatie uit deze e-mail is alleen toegestaan met voorafgaande schriftelijke toestemming van de afzender. Het Radboudumc staat geregistreerd bij de Kamer van Koophandel in het handelsregister onder nummer 80262783.
+
+The content of this message is intended solely for the addressee. No rights can be derived from this message or its attachments. If you are not the intended recipient, we kindly request you to delete the message and inform the sender. It is strictly prohibited to disclose, copy or distribute this email or the information inside it, without a written consent from the sender. Radboud university medical center is registered with the Dutch Chamber of Commerce trade register with number 80262783.
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul  7 11:05:17 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 7 Jul 2022 09:05:17 +0000
+Subject: [R-meta] Exact confidence intervals meta-analysis estimate
+In-Reply-To: <73B64855-4A96-4EF3-8DA2-CE02527B907C@gmail.com>
+References: <73B64855-4A96-4EF3-8DA2-CE02527B907C@gmail.com>
+Message-ID: <0540ea7c31bb43e298bbe613194ef885@UM-MAIL3214.unimaas.nl>
+
+Hi Stefi,
+
+Depends on what you mean by 'exact' and what kind of model you are using for the analysis. For example, when meta-analyzing a bunch of individual proportions under the assumption of homogeneity, then this is identical to simply adding up all of the event counts in the numerator and the sample sizes in the denominator. Then one can compute a Clopper-Pearson CI based on the aggregated data, which is an 'exact' CI. To illustrate:
+
+#######################################################
+
+dat <- dat.pritz1997
+dat
+
+# vtype="AV" to compute the sampling variances under the assumption of homogeneity
+dat <- escalc(measure="PR", xi=xi, ni=ni, data=dat, add=0, vtype="AV")
+dat
+
+# fit equal-effects model
+rma(yi, vi, data=dat, method="EE")
+
+# aggregate counts / sample sizes
+agg <- escalc(measure="PR", xi=sum(dat$xi), ni=sum(dat$ni))
+summary(agg)
+
+# note that the 'aggregated proportion' and its SE is identical to the one from rma()
+
+# Clopper-Pearson CI
+binom.test(sum(dat$xi), sum(dat$ni))
+
+#######################################################
+
+The Wald-type CI from rma() and the C-P CI are quite similar here, but it certainly could also be rather different. Under homogeneity, using an 'exact' logistic regression model for the analysis will also lead to the same pooled estimate, but the CI (computed on the logit scale and then back-transformed) is again a Wald-type CI which will be different from the two CIs above. To illustrate:
+
+#######################################################
+
+res <- rma.glmm(measure="PLO", xi=xi, ni=ni, data=dat, method="EE")
+predict(res, transf=transf.ilogit)
+
+#######################################################
+
+Once we go to random-effects models, one can still use rma.glmm(), but the CI is still a Wald-type CI. If you then want a CI that has guaranteed coverage of (at least) 95% (like the C-P CI), then I am not even sure such a method exists.
+
+In case you have not seen this, you might also want to take a look at:
+
+https://www.ncbi.nlm.nih.gov/books/NBK179162/
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Stefi Iaquinto
+>Sent: Tuesday, 05 July, 2022 20:22
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Exact confidence intervals meta-analysis estimate
+>
+>Hi everyone,
+>
+>I?m currently running a simulation study with a single proportion as outcome.
+>As I want to use some ?extreme" true proportions (0.95, 0.97 ?), I was wondering,
+>if there is an option with rma.uni() to calculate exact confidence intervals for
+>the overall effect estimate from a meta-analysis (If I?m not mistaken, the
+>default is calculating wald-type confidence intervals)?
+>
+>Thank you!
+>
+>Best,
+>Stefi
+
+From |en@ @end|ng |rom po||erho||@de  Thu Jul  7 14:22:45 2022
+From: |en@ @end|ng |rom po||erho||@de (Lena Pollerhoff)
+Date: Thu, 7 Jul 2022 14:22:45 +0200
+Subject: [R-meta] Adjusted effects p- and z-value
+In-Reply-To: <a4b4d4cb9f744e27a565d10c29c7c607@UM-MAIL3214.unimaas.nl>
+References: <52FDB41C-709D-4126-9BF7-36BBD30CDBD2@pollerhoff.de>
+ <a4b4d4cb9f744e27a565d10c29c7c607@UM-MAIL3214.unimaas.nl>
+Message-ID: <999E2761-6D8A-4CCB-9918-7FF84812B124@pollerhoff.de>
+
+Dear Wolfgang,
+
+Thank you so much for your quick response! 
+
+I assume it is also possible to calculate the p- and z-values with the anova function for the mean of a dummy variable in case of a categorical predictor, e.g. anova(res,X=c(1,colMeans(model.matrix(categorical_moderator))[-1])) ? 
+
+Further what would the best way to cite your online tutorials like the one for the adjusted effects? 
+
+Best wishes 
+Lena 
+
+> Am 07.07.2022 um 10:14 schrieb Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>:
+> 
+> Hi Lena,
+> 
+> See below for my responses.
+> 
+> Best,
+> Wolfgang
+> 
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>> Behalf Of Lena Pollerhoff
+>> Sent: Thursday, 07 July, 2022 8:01
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Adjusted effects p- and z-value
+>> 
+>> Hey everyone,
+>> 
+>> I?m currently computing adjusted effects based on meta-regression models (based
+>> on this tutorial https://www.metafor-
+>> project.org/doku.php/tips:computing_adjusted_effects <https://www.metafor-
+>> project.org/doku.php/tips:computing_adjusted_effects>).
+>> When I am computing the effect with predict(res, newmods = mean(continuous
+>> variable)) I receive the estimated average effect size (pred), the CI and PI.
+>> Now I was wondering whether it would be also possible to receive the p-value and
+>> z-value for the adjusted effect (similar to the output of a random-effect model)?
+> 
+> You can use anova() for this. Using the same example from the tutorial:
+> 
+> predict(res, newmods = mean(dat$ablat), transf=exp, digits=2)
+> 
+> anova(res, X = c(1,mean(dat$ablat)))
+> 
+> In contrast to predict() (where the 'intercept' argument controls whether the intercept is included in the linear contrast), with anova() this is done as part of X. Also, there is no 'transf' argument for anova(), but this is not relevant anyway, since the testing is done on the original (in this case, log) scale.
+> 
+>> Further I was wondering whether it is possible to include the PI in the forest
+>> plot (as the dotted lines around the diamond shaped effect) when I am manually
+>> including the adjusted effect in the forest plot with e.g.,
+>> sav <- predict(res, newmods = mean(continuous variable))
+>> Addpoly(sav$pred, sei=sav$se)
+>> 
+>> Normally one could add it with addpred = TRUE, but this does not work in this
+>> specific case.
+> 
+> There is actually an addpoly() method for 'predict.rma' objects now. So you can do:
+> 
+> pred <- predict(res, newmods = mean(dat$ablat))
+> addpoly(pred, addpred=TRUE)
+> 
+> For this to work, don't use transf=exp in predict(). If transf=exp was used as part of the call to forest(), then the addpoly() method will automatically use the same transformation automatically.
+> 
+> dat <- dat.bcg
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat,
+>              slab=paste0(author, ", ", year))
+> 
+> res <- rma(yi, vi, data=dat)
+> forest(res, xlim=c(-6.8,3.8), header=TRUE, top=2, atransf=exp, cex=0.9, addpred=TRUE,
+>       at=log(c(1/16, 1/8, 1/4, 1/2, 1, 2, 4, 8)), digits=c(2L,4L), ylim=c(-2,15))
+> res <- rma(yi, vi, mods = ~ ablat, data=dat)
+> pred <- predict(res, newmods = mean(dat$ablat))
+> addpoly(pred, addpred=TRUE)
+> 
+> I need to update the tutorial to show this.
+> 
+>> Thanks in advance and best wishes
+>> Lena
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul  7 17:09:59 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 7 Jul 2022 15:09:59 +0000
+Subject: [R-meta] Adjusted effects p- and z-value
+In-Reply-To: <999E2761-6D8A-4CCB-9918-7FF84812B124@pollerhoff.de>
+References: <52FDB41C-709D-4126-9BF7-36BBD30CDBD2@pollerhoff.de>
+ <a4b4d4cb9f744e27a565d10c29c7c607@UM-MAIL3214.unimaas.nl>
+ <999E2761-6D8A-4CCB-9918-7FF84812B124@pollerhoff.de>
+Message-ID: <d319bd5dece940f986bb9dd1cd22287b@UM-MAIL3214.unimaas.nl>
+
+Yes, this also works for this case. Note that model.matrix() already includes the intercept column, so there is no need to remove it (with [-1]) and then manually add it back. So this should work:
+
+anova(res, X=colMeans(model.matrix(categorical_moderator)))
+
+(since the mean of the columns of 1s is just 1).
+
+As for citing things from the metafor website - just follow whatever the rules are for the citation format you need to use. For example, with APA style, I think it would be:
+
+Viechtbauer, W. (2022, April 22). Computing Adjusted Effects Based on Meta-Regression Models. The metafor Package: A Meta-Analysis Package for R. https://www.metafor-project.org/doku.php/tips:computing_adjusted_effects
+
+The date is the one shown at the bottom (Last modified: 2022/04/22). No idea what part needs to be in italics here (the webpage title or the website title), if any.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Lena Pollerhoff [mailto:lena at pollerhoff.de]
+>Sent: Thursday, 07 July, 2022 14:23
+>To: Viechtbauer, Wolfgang (NP)
+>Cc: r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] Adjusted effects p- and z-value
+>
+>Dear Wolfgang,
+>
+>Thank you so much for your quick response!
+>
+>I assume it is also possible to calculate the p- and z-values with the anova
+>function for the mean of a dummy variable in case of a categorical predictor,
+>e.g. anova(res,X=c(1,colMeans(model.matrix(categorical_moderator))[-1])) ?
+>
+>Further what would the best way to cite your online tutorials like the one for
+>the adjusted effects?
+>
+>Best wishes
+>Lena
+>
+>> Am 07.07.2022 um 10:14 schrieb Viechtbauer, Wolfgang (NP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl>:
+>>
+>> Hi Lena,
+>>
+>> See below for my responses.
+>>
+>> Best,
+>> Wolfgang
+>>
+>>> -----Original Message-----
+>>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On
+>>> Behalf Of Lena Pollerhoff
+>>> Sent: Thursday, 07 July, 2022 8:01
+>>> To: r-sig-meta-analysis at r-project.org
+>>> Subject: [R-meta] Adjusted effects p- and z-value
+>>>
+>>> Hey everyone,
+>>>
+>>> I?m currently computing adjusted effects based on meta-regression models
+>(based
+>>> on this tutorial https://www.metafor-
+>>> project.org/doku.php/tips:computing_adjusted_effects <https://www.metafor-
+>>> project.org/doku.php/tips:computing_adjusted_effects>).
+>>> When I am computing the effect with predict(res, newmods = mean(continuous
+>>> variable)) I receive the estimated average effect size (pred), the CI and PI.
+>>> Now I was wondering whether it would be also possible to receive the p-value
+>and
+>>> z-value for the adjusted effect (similar to the output of a random-effect
+>model)?
+>>
+>> You can use anova() for this. Using the same example from the tutorial:
+>>
+>> predict(res, newmods = mean(dat$ablat), transf=exp, digits=2)
+>>
+>> anova(res, X = c(1,mean(dat$ablat)))
+>>
+>> In contrast to predict() (where the 'intercept' argument controls whether the
+>intercept is included in the linear contrast), with anova() this is done as part
+>of X. Also, there is no 'transf' argument for anova(), but this is not relevant
+>anyway, since the testing is done on the original (in this case, log) scale.
+>>
+>>> Further I was wondering whether it is possible to include the PI in the forest
+>>> plot (as the dotted lines around the diamond shaped effect) when I am manually
+>>> including the adjusted effect in the forest plot with e.g.,
+>>> sav <- predict(res, newmods = mean(continuous variable))
+>>> Addpoly(sav$pred, sei=sav$se)
+>>>
+>>> Normally one could add it with addpred = TRUE, but this does not work in this
+>>> specific case.
+>>
+>> There is actually an addpoly() method for 'predict.rma' objects now. So you can
+>do:
+>>
+>> pred <- predict(res, newmods = mean(dat$ablat))
+>> addpoly(pred, addpred=TRUE)
+>>
+>> For this to work, don't use transf=exp in predict(). If transf=exp was used as
+>part of the call to forest(), then the addpoly() method will automatically use
+>the same transformation automatically.
+>>
+>> dat <- dat.bcg
+>> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat,
+>>              slab=paste0(author, ", ", year))
+>>
+>> res <- rma(yi, vi, data=dat)
+>> forest(res, xlim=c(-6.8,3.8), header=TRUE, top=2, atransf=exp, cex=0.9,
+>addpred=TRUE,
+>>       at=log(c(1/16, 1/8, 1/4, 1/2, 1, 2, 4, 8)), digits=c(2L,4L), ylim=c(-
+>2,15))
+>> res <- rma(yi, vi, mods = ~ ablat, data=dat)
+>> pred <- predict(res, newmods = mean(dat$ablat))
+>> addpoly(pred, addpred=TRUE)
+>>
+>> I need to update the tutorial to show this.
+>>
+>>> Thanks in advance and best wishes
+>>> Lena
+
+From th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com  Fri Jul  8 13:29:10 2022
+From: th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com (Tharaka S. Priyadarshana)
+Date: Fri, 8 Jul 2022 19:29:10 +0800
+Subject: [R-meta] Use of raw proportion as the outcome measure for
+ individual group meta analysis
+Message-ID: <CADWK9cctnXbancrs7MNdh9vBxzDLaaqtQ4kTpQ_tfTpdieOjNA@mail.gmail.com>
+
+Dear all,
+
+I am following this individual group meta-analysis example in "matadat",
+https://wviechtb.github.io/metadat/reference/dat.pritz1997.html
+Here when the raw proportion is used as the outcome measure, why is the
+upper bound of the prediction interval exceeding 1? which means more than a
+100% success?? if yes! it does not make sense to me. Could someone please
+clarify how should I interpret the prediction interval in this example?
+
+Thank you,
+Tharaka
+
+### random-effects model with raw proportionsdat <- escalc
+<https://wviechtb.github.io/metafor/reference/escalc.html>(measure="PR",
+xi=xi, ni=ni, data=dat)res <- rma
+<https://wviechtb.github.io/metafor/reference/rma.uni.html>(yi, vi,
+data=dat)predict
+<https://wviechtb.github.io/metafor/reference/predict.rma.html>(res)#>
+#>    pred     se  ci.lb  ci.ub  pi.lb  pi.ub #>  0.7968 0.0423 0.7138
+0.8797 0.5306 1.0629
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Jul  8 14:36:50 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 8 Jul 2022 12:36:50 +0000
+Subject: [R-meta] Use of raw proportion as the outcome measure for
+ individual group meta analysis
+In-Reply-To: <CADWK9cctnXbancrs7MNdh9vBxzDLaaqtQ4kTpQ_tfTpdieOjNA@mail.gmail.com>
+References: <CADWK9cctnXbancrs7MNdh9vBxzDLaaqtQ4kTpQ_tfTpdieOjNA@mail.gmail.com>
+Message-ID: <152626d6cbcf47d8898857f56045b889@UM-MAIL3214.unimaas.nl>
+
+Dear Tharaka,
+
+When meta-analyzing raw proportions, this can indeed happen. It simply means that the upper bound of the prediction interval is 1. When working with the logit transformed proportions, this cannot happen (after the back-transformation).
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Tharaka S. Priyadarshana
+>Sent: Friday, 08 July, 2022 13:29
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Use of raw proportion as the outcome measure for individual
+>group meta analysis
+>
+>Dear all,
+>
+>I am following this individual group meta-analysis example in "matadat",
+>https://wviechtb.github.io/metadat/reference/dat.pritz1997.html
+>Here when the raw proportion is used as the outcome measure, why is the
+>upper bound of the prediction interval exceeding 1? which means more than a
+>100% success?? if yes! it does not make sense to me. Could someone please
+>clarify how should I interpret the prediction interval in this example?
+>
+>Thank you,
+>Tharaka
+>
+>### random-effects model with raw proportionsdat <- escalc
+><https://wviechtb.github.io/metafor/reference/escalc.html>(measure="PR",
+>xi=xi, ni=ni, data=dat)res <- rma
+><https://wviechtb.github.io/metafor/reference/rma.uni.html>(yi, vi,
+>data=dat)predict
+><https://wviechtb.github.io/metafor/reference/predict.rma.html>(res)#>
+>#>    pred     se  ci.lb  ci.ub  pi.lb  pi.ub #>  0.7968 0.0423 0.7138
+>0.8797 0.5306 1.0629
+
+
+From yh342 @end|ng |rom n@u@edu  Wed Jul 13 03:01:31 2022
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Tue, 12 Jul 2022 18:01:31 -0700
+Subject: [R-meta] metafor::rcalc() vcalc() for correlated Pearson rs
+Message-ID: <CA+dzWjrTmNPxfmO4sfNi3mAWZJX0iNiaziaxq7MMq7NsE-aEvQ@mail.gmail.com>
+
+Hello Everyone,
+
+I'm meta-analyzing the correlation (Pearson r) between extroversion (ext)
+and achievement in math, reading, and arts.
+
+My data looks like what is shown below. I wonder whether --rcalc()-- is a
+suitable option for building a var-covariance matrix for Pearson r
+coefficients in each study OR --vcalc()-- is a more suitable option?
+
+ps. It seems --rcalc()-- requires var1 and var2 in each row to be distinct
+in each study which makes me think var1 and var2 must be ID variables.
+
+Thank you for your time in advance.
+
+Sincerely,
+Yuhang
+
+study ri var1   var2   scale  outcome  ni  sample_id
+1      .1  ext    math   epq    math     50  1
+1      .2  ext    math   epq    read     50  1
+1      .3  ext    math   epq    art      50  1
+2      .4  ext    math   pf     math     35  1
+3      .5  ext    read   pf     read     80  1
+3      .6  ext    math   pf     math     64  2
+
+	[[alternative HTML version deleted]]
+
+
+From yh342 @end|ng |rom n@u@edu  Wed Jul 13 06:40:01 2022
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Tue, 12 Jul 2022 21:40:01 -0700
+Subject: [R-meta] rcalc() or vcalc() for correlated Pearson rs in metafor
+Message-ID: <CA+dzWjoHKg=MNmpqLr4ONBX+JAH52X2Ni77H9fn_0ZLVXyLKdA@mail.gmail.com>
+
+Hello Everyone,
+
+I'm meta-analyzing the correlation (Pearson r) between extroversion (ext)
+and achievement in math, reading, and arts.
+
+My data looks like what is shown below. I wonder whether "rcalc()" is a
+suitable option for building a var-covariance matrix for Pearson r
+coefficients in each study OR "vcalc()" is a more suitable option?
+
+ps. It seems "rcalc()" requires var1 and var2 in each row to be distinct in
+each study which makes me think "rcalc()" may not be suitable for cases
+where there are multiple time points or samples etc.
+
+study ri var1   var2   scale  outcome  ni  sample_id
+1      .1  ext    math   epq    math        50  1
+1      .2  ext    math   epq    read         50  1
+1      .3  ext    art       epq    art            50  1
+2      .4  ext    math   pf       math        35  1
+3      .5  ext    read    pf       read         80  1
+3      .6  ext    math   pf       math        64   2
+
+Thank you for your time in advance.
+
+Sincerely,
+
+Yuhang Hu
+Ph.D. Student
+Northern Arizona University
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Jul 18 10:57:49 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 18 Jul 2022 08:57:49 +0000
+Subject: [R-meta] Query lost on the mailing list
+In-Reply-To: <CA+dzWjqKewzNbP_nc43baajcqBgeNZUZpixzJ8BWCD3xfgR_6w@mail.gmail.com>
+References: <CA+dzWjqKewzNbP_nc43baajcqBgeNZUZpixzJ8BWCD3xfgR_6w@mail.gmail.com>
+Message-ID: <fc6e7a00988c49ea9e1bde0177cb0e3f@UM-MAIL3214.unimaas.nl>
+
+Hi Yuhang,
+
+One can also use rcalc() for more complex situations with multiple time points (multiple samples aren't an issue, since they are independent, so one can just combine a study ID with a sample ID for the purposes of using rcalc()). But if the same sample is measured multiple times on some variable of interest, then one just needs to reflect this as distinct 'var1' (or 'var2') values. For example:
+
+study time var1 var2
+1     1    x1   y1
+1     2    x2   y2
+
+dat <- read.table(header=TRUE, text = "
+study time var1 var2 ri ni
+1     1    x1   y1   0.4 60
+1     2    x2   y2   0.5 60")
+
+tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat)
+tmp$V
+
+However, in order to compute the covariance between r(x1,y1) and r(x2,y2), one also needs r(x1,x2), r(y1,y2), r(x1,y2), and r(y1,x2). For example:
+
+dat <- read.table(header=TRUE, text = "
+study time var1 var2 ri ni
+1     1    x1   y1   0.4 60
+1     2    x2   y2   0.5 60
+1     12   x1   x2   0.7 60
+1     12   y1   y2   0.8 60
+1     12   x1   y2   0.3 60
+1     12   y1   x2   0.2 60")
+
+tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat)
+tmp$V
+
+In the end, one might only keep the first two rows from that study (and the first two rows and columns from tmp$V), but the computation of the covariance requires the info from the full 4x4 correlation matrix (i.e., all 6 correlations).
+
+It isn't entirely clear to me why there are two rows with var1=ext and var2=math in the two studies you are showing, so I cannot comment on this specific case further.
+
+Best,
+Wolfgang
+
+>Date: Tue, 12 Jul 2022 21:40:01 -0700
+>From: Yuhang Hu <yh342 at nau.edu>
+>To:?r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] rcalc() or vcalc() for correlated Pearson rs in
+>
+>Hello Everyone,
+>
+>I'm meta-analyzing the correlation (Pearson r) between extroversion (ext)
+>and achievement in math, reading, and arts.
+>
+>My data looks like what is shown below. I wonder whether "rcalc()" is a
+>suitable option for building a var-covariance matrix for Pearson r
+>coefficients in each study OR "vcalc()" is a more suitable option?
+>
+>ps. It seems "rcalc()" requires var1 and var2 in each row to be distinct in
+>each study which makes me think "rcalc()" may not be suitable for cases
+>where there are multiple time points or samples etc.
+>
+>study  ri  var1? ? var2? ?scale? outcome? ni? sample_id
+>1? ? ? .1?  ext? ? math? ?epq? ? math? ? ?50? 1
+>1? ? ? .2?  ext? ? math? ?epq? ? read? ? ?50? 1
+>1? ? ? .3?  ext? ? art? ? epq? ? art? ? ? 50? 1
+>2? ? ? .4?  ext? ? math? ?pf? ? ?math? ? ?35? 1
+>3? ? ? .5?  ext? ? read? ?pf? ? ?read? ? ?80? 1
+>3? ? ? .6?  ext? ? math? ?pf? ? ?math? ? ?64? 2
+>
+>Thank you for your time in advance.
+>
+>Sincerely,
+>
+>Yuhang Hu
+>Ph.D. Student
+>Northern Arizona University
+
+From j@v@|deben|to@ch @end|ng |rom gm@||@com  Thu Jul 21 16:42:45 2022
+From: j@v@|deben|to@ch @end|ng |rom gm@||@com (Jose Valdebenito)
+Date: Thu, 21 Jul 2022 10:42:45 -0400
+Subject: [R-meta] min sample size for three random variables in meta-analysis
+Message-ID: <CAHnsTv-PzTj6U6UCxUipQdpyY0RaySruGt6Z67gGA5q0FU68Kw@mail.gmail.com>
+
+Hi,
+
+I am conducting a (multi-level) meta-analysis with some sample sizes that
+are a bit small.
+
+I was wondering if there is a kind of rule of thumb regarding minimum
+sample size number, and the maximum number of random variables I can add to
+the models.
+
+I would like to add 3 (as suggested in Cinar et al. Methods Ecol Evol.
+2022;13:383?95), but I am afraid that might incur in overparameterization
+if I have, say k=10?
+
+These are the random variables:
+-Phylogenetic relatedness
+-Study ID
+-Species ID
+
+Also, would it be any different in a meta-regression?
+
+Here I paste the model and dataset so you can see:
+
+m2 <- rma.mv(L_d, L_v,
+                        data = df,
+                         random = list(~1|species_2,
+                                               ~1|study.ID,
+                                               ~1|spp),
+                          R = list(species_2 = vcv), digits = 3)
+
+
+> head(df, 10)
+species_2                                 spp
+           study.ID         L_d         L_v
+Grus_americana                       Grus_americana
+p.b.4             0.000       0.135
+Loxia_leucoptera                      Loxia_leucoptera
+p.b.15          1.057        0.068
+Centrocercus_urophasianus    Centrocercus_urophasianus   p.b.60
+0.384        0.021
+Pica_nuttalli                              Pica_nuttalli
+        p.b.8            -2.042      0.037
+Acrocephalus_paludicola          Acrocephalus_paludicola       17
+    0.000      0.068
+Acrocephalus_paludicola          Acrocephalus_paludicola       17
+      -4.978      0.334
+Lepidothrix_coronata                Lepidothrix_coronata              20
+             -2.043     0.088
+Erithacus_rubecula                   Erithacus_rubecula                35
+              -1.723      0.401
+Fringilla_coelebs                       Fringilla_coelebs
+ 35                 -2.697      0.111
+Parus_caeruleus                       Parus_caeruleus                    35
+               4.862      0.559
+
+
+Thanks in advance,
+Joe
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Fri Jul 22 14:19:56 2022
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Fri, 22 Jul 2022 13:19:56 +0100
+Subject: [R-meta] min sample size for three random variables in
+ meta-analysis
+In-Reply-To: <CAHnsTv-PzTj6U6UCxUipQdpyY0RaySruGt6Z67gGA5q0FU68Kw@mail.gmail.com>
+References: <CAHnsTv-PzTj6U6UCxUipQdpyY0RaySruGt6Z67gGA5q0FU68Kw@mail.gmail.com>
+Message-ID: <5a40c6a1-bced-3df1-9964-0afc9228cb52@dewey.myzen.co.uk>
+
+Dear Jose
+
+Unfortunately this is a plain text list and your post in HTML has got 
+scrambled so as to be almost unreadable.
+
+Just to clarify, when you say small sample size do you mean a small 
+number of primary studies or that individual studies were based on small 
+numbers? Is k the number of primary studies?
+
+Michael
+
+On 21/07/2022 15:42, Jose Valdebenito wrote:
+> Hi,
+> 
+> I am conducting a (multi-level) meta-analysis with some sample sizes that
+> are a bit small.
+> 
+> I was wondering if there is a kind of rule of thumb regarding minimum
+> sample size number, and the maximum number of random variables I can add to
+> the models.
+> 
+> I would like to add 3 (as suggested in Cinar et al. Methods Ecol Evol.
+> 2022;13:383?95), but I am afraid that might incur in overparameterization
+> if I have, say k=10?
+> 
+> These are the random variables:
+> -Phylogenetic relatedness
+> -Study ID
+> -Species ID
+> 
+> Also, would it be any different in a meta-regression?
+> 
+> Here I paste the model and dataset so you can see:
+> 
+> m2 <- rma.mv(L_d, L_v,
+>                          data = df,
+>                           random = list(~1|species_2,
+>                                                 ~1|study.ID,
+>                                                 ~1|spp),
+>                            R = list(species_2 = vcv), digits = 3)
+> 
+> 
+>> head(df, 10)
+> species_2                                 spp
+>             study.ID         L_d         L_v
+> Grus_americana                       Grus_americana
+> p.b.4             0.000       0.135
+> Loxia_leucoptera                      Loxia_leucoptera
+> p.b.15          1.057        0.068
+> Centrocercus_urophasianus    Centrocercus_urophasianus   p.b.60
+> 0.384        0.021
+> Pica_nuttalli                              Pica_nuttalli
+>          p.b.8            -2.042      0.037
+> Acrocephalus_paludicola          Acrocephalus_paludicola       17
+>      0.000      0.068
+> Acrocephalus_paludicola          Acrocephalus_paludicola       17
+>        -4.978      0.334
+> Lepidothrix_coronata                Lepidothrix_coronata              20
+>               -2.043     0.088
+> Erithacus_rubecula                   Erithacus_rubecula                35
+>                -1.723      0.401
+> Fringilla_coelebs                       Fringilla_coelebs
+>   35                 -2.697      0.111
+> Parus_caeruleus                       Parus_caeruleus                    35
+>                 4.862      0.559
+> 
+> 
+> Thanks in advance,
+> Joe
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From j@v@|deben|to@ch @end|ng |rom gm@||@com  Fri Jul 22 16:50:01 2022
+From: j@v@|deben|to@ch @end|ng |rom gm@||@com (Jose Valdebenito)
+Date: Fri, 22 Jul 2022 10:50:01 -0400
+Subject: [R-meta] min sample size for three random variables in
+ meta-analysis
+In-Reply-To: <5a40c6a1-bced-3df1-9964-0afc9228cb52@dewey.myzen.co.uk>
+References: <CAHnsTv-PzTj6U6UCxUipQdpyY0RaySruGt6Z67gGA5q0FU68Kw@mail.gmail.com>
+ <5a40c6a1-bced-3df1-9964-0afc9228cb52@dewey.myzen.co.uk>
+Message-ID: <CAHnsTv9Mx0nwCS=7nOFTWMaLiSt1hAmtuiHBnkqaX7iUsQ1Z-g@mail.gmail.com>
+
+Dear Michael,
+Thanks for your reply. By sample size I mean small number of primary
+studies. k means number of effect sizes.
+In the example below there were 10 effect sizes, 7 studies, 9 species
+ID, and 9 species associated with a vcv value.
+
+> head(df, 10)
+species_2 | spp | study.ID | L_d | L_v
+Grus_americana | Grus_americana | p.b.4 | 0.000 | 0.135
+Loxia_leucoptera | Loxia_leucoptera | p.b.15 | 1.057 | 0.068
+Centrocercus_urophasianus | Centrocercus_urophasianus | p.b.60 | 0.384 | 0.021
+Pica_nuttalli | Pica_nuttalli | p.b.8 | -2.042 | 0.037
+Acrocephalus_paludicola | Acrocephalus_paludicola | 17 | 0.000 | 0.068
+Acrocephalus_paludicola | Acrocephalus_paludicola | 17 | -4.978 | 0.334
+Lepidothrix_coronata | Lepidothrix_coronata | 20 | -2.043 | 0.088
+Erithacus_rubecula | Erithacus_rubecula | 35 | -1.723 | 0.401
+Fringilla_coelebs | Fringilla_coelebs | 35 | -2.697 | 0.111
+Parus_caeruleus | Parus_caeruleus | 35 | 4.862 | 0.559
+
+Thanks,
+Jose
+On Fri, 22 Jul 2022 at 08:19, Michael Dewey <lists at dewey.myzen.co.uk> wrote:
+>
+> Dear Jose
+>
+> Unfortunately this is a plain text list and your post in HTML has got
+> scrambled so as to be almost unreadable.
+>
+> Just to clarify, when you say small sample size do you mean a small
+> number of primary studies or that individual studies were based on small
+> numbers? Is k the number of primary studies?
+>
+> Michael
+>
+> On 21/07/2022 15:42, Jose Valdebenito wrote:
+> > Hi,
+> >
+> > I am conducting a (multi-level) meta-analysis with some sample sizes that
+> > are a bit small.
+> >
+> > I was wondering if there is a kind of rule of thumb regarding minimum
+> > sample size number, and the maximum number of random variables I can add to
+> > the models.
+> >
+> > I would like to add 3 (as suggested in Cinar et al. Methods Ecol Evol.
+> > 2022;13:383?95), but I am afraid that might incur in overparameterization
+> > if I have, say k=10?
+> >
+> > These are the random variables:
+> > -Phylogenetic relatedness
+> > -Study ID
+> > -Species ID
+> >
+> > Also, would it be any different in a meta-regression?
+> >
+> > Here I paste the model and dataset so you can see:
+> >
+> > m2 <- rma.mv(L_d, L_v,
+> >                          data = df,
+> >                           random = list(~1|species_2,
+> >                                                 ~1|study.ID,
+> >                                                 ~1|spp),
+> >                            R = list(species_2 = vcv), digits = 3)
+> >
+> >
+> >> head(df, 10)
+> > species_2                                 spp
+> >             study.ID         L_d         L_v
+> > Grus_americana                       Grus_americana
+> > p.b.4             0.000       0.135
+> > Loxia_leucoptera                      Loxia_leucoptera
+> > p.b.15          1.057        0.068
+> > Centrocercus_urophasianus    Centrocercus_urophasianus   p.b.60
+> > 0.384        0.021
+> > Pica_nuttalli                              Pica_nuttalli
+> >          p.b.8            -2.042      0.037
+> > Acrocephalus_paludicola          Acrocephalus_paludicola       17
+> >      0.000      0.068
+> > Acrocephalus_paludicola          Acrocephalus_paludicola       17
+> >        -4.978      0.334
+> > Lepidothrix_coronata                Lepidothrix_coronata              20
+> >               -2.043     0.088
+> > Erithacus_rubecula                   Erithacus_rubecula                35
+> >                -1.723      0.401
+> > Fringilla_coelebs                       Fringilla_coelebs
+> >   35                 -2.697      0.111
+> > Parus_caeruleus                       Parus_caeruleus                    35
+> >                 4.862      0.559
+> >
+> >
+> > Thanks in advance,
+> > Joe
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+
+
+From wuhu@ng0421 @end|ng |rom gm@||@com  Wed Jul 27 05:39:14 2022
+From: wuhu@ng0421 @end|ng |rom gm@||@com (Huang)
+Date: Tue, 26 Jul 2022 23:39:14 -0400
+Subject: [R-meta] confidence interval very large
+Message-ID: <CABXv9AEHQ-Jzw2AiKPXVh1hyL86bJWwV8-Df-jsC+a1WaUGt2Q@mail.gmail.com>
+
+Hi folks,
+
+I am using conf_int to calculate the confidence interval but the results
+showed the confidence interval are very large. For example, I have a mean
+estimate 0.1655 with a SE of 0.3014 (df = 1), but the 95% confidence
+interval is [-3.659, 3.990]. Is this correct? Should I report the model
+based confidence interval instead of RVE based? Thank you so much for
+taking time to respond to my email.
+
+Best wishes,
+HUang
+
+
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Wed Jul 27 10:14:10 2022
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Wed, 27 Jul 2022 10:14:10 +0200
+Subject: [R-meta] confidence interval very large
+In-Reply-To: <CABXv9AEHQ-Jzw2AiKPXVh1hyL86bJWwV8-Df-jsC+a1WaUGt2Q@mail.gmail.com>
+References: <CABXv9AEHQ-Jzw2AiKPXVh1hyL86bJWwV8-Df-jsC+a1WaUGt2Q@mail.gmail.com>
+Message-ID: <063797d2-3023-2a6a-5cb6-ce3fd7111556@imbi.uni-freiburg.de>
+
+Am 27.07.22 um 05:39 schrieb Huang:
+
+> Hi folks,
+>
+> I am using conf_int to calculate the confidence interval but the results
+> showed the confidence interval are very large. For example, I have a mean
+> estimate 0.1655 with a SE of 0.3014 (df = 1), but the 95% confidence
+> interval is [-3.659, 3.990]. Is this correct? [...]
+
+Looks like it is. I get similar values calculating the CI using base R:
+
+0.1655 + c(-1, 1) * 0.3014 * qt(0.975, df = 1)
+
+Best,
+
+Guido
+
+
+From jepu@to @end|ng |rom gm@||@com  Wed Jul 27 17:50:48 2022
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 27 Jul 2022 10:50:48 -0500
+Subject: [R-meta] confidence interval very large
+In-Reply-To: <CABXv9AEHQ-Jzw2AiKPXVh1hyL86bJWwV8-Df-jsC+a1WaUGt2Q@mail.gmail.com>
+References: <CABXv9AEHQ-Jzw2AiKPXVh1hyL86bJWwV8-Df-jsC+a1WaUGt2Q@mail.gmail.com>
+Message-ID: <CAFUVuJyOEicN5utwYsMt1FmkfjHqKGrUT_t0NSokyM508jUs=g@mail.gmail.com>
+
+Hi Huang,
+
+The wide confidence interval is due to having only one degree of freedom (a
+t distribution with 1 degree of freedom is equivalent to the dreaded,
+ill-behaved Cauchy distribution). I would not trust confidence intervals
+based on so few degrees of freedom. Tipton (2015 Psych Methods) suggests
+disregarding results based on RVE if df < 4.
+
+Generally, low degrees of freedom means that there is very little
+information available to estimate standard errors--i.e., the SEs will be
+very noisy. This can happen, for instance, if you are comparing two
+different categories of effect sizes and one of the categories only appears
+in two studies.
+
+You could, in these instances, report the model-based confidence interval,
+but in doing so you're relying on all of the additional assumptions of the
+model (such as homoskedasticity of random effects, correctness of
+correlations between sampling errors). So you would need to be clear about
+these caveats. You might consider also reporting sensitivity analyses under
+some range of plausible alternative assumptions.
+
+James
+
+On Tue, Jul 26, 2022 at 10:39 PM Huang <wuhuang0421 at gmail.com> wrote:
+
+> Hi folks,
+>
+> I am using conf_int to calculate the confidence interval but the results
+> showed the confidence interval are very large. For example, I have a mean
+> estimate 0.1655 with a SE of 0.3014 (df = 1), but the 95% confidence
+> interval is [-3.659, 3.990]. Is this correct? Should I report the model
+> based confidence interval instead of RVE based? Thank you so much for
+> taking time to respond to my email.
+>
+> Best wishes,
+> HUang
+>
+>
+> >
+> >
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wuhu@ng0421 @end|ng |rom gm@||@com  Wed Jul 27 22:40:59 2022
+From: wuhu@ng0421 @end|ng |rom gm@||@com (Huang)
+Date: Wed, 27 Jul 2022 16:40:59 -0400
+Subject: [R-meta] confidence interval very large
+In-Reply-To: <CAFUVuJyOEicN5utwYsMt1FmkfjHqKGrUT_t0NSokyM508jUs=g@mail.gmail.com>
+References: <CABXv9AEHQ-Jzw2AiKPXVh1hyL86bJWwV8-Df-jsC+a1WaUGt2Q@mail.gmail.com>
+ <CAFUVuJyOEicN5utwYsMt1FmkfjHqKGrUT_t0NSokyM508jUs=g@mail.gmail.com>
+Message-ID: <CABXv9AGjhVHzxk+NcyLqfn1oh-R31zfDs=95P3BO+V0JLb4vAw@mail.gmail.com>
+
+Thanks so much for your responses. Dr.Pustejovsky, besides confidence
+interval, are other results (e.g., robust SE and t-tests & F-tests
+trustable) when df < 4? I appreciate your help.
+
+Best wishes,
+Huang
+
+On Wed, Jul 27, 2022 at 11:51 AM James Pustejovsky <jepusto at gmail.com>
+wrote:
+
+> Hi Huang,
+>
+> The wide confidence interval is due to having only one degree of freedom
+> (a t distribution with 1 degree of freedom is equivalent to the dreaded,
+> ill-behaved Cauchy distribution). I would not trust confidence intervals
+> based on so few degrees of freedom. Tipton (2015 Psych Methods) suggests
+> disregarding results based on RVE if df < 4.
+>
+> Generally, low degrees of freedom means that there is very little
+> information available to estimate standard errors--i.e., the SEs will be
+> very noisy. This can happen, for instance, if you are comparing two
+> different categories of effect sizes and one of the categories only appears
+> in two studies.
+>
+> You could, in these instances, report the model-based confidence interval,
+> but in doing so you're relying on all of the additional assumptions of the
+> model (such as homoskedasticity of random effects, correctness of
+> correlations between sampling errors). So you would need to be clear about
+> these caveats. You might consider also reporting sensitivity analyses under
+> some range of plausible alternative assumptions.
+>
+> James
+>
+> On Tue, Jul 26, 2022 at 10:39 PM Huang <wuhuang0421 at gmail.com> wrote:
+>
+>> Hi folks,
+>>
+>> I am using conf_int to calculate the confidence interval but the results
+>> showed the confidence interval are very large. For example, I have a mean
+>> estimate 0.1655 with a SE of 0.3014 (df = 1), but the 95% confidence
+>> interval is [-3.659, 3.990]. Is this correct? Should I report the model
+>> based confidence interval instead of RVE based? Thank you so much for
+>> taking time to respond to my email.
+>>
+>> Best wishes,
+>> HUang
+>>
+>>
+>> >
+>> >
+>>
+>>         [[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>> To manage your subscription to this mailing list, go to:
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Wed Jul 27 23:02:19 2022
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 27 Jul 2022 16:02:19 -0500
+Subject: [R-meta] confidence interval very large
+In-Reply-To: <CABXv9AGjhVHzxk+NcyLqfn1oh-R31zfDs=95P3BO+V0JLb4vAw@mail.gmail.com>
+References: <CABXv9AEHQ-Jzw2AiKPXVh1hyL86bJWwV8-Df-jsC+a1WaUGt2Q@mail.gmail.com>
+ <CAFUVuJyOEicN5utwYsMt1FmkfjHqKGrUT_t0NSokyM508jUs=g@mail.gmail.com>
+ <CABXv9AGjhVHzxk+NcyLqfn1oh-R31zfDs=95P3BO+V0JLb4vAw@mail.gmail.com>
+Message-ID: <CAFUVuJxBhKYvRVJ15FuEBOPYkfadyijUgzcXCO5WG7R9AU1c6g@mail.gmail.com>
+
+That's a good question. No, the same concerns apply to CIs and to SEs and
+t-statistics.
+
+For F-statistics our research (Tipton & Pustejovsky, 2015 in JEBS) found
+that F-tests tend to be conservative, with lower-than-nominal Type-I error,
+when df are very low. So they're not necessarily problematic in terms of
+Type I error control, but they do tend to have very low power so still
+wouldn't put much stock in them.
+
+On Wed, Jul 27, 2022 at 3:41 PM Huang <wuhuang0421 at gmail.com> wrote:
+
+> Thanks so much for your responses. Dr.Pustejovsky, besides confidence
+> interval, are other results (e.g., robust SE and t-tests & F-tests
+> trustable) when df < 4? I appreciate your help.
+>
+> Best wishes,
+> Huang
+>
+> On Wed, Jul 27, 2022 at 11:51 AM James Pustejovsky <jepusto at gmail.com>
+> wrote:
+>
+>> Hi Huang,
+>>
+>> The wide confidence interval is due to having only one degree of freedom
+>> (a t distribution with 1 degree of freedom is equivalent to the dreaded,
+>> ill-behaved Cauchy distribution). I would not trust confidence intervals
+>> based on so few degrees of freedom. Tipton (2015 Psych Methods) suggests
+>> disregarding results based on RVE if df < 4.
+>>
+>> Generally, low degrees of freedom means that there is very little
+>> information available to estimate standard errors--i.e., the SEs will be
+>> very noisy. This can happen, for instance, if you are comparing two
+>> different categories of effect sizes and one of the categories only appears
+>> in two studies.
+>>
+>> You could, in these instances, report the model-based confidence
+>> interval, but in doing so you're relying on all of the additional
+>> assumptions of the model (such as homoskedasticity of random effects,
+>> correctness of correlations between sampling errors). So you would need to
+>> be clear about these caveats. You might consider also reporting sensitivity
+>> analyses under some range of plausible alternative assumptions.
+>>
+>> James
+>>
+>> On Tue, Jul 26, 2022 at 10:39 PM Huang <wuhuang0421 at gmail.com> wrote:
+>>
+>>> Hi folks,
+>>>
+>>> I am using conf_int to calculate the confidence interval but the results
+>>> showed the confidence interval are very large. For example, I have a mean
+>>> estimate 0.1655 with a SE of 0.3014 (df = 1), but the 95% confidence
+>>> interval is [-3.659, 3.990]. Is this correct? Should I report the model
+>>> based confidence interval instead of RVE based? Thank you so much for
+>>> taking time to respond to my email.
+>>>
+>>> Best wishes,
+>>> HUang
+>>>
+>>>
+>>> >
+>>> >
+>>>
+>>>         [[alternative HTML version deleted]]
+>>>
+>>> _______________________________________________
+>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>> To manage your subscription to this mailing list, go to:
+>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>
+>>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul 28 12:41:26 2022
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 28 Jul 2022 10:41:26 +0000
+Subject: [R-meta] min sample size for three random variables in
+ meta-analysis
+In-Reply-To: <CAHnsTv9Mx0nwCS=7nOFTWMaLiSt1hAmtuiHBnkqaX7iUsQ1Z-g@mail.gmail.com>
+References: <CAHnsTv-PzTj6U6UCxUipQdpyY0RaySruGt6Z67gGA5q0FU68Kw@mail.gmail.com>
+ <5a40c6a1-bced-3df1-9964-0afc9228cb52@dewey.myzen.co.uk>
+ <CAHnsTv9Mx0nwCS=7nOFTWMaLiSt1hAmtuiHBnkqaX7iUsQ1Z-g@mail.gmail.com>
+Message-ID: <02c655991e664c6bb56622f297f2b707@UM-MAIL3214.unimaas.nl>
+
+Dear Jose,
+
+With this little data, you are not going to get accurate estimates of the variance components (in fact, the model may even be overparameterized, but I cannot easily check this without a fully reproducible example). Hence, I wouldn't put much trust into the findings.
+
+In general, I am not aware of any useful rules though that one could use to decide on an appropriate model complexity in this context. In the multilevel literature, one sometimes finds suggestions that there should be at least a certain number (e.g., 10) of upper-level units (e.g., schools) before one can consider using random effects at that level. But these rules are typically overly simplistic and have not been examined in the meta-analytic context as far as I know.
+
+You might have to stick to a simpler (e.g., standard random-effects model) for this analysis and note that phylogenetic relatedness could not be accounted for due to the small sample size.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Jose Valdebenito
+>Sent: Friday, 22 July, 2022 16:50
+>To: Michael Dewey
+>Cc: r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] min sample size for three random variables in meta-analysis
+>
+>Dear Michael,
+>Thanks for your reply. By sample size I mean small number of primary
+>studies. k means number of effect sizes.
+>In the example below there were 10 effect sizes, 7 studies, 9 species
+>ID, and 9 species associated with a vcv value.
+>
+>> head(df, 10)
+>species_2 | spp | study.ID | L_d | L_v
+>Grus_americana | Grus_americana | p.b.4 | 0.000 | 0.135
+>Loxia_leucoptera | Loxia_leucoptera | p.b.15 | 1.057 | 0.068
+>Centrocercus_urophasianus | Centrocercus_urophasianus | p.b.60 | 0.384 | 0.021
+>Pica_nuttalli | Pica_nuttalli | p.b.8 | -2.042 | 0.037
+>Acrocephalus_paludicola | Acrocephalus_paludicola | 17 | 0.000 | 0.068
+>Acrocephalus_paludicola | Acrocephalus_paludicola | 17 | -4.978 | 0.334
+>Lepidothrix_coronata | Lepidothrix_coronata | 20 | -2.043 | 0.088
+>Erithacus_rubecula | Erithacus_rubecula | 35 | -1.723 | 0.401
+>Fringilla_coelebs | Fringilla_coelebs | 35 | -2.697 | 0.111
+>Parus_caeruleus | Parus_caeruleus | 35 | 4.862 | 0.559
+>
+>Thanks,
+>Jose
+>On Fri, 22 Jul 2022 at 08:19, Michael Dewey <lists at dewey.myzen.co.uk> wrote:
+>>
+>> Dear Jose
+>>
+>> Unfortunately this is a plain text list and your post in HTML has got
+>> scrambled so as to be almost unreadable.
+>>
+>> Just to clarify, when you say small sample size do you mean a small
+>> number of primary studies or that individual studies were based on small
+>> numbers? Is k the number of primary studies?
+>>
+>> Michael
+>>
+>> On 21/07/2022 15:42, Jose Valdebenito wrote:
+>> > Hi,
+>> >
+>> > I am conducting a (multi-level) meta-analysis with some sample sizes that
+>> > are a bit small.
+>> >
+>> > I was wondering if there is a kind of rule of thumb regarding minimum
+>> > sample size number, and the maximum number of random variables I can add to
+>> > the models.
+>> >
+>> > I would like to add 3 (as suggested in Cinar et al. Methods Ecol Evol.
+>> > 2022;13:383?95), but I am afraid that might incur in overparameterization
+>> > if I have, say k=10?
+>> >
+>> > These are the random variables:
+>> > -Phylogenetic relatedness
+>> > -Study ID
+>> > -Species ID
+>> >
+>> > Also, would it be any different in a meta-regression?
+>> >
+>> > Here I paste the model and dataset so you can see:
+>> >
+>> > m2 <- rma.mv(L_d, L_v,
+>> >                          data = df,
+>> >                           random = list(~1|species_2,
+>> >                                                 ~1|study.ID,
+>> >                                                 ~1|spp),
+>> >                            R = list(species_2 = vcv), digits = 3)
+>> >
+>> >> head(df, 10)
+>> > species_2                                 spp
+>> >             study.ID         L_d         L_v
+>> > Grus_americana                       Grus_americana
+>> > p.b.4             0.000       0.135
+>> > Loxia_leucoptera                      Loxia_leucoptera
+>> > p.b.15          1.057        0.068
+>> > Centrocercus_urophasianus    Centrocercus_urophasianus   p.b.60
+>> > 0.384        0.021
+>> > Pica_nuttalli                              Pica_nuttalli
+>> >          p.b.8            -2.042      0.037
+>> > Acrocephalus_paludicola          Acrocephalus_paludicola       17
+>> >      0.000      0.068
+>> > Acrocephalus_paludicola          Acrocephalus_paludicola       17
+>> >        -4.978      0.334
+>> > Lepidothrix_coronata                Lepidothrix_coronata              20
+>> >               -2.043     0.088
+>> > Erithacus_rubecula                   Erithacus_rubecula                35
+>> >                -1.723      0.401
+>> > Fringilla_coelebs                       Fringilla_coelebs
+>> >   35                 -2.697      0.111
+>> > Parus_caeruleus                       Parus_caeruleus                    35
+>> >                 4.862      0.559
+>> >
+>> > Thanks in advance,
+>> > Joe
+

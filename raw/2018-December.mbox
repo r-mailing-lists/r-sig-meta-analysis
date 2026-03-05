@@ -1,0 +1,4118 @@
+From @loignon @ending from l@u@edu  Mon Dec 10 19:01:32 2018
+From: @loignon @ending from l@u@edu (Andrew Loignon)
+Date: Mon, 10 Dec 2018 18:01:32 +0000
+Subject: [R-meta] Replicating Three-Level Model with Fixed Effects
+Message-ID: <BYAPR06MB38457C17037C189DDAF5791CC9A50@BYAPR06MB3845.namprd06.prod.outlook.com>
+
+Hi everyone,
+
+As part of a separate project, I've been familiarizing myself with multi-level meta-analyses. While working through the example provided on the metafor package's website (http://www.metafor-project.org/doku.php/analyses:konstantopoulos2011), I ran into some difficulties replicating the three-level model described by Konstantopolous (2011, "Fixed effects and variance components estimation in
+three-level meta-analysis").
+
+Specifically, I can replicate Konstantopolous' two-level model using year as a fixed effect (Table 4 in the research article) using the following code:
+
+m0.ml <- rma.mv(yi, vi,
+                random = ~ 1| study,
+                mods = ~ I(year-mean(year)),
+                method="ML",
+                digits=3,
+                data=dat.konstantopoulos2011
+                )
+summary(m0.ml)
+
+However, when I extend the model to include the higher-level nesting variable (i.e., district), the intercept diverges from what Konstantopolous reports (Table 5 in the research article). Right now, I'm using the following code:
+
+m1.ml <- rma.mv(yi, vi,
+                random = ~ 1| district/study,
+                mods = ~ I(year-mean(year)),
+                method="ML",
+                digits = 3,
+                data=dat.konstantopoulos2011)
+summary(m1.ml)
+
+With this model, I find an intercept of .178, while Konstantopolous reports a value of .183.
+
+Any suggestions for how to reconcile these differences would be very much appreciated.
+
+Best,
+
+Andrew
+Andrew C. Loignon
+Assistant Professor
+2716 Business Education Complex
+Rucks Department of Management
+E. J. Ourso College of Business
+Louisiana State University
+Baton Rouge, LA 70808
+Email: aloignon at lsu.edu<mailto:aloignon at lsu.edu>
+Phone: 225-578-6148
+
+
+	[[alternative HTML version deleted]]
+
+
+From li@t@ @ending from dewey@myzen@co@uk  Tue Dec 11 10:13:02 2018
+From: li@t@ @ending from dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 11 Dec 2018 09:13:02 +0000
+Subject: [R-meta] Replicating Three-Level Model with Fixed Effects
+In-Reply-To: <BYAPR06MB38457C17037C189DDAF5791CC9A50@BYAPR06MB3845.namprd06.prod.outlook.com>
+References: <BYAPR06MB38457C17037C189DDAF5791CC9A50@BYAPR06MB3845.namprd06.prod.outlook.com>
+Message-ID: <7d49b01a-9b17-cd59-043d-60cb75c0f7af@dewey.myzen.co.uk>
+
+Dear Andrew
+
+The difference you report is about 2.5%. With possibly different 
+hardware, different fitting algorithm, ..., I would not be too concerned 
+myself. Other readers on this site might have a different view though.
+
+Michael
+
+On 10/12/2018 18:01, Andrew Loignon wrote:
+> Hi everyone,
+> 
+> As part of a separate project, I've been familiarizing myself with multi-level meta-analyses. While working through the example provided on the metafor package's website (http://www.metafor-project.org/doku.php/analyses:konstantopoulos2011), I ran into some difficulties replicating the three-level model described by Konstantopolous (2011, "Fixed effects and variance components estimation in
+> three-level meta-analysis").
+> 
+> Specifically, I can replicate Konstantopolous' two-level model using year as a fixed effect (Table 4 in the research article) using the following code:
+> 
+> m0.ml <- rma.mv(yi, vi,
+>                  random = ~ 1| study,
+>                  mods = ~ I(year-mean(year)),
+>                  method="ML",
+>                  digits=3,
+>                  data=dat.konstantopoulos2011
+>                  )
+> summary(m0.ml)
+> 
+> However, when I extend the model to include the higher-level nesting variable (i.e., district), the intercept diverges from what Konstantopolous reports (Table 5 in the research article). Right now, I'm using the following code:
+> 
+> m1.ml <- rma.mv(yi, vi,
+>                  random = ~ 1| district/study,
+>                  mods = ~ I(year-mean(year)),
+>                  method="ML",
+>                  digits = 3,
+>                  data=dat.konstantopoulos2011)
+> summary(m1.ml)
+> 
+> With this model, I find an intercept of .178, while Konstantopolous reports a value of .183.
+> 
+> Any suggestions for how to reconcile these differences would be very much appreciated.
+> 
+> Best,
+> 
+> Andrew
+> Andrew C. Loignon
+> Assistant Professor
+> 2716 Business Education Complex
+> Rucks Department of Management
+> E. J. Ourso College of Business
+> Louisiana State University
+> Baton Rouge, LA 70808
+> Email: aloignon at lsu.edu<mailto:aloignon at lsu.edu>
+> Phone: 225-578-6148
+> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Tue Dec 11 14:10:55 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Tue, 11 Dec 2018 13:10:55 +0000
+Subject: [R-meta] Replicating Three-Level Model with Fixed Effects
+In-Reply-To: <7d49b01a-9b17-cd59-043d-60cb75c0f7af@dewey.myzen.co.uk>
+References: <BYAPR06MB38457C17037C189DDAF5791CC9A50@BYAPR06MB3845.namprd06.prod.outlook.com>
+ <7d49b01a-9b17-cd59-043d-60cb75c0f7af@dewey.myzen.co.uk>
+Message-ID: <056b120bd49d4563b273aaed14962937@UM-MAIL3214.unimaas.nl>
+
+This may be one explanation. But I think the district-level value of 'year' was used to center. So:
+
+> mean(aggregate(dat$year, list(dat$district), FUN=mean)$x)
+[1] 1990.591
+
+Then:
+
+> res <- rma.mv(yi, vi, mods = ~ I(year-1990.591), random = ~ 1 | district/study, data=dat, method="ML")
+> print(res, digits=3)
+
+Multivariate Meta-Analysis Model (k = 56; method: ML)
+
+Variance Components:
+
+           estim   sqrt  nlvls  fixed          factor 
+sigma^2.1  0.056  0.238     11     no        district 
+sigma^2.2  0.033  0.181     56     no  district/study 
+
+Test for Residual Heterogeneity:
+QE(df = 54) = 550.260, p-val < .001
+
+Test of Moderators (coefficient 2):
+QM(df = 1) = 0.355, p-val = 0.551
+
+Model Results:
+
+                    estimate     se   zval   pval   ci.lb  ci.ub 
+intrcpt                0.183  0.080  2.298  0.022   0.027  0.340  * 
+I(year - 1990.591)     0.005  0.009  0.596  0.551  -0.012  0.022    
+
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+These are now the same results as in Table 5.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>project.org] On Behalf Of Michael Dewey
+>Sent: Tuesday, 11 December, 2018 10:13
+>To: Andrew Loignon; r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] Replicating Three-Level Model with Fixed Effects
+>
+>Dear Andrew
+>
+>The difference you report is about 2.5%. With possibly different
+>hardware, different fitting algorithm, ..., I would not be too concerned
+>myself. Other readers on this site might have a different view though.
+>
+>Michael
+>
+>On 10/12/2018 18:01, Andrew Loignon wrote:
+>> Hi everyone,
+>>
+>> As part of a separate project, I've been familiarizing myself with
+>multi-level meta-analyses. While working through the example provided on
+>the metafor package's website (http://www.metafor-
+>project.org/doku.php/analyses:konstantopoulos2011), I ran into some
+>difficulties replicating the three-level model described by
+>Konstantopolous (2011, "Fixed effects and variance components estimation
+>in
+>> three-level meta-analysis").
+>>
+>> Specifically, I can replicate Konstantopolous' two-level model using
+>year as a fixed effect (Table 4 in the research article) using the
+>following code:
+>>
+>> m0.ml <- rma.mv(yi, vi,
+>>                  random = ~ 1| study,
+>>                  mods = ~ I(year-mean(year)),
+>>                  method="ML",
+>>                  digits=3,
+>>                  data=dat.konstantopoulos2011
+>>                  )
+>> summary(m0.ml)
+>>
+>> However, when I extend the model to include the higher-level nesting
+>variable (i.e., district), the intercept diverges from what
+>Konstantopolous reports (Table 5 in the research article). Right now, I'm
+>using the following code:
+>>
+>> m1.ml <- rma.mv(yi, vi,
+>>                  random = ~ 1| district/study,
+>>                  mods = ~ I(year-mean(year)),
+>>                  method="ML",
+>>                  digits = 3,
+>>                  data=dat.konstantopoulos2011)
+>> summary(m1.ml)
+>>
+>> With this model, I find an intercept of .178, while Konstantopolous
+>reports a value of .183.
+>>
+>> Any suggestions for how to reconcile these differences would be very
+>much appreciated.
+>>
+>> Best,
+>>
+>> Andrew
+>> Andrew C. Loignon
+>> Assistant Professor
+>> 2716 Business Education Complex
+>> Rucks Department of Management
+>> E. J. Ourso College of Business
+>> Louisiana State University
+>> Baton Rouge, LA 70808
+>> Email: aloignon at lsu.edu<mailto:aloignon at lsu.edu>
+>> Phone: 225-578-6148
+
+
+From @loignon @ending from l@u@edu  Tue Dec 11 16:46:35 2018
+From: @loignon @ending from l@u@edu (Andrew Loignon)
+Date: Tue, 11 Dec 2018 15:46:35 +0000
+Subject: [R-meta] Replicating Three-Level Model with Fixed Effects
+In-Reply-To: <056b120bd49d4563b273aaed14962937@UM-MAIL3214.unimaas.nl>
+References: <BYAPR06MB38457C17037C189DDAF5791CC9A50@BYAPR06MB3845.namprd06.prod.outlook.com>
+ <7d49b01a-9b17-cd59-043d-60cb75c0f7af@dewey.myzen.co.uk>
+ <056b120bd49d4563b273aaed14962937@UM-MAIL3214.unimaas.nl>
+Message-ID: <BYAPR06MB384582C255D4319B5275DD29C9A60@BYAPR06MB3845.namprd06.prod.outlook.com>
+
+Hi Michael and Wolfgang,
+
+Thanks for your prompt replies. That certainly helps clarify things.
+
+Best,
+
+Andrew
+
+Andrew C. Loignon
+Assistant Professor
+2716 Business Education Complex
+Rucks Department of Management
+E. J. Ourso College of Business
+Louisiana State University
+Baton Rouge, LA 70808
+Email: aloignon at lsu.edu
+Phone: 225-578-6148
+
+-----Original Message-----
+From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> 
+Sent: Tuesday, December 11, 2018 07:11
+To: Michael Dewey <lists at dewey.myzen.co.uk>; Andrew Loignon <aloignon at lsu.edu>; r-sig-meta-analysis at r-project.org
+Subject: RE: [R-meta] Replicating Three-Level Model with Fixed Effects
+
+This may be one explanation. But I think the district-level value of 'year' was used to center. So:
+
+> mean(aggregate(dat$year, list(dat$district), FUN=mean)$x)
+[1] 1990.591
+
+Then:
+
+> res <- rma.mv(yi, vi, mods = ~ I(year-1990.591), random = ~ 1 | 
+> district/study, data=dat, method="ML") print(res, digits=3)
+
+Multivariate Meta-Analysis Model (k = 56; method: ML)
+
+Variance Components:
+
+           estim   sqrt  nlvls  fixed          factor 
+sigma^2.1  0.056  0.238     11     no        district 
+sigma^2.2  0.033  0.181     56     no  district/study 
+
+Test for Residual Heterogeneity:
+QE(df = 54) = 550.260, p-val < .001
+
+Test of Moderators (coefficient 2):
+QM(df = 1) = 0.355, p-val = 0.551
+
+Model Results:
+
+                    estimate     se   zval   pval   ci.lb  ci.ub 
+intrcpt                0.183  0.080  2.298  0.022   0.027  0.340  * 
+I(year - 1990.591)     0.005  0.009  0.596  0.551  -0.012  0.022    
+
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+These are now the same results as in Table 5.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>project.org] On Behalf Of Michael Dewey
+>Sent: Tuesday, 11 December, 2018 10:13
+>To: Andrew Loignon; r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] Replicating Three-Level Model with Fixed Effects
+>
+>Dear Andrew
+>
+>The difference you report is about 2.5%. With possibly different 
+>hardware, different fitting algorithm, ..., I would not be too 
+>concerned myself. Other readers on this site might have a different view though.
+>
+>Michael
+>
+>On 10/12/2018 18:01, Andrew Loignon wrote:
+>> Hi everyone,
+>>
+>> As part of a separate project, I've been familiarizing myself with
+>multi-level meta-analyses. While working through the example provided 
+>on the metafor package's website (http://www.metafor- 
+>project.org/doku.php/analyses:konstantopoulos2011), I ran into some 
+>difficulties replicating the three-level model described by 
+>Konstantopolous (2011, "Fixed effects and variance components 
+>estimation in
+>> three-level meta-analysis").
+>>
+>> Specifically, I can replicate Konstantopolous' two-level model using
+>year as a fixed effect (Table 4 in the research article) using the 
+>following code:
+>>
+>> m0.ml <- rma.mv(yi, vi,
+>>                  random = ~ 1| study,
+>>                  mods = ~ I(year-mean(year)),
+>>                  method="ML",
+>>                  digits=3,
+>>                  data=dat.konstantopoulos2011
+>>                  )
+>> summary(m0.ml)
+>>
+>> However, when I extend the model to include the higher-level nesting
+>variable (i.e., district), the intercept diverges from what 
+>Konstantopolous reports (Table 5 in the research article). Right now, 
+>I'm using the following code:
+>>
+>> m1.ml <- rma.mv(yi, vi,
+>>                  random = ~ 1| district/study,
+>>                  mods = ~ I(year-mean(year)),
+>>                  method="ML",
+>>                  digits = 3,
+>>                  data=dat.konstantopoulos2011)
+>> summary(m1.ml)
+>>
+>> With this model, I find an intercept of .178, while Konstantopolous
+>reports a value of .183.
+>>
+>> Any suggestions for how to reconcile these differences would be very
+>much appreciated.
+>>
+>> Best,
+>>
+>> Andrew
+>> Andrew C. Loignon
+>> Assistant Professor
+>> 2716 Business Education Complex
+>> Rucks Department of Management
+>> E. J. Ourso College of Business
+>> Louisiana State University
+>> Baton Rouge, LA 70808
+>> Email: aloignon at lsu.edu<mailto:aloignon at lsu.edu>
+>> Phone: 225-578-6148
+
+
+From webb@julie @ending from gm@il@com  Wed Dec 12 20:45:35 2018
+From: webb@julie @ending from gm@il@com (Julie Webbs)
+Date: Wed, 12 Dec 2018 19:45:35 +0000
+Subject: [R-meta] Effect size using forest plot
+Message-ID: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+
+I have Means, SDs and sample size for 15 studies.
+
+Can anyone help me to plot a forest plot for effect sizes?
+Thank you
+Julie
+
+	[[alternative HTML version deleted]]
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Thu Dec 13 09:46:32 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Thu, 13 Dec 2018 08:46:32 +0000
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+Message-ID: <ac61b33c508c4fe2883263a2ab8c17f0@UM-MAIL3214.unimaas.nl>
+
+Hi Julie,
+
+What kind of effect size measure you want to plot? You say you have means, SDs, and Ns. For a single group or two groups? In the latter case, you probably want standardized mean differences. Then take a look at the example code at the bottom of:
+
+library(metafor)
+help(dat.normand1999)
+
+It shows how to do this.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>project.org] On Behalf Of Julie Webbs
+>Sent: Wednesday, 12 December, 2018 20:46
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Effect size using forest plot
+>
+>I have Means, SDs and sample size for 15 studies.
+>
+>Can anyone help me to plot a forest plot for effect sizes?
+>Thank you
+>Julie
+
+
+From @nn@-len@@@chubert @ending from p@ychologie@uni-heidelberg@de  Thu Dec 13 09:48:54 2018
+From: @nn@-len@@@chubert @ending from p@ychologie@uni-heidelberg@de (Anna-Lena Schubert)
+Date: Thu, 13 Dec 2018 09:48:54 +0100
+Subject: [R-meta] Quick question about multiple independent samples within
+ one study
+Message-ID: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+
+Hi everyone,
+
+in my current meta-analysis, I'm looking at a single DV in each study.
+However, some studies report multiple samples (e.g., children and
+adults). The samples are utterly independent, but the measures used
+across samples are equal. Would you suggest that I treat those studies
+as correlated in a random-effects model or can I treat them as unrelated
+as the samples are independent of each other?
+
+Thanks,
+
+Anna-Lena
+
+
+From @c @ending from imbi@uni-freiburg@de  Thu Dec 13 12:17:10 2018
+From: @c @ending from imbi@uni-freiburg@de (Guido Schwarzer)
+Date: Thu, 13 Dec 2018 12:17:10 +0100
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+Message-ID: <797e5ee1-de19-bc69-3c42-c452890509e2@imbi.uni-freiburg.de>
+
+Am 12.12.18 um 20:45 schrieb Julie Webbs:
+
+> I have Means, SDs and sample size for 15 studies.
+>
+> Can anyone help me to plot a forest plot for effect sizes?
+In R package *meta*, you can use
+- metacont() for two groups providing means, SDs, and sample sizes,
+- metamean() for a single group.
+
+The standard effect size measures (Hedges' g, Cohen's, and Glass' delta) 
+are available in metacont().
+
+You can use the R commands 'help(metacont)' and 'help(metamean)' to get 
+information on these functions.
+
+Furthermore, the commands 'example(metacont)' and 'help(metamean)' will 
+run some analyses (and produce a forest plot for metacont).
+
+Best wishes, Guido
+
+
+	[[alternative HTML version deleted]]
+
+
+From @c @ending from imbi@uni-freiburg@de  Thu Dec 13 14:17:27 2018
+From: @c @ending from imbi@uni-freiburg@de (Guido Schwarzer)
+Date: Thu, 13 Dec 2018 14:17:27 +0100
+Subject: [R-meta] 
+ Quick question about multiple independent samples within one study
+In-Reply-To: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+References: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+Message-ID: <9d4ddef4-6796-c41b-14a3-edf765564a07@imbi.uni-freiburg.de>
+
+Dear Anna-Lena,
+
+I would suggest that you have a look at R?cker et al. (2017) as well as 
+sections 16.5.4 and 16.5.5 of the Cochrane Handbook 
+(https://handbook-5-1.cochrane.org/).
+
+These papers deal with multiple treatment groups, however, the same 
+arguments apply if you have different age groups etc. within a study.
+
+In summary, it is fine to include multiple independent groups from a 
+study under a fixed effect model. However, you should combine the groups 
+within a study under the random effects model.
+
+Best wishes, Guido
+
+Reference:
+R?cker G, Cates CJ, Schwarzer G. Methods for including information from 
+multi-arm trials in pairwise meta-analysis. Res Synth Methods. 
+2017;8(4):392?403.
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Thu Dec 13 15:24:13 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Thu, 13 Dec 2018 14:24:13 +0000
+Subject: [R-meta] 
+ Quick question about multiple independent samples within one study
+In-Reply-To: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+References: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+Message-ID: <54e7d56717324977915da057030dee47@UM-MAIL3214.unimaas.nl>
+
+I would suggest to use a multilevel model for this. This is in fact the perfect application of the three-level model described by Konstantopoulos (2011):
+
+http://www.metafor-project.org/doku.php/analyses:konstantopoulos2011
+
+So, in this case, we would add random effects for studies and groups within studies.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>project.org] On Behalf Of Anna-Lena Schubert
+>Sent: Thursday, 13 December, 2018 9:49
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Quick question about multiple independent samples
+>within one study
+>
+>Hi everyone,
+>
+>in my current meta-analysis, I'm looking at a single DV in each study.
+>However, some studies report multiple samples (e.g., children and
+>adults). The samples are utterly independent, but the measures used
+>across samples are equal. Would you suggest that I treat those studies
+>as correlated in a random-effects model or can I treat them as unrelated
+>as the samples are independent of each other?
+>
+>Thanks,
+>
+>Anna-Lena
+
+
+From li@t@ @ending from dewey@myzen@co@uk  Thu Dec 13 16:00:09 2018
+From: li@t@ @ending from dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 13 Dec 2018 15:00:09 +0000
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+Message-ID: <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+
+Dear Julie
+
+In addition to the suggestions of Guido and Wolfgang you might be 
+interested in looking at some of the other options outlined in the CRAN 
+Task View 	https://CRAN.R-project.org/view=MetaAnalysis. Search for the 
+string Graphical methods.
+
+Michael (who maintains the task view)
+
+On 12/12/2018 19:45, Julie Webbs wrote:
+> I have Means, SDs and sample size for 15 studies.
+> 
+> Can anyone help me to plot a forest plot for effect sizes?
+> Thank you
+> Julie
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From @c @ending from imbi@uni-freiburg@de  Thu Dec 13 16:01:26 2018
+From: @c @ending from imbi@uni-freiburg@de (Guido Schwarzer)
+Date: Thu, 13 Dec 2018 16:01:26 +0100
+Subject: [R-meta] 
+ Quick question about multiple independent samples within one study
+In-Reply-To: <9d4ddef4-6796-c41b-14a3-edf765564a07@imbi.uni-freiburg.de>
+References: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+ <9d4ddef4-6796-c41b-14a3-edf765564a07@imbi.uni-freiburg.de>
+Message-ID: <40b7e18c-2735-dcce-b1ae-eb0a5b7e340f@imbi.uni-freiburg.de>
+
+Hi,
+
+I got this wrong (and gave a nice answer for a different question).
+
+See Wolfgang's email for the correct answer.
+
+Best wishes, Guido
+
+
+From webb@julie @ending from gm@il@com  Thu Dec 13 16:12:23 2018
+From: webb@julie @ending from gm@il@com (Julie Webbs)
+Date: Thu, 13 Dec 2018 15:12:23 +0000
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+ <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+Message-ID: <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+
+Thank you very much, Guido and Wolfgang. Sorted!
+If I have only a single number.  say  mean. Is it possible to have a
+meta-analysis just for mean?
+
+Thanks
+Julie
+
+
+On Thu, Dec 13, 2018 at 3:00 PM Michael Dewey <lists at dewey.myzen.co.uk>
+wrote:
+
+> Dear Julie
+>
+> In addition to the suggestions of Guido and Wolfgang you might be
+> interested in looking at some of the other options outlined in the CRAN
+> Task View       https://CRAN.R-project.org/view=MetaAnalysis. Search for
+> the
+> string Graphical methods.
+>
+> Michael (who maintains the task view)
+>
+> On 12/12/2018 19:45, Julie Webbs wrote:
+> > I have Means, SDs and sample size for 15 studies.
+> >
+> > Can anyone help me to plot a forest plot for effect sizes?
+> > Thank you
+> > Julie
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list
+> > R-sig-meta-analysis at r-project.org
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ruecker @ending from imbi@uni-freiburg@de  Thu Dec 13 16:30:25 2018
+From: ruecker @ending from imbi@uni-freiburg@de (Gerta Ruecker)
+Date: Thu, 13 Dec 2018 16:30:25 +0100
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+ <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+ <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+Message-ID: <4d6bb3ff-ecd6-3f98-7ee7-af2073a11305@imbi.uni-freiburg.de>
+
+Dear Julie,
+
+Dear Julie,
+
+This was part of Guido's answer:
+
+In R package*meta*, you can use
+- metamean() for a single group.
+
+You can use the R command 'help(metamean)' to get
+information.
+
+The command 'example(metamean)' will run some analyses.
+
+
+Best,
+Gerta
+
+Am 13.12.2018 um 16:12 schrieb Julie Webbs:
+> Thank you very much, Guido and Wolfgang. Sorted!
+> If I have only a single number.  say  mean. Is it possible to have a
+> meta-analysis just for mean?
+>
+> Thanks
+> Julie
+>
+>
+>
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+From jepu@to @ending from gm@il@com  Thu Dec 13 16:35:16 2018
+From: jepu@to @ending from gm@il@com (James Pustejovsky)
+Date: Thu, 13 Dec 2018 09:35:16 -0600
+Subject: [R-meta] 
+ Quick question about multiple independent samples within one study
+In-Reply-To: <54e7d56717324977915da057030dee47@UM-MAIL3214.unimaas.nl>
+References: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+ <54e7d56717324977915da057030dee47@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAFUVuJy3QA16_4JuxorBeg0bX+uSa06yF7cf=r=LgVA=RZ4YKw@mail.gmail.com>
+
+Anna-Lena,
+
+I agree with Wolfgang's suggestion to fit a three-level random effects
+model. A small additional suggestion: to directly answer the question you
+posed, you could also fit a regular random effects model, treating each
+sample as independent. They you could compare the two models with a
+likelihood ratio test to determine whether there is dependence between
+samples nested within studies (that is, whether the study-level variance
+component is positive).
+
+James
+
+On Thu, Dec 13, 2018 at 8:24 AM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> I would suggest to use a multilevel model for this. This is in fact the
+> perfect application of the three-level model described by Konstantopoulos
+> (2011):
+>
+> http://www.metafor-project.org/doku.php/analyses:konstantopoulos2011
+>
+> So, in this case, we would add random effects for studies and groups
+> within studies.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+> >project.org] On Behalf Of Anna-Lena Schubert
+> >Sent: Thursday, 13 December, 2018 9:49
+> >To: r-sig-meta-analysis at r-project.org
+> >Subject: [R-meta] Quick question about multiple independent samples
+> >within one study
+> >
+> >Hi everyone,
+> >
+> >in my current meta-analysis, I'm looking at a single DV in each study.
+> >However, some studies report multiple samples (e.g., children and
+> >adults). The samples are utterly independent, but the measures used
+> >across samples are equal. Would you suggest that I treat those studies
+> >as correlated in a random-effects model or can I treat them as unrelated
+> >as the samples are independent of each other?
+> >
+> >Thanks,
+> >
+> >Anna-Lena
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @nn@-len@@@chubert @ending from p@ychologie@uni-heidelberg@de  Thu Dec 13 16:36:24 2018
+From: @nn@-len@@@chubert @ending from p@ychologie@uni-heidelberg@de (Anna-Lena Schubert)
+Date: Thu, 13 Dec 2018 16:36:24 +0100
+Subject: [R-meta] 
+ Quick question about multiple independent samples within one study
+In-Reply-To: <40b7e18c-2735-dcce-b1ae-eb0a5b7e340f@imbi.uni-freiburg.de>
+References: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+ <9d4ddef4-6796-c41b-14a3-edf765564a07@imbi.uni-freiburg.de>
+ <40b7e18c-2735-dcce-b1ae-eb0a5b7e340f@imbi.uni-freiburg.de>
+Message-ID: <3d125377-fd4b-5f57-9532-242a0dcf9250@psychologie.uni-heidelberg.de>
+
+Thanks for your helpful responses! I will quickly add a follow-up
+question regarding implementation: Previously (before accounting for
+dependencies within studies), my code looked like this:
+
+??? ??? res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = ~
+var1var2 | id, struct="UN", data=dat$dat)
+
+Here, I investigate whether the correlation with a criterion variable
+differs between two predictors. Now, I have some studies with
+independent samples (different age groups), while I have other studies
+with different criterion variables within the same sample (different
+measures). If I wanted to introduce both dependencies, I believe I could
+change the code as follows:
+
+??? ??? res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~
+var1var2 | id, ~sample | id, ~measure | id), data=dat$dat)
+
+Three concerns: First, is "sample | id" or "id | sample" appropriate?
+Second, metafor tells me I can only have to random factors ("Only up to
+two '~ inner | outer' formulas allowed in the 'random' argument"). Which
+should I drop or is there a workaround? Third, I'm somewhat worrying I
+might be overfitting. Is this a legit worry?
+
+Best, Anna-Lena
+
+Am 13.12.2018 um 16:01 schrieb Guido Schwarzer:
+> Hi,
+>
+> I got this wrong (and gave a nice answer for a different question).
+>
+> See Wolfgang's email for the correct answer.
+>
+> Best wishes, Guido
+>
+-- 
+Signatur
+
+
+      Dr. Anna-Lena Schubert
+
+Postdoc at Section of Personality
+Heidelberg University - Institute of Psychology
+
+Hauptstra?e 47-51
+D-69117 Heidelberg Germany
+
+Phone:?+49 6221 54 7746
+Mail:?anna-lena.schubert at psychologie.uni-heidelberg.de
+Web:?http://www.psychologie.uni-heidelberg.de/ae/diff/diff/people-schubert.html
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20181213/9fb7966e/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: kagihcbhkcbcdmli.png
+Type: image/png
+Size: 25980 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20181213/9fb7966e/attachment-0001.png>
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Thu Dec 13 16:51:37 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Thu, 13 Dec 2018 15:51:37 +0000
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+ <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+ <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+Message-ID: <299d800dd84c47c180f24b9fef5e8242@UM-MAIL3214.unimaas.nl>
+
+Yes, but only if the means are based on measurements using the same instrument/outcome variable across studies (see help(escalc) and search for "MN", including the quotes).
+
+Best,
+Wolfgang
+ 
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>project.org] On Behalf Of Julie Webbs
+>Sent: Thursday, 13 December, 2018 16:12
+>To: Michael Dewey
+>Cc: r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] Effect size using forest plot
+>
+>Thank you very much, Guido and Wolfgang. Sorted!
+>If I have only a single number.  say  mean. Is it possible to have a
+>meta-analysis just for mean?
+>
+>Thanks
+>Julie
+
+
+From ruecker @ending from imbi@uni-freiburg@de  Thu Dec 13 16:53:13 2018
+From: ruecker @ending from imbi@uni-freiburg@de (Gerta Ruecker)
+Date: Thu, 13 Dec 2018 16:53:13 +0100
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <CAOQbByj3vTYGEyrHbnVz85GuYxtP6roZBPSApm7LvXQms_SfTQ@mail.gmail.com>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+ <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+ <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+ <4d6bb3ff-ecd6-3f98-7ee7-af2073a11305@imbi.uni-freiburg.de>
+ <CAOQbByiFDkjR6Wi0h5DTxYKnzKL6W_OcV29_LzbW9435X_7E+Q@mail.gmail.com>
+ <c5c86bcc-a01b-ce93-cfe1-d4ff959a0eae@imbi.uni-freiburg.de>
+ <CAOQbByj3vTYGEyrHbnVz85GuYxtP6roZBPSApm7LvXQms_SfTQ@mail.gmail.com>
+Message-ID: <041b4cdb-d0b5-709f-9574-204124f94871@imbi.uni-freiburg.de>
+
+Do the Cronbach's alpha values have a standard error?
+
+Best,
+
+Gerta
+
+Am 13.12.2018 um 16:48 schrieb Julie Webbs:
+> Yes as an exampel. Some times we have a single value, e.g, Cronbach's 
+> alpha
+>
+> On Thu, Dec 13, 2018 at 3:39 PM Gerta Ruecker 
+> <ruecker at imbi.uni-freiburg.de <mailto:ruecker at imbi.uni-freiburg.de>> 
+> wrote:
+>
+>     You mean a mean without SD or sample size? Perhaps I still do not
+>     understand what you have.
+>
+>     Best,
+>
+>     Gerta
+>
+>     Am 13.12.2018 um 16:36 schrieb Julie Webbs:
+>>     Sorry but I said a single number, not a single group
+>>
+>>     On Thu, Dec 13, 2018 at 3:32 PM Gerta Ruecker
+>>     <ruecker at imbi.uni-freiburg.de
+>>     <mailto:ruecker at imbi.uni-freiburg.de>> wrote:
+>>
+>>
+>>         Dear Julie,
+>>
+>>         This was part of Guido's answer:
+>>
+>>         In R package*meta*, you can use
+>>         - metamean() for a single group.
+>>
+>>         You can use the R command 'help(metamean)' to get
+>>         information.
+>>
+>>         The command 'example(metamean)' will run some analyses.
+>>
+>>
+>>         Best,
+>>         Gerta
+>>
+>>         Am 13.12.2018 um 16:12 schrieb Julie Webbs:
+>>         > Thank you very much, Guido and Wolfgang. Sorted!
+>>         > If I have only a single number.? say? mean. Is it possible
+>>         to have a
+>>         > meta-analysis just for mean?
+>>         >
+>>         > Thanks
+>>         > Julie
+>>         >
+>>         >
+>>         >
+>>         -- 
+>>
+>>         Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+>>
+>>         Institute of Medical Biometry and Statistics,
+>>         Faculty of Medicine and Medical Center - University of Freiburg
+>>
+>>         Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+>>
+>>         Phone:? ? +49/761/203-6673
+>>         Fax:? ? ? +49/761/203-6680
+>>         Mail: ruecker at imbi.uni-freiburg.de
+>>         <mailto:ruecker at imbi.uni-freiburg.de>
+>>         Homepage:
+>>         https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+>>
+>     -- 
+>
+>     Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+>
+>     Institute of Medical Biometry and Statistics,
+>     Faculty of Medicine and Medical Center - University of Freiburg
+>
+>     Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+>
+>     Phone:    +49/761/203-6673
+>     Fax:      +49/761/203-6680
+>     Mail:ruecker at imbi.uni-freiburg.de  <mailto:ruecker at imbi.uni-freiburg.de>
+>     Homepage:https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+>
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+	[[alternative HTML version deleted]]
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Thu Dec 13 16:58:18 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Thu, 13 Dec 2018 15:58:18 +0000
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <041b4cdb-d0b5-709f-9574-204124f94871@imbi.uni-freiburg.de>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+ <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+ <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+ <4d6bb3ff-ecd6-3f98-7ee7-af2073a11305@imbi.uni-freiburg.de>
+ <CAOQbByiFDkjR6Wi0h5DTxYKnzKL6W_OcV29_LzbW9435X_7E+Q@mail.gmail.com>
+ <c5c86bcc-a01b-ce93-cfe1-d4ff959a0eae@imbi.uni-freiburg.de>
+ <CAOQbByj3vTYGEyrHbnVz85GuYxtP6roZBPSApm7LvXQms_SfTQ@mail.gmail.com>
+ <041b4cdb-d0b5-709f-9574-204124f94871@imbi.uni-freiburg.de>
+Message-ID: <d0964186c81b4b3d9c000b19b4c4af6b@UM-MAIL3214.unimaas.nl>
+
+Now that is a rather different case. Search help(escalc) for "Cronbach's alpha". Here, one needs to specify the observed alpha values, the number of items/replications/parts of the measurement instrument, and the sample sizes. One can meta-analyze raw alpha values, but it is usually better to apply a transformation, like those described by Hakstian & Whalen (1976) and 
+Bonett (2002).
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>project.org] On Behalf Of Gerta Ruecker
+>Sent: Thursday, 13 December, 2018 16:53
+>To: Julie Webbs; R meta
+>Subject: Re: [R-meta] Effect size using forest plot
+>
+>Do the Cronbach's alpha values have a standard error?
+>
+>Best,
+>
+>Gerta
+>
+>Am 13.12.2018 um 16:48 schrieb Julie Webbs:
+>> Yes as an exampel. Some times we have a single value, e.g, Cronbach's
+>> alpha
+>>
+>> On Thu, Dec 13, 2018 at 3:39 PM Gerta Ruecker
+>> <ruecker at imbi.uni-freiburg.de <mailto:ruecker at imbi.uni-freiburg.de>>
+>> wrote:
+>>
+>>     You mean a mean without SD or sample size? Perhaps I still do not
+>>     understand what you have.
+>>
+>>     Best,
+>>
+>>     Gerta
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Thu Dec 13 17:06:18 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Thu, 13 Dec 2018 16:06:18 +0000
+Subject: [R-meta] 
+ Quick question about multiple independent samples within one study
+In-Reply-To: <3d125377-fd4b-5f57-9532-242a0dcf9250@psychologie.uni-heidelberg.de>
+References: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+ <9d4ddef4-6796-c41b-14a3-edf765564a07@imbi.uni-freiburg.de>
+ <40b7e18c-2735-dcce-b1ae-eb0a5b7e340f@imbi.uni-freiburg.de>
+ <3d125377-fd4b-5f57-9532-242a0dcf9250@psychologie.uni-heidelberg.de>
+Message-ID: <a4c83fb9bae24e44986dafb1f63bfaba@UM-MAIL3214.unimaas.nl>
+
+Ok, so if I understand (and remember correctly), then you will have two rows for each level of 'id', one for the correlation cor(x1, y) and one for the correlation cor(x2, y). And now you also have studies with multiple (independent) samples. So, for example:
+
+study  id   var1var2   yi
+-------------------------
+1      1    var1       .
+1      1    var2       .
+2      2    var1       .
+2      2    var2       .
+2      3    var1       .
+2      3    var2       .
+3      4    var1       .
+3      4    var2       .
+
+So, study 2 has 2 samples and hence 4 rows. That would actually be a model with an additional level beyond what Konstantopoulos describes. So you have studies, samples within studies, and then two estimates within samples. Then I would go with:
+
+res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~ var1var2 | id, ~ 1 | study/id), data=dat$dat)
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>project.org] On Behalf Of Anna-Lena Schubert
+>Sent: Thursday, 13 December, 2018 16:36
+>To: Guido Schwarzer; r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] Quick question about multiple independent samples
+>within one study
+>
+>Thanks for your helpful responses! I will quickly add a follow-up
+>question regarding implementation: Previously (before accounting for
+>dependencies within studies), my code looked like this:
+>
+>??? ??? res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = ~
+>var1var2 | id, struct="UN", data=dat$dat)
+>
+>Here, I investigate whether the correlation with a criterion variable
+>differs between two predictors. Now, I have some studies with independent
+>samples (different age groups), while I have other studies with different
+>criterion variables within the same sample (different measures). If I
+>wanted to introduce both dependencies, I believe I could change the code
+>as follows:
+>
+>??? ??? res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~
+>var1var2 | id, ~sample | id, ~measure | id), data=dat$dat)
+>
+>Three concerns: First, is "sample | id" or "id | sample" appropriate?
+>Second, metafor tells me I can only have to random factors ("Only up to
+>two '~ inner | outer' formulas allowed in the 'random' argument"). Which
+>should I drop or is there a workaround? Third, I'm somewhat worrying I
+>might be overfitting. Is this a legit worry?
+>
+>Best, Anna-Lena
+>
+>Am 13.12.2018 um 16:01 schrieb Guido Schwarzer:
+>Hi,
+>
+>I got this wrong (and gave a nice answer for a different question).
+>
+>See Wolfgang's email for the correct answer.
+>
+>Best wishes, Guido
+>--
+>Dr. Anna-Lena Schubert
+>Postdoc at Section of Personality
+>Heidelberg University - Institute of Psychology
+>Hauptstra?e 47-51
+>D-69117 Heidelberg
+>Germany
+>Phone:?+49 6221 54 7746
+>Mail:?anna-lena.schubert at psychologie.uni-heidelberg.de
+>Web:?http://www.psychologie.uni-heidelberg.de/ae/diff/diff/people-
+>schubert.html
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Thu Dec 13 17:08:32 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Thu, 13 Dec 2018 16:08:32 +0000
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <CAOQbBygeKiVAOPNvHk+gG732D-nPAXjvmhwp+bpvSw3oVKyYfg@mail.gmail.com>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+ <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+ <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+ <4d6bb3ff-ecd6-3f98-7ee7-af2073a11305@imbi.uni-freiburg.de>
+ <CAOQbByiFDkjR6Wi0h5DTxYKnzKL6W_OcV29_LzbW9435X_7E+Q@mail.gmail.com>
+ <c5c86bcc-a01b-ce93-cfe1-d4ff959a0eae@imbi.uni-freiburg.de>
+ <CAOQbByj3vTYGEyrHbnVz85GuYxtP6roZBPSApm7LvXQms_SfTQ@mail.gmail.com>
+ <041b4cdb-d0b5-709f-9574-204124f94871@imbi.uni-freiburg.de>
+ <d0964186c81b4b3d9c000b19b4c4af6b@UM-MAIL3214.unimaas.nl>
+ <CAOQbBygeKiVAOPNvHk+gG732D-nPAXjvmhwp+bpvSw3oVKyYfg@mail.gmail.com>
+Message-ID: <e8aee8913145497183e8e9352658081b@UM-MAIL3214.unimaas.nl>
+
+Please always include the mailing list in replies.
+
+Not sure what you mean by "not encouraging". But regardless, see help(escalc):
+
+The options for the measure argument are then:
+
+- "ARAW" for raw alpha values.
+- "AHW" for transformed alpha values (Hakstian & Whalen, 1976).
+- "ABT" for transformed alpha values (Bonett, 2002).
+
+So, use measure="ARAW".
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Julie Webbs [mailto:webbsjulie at gmail.com]
+>Sent: Thursday, 13 December, 2018 17:03
+>To: Viechtbauer, Wolfgang (SP)
+>Subject: Re: [R-meta] Effect size using forest plot
+>
+>Hakstian & Whalen is not encouraging for me. you stated:? One can meta-
+>analyze raw alpha values, Can I ask How?
+>
+>On Thu, Dec 13, 2018 at 3:58 PM Viechtbauer, Wolfgang (SP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>Now that is a rather different case. Search help(escalc) for "Cronbach's
+>alpha". Here, one needs to specify the observed alpha values, the number
+>of items/replications/parts of the measurement instrument, and the sample
+>sizes. One can meta-analyze raw alpha values, but it is usually better to
+>apply a transformation, like those described by Hakstian & Whalen (1976)
+>and
+>Bonett (2002).
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>>project.org] On Behalf Of Gerta Ruecker
+>>Sent: Thursday, 13 December, 2018 16:53
+>>To: Julie Webbs; R meta
+>>Subject: Re: [R-meta] Effect size using forest plot
+>>
+>>Do the Cronbach's alpha values have a standard error?
+>>
+>>Best,
+>>
+>>Gerta
+>>
+>>Am 13.12.2018 um 16:48 schrieb Julie Webbs:
+>>> Yes as an exampel. Some times we have a single value, e.g, Cronbach's
+>>> alpha
+>>>
+>>> On Thu, Dec 13, 2018 at 3:39 PM Gerta Ruecker
+>>> <ruecker at imbi.uni-freiburg.de <mailto:ruecker at imbi.uni-freiburg.de>>
+>>> wrote:
+>>>
+>>>? ? ?You mean a mean without SD or sample size? Perhaps I still do not
+>>>? ? ?understand what you have.
+>>>
+>>>? ? ?Best,
+>>>
+>>>? ? ?Gerta
+
+From webb@julie @ending from gm@il@com  Thu Dec 13 17:15:22 2018
+From: webb@julie @ending from gm@il@com (Julie Webbs)
+Date: Thu, 13 Dec 2018 16:15:22 +0000
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <e8aee8913145497183e8e9352658081b@UM-MAIL3214.unimaas.nl>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+ <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+ <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+ <4d6bb3ff-ecd6-3f98-7ee7-af2073a11305@imbi.uni-freiburg.de>
+ <CAOQbByiFDkjR6Wi0h5DTxYKnzKL6W_OcV29_LzbW9435X_7E+Q@mail.gmail.com>
+ <c5c86bcc-a01b-ce93-cfe1-d4ff959a0eae@imbi.uni-freiburg.de>
+ <CAOQbByj3vTYGEyrHbnVz85GuYxtP6roZBPSApm7LvXQms_SfTQ@mail.gmail.com>
+ <041b4cdb-d0b5-709f-9574-204124f94871@imbi.uni-freiburg.de>
+ <d0964186c81b4b3d9c000b19b4c4af6b@UM-MAIL3214.unimaas.nl>
+ <CAOQbBygeKiVAOPNvHk+gG732D-nPAXjvmhwp+bpvSw3oVKyYfg@mail.gmail.com>
+ <e8aee8913145497183e8e9352658081b@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAOQbByj92JKs4rn2dE_=7orD=AKsXyVZo+RY-RssD7sZrwadtA@mail.gmail.com>
+
+It is very useful. So measure="ARAW, is that correct?
+
+
+On Thu, Dec 13, 2018 at 4:08 PM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Please always include the mailing list in replies.
+>
+> Not sure what you mean by "not encouraging". But regardless, see
+> help(escalc):
+>
+> The options for the measure argument are then:
+>
+> - "ARAW" for raw alpha values.
+> - "AHW" for transformed alpha values (Hakstian & Whalen, 1976).
+> - "ABT" for transformed alpha values (Bonett, 2002).
+>
+> So, use measure="ARAW".
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Julie Webbs [mailto:webbsjulie at gmail.com]
+> >Sent: Thursday, 13 December, 2018 17:03
+> >To: Viechtbauer, Wolfgang (SP)
+> >Subject: Re: [R-meta] Effect size using forest plot
+> >
+> >Hakstian & Whalen is not encouraging for me. you stated:  One can meta-
+> >analyze raw alpha values, Can I ask How?
+> >
+> >On Thu, Dec 13, 2018 at 3:58 PM Viechtbauer, Wolfgang (SP)
+> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >Now that is a rather different case. Search help(escalc) for "Cronbach's
+> >alpha". Here, one needs to specify the observed alpha values, the number
+> >of items/replications/parts of the measurement instrument, and the sample
+> >sizes. One can meta-analyze raw alpha values, but it is usually better to
+> >apply a transformation, like those described by Hakstian & Whalen (1976)
+> >and
+> >Bonett (2002).
+> >
+> >Best,
+> >Wolfgang
+> >
+> >>-----Original Message-----
+> >>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+> >>project.org] On Behalf Of Gerta Ruecker
+> >>Sent: Thursday, 13 December, 2018 16:53
+> >>To: Julie Webbs; R meta
+> >>Subject: Re: [R-meta] Effect size using forest plot
+> >>
+> >>Do the Cronbach's alpha values have a standard error?
+> >>
+> >>Best,
+> >>
+> >>Gerta
+> >>
+> >>Am 13.12.2018 um 16:48 schrieb Julie Webbs:
+> >>> Yes as an exampel. Some times we have a single value, e.g, Cronbach's
+> >>> alpha
+> >>>
+> >>> On Thu, Dec 13, 2018 at 3:39 PM Gerta Ruecker
+> >>> <ruecker at imbi.uni-freiburg.de <mailto:ruecker at imbi.uni-freiburg.de>>
+> >>> wrote:
+> >>>
+> >>>     You mean a mean without SD or sample size? Perhaps I still do not
+> >>>     understand what you have.
+> >>>
+> >>>     Best,
+> >>>
+> >>>     Gerta
+>
+
+	[[alternative HTML version deleted]]
+
+
+From webb@julie @ending from gm@il@com  Thu Dec 13 17:24:06 2018
+From: webb@julie @ending from gm@il@com (Julie Webbs)
+Date: Thu, 13 Dec 2018 16:24:06 +0000
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <e8aee8913145497183e8e9352658081b@UM-MAIL3214.unimaas.nl>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+ <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+ <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+ <4d6bb3ff-ecd6-3f98-7ee7-af2073a11305@imbi.uni-freiburg.de>
+ <CAOQbByiFDkjR6Wi0h5DTxYKnzKL6W_OcV29_LzbW9435X_7E+Q@mail.gmail.com>
+ <c5c86bcc-a01b-ce93-cfe1-d4ff959a0eae@imbi.uni-freiburg.de>
+ <CAOQbByj3vTYGEyrHbnVz85GuYxtP6roZBPSApm7LvXQms_SfTQ@mail.gmail.com>
+ <041b4cdb-d0b5-709f-9574-204124f94871@imbi.uni-freiburg.de>
+ <d0964186c81b4b3d9c000b19b4c4af6b@UM-MAIL3214.unimaas.nl>
+ <CAOQbBygeKiVAOPNvHk+gG732D-nPAXjvmhwp+bpvSw3oVKyYfg@mail.gmail.com>
+ <e8aee8913145497183e8e9352658081b@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAOQbByiDSRCdLRLJ1YGUWF7SFrYHb04VtjmVij0sMm6=NoOwgg@mail.gmail.com>
+
+not sure why i could not get this data
+
+dat <- get(data(dat.bonett2010))
+
+
+On Thu, Dec 13, 2018 at 4:08 PM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Please always include the mailing list in replies.
+>
+> Not sure what you mean by "not encouraging". But regardless, see
+> help(escalc):
+>
+> The options for the measure argument are then:
+>
+> - "ARAW" for raw alpha values.
+> - "AHW" for transformed alpha values (Hakstian & Whalen, 1976).
+> - "ABT" for transformed alpha values (Bonett, 2002).
+>
+> So, use measure="ARAW".
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Julie Webbs [mailto:webbsjulie at gmail.com]
+> >Sent: Thursday, 13 December, 2018 17:03
+> >To: Viechtbauer, Wolfgang (SP)
+> >Subject: Re: [R-meta] Effect size using forest plot
+> >
+> >Hakstian & Whalen is not encouraging for me. you stated:  One can meta-
+> >analyze raw alpha values, Can I ask How?
+> >
+> >On Thu, Dec 13, 2018 at 3:58 PM Viechtbauer, Wolfgang (SP)
+> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >Now that is a rather different case. Search help(escalc) for "Cronbach's
+> >alpha". Here, one needs to specify the observed alpha values, the number
+> >of items/replications/parts of the measurement instrument, and the sample
+> >sizes. One can meta-analyze raw alpha values, but it is usually better to
+> >apply a transformation, like those described by Hakstian & Whalen (1976)
+> >and
+> >Bonett (2002).
+> >
+> >Best,
+> >Wolfgang
+> >
+> >>-----Original Message-----
+> >>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+> >>project.org] On Behalf Of Gerta Ruecker
+> >>Sent: Thursday, 13 December, 2018 16:53
+> >>To: Julie Webbs; R meta
+> >>Subject: Re: [R-meta] Effect size using forest plot
+> >>
+> >>Do the Cronbach's alpha values have a standard error?
+> >>
+> >>Best,
+> >>
+> >>Gerta
+> >>
+> >>Am 13.12.2018 um 16:48 schrieb Julie Webbs:
+> >>> Yes as an exampel. Some times we have a single value, e.g, Cronbach's
+> >>> alpha
+> >>>
+> >>> On Thu, Dec 13, 2018 at 3:39 PM Gerta Ruecker
+> >>> <ruecker at imbi.uni-freiburg.de <mailto:ruecker at imbi.uni-freiburg.de>>
+> >>> wrote:
+> >>>
+> >>>     You mean a mean without SD or sample size? Perhaps I still do not
+> >>>     understand what you have.
+> >>>
+> >>>     Best,
+> >>>
+> >>>     Gerta
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @nn@-len@@@chubert @ending from p@ychologie@uni-heidelberg@de  Thu Dec 13 17:24:43 2018
+From: @nn@-len@@@chubert @ending from p@ychologie@uni-heidelberg@de (Anna-Lena Schubert)
+Date: Thu, 13 Dec 2018 17:24:43 +0100
+Subject: [R-meta] 
+ Quick question about multiple independent samples within one study
+In-Reply-To: <a4c83fb9bae24e44986dafb1f63bfaba@UM-MAIL3214.unimaas.nl>
+References: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+ <9d4ddef4-6796-c41b-14a3-edf765564a07@imbi.uni-freiburg.de>
+ <40b7e18c-2735-dcce-b1ae-eb0a5b7e340f@imbi.uni-freiburg.de>
+ <3d125377-fd4b-5f57-9532-242a0dcf9250@psychologie.uni-heidelberg.de>
+ <a4c83fb9bae24e44986dafb1f63bfaba@UM-MAIL3214.unimaas.nl>
+Message-ID: <b8fa913f-f3ad-e05f-e02f-a2905ce2de2e@psychologie.uni-heidelberg.de>
+
+Yes, that's exactly what my design looks like -- and all levels are
+incompletely crossed because there are only few studies with additional
+samples or additional measures. Thanks again for the prompt response and
+the great help! My final question (so I don't have to post again if I
+run into the same situation in the future) would be why the random
+effect for var1var2 only contains "id" and not "study/id"?
+
+Best,
+
+Anna-Lena
+
+Am 13.12.2018 um 17:06 schrieb Viechtbauer, Wolfgang (SP):
+> Ok, so if I understand (and remember correctly), then you will have two rows for each level of 'id', one for the correlation cor(x1, y) and one for the correlation cor(x2, y). And now you also have studies with multiple (independent) samples. So, for example:
+>
+> study  id   var1var2   yi
+> -------------------------
+> 1      1    var1       .
+> 1      1    var2       .
+> 2      2    var1       .
+> 2      2    var2       .
+> 2      3    var1       .
+> 2      3    var2       .
+> 3      4    var1       .
+> 3      4    var2       .
+>
+> So, study 2 has 2 samples and hence 4 rows. That would actually be a model with an additional level beyond what Konstantopoulos describes. So you have studies, samples within studies, and then two estimates within samples. Then I would go with:
+>
+> res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~ var1var2 | id, ~ 1 | study/id), data=dat$dat)
+>
+> Best,
+> Wolfgang
+>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>> project.org] On Behalf Of Anna-Lena Schubert
+>> Sent: Thursday, 13 December, 2018 16:36
+>> To: Guido Schwarzer; r-sig-meta-analysis at r-project.org
+>> Subject: Re: [R-meta] Quick question about multiple independent samples
+>> within one study
+>>
+>> Thanks for your helpful responses! I will quickly add a follow-up
+>> question regarding implementation: Previously (before accounting for
+>> dependencies within studies), my code looked like this:
+>>
+>> ??? ??? res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = ~
+>> var1var2 | id, struct="UN", data=dat$dat)
+>>
+>> Here, I investigate whether the correlation with a criterion variable
+>> differs between two predictors. Now, I have some studies with independent
+>> samples (different age groups), while I have other studies with different
+>> criterion variables within the same sample (different measures). If I
+>> wanted to introduce both dependencies, I believe I could change the code
+>> as follows:
+>>
+>> ??? ??? res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~
+>> var1var2 | id, ~sample | id, ~measure | id), data=dat$dat)
+>>
+>> Three concerns: First, is "sample | id" or "id | sample" appropriate?
+>> Second, metafor tells me I can only have to random factors ("Only up to
+>> two '~ inner | outer' formulas allowed in the 'random' argument"). Which
+>> should I drop or is there a workaround? Third, I'm somewhat worrying I
+>> might be overfitting. Is this a legit worry?
+>>
+>> Best, Anna-Lena
+>>
+>> Am 13.12.2018 um 16:01 schrieb Guido Schwarzer:
+>> Hi,
+>>
+>> I got this wrong (and gave a nice answer for a different question).
+>>
+>> See Wolfgang's email for the correct answer.
+>>
+>> Best wishes, Guido
+>> --
+>> Dr. Anna-Lena Schubert
+>> Postdoc at Section of Personality
+>> Heidelberg University - Institute of Psychology
+>> Hauptstra?e 47-51
+>> D-69117 Heidelberg
+>> Germany
+>> Phone:?+49 6221 54 7746
+>> Mail:?anna-lena.schubert at psychologie.uni-heidelberg.de
+>> Web:?http://www.psychologie.uni-heidelberg.de/ae/diff/diff/people-
+>> schubert.html
+-- 
+Signatur
+
+
+      Dr. Anna-Lena Schubert
+
+Postdoc at Section of Personality
+Heidelberg University - Institute of Psychology
+
+Hauptstra?e 47-51
+D-69117 Heidelberg Germany
+
+Phone:?+49 6221 54 7746
+Mail:?anna-lena.schubert at psychologie.uni-heidelberg.de
+Web:?http://www.psychologie.uni-heidelberg.de/ae/diff/diff/people-schubert.html
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20181213/1dd7c507/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: kmiddginielbgain.png
+Type: image/png
+Size: 25980 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20181213/1dd7c507/attachment-0001.png>
+
+From webb@julie @ending from gm@il@com  Thu Dec 13 17:26:44 2018
+From: webb@julie @ending from gm@il@com (Julie Webbs)
+Date: Thu, 13 Dec 2018 16:26:44 +0000
+Subject: [R-meta] Effect size using forest plot
+In-Reply-To: <e8aee8913145497183e8e9352658081b@UM-MAIL3214.unimaas.nl>
+References: <CAOQbBygD=F_robN_rA_UVQEEL_yag5xAH471jVW_K90gjGYsrA-8387@mail.gmail.com>
+ <f13cad0f-608f-02cb-6a3b-c211127bd1a4@dewey.myzen.co.uk>
+ <CAOQbByiEw9T5mksJtAEpowsh_E9=+HvmNfa4uqJnM+byRUF44w@mail.gmail.com>
+ <4d6bb3ff-ecd6-3f98-7ee7-af2073a11305@imbi.uni-freiburg.de>
+ <CAOQbByiFDkjR6Wi0h5DTxYKnzKL6W_OcV29_LzbW9435X_7E+Q@mail.gmail.com>
+ <c5c86bcc-a01b-ce93-cfe1-d4ff959a0eae@imbi.uni-freiburg.de>
+ <CAOQbByj3vTYGEyrHbnVz85GuYxtP6roZBPSApm7LvXQms_SfTQ@mail.gmail.com>
+ <041b4cdb-d0b5-709f-9574-204124f94871@imbi.uni-freiburg.de>
+ <d0964186c81b4b3d9c000b19b4c4af6b@UM-MAIL3214.unimaas.nl>
+ <CAOQbBygeKiVAOPNvHk+gG732D-nPAXjvmhwp+bpvSw3oVKyYfg@mail.gmail.com>
+ <e8aee8913145497183e8e9352658081b@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAOQbByhnR9Skn7=_Xq3nktuf_58rBHh=dnNoZwCkUdWZ2zyqww@mail.gmail.com>
+
+Sorry, I got it, Gerta- Very much appreciated for your fantastically
+helpful.
+
+On Thu, Dec 13, 2018 at 4:08 PM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Please always include the mailing list in replies.
+>
+> Not sure what you mean by "not encouraging". But regardless, see
+> help(escalc):
+>
+> The options for the measure argument are then:
+>
+> - "ARAW" for raw alpha values.
+> - "AHW" for transformed alpha values (Hakstian & Whalen, 1976).
+> - "ABT" for transformed alpha values (Bonett, 2002).
+>
+> So, use measure="ARAW".
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Julie Webbs [mailto:webbsjulie at gmail.com]
+> >Sent: Thursday, 13 December, 2018 17:03
+> >To: Viechtbauer, Wolfgang (SP)
+> >Subject: Re: [R-meta] Effect size using forest plot
+> >
+> >Hakstian & Whalen is not encouraging for me. you stated:  One can meta-
+> >analyze raw alpha values, Can I ask How?
+> >
+> >On Thu, Dec 13, 2018 at 3:58 PM Viechtbauer, Wolfgang (SP)
+> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >Now that is a rather different case. Search help(escalc) for "Cronbach's
+> >alpha". Here, one needs to specify the observed alpha values, the number
+> >of items/replications/parts of the measurement instrument, and the sample
+> >sizes. One can meta-analyze raw alpha values, but it is usually better to
+> >apply a transformation, like those described by Hakstian & Whalen (1976)
+> >and
+> >Bonett (2002).
+> >
+> >Best,
+> >Wolfgang
+> >
+> >>-----Original Message-----
+> >>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+> >>project.org] On Behalf Of Gerta Ruecker
+> >>Sent: Thursday, 13 December, 2018 16:53
+> >>To: Julie Webbs; R meta
+> >>Subject: Re: [R-meta] Effect size using forest plot
+> >>
+> >>Do the Cronbach's alpha values have a standard error?
+> >>
+> >>Best,
+> >>
+> >>Gerta
+> >>
+> >>Am 13.12.2018 um 16:48 schrieb Julie Webbs:
+> >>> Yes as an exampel. Some times we have a single value, e.g, Cronbach's
+> >>> alpha
+> >>>
+> >>> On Thu, Dec 13, 2018 at 3:39 PM Gerta Ruecker
+> >>> <ruecker at imbi.uni-freiburg.de <mailto:ruecker at imbi.uni-freiburg.de>>
+> >>> wrote:
+> >>>
+> >>>     You mean a mean without SD or sample size? Perhaps I still do not
+> >>>     understand what you have.
+> >>>
+> >>>     Best,
+> >>>
+> >>>     Gerta
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Thu Dec 13 17:41:34 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Thu, 13 Dec 2018 16:41:34 +0000
+Subject: [R-meta] 
+ Quick question about multiple independent samples within one study
+In-Reply-To: <b8fa913f-f3ad-e05f-e02f-a2905ce2de2e@psychologie.uni-heidelberg.de>
+References: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+ <9d4ddef4-6796-c41b-14a3-edf765564a07@imbi.uni-freiburg.de>
+ <40b7e18c-2735-dcce-b1ae-eb0a5b7e340f@imbi.uni-freiburg.de>
+ <3d125377-fd4b-5f57-9532-242a0dcf9250@psychologie.uni-heidelberg.de>
+ <a4c83fb9bae24e44986dafb1f63bfaba@UM-MAIL3214.unimaas.nl>
+ <b8fa913f-f3ad-e05f-e02f-a2905ce2de2e@psychologie.uni-heidelberg.de>
+Message-ID: <53c693a7226549f582952ff868734eba@UM-MAIL3214.unimaas.nl>
+
+First: I forgot the 'struct="UN"' part, so:
+
+res1 <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~ var1var2 | id, ~ 1 | study/id), struct="UN", data=dat$dat)
+
+One could consider various models here. Another one would indeed be:
+
+res2 <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~ var1var2 | study, ~ var1var2 | id), struct=c("UN","UN"), data=dat$dat)
+
+('~ var1var2 | study/id' does not currently work, but if 'id' is coded in the way I show below, then this is the same thing).
+
+As James mentioned, one could use LRTs to compare such models:
+
+anova(res1, res2)
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Anna-Lena Schubert [mailto:anna-lena.schubert at psychologie.uni-
+>heidelberg.de]
+>Sent: Thursday, 13 December, 2018 17:25
+>To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] Quick question about multiple independent samples
+>within one study
+>
+>Yes, that's exactly what my design looks like -- and all levels are
+>incompletely crossed because there are only few studies with additional
+>samples or additional measures. Thanks again for the prompt response and
+>the great help! My final question (so I don't have to post again if I run
+>into the same situation in the future) would be why the random effect for
+>var1var2 only contains "id" and not "study/id"?
+>
+>Best,
+>Anna-Lena
+>
+>Am 13.12.2018 um 17:06 schrieb Viechtbauer, Wolfgang (SP):
+>
+>Ok, so if I understand (and remember correctly), then you will have two
+>rows for each level of 'id', one for the correlation cor(x1, y) and one
+>for the correlation cor(x2, y). And now you also have studies with
+>multiple (independent) samples. So, for example:
+>
+>study  id   var1var2   yi
+>-------------------------
+>1      1    var1       .
+>1      1    var2       .
+>2      2    var1       .
+>2      2    var2       .
+>2      3    var1       .
+>2      3    var2       .
+>3      4    var1       .
+>3      4    var2       .
+>
+>So, study 2 has 2 samples and hence 4 rows. That would actually be a
+>model with an additional level beyond what Konstantopoulos describes. So
+>you have studies, samples within studies, and then two estimates within
+>samples. Then I would go with:
+>
+>res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~ var1var2
+>| id, ~ 1 | study/id), data=dat$dat)
+>
+>Best,
+>Wolfgang
+
+From @nn@-len@@@chubert @ending from p@ychologie@uni-heidelberg@de  Thu Dec 13 18:06:04 2018
+From: @nn@-len@@@chubert @ending from p@ychologie@uni-heidelberg@de (Anna-Lena Schubert)
+Date: Thu, 13 Dec 2018 18:06:04 +0100
+Subject: [R-meta] 
+ Quick question about multiple independent samples within one study
+In-Reply-To: <53c693a7226549f582952ff868734eba@UM-MAIL3214.unimaas.nl>
+References: <c13523ef-b1c2-1e4d-c084-9e232eeb819b@psychologie.uni-heidelberg.de>
+ <9d4ddef4-6796-c41b-14a3-edf765564a07@imbi.uni-freiburg.de>
+ <40b7e18c-2735-dcce-b1ae-eb0a5b7e340f@imbi.uni-freiburg.de>
+ <3d125377-fd4b-5f57-9532-242a0dcf9250@psychologie.uni-heidelberg.de>
+ <a4c83fb9bae24e44986dafb1f63bfaba@UM-MAIL3214.unimaas.nl>
+ <b8fa913f-f3ad-e05f-e02f-a2905ce2de2e@psychologie.uni-heidelberg.de>
+ <53c693a7226549f582952ff868734eba@UM-MAIL3214.unimaas.nl>
+Message-ID: <c88b4df8-1ee4-c0e7-5ed0-efef69a82a2b@psychologie.uni-heidelberg.de>
+
+That's neat! LRT and AIC favor the first model, while BIC is somewhat
+ambigious (probably given complexity). In that case, I'll probably stick
+with the first model. Thanks again for your help, Wolfgang and James!
+
+Am 13.12.2018 um 17:41 schrieb Viechtbauer, Wolfgang (SP):
+> First: I forgot the 'struct="UN"' part, so:
+>
+> res1 <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~ var1var2 | id, ~ 1 | study/id), struct="UN", data=dat$dat)
+>
+> One could consider various models here. Another one would indeed be:
+>
+> res2 <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~ var1var2 | study, ~ var1var2 | id), struct=c("UN","UN"), data=dat$dat)
+>
+> ('~ var1var2 | study/id' does not currently work, but if 'id' is coded in the way I show below, then this is the same thing).
+>
+> As James mentioned, one could use LRTs to compare such models:
+>
+> anova(res1, res2)
+>
+> Best,
+> Wolfgang
+>
+>> -----Original Message-----
+>> From: Anna-Lena Schubert [mailto:anna-lena.schubert at psychologie.uni-
+>> heidelberg.de]
+>> Sent: Thursday, 13 December, 2018 17:25
+>> To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+>> Subject: Re: [R-meta] Quick question about multiple independent samples
+>> within one study
+>>
+>> Yes, that's exactly what my design looks like -- and all levels are
+>> incompletely crossed because there are only few studies with additional
+>> samples or additional measures. Thanks again for the prompt response and
+>> the great help! My final question (so I don't have to post again if I run
+>> into the same situation in the future) would be why the random effect for
+>> var1var2 only contains "id" and not "study/id"?
+>>
+>> Best,
+>> Anna-Lena
+>>
+>> Am 13.12.2018 um 17:06 schrieb Viechtbauer, Wolfgang (SP):
+>>
+>> Ok, so if I understand (and remember correctly), then you will have two
+>> rows for each level of 'id', one for the correlation cor(x1, y) and one
+>> for the correlation cor(x2, y). And now you also have studies with
+>> multiple (independent) samples. So, for example:
+>>
+>> study  id   var1var2   yi
+>> -------------------------
+>> 1      1    var1       .
+>> 1      1    var2       .
+>> 2      2    var1       .
+>> 2      2    var2       .
+>> 2      3    var1       .
+>> 2      3    var2       .
+>> 3      4    var1       .
+>> 3      4    var2       .
+>>
+>> So, study 2 has 2 samples and hence 4 rows. That would actually be a
+>> model with an additional level beyond what Konstantopoulos describes. So
+>> you have studies, samples within studies, and then two estimates within
+>> samples. Then I would go with:
+>>
+>> res <- rma.mv(yi, dat$V, mods = ~ var1var2 - 1, random = list(~ var1var2
+>> | id, ~ 1 | study/id), data=dat$dat)
+>>
+>> Best,
+>> Wolfgang
+-- 
+Signatur
+
+
+      Dr. Anna-Lena Schubert
+
+Postdoc at Section of Personality
+Heidelberg University - Institute of Psychology
+
+Hauptstra?e 47-51
+D-69117 Heidelberg Germany
+
+Phone:?+49 6221 54 7746
+Mail:?anna-lena.schubert at psychologie.uni-heidelberg.de
+Web:?http://www.psychologie.uni-heidelberg.de/ae/diff/diff/people-schubert.html
+
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20181213/e67d6ed0/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: kddmmepglbacnamk.png
+Type: image/png
+Size: 25980 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20181213/e67d6ed0/attachment-0001.png>
+
+From robertob@kker @ending from gm@il@com  Fri Dec 14 14:35:15 2018
+From: robertob@kker @ending from gm@il@com (P. Roberto Bakker)
+Date: Fri, 14 Dec 2018 14:35:15 +0100
+Subject: [R-meta] xlim - half text / many studies: row text problemes
+In-Reply-To: <CAKDq9_N5az4MHeUXd=kV17vLr24rfccK9Kt+WkZn0EX6VSwG=A@mail.gmail.com>
+References: <CAKDq9_Okt3tgUn5A_CqQ-axj3i67XuJ7mU3Kgtu4upV+16=DDw@mail.gmail.com>
+ <CAKDq9_PoeUSMNzLWcK9+t6uZ5jh9gQcDaBmVZN37uCH2sZDhOA@mail.gmail.com>
+ <CAKDq9_P38PSGQdAFXWvUmtEfORaaMgScvdaXSxui=HJr9YFP1Q@mail.gmail.com>
+ <08F4D8F6-9701-4780-A331-A8C575EA4282@awkruijt.nl>
+ <CAKDq9_N5az4MHeUXd=kV17vLr24rfccK9Kt+WkZn0EX6VSwG=A@mail.gmail.com>
+Message-ID: <CAKDq9_OzdDgQ=FS9cUKtRjHq_wTvM7xcHrjr2RZz7-ej2fpvpw@mail.gmail.com>
+
+Hi Anne-Wil,
+
+I just wanted to tell that your information below was were usable.
+
+Thank you,
+
+Roberto
+
+Op ma 11 jun. 2018 om 15:17 schreef P. Roberto Bakker <
+robertobakker at gmail.com>:
+
+> Hi Anne-Wil,
+>
+> Thank you so much for your information.
+> I will let you know if I have more questions.
+>
+> All the best (en hartelijke groet ook),
+>
+> Roberto
+>
+> 2018-06-11 14:36 GMT+02:00 Anne-Wil Kruijt <mail at awkruijt.nl>:
+>
+>> Hi Robert and list,
+>>
+>> The problem is not so much with the internal code of the plot (such that
+>> changing the size of, for instance, the axes will solve it), but with the
+>> space that is made available for the plot - it is just not high enough for
+>> your number of records.
+>> I wrote some script with examples, comments, and the solution that I use
+>> (printing the plot as a .png with specified dimensions), which I paste
+>> below. I hope this solves it for you. Please let me know if it doesn't!
+>>
+>> All best (hartelijke groet!),
+>>
+>> Anne-Wil
+>>
+>>
+>> ###  start of example script
+>>
+>> # this is code given as an example of a forest plot in metafor's
+>> documentation:
+>>
+>> ### meta-analysis of the log risk ratios using a random-effects model
+>> res <- rma(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg,
+>>            slab=paste(author, year, sep=", "))
+>>
+>> ### default forest plot of the log risk ratios and summary estimate
+>> forest(res)
+>>
+>>
+>> # now we double up the number of records by creating an 'example data
+>> frame' (edf) which consists of
+>> # the same data use above copied twice:
+>>
+>> edf <- rbind(dat.bcg, dat.bcg)
+>> res <- rma(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=edf,
+>>            slab=paste(author, year, sep=", "))
+>>
+>> # now the forest plot shows those overlapping rows that you have for your
+>> data too:
+>> forest(res)
+>>
+>>
+>> # the problem is that the number of rows doubles, but the total
+>> dimensions made available (by rmarkdown) to plot it in are still the same.
+>>
+>> # if you're working in a .rmd file, a quick-glance workaround is to hit
+>> the left one of the three tiny light gray icons that appear at the top
+>> right of the plot output (right below the chunk you're working in). It will
+>> open a pop up window that you can resize.
+>> # if you're working in 'plain r studio', you can hit the icon on the
+>> right of three icons at the top left of the 'viewer pane' to get a
+>> resizable pop up window with the plot.
+>>
+>> # personally, I use the above for quick glances, and use the code below
+>> to create the images that I eventually use in papers, presentations etc.
+>> # It allows you to set the required resolution and size (in pixels), as
+>> well as the background color (in this example it's set to transparent,
+>> which can be nice for powerpoints with a coloured background).
+>>
+>> # if you're working on a mac you may need to install xquartz if you don't
+>> have it yet (https://www.xquartz.org/); if you're on windows I don't
+>> know if you need additional software (but I suspect not - perhaps you won't
+>> even need the dev.off() line on windows either).
+>>
+>> # it is important (on my computer at least) to run the three lines
+>> (png(), plotcall, dev.off()) in one go (select the three, then run, or
+>> place them in their own chunk and then run - but don't run them line by
+>> line)
+>>
+>> # these two sets of three lines (and the DPI setting line) will save the
+>> same plot (forest(res)) twice, as .pngs in your working directory. You
+>> won't see the plots appear in R itself (! - it will only show some text
+>> like "null device 1") but you can find them using finder/explorer.
+>> # The first set of three lines saves it as a .png with width = 500 and
+>> height = 350 (giving slighly overlapping lines), the second set saves it as
+>> a .png with width = 500 and height = 600, which is a lot more pleasant.
+>> Just toy around with the width and heigth settings untill the plots feels
+>> good for you purposes.
+>>
+>> # enjoy!
+>>
+>> dpi = 150
+>>
+>>
+>> png(filename = "foresplot500by350.png", width= (500 *(dpi/72)), height=
+>> (350 * (dpi/72)), res = dpi, bg = "transparent") # info on the file to save
+>> forest(res) # the r code for a plot - could also be ggplot, base plot, etc
+>> dev.off()  # close the connection with the external writer.
+>>
+>>
+>> png(filename = "foresplot500by600.png", width= (500 *(dpi/72)), height=
+>> (600 * (dpi/72)), res = dpi, bg = "transparent")
+>> forest(res)
+>> dev.off()
+>>
+>> ### end of example script
+>>
+>>
+>>
+>> ?On 2018-06-11, 13:37, "R-sig-meta-analysis on behalf of P. Roberto
+>> Bakker" <r-sig-meta-analysis-bounces at r-project.org on behalf of
+>> robertobakker at gmail.com> wrote:
+>>
+>>     Hi,
+>>
+>>     My R page is 3.5.0.
+>>     My question is about forest() in metafor.
+>>
+>>     Thank you in advance.
+>>
+>>     Best,
+>>     Roberto
+>>
+>>     2018-06-08 18:21 GMT+02:00 P. Roberto Bakker <robertobakker at gmail.com
+>> >:
+>>
+>>     > Hi,
+>>     >
+>>     > My apologies, I forgot telling, the package is metafor/forest
+>>     >
+>>     > Best and thank you in advance,
+>>     >
+>>     > Roberto
+>>     >
+>>     > 2018-06-07 10:11 GMT-04:00 P. Roberto Bakker <
+>> robertobakker at gmail.com>:
+>>     >
+>>     >> Hi,
+>>     >>
+>>     >> When I change 'xlim(-1, 49)' into  'xlim(1, 49)'  then the lower
+>> half of
+>>     >> text "RE Model..." disappears.
+>>     >> How can I correct this?
+>>     >>
+>>     >> Reason for changing the 'xlim' is because this meta-analysis
+>> contains a
+>>     >> lot of studies and therefore  row texts overlap. A smaller font
+>> makes it
+>>     >> difficult to read
+>>     >> By lowering the lower xlim the text font is better.
+>>     >> Is ther a better way?
+>>     >>
+>>     >> Best and thank you in advance,
+>>     >>
+>>     >> Roberto
+>>     >>
+>>     >
+>>     >
+>>
+>>         [[alternative HTML version deleted]]
+>>
+>>     _______________________________________________
+>>     R-sig-meta-analysis mailing list
+>>     R-sig-meta-analysis at r-project.org
+>>     https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>>
+>>
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ce@@r@terrer @ending from me@com  Tue Dec 18 09:54:45 2018
+From: ce@@r@terrer @ending from me@com (Cesar Terrer Moreno)
+Date: Tue, 18 Dec 2018 09:54:45 +0100
+Subject: [R-meta] Nonlinear meta-regression
+Message-ID: <91BDF5BD-BDD6-4264-B8C3-81E5C7B0E73A@me.com>
+
+Dear all,
+
+The studies of my meta-analysis form this relationship, with y as the effect size, x as the main moderator, and the size of points as the inverse of the variance: https://imgur.com/a/ad6Br5y <https://imgur.com/a/ad6Br5y>
+
+In my opinion, the regression is clearly nonlinear. And in ecological terms, it makes sense that the relationship saturates. Here I?ve just fitted a regular loess function to aid the eye in seeing the pattern I refer to.
+
+How would you fit a nonelinear mixed-effects meta regression with metafor for a case like this?
+
+Thanks in advance.
+Best,
+C?sar
+	[[alternative HTML version deleted]]
+
+
+From li@t@ @ending from dewey@myzen@co@uk  Tue Dec 18 12:46:56 2018
+From: li@t@ @ending from dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 18 Dec 2018 11:46:56 +0000
+Subject: [R-meta] Nonlinear meta-regression
+In-Reply-To: <91BDF5BD-BDD6-4264-B8C3-81E5C7B0E73A@me.com>
+References: <91BDF5BD-BDD6-4264-B8C3-81E5C7B0E73A@me.com>
+Message-ID: <6d4f7b8a-58d3-3b22-f301-a0d0a99e3f9d@dewey.myzen.co.uk>
+
+Dear C?sar
+
+I would have to say that based purely on the plot and given the sparsity 
+of points for high levels of phosphorus I would not see quite what you 
+see. However if on theoretical grounds you are expecting a ceiling then 
+fine.
+
+If you want to fit a model which is non-linear in the variables then you 
+just enter the transformed predictors as moderators. So this would apply 
+if you wanted a polynomial or splines ir some form of segmented fit for 
+phosphorus. If you want a model which is non-linear in the parameters 
+like some form of exponential then that lies outside what I know how to 
+do but someone else will doubtless chip in.
+
+Michael
+
+On 18/12/2018 08:54, Cesar Terrer Moreno wrote:
+> Dear all,
+> 
+> The studies of my meta-analysis form this relationship, with y as the effect size, x as the main moderator, and the size of points as the inverse of the variance: https://imgur.com/a/ad6Br5y <https://imgur.com/a/ad6Br5y>
+> 
+> In my opinion, the regression is clearly nonlinear. And in ecological terms, it makes sense that the relationship saturates. Here I?ve just fitted a regular loess function to aid the eye in seeing the pattern I refer to.
+> 
+> How would you fit a nonelinear mixed-effects meta regression with metafor for a case like this?
+> 
+> Thanks in advance.
+> Best,
+> C?sar
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From webb@julie @ending from gm@il@com  Tue Dec 18 18:33:00 2018
+From: webb@julie @ending from gm@il@com (Julie Webbs)
+Date: Tue, 18 Dec 2018 17:33:00 +0000
+Subject: [R-meta] Gender meta-analysis
+Message-ID: <CAOQbByh2zFsOdk=GvAh39D8nUWevfDG8O7H+0=FuaEQ2bKzVxg@mail.gmail.com>
+
+I have the data for 10 years according to gender and performance. If  I
+assume female as a group and males as another group , will it be possible
+to run a meta-analysis using 10 years, assuming each year as a study?
+Questions for measuring performance are different, but samples more or less
+the same with different people.
+
+Thank you for your advice.
+
+	[[alternative HTML version deleted]]
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Wed Dec 19 09:47:43 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Wed, 19 Dec 2018 08:47:43 +0000
+Subject: [R-meta] Nonlinear meta-regression
+In-Reply-To: <6d4f7b8a-58d3-3b22-f301-a0d0a99e3f9d@dewey.myzen.co.uk>
+References: <91BDF5BD-BDD6-4264-B8C3-81E5C7B0E73A@me.com>
+ <6d4f7b8a-58d3-3b22-f301-a0d0a99e3f9d@dewey.myzen.co.uk>
+Message-ID: <17aa327ba2b2491dbad23eb8908678aa@UM-MAIL3214.unimaas.nl>
+
+An example of using cubic splines can be found here:
+
+https://stats.stackexchange.com/a/280119/1934
+
+But if you want a 'truly' non-linear model (i.e., non-linear in the parameters), then metafor doesn't do that. Code to fit non-linear models has passed through this list, but it would require adapting/tweaking depending on the model you want to fit (e.g., in this case, it seems you would want something curvilinear for low values of x and an upper asymptote for high values of x).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Michael Dewey
+Sent: Tuesday, 18 December, 2018 12:47
+To: Cesar Terrer Moreno; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Nonlinear meta-regression
+
+Dear C?sar
+
+I would have to say that based purely on the plot and given the sparsity 
+of points for high levels of phosphorus I would not see quite what you 
+see. However if on theoretical grounds you are expecting a ceiling then 
+fine.
+
+If you want to fit a model which is non-linear in the variables then you 
+just enter the transformed predictors as moderators. So this would apply 
+if you wanted a polynomial or splines ir some form of segmented fit for 
+phosphorus. If you want a model which is non-linear in the parameters 
+like some form of exponential then that lies outside what I know how to 
+do but someone else will doubtless chip in.
+
+Michael
+
+On 18/12/2018 08:54, Cesar Terrer Moreno wrote:
+> Dear all,
+> 
+> The studies of my meta-analysis form this relationship, with y as the effect size, x as the main moderator, and the size of points as the inverse of the variance: https://imgur.com/a/ad6Br5y <https://imgur.com/a/ad6Br5y>
+> 
+> In my opinion, the regression is clearly nonlinear. And in ecological terms, it makes sense that the relationship saturates. Here I?ve just fitted a regular loess function to aid the eye in seeing the pattern I refer to.
+> 
+> How would you fit a nonelinear mixed-effects meta regression with metafor for a case like this?
+> 
+> Thanks in advance.
+> Best,
+> C?sar
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Wed Dec 19 09:54:53 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Wed, 19 Dec 2018 08:54:53 +0000
+Subject: [R-meta] Gender meta-analysis
+In-Reply-To: <CAOQbByh2zFsOdk=GvAh39D8nUWevfDG8O7H+0=FuaEQ2bKzVxg@mail.gmail.com>
+References: <CAOQbByh2zFsOdk=GvAh39D8nUWevfDG8O7H+0=FuaEQ2bKzVxg@mail.gmail.com>
+Message-ID: <d7f862663a684ec4bc6850b8c7a353e8@UM-MAIL3214.unimaas.nl>
+
+Hi Julie,
+
+If you want to include multiple estimates that are obtained from the same sample repeatedly over time, then one needs to account for the dependency in the sampling errors of the estimates over time and for the dependency in the underlying true outcomes. Models of this type have been described in:
+
+Trikalinos, T. A., & Olkin, I. (2012). Meta-analysis of effect sizes reported at multiple time points: A multivariate approach. Clinical Trials, 9, 610-620.
+
+Ishak, K. J., Platt, R. W., Joseph, L., Hanley, J. A., & Caro, J. J. (2007). Meta-analysis of longitudinal studies. Clinical Trials, 4, 525-539.
+
+Musekiwa, A., Manda, S. O., Mwambi, H. G., & Chen, D. G. (2016). Meta-analysis of effect sizes reported at multiple time points using general linear mixed model. PLOS ONE, 11(10), e0164898.
+
+Implementations of these methods can be found under:
+
+help(dat.fine1993)
+help(dat.ishak2007)
+
+Construction of the var-cov matrix of the sampling errors can be difficult. As an alternative, one could use cluster-robust inference methods.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Julie Webbs
+Sent: Tuesday, 18 December, 2018 18:33
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Gender meta-analysis
+
+I have the data for 10 years according to gender and performance. If  I
+assume female as a group and males as another group , will it be possible
+to run a meta-analysis using 10 years, assuming each year as a study?
+Questions for measuring performance are different, but samples more or less
+the same with different people.
+
+Thank you for your advice.
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Wed Dec 19 10:25:15 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Wed, 19 Dec 2018 09:25:15 +0000
+Subject: [R-meta] 
+ SMD from three-level nested design (raw data available)
+In-Reply-To: <CAJz9w=2A=DkwqpQem77_wc9s4e3_yPi9JUsrQR9970oPKDfaQw@mail.gmail.com>
+References: <CAJz9w=0Z755_VWoo4oeyzQFMB7Mvv1PKtvf7b-__ERzRoJYJ1g@mail.gmail.com>
+ <CAFUVuJwEQc+T4V=HC4dgqvjet6z_aTmkMZQKfEZf9Kz1+zHBjw@mail.gmail.com>
+ <CAJz9w=3Cn1H1giwDt8oCow3oZxGFZhaMJBXo+Qf=GQgQ4CEjHg@mail.gmail.com>
+ <CAFUVuJyf3dAaF=JARVzEvVdwzmPXtPvy53etZhNd0FV60JiiiQ@mail.gmail.com>
+ <CAJz9w=1x8BsK8FGtaHDhKucYf6aKX=ib8y6xOQHPEg-+CkTRkA@mail.gmail.com>
+ <CAFUVuJynq_K0az_fXoAgDkVVKnNWHBz9_v4LZFqCBDyZhSWu8g@mail.gmail.com>
+ <CAJz9w=2A=DkwqpQem77_wc9s4e3_yPi9JUsrQR9970oPKDfaQw@mail.gmail.com>
+Message-ID: <a0ccf618e8e142a7aefee0a71f0551fb@UM-MAIL3214.unimaas.nl>
+
+Catching up on some older posts.
+
+1) The transformations of a log odds ratio to a standardized mean difference (measures "OR2DN" and "OR2DL" in escalc()) are quite simple. For OR2DN, it is essentially:
+
+yi <- lnori / 1.65
+vi <- selnori^2 / 1.65^2
+
+where lnori is the log odds ratio and selnori the corresponding standard error. So, you basically can just take the coefficient from the generalized mixed-effects model (which *is* a log odds ratio, assuming you fitted a logistic mixed-effects model) and its SE and plug those into these equations. The SE of the coefficient already incorporates the additional source of variability due to the nested structure of the data (assuming you include appropriate variance components in the mixed-effects model to reflect the nesting). One could debate whether the logic underlying this transformation is still applicable when the data have a nested structure, but I think this approach is defensible.
+
+2) If I understand you correctly, you are considering the following case: A dichotomous variables (which we consider a dichotomized version of a latent continuous variable) and a continuous variable are measured in a group of subjects and there is again nesting. The question is how to estimate the correlation between the latent continuous variable and the observed continuous variable based on such multilevel data. So, the data structure would be:
+
+group  subject  outcome  y
+1      1        dich     1
+1      1        cont     5
+1      2        dich     0
+1      2        cont     2
+1      3        dich     1
+1      3        cont     4
+...
+
+so two rows of data per subject. First of all, modeling such data jointly is not straightforward, because you need two different types of models for the two outcomes (e.g., logistic or probit for the dichotomous variable and normal for the continuous variable). You would need to look into what are sometimes called 'joint models', such as:
+
+https://cran.r-project.org/package=merlin
+
+Then one needs to allow for correlation between the two outcomes. Finally, one would really need to allow for correlation between the latent continuous variable and the observed continuous variable, so this might require specifying a model with latent variables (so, a joint model with latent variables). Implementing something like this would be a rather interesting exercise, but might actually be breaking some novel ground. So, I can only say that conceptually this should be possible, but I do not know of any solutions 'out of the box'. Maybe merlin can actually do this, but I haven't looked into this.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Fabian Schellhaas
+Sent: Thursday, 29 November, 2018 22:42
+To: James Pustejovsky
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] SMD from three-level nested design (raw data available)
+
+Dear all,
+
+We had a couple of related questions, so I will add to this thread. If
+preferred, I'd be happy to start a new thread instead.
+
+1. Another study, for which we obtained the raw data from the authors, has
+a nested data structure with two levels ? individual participants nested in
+clusters. What complicates matters here is that the construct of interest,
+which is continuous, was operationalized as a dichotomous measure. In the
+non-nested case, we would just compute the transformed log-odds ratio
+(e.g., escalc(measure = "OR2DN") in metafor). However, since the data are
+nested, we can fit a generalized linear mixed model (GLMM) to predict this
+dichotomous outcome. How would we then extract an effect size analogous to
+the transformed log-odds ratio from this model? The Hedges chapter and
+papers only describe the case of a continuous outcome variable, so we're
+not sure about the correct approach.
+
+2. We also wondered, more generally, how effect-size calculation from
+nested data with a dichotomous outcome would be handled in a meta-analysis
+of correlations. In the non-nested case, we could compute the biserial
+correlation when the predictor is continuous and the outcome is
+dichotomized (e.g., Jacobs & Viechtbauer, 2017). However, how would we
+extract an effect size analogous to the biserial correlation from a GLMM,
+which could then be combined with correlations from single-level data?
+
+Many thanks for any pointers!
+Fabian
+
+---
+Fabian M. H. Schellhaas | Ph.D. Candidate | Department of Psychology | Yale
+University
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Wed Dec 19 10:42:59 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Wed, 19 Dec 2018 09:42:59 +0000
+Subject: [R-meta] 
+ Network meta-analysis with randomized and non-randomized
+ studies in metafor
+In-Reply-To: <1A8B023A-2B2B-43F5-9497-AC9846A68E99@yaletown.io>
+References: <1A8B023A-2B2B-43F5-9497-AC9846A68E99@yaletown.io>
+Message-ID: <665fffe2911a4821a4be7ea238dee2c8@UM-MAIL3214.unimaas.nl>
+
+Hi Chris,
+
+Why don't you just include a moderator that distinguishes RS from NRS? The model should already include fixed/random effects for studies and random effects for estimates, so adding a moderator is sufficient. Here is an example, using the data from help(dat.hasselblad1998):
+
+### copy data into 'dat'
+dat <- dat.hasselblad1998
+
+### calculate log odds for each study arm
+dat <- escalc(measure="PLO", xi=xi, ni=ni, add=1/2, to="all", data=dat)
+dat
+
+### convert trt variable to factor with desired ordering of levels
+dat$trt <- factor(dat$trt, levels=c("no_contact", "self_help", "ind_counseling", "grp_counseling"))
+
+### add a space before each level (this makes the output a bit more legible)
+levels(dat$trt) <- paste0(" ", levels(dat$trt))
+
+### network meta-analysis using an arm-based model
+res <- rma.mv(yi, vi, mods = ~ trt, random = ~ 1 | study/id, data=dat)
+res
+
+### simulate a RS/NRS moderator (type)
+set.seed(1234)
+dat$type <- rep(sample(c("RS", "NRS"), length(unique(dat$study)), replace=TRUE), times=tapply(dat$study, dat$study, length))
+
+### adding type (RS/NRS) to the model
+res <- rma.mv(yi, vi, mods = ~ trt + type, random = ~ 1 | study/id, data=dat)
+res
+
+This last model assumes that the amount of heterogeneity at the study and estimate level is the same for RS and NRS. This might not be true; we may suspect that NRS are more heterogeneous. We can allow for this:
+
+### allowing for different amounts of heterogeneity for RS vs NRS
+res <- rma.mv(yi, vi, mods = ~ trt + type, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+res
+
+This is already a pretty complex model, so let's check on the identifiability of the variance components:
+
+profile(res)
+
+Looks good -- all profile plots have a clear peak (one being at 0, but that is fine).
+
+Finally, one may not just want to distinguish between RS/NRS, but actually allow the effect of the treatment to differ depending on the type of study. Then we allow type and trt to interact:
+
+res <- rma.mv(yi, vi, mods = ~ type * trt, random = list(~ type | study, ~ type | id), struct=c("DIAG","DIAG"), data=dat)
+res
+
+I hope this gives you some ideas on how to model your data.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Chris Rose
+Sent: Wednesday, 21 November, 2018 10:25
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Network meta-analysis with randomized and non-randomized studies in metafor
+
+Hi
+
+I'm working on a network meta-analysis (NMA) that will include randomized studies (RS) and non-randomized studies (NRS). I anticipate that the NRS may be biased, and that magnitude and direction of bias may vary unpredictably across the NRS. I am less concerned that the NRS may be overly precise (though I may be wrong!). It is also possible that I will have to include fixed effects for moderators (i.e., do a network meta-regression). I'm considering using the metafor package (see the end of this email for my reasoning).
+
+How should I model the distinction between the RS and NRS in metafor? I?m considering using a random effect (intercept) for each NRS. I.e., each effect estimate would be supported by some mixture of direct and indirect evidence that is (hopefully) unbiased in the case of the RS, and potentially biased in the case of the NRS (with that bias explained by the random effects).
+
+How would I specify this model in metafor? I.e., how do I specify that the random effects are conditional on a study being a NRS? Could I use a factor variable that has the same value for all the randomized studies, and distinct values for the non-randomized studies? Is there a better way to do this?
+
+Thanks in advance,
+
+Chris
+
+Why metafor?
+
+I?m aware of various NMA packages available for R, and I'm able to implement bespoke Bayesian models in JAGS and Stan. I?m considering metafor because:
+
+1. I need to use R.
+2. I have multiple outcomes to analyze and need to do various sensitivity analyses, so run-time is a consideration and MCMC is less attractive for this reason.
+3. I'd prefer to use a well-tested model implementation (I'm experienced enough with JAGS and Stan to know it's possible to make programming errors).
+4. I think the existing NMA-specific packages do not support modeling the distinction between RS and NRS (but I could be wrong).
+5. I think the existing NMA packages either do not support regression, or only support a single covariate or continuous covariates. I think this means they do not allow me to adjust for the randomized/non-randomized designs as well as other covariates if that was necessary. Again, I could be wrong.
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Wed Dec 19 10:48:11 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Wed, 19 Dec 2018 09:48:11 +0000
+Subject: [R-meta] Modeling dependent effect sizes (MASEM/TSSEM)
+In-Reply-To: <CAJtuV0rGks2TTqUaGYwhcHMhMwWgcmriQmfHDSHtkxnj=aNnzw@mail.gmail.com>
+References: <CAJtuV0rGks2TTqUaGYwhcHMhMwWgcmriQmfHDSHtkxnj=aNnzw@mail.gmail.com>
+Message-ID: <220ff8d4b9504f2ea769bdd9afac952b@UM-MAIL3214.unimaas.nl>
+
+Hi Marius,
+
+Even though we may want to use cluster-robust methods in the end, I think one should try to have a 'working model' that is at least a decent approximation. This will increase the efficiency of the parameter estimates and can also prevent that studies with a lot of effects are receiving 'undue' weight in the analysis. So, I would still use:
+
+Step1 <- rma.mv(yi=r, V=N_INV,
+                data=Robust1,
+                random=list(~1|K_ID,~1|ESID),
+                method="ML", mods=~factor(Zelle)-1)
+
+as my working model and then:
+
+step2 <- robust(Step1, cluster = Robust1$K_ID, adjust = TRUE)
+summary(step2)
+
+for the cluster-robust inferences.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Marius Wuketich
+Sent: Saturday, 17 November, 2018 15:33
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Modeling dependent effect sizes (MASEM/TSSEM)
+
+Dear colleagues,
+
+I have a question about different approaches to modeling dependent effect
+sizes. I'm doing a TSSEM study (based on correlation coefficients)
+according to Mike Cheung in metaSEM. My path model is a model with one
+independent and one dependent variable and three mediators.
+
+A small part of my work deals with different methods to consider dependent
+effect strengths in a MASEM analysis. I would like to compare the results
+of the following three methods:
+
+1. simple averaging the effect sizes
+
+2. the approach of Wilson/Polanin/Lipsey 2016 (
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4905597/) - a combination of a
+three-level hierarchical model and TSSEM
+
+3. the robust variance estimation according to Tipton/Hedges/Johnson 2010 (
+https://onlinelibrary.wiley.com/doi/abs/10.1002/jrsm.5) for the first part
+of the TSSEM
+
+With the third approach, I now have a basic understanding problem - how do
+I have to specify my model in metafor for the robust approach?
+
+K_ID = Study ID
+ESID = Effect sizes ID
+
+Second approach (three-level-model):
+
+Step1 <-rma.mv(yi=r, V=N_INV,
+               data=dataset,
+               random=list(~1|K_ID,~1|ESID),
+               method="ML", mods=~factor(Zelle)-1)
+summary (Step1)
+
+Third approach (robust variance approach):
+
+Step1 <-rma.mv(yi=r, V=N_INV,
+               data=Robust1,
+               random= ~1|K_ID,
+               method="ML", mods=~factor(Zelle)-1)
+summary (Step1)
+
+step2 <- robust(Step1, cluster = Robust1$K_ID, adjust = TRUE)
+summary(step2)
+
+######################################################
+
+Is that specified correctly yet? It just seems too simple to me.
+
+Best,
+Marius
+
+
+From nzelle@k@yem @ending from ndm@ox@@c@uk  Wed Dec 19 13:31:48 2018
+From: nzelle@k@yem @ending from ndm@ox@@c@uk (Nzelle Kayem)
+Date: Wed, 19 Dec 2018 12:31:48 +0000
+Subject: [R-meta] Publication Bias
+Message-ID: <LNXP265MB0954A3EA9DAED7639C59E0ABF9BE0@LNXP265MB0954.GBRP265.PROD.OUTLOOK.COM>
+
+Hello,
+
+I found a blog on publication bias and unfortunately my questions were not answered so I thought I will write to you.
+
+I am conducting a review on Ebola in pregnancy and I have completed the proportional meta-analysis.
+
+I got into trouble though when I tried to do the publication bias tests. I used the double arcsine transformation and I have plotted the funnels using the sample size but I don't know the code to use for the peters test. I have used as a guide so far Wang et al 2018 and Viechtbauer W 2010.
+
+Below is an example of the plot
+
+[cid:image001.png at 01D49796.CE2DBEA0]
+
+Thanks
+
+Delphine
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20181219/8db5ee9e/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image001.png
+Type: image/png
+Size: 44789 bytes
+Desc: image001.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20181219/8db5ee9e/attachment-0001.png>
+
+From cfuruk@w@ @ending from mit@edu  Wed Dec 19 13:50:11 2018
+From: cfuruk@w@ @ending from mit@edu (Chishio Furukawa)
+Date: Wed, 19 Dec 2018 21:50:11 +0900
+Subject: [R-meta] Inquiry on metafor trimfill and weightr
+Message-ID: <CAK7W6U4f-k9vPdaqrSF91PK1utL+2BCV-_aLEG6EZV1PSRuOGQ@mail.gmail.com>
+
+Dear the community of metafor users,
+
+I am writing to seek your advice for using the metafor trimfill (Duval and
+Tweedie 2000) and weightr (Hedges and Vevea 2005).
+
+Currently I am conducting a simulation study comparing their performance
+across various models of publication selection. However, when I looped over
+many simulated meta-analysis data sets, I encountered various errors that
+stopped the loop. I am writing to ask your advice on what I can do to
+address them.
+
+1) trimfill
+- for some data, I receive an error message "Trim and fill algorithm did
+not converge."
+2) weightr
+- for some data, there is an error with "optim" package that has
+"non-finite finite-difference value."
+- the Hessian is non-singular so I cannot calculate the standard error of
+each parameter.
+
+May I ask if anyone could advise me on (i) what features of data create any
+of these problems, and (ii) if there are ways to let the computation go
+through without having the code break? I am thinking, after all, I could
+skip these few simulation data sets that generate the prolems, and compute
+the coverage probabilities and interval lengths on the data that do not
+have these problems (although that might not be the most ideal way to
+address them.)
+
+Thank you so much in advance for your advice.
+
+Best regards,
+Chishio
+
+
+
+
+-- 
+Chishio Furukawa
+PhD Candidate
+Department of Economics
+Massachusetts Institute of Technology
+Cell: 617-767-1209
+Email: chishio at mit.edu
+
+	[[alternative HTML version deleted]]
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Wed Dec 19 15:29:57 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Wed, 19 Dec 2018 14:29:57 +0000
+Subject: [R-meta] Publication Bias
+In-Reply-To: <LNXP265MB0954A3EA9DAED7639C59E0ABF9BE0@LNXP265MB0954.GBRP265.PROD.OUTLOOK.COM>
+References: <LNXP265MB0954A3EA9DAED7639C59E0ABF9BE0@LNXP265MB0954.GBRP265.PROD.OUTLOOK.COM>
+Message-ID: <bed19164c47747d2ab8b36adddcf974d@UM-MAIL3214.unimaas.nl>
+
+Dear Delphine,
+
+For this outcome, the 'Peters test' would in essence be:
+
+library(metafor)
+
+dat <- escalc(measure="PFT", xi=xi, ni=ni, data=dat.debruin2009)
+dat
+
+regtest(dat$yi, dat$vi, model="lm", predictor="ninv")
+
+So, using the inverse sample size as predictor and using 'weighted regression with multiplicative dispersion' as the model.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Nzelle Kayem
+Sent: Wednesday, 19 December, 2018 13:32
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Publication Bias
+
+Hello,
+
+I found a blog on publication bias and unfortunately my questions were not answered so I thought I will write to you.
+
+I am conducting a review on Ebola in pregnancy and I have completed the proportional meta-analysis. 
+
+I got into trouble though when I tried to do the publication bias tests. I used the double arcsine transformation and I have plotted the funnels using the sample size but I don't know the code to use for the peters test. I have used as a guide so far Wang et al 2018 and Viechtbauer W 2010.
+
+Below is an example of the plot
+
+Thanks
+
+Delphine
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Wed Dec 19 15:39:05 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Wed, 19 Dec 2018 14:39:05 +0000
+Subject: [R-meta] Inquiry on metafor trimfill and weightr
+In-Reply-To: <CAK7W6U4f-k9vPdaqrSF91PK1utL+2BCV-_aLEG6EZV1PSRuOGQ@mail.gmail.com>
+References: <CAK7W6U4f-k9vPdaqrSF91PK1utL+2BCV-_aLEG6EZV1PSRuOGQ@mail.gmail.com>
+Message-ID: <a4a333b8f002426aa5762ae908333e5b@UM-MAIL3214.unimaas.nl>
+
+Dear Chishio,
+
+As for trimfill(), I cannot tell you what particular features of the data might make (non)convergence more or less likely. But you could take a problematic dataset and try:
+
+trimfill(res, verbose=TRUE)
+
+What do you see in the output? You could also try increasing the maximum number of iterations:
+
+trimfill(res, maxiter=1000)
+
+But usually trim and fill converges quickly, so if it doesn't converge after 100 iterations (the default), then I doubt it will after 1000 (or more). But it is worth trying.
+
+More generally, in your simulation code, you need to use the try() function. So, something like this:
+
+for (...) {
+
+   [...]
+
+   sav <- try(trimfill(res))
+
+   if (inherits(sav, "try-error"))
+      next
+
+   [do stuff if it converges]
+
+}
+
+This way, the code/loop will continue even if the function inside try() throws an error.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Chishio Furukawa
+Sent: Wednesday, 19 December, 2018 13:50
+To: R meta
+Subject: [R-meta] Inquiry on metafor trimfill and weightr
+
+Dear the community of metafor users,
+
+I am writing to seek your advice for using the metafor trimfill (Duval and
+Tweedie 2000) and weightr (Hedges and Vevea 2005).
+
+Currently I am conducting a simulation study comparing their performance
+across various models of publication selection. However, when I looped over
+many simulated meta-analysis data sets, I encountered various errors that
+stopped the loop. I am writing to ask your advice on what I can do to
+address them.
+
+1) trimfill
+- for some data, I receive an error message "Trim and fill algorithm did
+not converge."
+2) weightr
+- for some data, there is an error with "optim" package that has
+"non-finite finite-difference value."
+- the Hessian is non-singular so I cannot calculate the standard error of
+each parameter.
+
+May I ask if anyone could advise me on (i) what features of data create any
+of these problems, and (ii) if there are ways to let the computation go
+through without having the code break? I am thinking, after all, I could
+skip these few simulation data sets that generate the prolems, and compute
+the coverage probabilities and interval lengths on the data that do not
+have these problems (although that might not be the most ideal way to
+address them.)
+
+Thank you so much in advance for your advice.
+
+Best regards,
+Chishio
+
+-- 
+Chishio Furukawa
+PhD Candidate
+Department of Economics
+Massachusetts Institute of Technology
+Cell: 617-767-1209
+Email: chishio at mit.edu
+
+
+From ruecker @ending from imbi@uni-freiburg@de  Wed Dec 19 16:14:21 2018
+From: ruecker @ending from imbi@uni-freiburg@de (Gerta Ruecker)
+Date: Wed, 19 Dec 2018 16:14:21 +0100
+Subject: [R-meta] Publication Bias
+In-Reply-To: <bed19164c47747d2ab8b36adddcf974d@UM-MAIL3214.unimaas.nl>
+References: <LNXP265MB0954A3EA9DAED7639C59E0ABF9BE0@LNXP265MB0954.GBRP265.PROD.OUTLOOK.COM>
+ <bed19164c47747d2ab8b36adddcf974d@UM-MAIL3214.unimaas.nl>
+Message-ID: <918a43f6-f7a8-0d84-9f90-03a076d4d71b@imbi.uni-freiburg.de>
+
+Dear Delphine,
+
+beyond the R code the question is: What does a funnel plot test mean for 
+a meta-analysis of proportions? For meta-analyses of comparative effect 
+sizes (i.e.,? comparing two interventions), the assumption behind the 
+funnel plot tests is that imprecise studies with undesired effects 
+(e.g., placebo better than treatment) were suppressed, leading to a gap 
+in the funnel plot on the "bad" side. But what is the corresponding 
+hypothesis for proportions, for example prevalences? Does the 
+funnelplot/the test make sense? How would you interpret ther result?
+
+Best,
+
+Gerta
+
+Am 19.12.2018 um 15:29 schrieb Viechtbauer, Wolfgang (SP):
+> Dear Delphine,
+>
+> For this outcome, the 'Peters test' would in essence be:
+>
+> library(metafor)
+>
+> dat <- escalc(measure="PFT", xi=xi, ni=ni, data=dat.debruin2009)
+> dat
+>
+> regtest(dat$yi, dat$vi, model="lm", predictor="ninv")
+>
+> So, using the inverse sample size as predictor and using 'weighted regression with multiplicative dispersion' as the model.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Nzelle Kayem
+> Sent: Wednesday, 19 December, 2018 13:32
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Publication Bias
+>
+> Hello,
+>
+> I found a blog on publication bias and unfortunately my questions were not answered so I thought I will write to you.
+>
+> I am conducting a review on Ebola in pregnancy and I have completed the proportional meta-analysis.
+>
+> I got into trouble though when I tried to do the publication bias tests. I used the double arcsine transformation and I have plotted the funnels using the sample size but I don't know the code to use for the peters test. I have used as a guide so far Wang et al 2018 and Viechtbauer W 2010.
+>
+> Below is an example of the plot
+>
+> Thanks
+>
+> Delphine
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+From nzelle@k@yem @ending from ndm@ox@@c@uk  Wed Dec 19 15:51:51 2018
+From: nzelle@k@yem @ending from ndm@ox@@c@uk (Nzelle Kayem)
+Date: Wed, 19 Dec 2018 14:51:51 +0000
+Subject: [R-meta] Publication Bias
+In-Reply-To: <bed19164c47747d2ab8b36adddcf974d@UM-MAIL3214.unimaas.nl>
+References: <LNXP265MB0954A3EA9DAED7639C59E0ABF9BE0@LNXP265MB0954.GBRP265.PROD.OUTLOOK.COM>
+ <bed19164c47747d2ab8b36adddcf974d@UM-MAIL3214.unimaas.nl>
+Message-ID: <LNXP265MB095497E931E8BD9A2204881FF9BE0@LNXP265MB0954.GBRP265.PROD.OUTLOOK.COM>
+
+Dear Wolfgang,
+
+Thank you very much.
+
+Best
+
+Delphine
+
+-----Original Message-----
+From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> 
+Sent: 19 December 2018 14:30
+To: Nzelle Kayem <nzelle.kayem at ndm.ox.ac.uk>; r-sig-meta-analysis at r-project.org
+Subject: RE: [R-meta] Publication Bias
+
+Dear Delphine,
+
+For this outcome, the 'Peters test' would in essence be:
+
+library(metafor)
+
+dat <- escalc(measure="PFT", xi=xi, ni=ni, data=dat.debruin2009) dat
+
+regtest(dat$yi, dat$vi, model="lm", predictor="ninv")
+
+So, using the inverse sample size as predictor and using 'weighted regression with multiplicative dispersion' as the model.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Nzelle Kayem
+Sent: Wednesday, 19 December, 2018 13:32
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Publication Bias
+
+Hello,
+
+I found a blog on publication bias and unfortunately my questions were not answered so I thought I will write to you.
+
+I am conducting a review on Ebola in pregnancy and I have completed the proportional meta-analysis. 
+
+I got into trouble though when I tried to do the publication bias tests. I used the double arcsine transformation and I have plotted the funnels using the sample size but I don't know the code to use for the peters test. I have used as a guide so far Wang et al 2018 and Viechtbauer W 2010.
+
+Below is an example of the plot
+
+Thanks
+
+Delphine
+
+
+From li@t@ @ending from dewey@myzen@co@uk  Wed Dec 19 16:29:04 2018
+From: li@t@ @ending from dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 19 Dec 2018 15:29:04 +0000
+Subject: [R-meta] Inquiry on metafor trimfill and weightr
+In-Reply-To: <CAK7W6U4f-k9vPdaqrSF91PK1utL+2BCV-_aLEG6EZV1PSRuOGQ@mail.gmail.com>
+References: <CAK7W6U4f-k9vPdaqrSF91PK1utL+2BCV-_aLEG6EZV1PSRuOGQ@mail.gmail.com>
+Message-ID: <36eb92c6-268e-1dd1-eef7-1ed1ec52a4f5@dewey.myzen.co.uk>
+
+Dear Chishio
+
+Do the two methods stop on the same data sets? As well as possibly 
+giving you a clue as to what is happening that would, in my opinion, 
+make leaving those sets out more justifiable for your comparison.
+
+Michael
+
+On 19/12/2018 12:50, Chishio Furukawa wrote:
+> Dear the community of metafor users,
+> 
+> I am writing to seek your advice for using the metafor trimfill (Duval and
+> Tweedie 2000) and weightr (Hedges and Vevea 2005).
+> 
+> Currently I am conducting a simulation study comparing their performance
+> across various models of publication selection. However, when I looped over
+> many simulated meta-analysis data sets, I encountered various errors that
+> stopped the loop. I am writing to ask your advice on what I can do to
+> address them.
+> 
+> 1) trimfill
+> - for some data, I receive an error message "Trim and fill algorithm did
+> not converge."
+> 2) weightr
+> - for some data, there is an error with "optim" package that has
+> "non-finite finite-difference value."
+> - the Hessian is non-singular so I cannot calculate the standard error of
+> each parameter.
+> 
+> May I ask if anyone could advise me on (i) what features of data create any
+> of these problems, and (ii) if there are ways to let the computation go
+> through without having the code break? I am thinking, after all, I could
+> skip these few simulation data sets that generate the prolems, and compute
+> the coverage probabilities and interval lengths on the data that do not
+> have these problems (although that might not be the most ideal way to
+> address them.)
+> 
+> Thank you so much in advance for your advice.
+> 
+> Best regards,
+> Chishio
+> 
+> 
+> 
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From jepu@to @ending from gm@il@com  Wed Dec 19 18:41:56 2018
+From: jepu@to @ending from gm@il@com (James Pustejovsky)
+Date: Wed, 19 Dec 2018 11:41:56 -0600
+Subject: [R-meta] Inquiry on metafor trimfill and weightr
+In-Reply-To: <36eb92c6-268e-1dd1-eef7-1ed1ec52a4f5@dewey.myzen.co.uk>
+References: <CAK7W6U4f-k9vPdaqrSF91PK1utL+2BCV-_aLEG6EZV1PSRuOGQ@mail.gmail.com>
+ <36eb92c6-268e-1dd1-eef7-1ed1ec52a4f5@dewey.myzen.co.uk>
+Message-ID: <CAFUVuJwy5Y2xvG5k557sVb77-v1edgoHTE=HPQPQQv8=yJ1_1w@mail.gmail.com>
+
+Chishio,
+
+For trim-and-fill, it could be that non-convergence is due to
+non-convergence of the random effects model used to initialize the
+algorithm. In my experience, applying the R0 trim-and-fill algorithm after
+fitting a fixed (common) effect model does not have convergence problems.
+Not sure about the L0 version.
+
+For weightr, there are several reasons that you can get non-convergence or
+NPD hessian: it could be because the variance component estimate approaches
+zero or because the weight parameters (the probability that an effect is
+observed, given its significance level, relative to the probability that
+significant effects are observed) are near zero. The latter happens when
+one of the significance ranges has very few observed effects in it. For
+instance, in the simplest 3-parameter model with one threshold at p = .025,
+non-convergence tends to occur when there are no significant effects or all
+significant effects. Eithe rof these cases will be more or less likely
+depending on the average effect size and degree of heterogeneity in the
+underlying population.
+
+I've done some simulations with both of these methods, reported in this
+forthcoming paper: https://psyarxiv.com/ea6kz/
+The code for the simulations is here: https://osf.io/xqcra/
+In particular, see the function fit_3PSM() for an example of one way to
+handle the various non-convergence cases (though there are surely better
+ways).
+
+James
+
+On Wed, Dec 19, 2018 at 9:31 AM Michael Dewey <lists at dewey.myzen.co.uk>
+wrote:
+
+> Dear Chishio
+>
+> Do the two methods stop on the same data sets? As well as possibly
+> giving you a clue as to what is happening that would, in my opinion,
+> make leaving those sets out more justifiable for your comparison.
+>
+> Michael
+>
+> On 19/12/2018 12:50, Chishio Furukawa wrote:
+> > Dear the community of metafor users,
+> >
+> > I am writing to seek your advice for using the metafor trimfill (Duval
+> and
+> > Tweedie 2000) and weightr (Hedges and Vevea 2005).
+> >
+> > Currently I am conducting a simulation study comparing their performance
+> > across various models of publication selection. However, when I looped
+> over
+> > many simulated meta-analysis data sets, I encountered various errors that
+> > stopped the loop. I am writing to ask your advice on what I can do to
+> > address them.
+> >
+> > 1) trimfill
+> > - for some data, I receive an error message "Trim and fill algorithm did
+> > not converge."
+> > 2) weightr
+> > - for some data, there is an error with "optim" package that has
+> > "non-finite finite-difference value."
+> > - the Hessian is non-singular so I cannot calculate the standard error of
+> > each parameter.
+> >
+> > May I ask if anyone could advise me on (i) what features of data create
+> any
+> > of these problems, and (ii) if there are ways to let the computation go
+> > through without having the code break? I am thinking, after all, I could
+> > skip these few simulation data sets that generate the prolems, and
+> compute
+> > the coverage probabilities and interval lengths on the data that do not
+> > have these problems (although that might not be the most ideal way to
+> > address them.)
+> >
+> > Thank you so much in advance for your advice.
+> >
+> > Best regards,
+> > Chishio
+> >
+> >
+> >
+> >
+>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From webb@julie @ending from gm@il@com  Sun Dec 23 18:18:58 2018
+From: webb@julie @ending from gm@il@com (Julie Webbs)
+Date: Sun, 23 Dec 2018 17:18:58 +0000
+Subject: [R-meta] FE Model
+Message-ID: <CAOQbByi7f6dBz7dDfQV=GEaVS_NC=ic=GpZ+k0EqZazuh8-zEg@mail.gmail.com>
+
+Hi
+I have set method = "FE" in rma(), but in the forest plot , I get the RM
+Model, and the results do not change when I use method = "FE" in metafor.
+Is it a bug or I missed something?
+Any help?
+Julie
+
+	[[alternative HTML version deleted]]
+
+
+From webb@julie @ending from gm@il@com  Sun Dec 23 18:22:32 2018
+From: webb@julie @ending from gm@il@com (Julie Webbs)
+Date: Sun, 23 Dec 2018 17:22:32 +0000
+Subject: [R-meta] FE Model
+In-Reply-To: <CAOQbByi7f6dBz7dDfQV=GEaVS_NC=ic=GpZ+k0EqZazuh8-zEg@mail.gmail.com>
+References: <CAOQbByi7f6dBz7dDfQV=GEaVS_NC=ic=GpZ+k0EqZazuh8-zEg@mail.gmail.com>
+Message-ID: <CAOQbByjAa5ajZHt+tVJ-LhKA1BNPooMqPdAH7Z7n7NY68heykQ@mail.gmail.com>
+
+Sorry i meant I get the RE Model
+
+On Sun, Dec 23, 2018 at 5:18 PM Julie Webbs <webbsjulie at gmail.com> wrote:
+
+> Hi
+> I have set method = "FE" in rma(), but in the forest plot , I get the RM
+> Model, and the results do not change when I use method = "FE" in metafor.
+> Is it a bug or I missed something?
+> Any help?
+> Julie
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @v@nmeter @ending from northwell@edu  Sun Dec 23 17:40:57 2018
+From: @v@nmeter @ending from northwell@edu (Van Meter, Anna)
+Date: Sun, 23 Dec 2018 16:40:57 +0000
+Subject: [R-meta] question about effect size estimates using Berkey
+Message-ID: <BL0PR1901MB216236B3B38253E3A416862CAEBA0@BL0PR1901MB2162.namprd19.prod.outlook.com>
+
+Hello,
+
+
+
+I have a question about inconsistent results that I am getting when trying to calculate effect sizes using the Berkey method. The data are prevalence rates from different studies and some studies include multiple prevalence rates, which may reflect the same people. For example, one study could report the prevalence for bipolar I and for the full bipolar spectrum, which would include those with bipolar I, plus others who have other subtypes of bipolar disorder. There are three potential prevalence categories ? bipolar I, bipolar I & II, all bipolar.
+
+
+
+I have created two binary dummy codes to represent which subtypes are included in each sample ? inc2yn (bipolar I & II) and nosyn (all bipolar). There is also a code that says which of the three categories an effect size belongs to (threegroup) and is coded 1 (bipolar I), 2 (bipolar I & II) or 3 (all bipolar).
+
+
+
+Id refers to individual effects sizes, articleno is the study, so Ids are nested within articleno.
+
+
+
+There are 27 effect sizes from 18 studies. There are 13 bipolar I effects, 7 bipolar I & II effects, and 7 all bipolar effects.
+
+
+
+Initially, I ran the following code to get estimates for the three effect sizes:
+
+resmvberkey0<-rma.mv(yi, berkeyV, data=kidtall1, mods= cbind(inc2yn, nosyn), slab = paste(reference),random = list((~ 1 | Id), ~ 1 | articleno), method="ML")
+
+
+
+Then, to get an estimate for bipolar I & II (for example). I would use the following command:
+
+predict(resmvberkey0, transf=transf.ilogit, newmods = cbind(1,0))
+
+
+
+Later, when I was making a forest plot, I wanted to get estimates from a model that did not include moderators (it seems that you cannot include moderators in the addpoly command). This led me to use the subset command to get estimates for each effect size separately:
+
+resmvberkey0bp1_2<-rma.mv(yi, berkeyV, data=kidtall1, subset=threegroup==2, random = list((~ 1 | Id), ~ 1 | articleno), method="ML")
+
+predict(resmvberkey0bp1_2, transf=transf.ilogit)
+
+
+
+The rates I get by manipulating the moderators to estimate for a single category are different from the rates I get when I use the subset command:
+
+moderator result for bipolar I = .11%
+
+subset result for bipolar I = .15%
+
+
+
+moderator result for bipolar I & II = .18%
+
+subset result for bipolar I & II is .17%
+
+
+
+moderator result for all bipolar is 1.51%
+
+subset result for all bipolar is 3.56%
+
+
+
+Any thoughts about why these results would be so different ? and why ? would be greatly appreciated.
+
+
+
+Thank you,
+
+Anna
+
+
+Anna Van Meter, PhD
+
+Assistant Professor, The Feinstein Institute for Medical Research
+
+Adjunct Assistant Professor, Ferkauf Graduate School of Psychology, Yeshiva University
+
+The Zucker Hillside Hospital, Division of Psychiatry Research
+
+75-59 263rd Street
+
+Glen Oaks, NY 11004
+
+718.470.5813
+
+
+
+The information contained in this electronic e-mail transmission and any attachments are intended only for the use of the individual or entity to whom or to which it is addressed, and may contain information that is privileged, confidential and exempt from disclosure under applicable law. If the reader of this communication is not the intended recipient, or the employee or agent responsible for delivering this communication to the intended recipient, you are hereby notified that any dissemination, distribution, copying or disclosure of this communication and any attachment is strictly prohibited. If you have received this transmission in error, please notify the sender immediately by telephone and electronic mail, and delete the original communication and any attachment from any computer, server or other electronic recording or storage device or medium. Receipt by anyone other than the intended recipient is not a waiver of any attorney-client, physician-patient or other privilege.
+	[[alternative HTML version deleted]]
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Sun Dec 23 18:43:39 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Sun, 23 Dec 2018 17:43:39 +0000
+Subject: [R-meta] FE Model
+In-Reply-To: <CAOQbByjAa5ajZHt+tVJ-LhKA1BNPooMqPdAH7Z7n7NY68heykQ@mail.gmail.com>
+References: <CAOQbByi7f6dBz7dDfQV=GEaVS_NC=ic=GpZ+k0EqZazuh8-zEg@mail.gmail.com>
+ <CAOQbByjAa5ajZHt+tVJ-LhKA1BNPooMqPdAH7Z7n7NY68heykQ@mail.gmail.com>
+Message-ID: <9e7013b8abca4402882dba8b5e80dbbf@UM-MAIL3214.unimaas.nl>
+
+Hi Julie,
+
+Could you provide a reproducible example illustrating the issue?
+
+This works just fine:
+
+yi <- c(.1, .2, .3)
+vi <- rep(.01, 3)
+res <- rma(yi, vi, method="FE")
+forest(res)
+
+Maybe tau^2 is estimated to be zero in your case? Then the plot will look the same, except for the labeling:
+
+res <- rma(yi, vi)
+res
+forest(res)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Julie Webbs
+Sent: Sunday, 23 December, 2018 18:23
+To: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] FE Model
+
+Sorry i meant I get the RE Model
+
+On Sun, Dec 23, 2018 at 5:18 PM Julie Webbs <webbsjulie at gmail.com> wrote:
+
+> Hi
+> I have set method = "FE" in rma(), but in the forest plot , I get the RM
+> Model, and the results do not change when I use method = "FE" in metafor.
+> Is it a bug or I missed something?
+> Any help?
+> Julie
+
+
+From webb@julie @ending from gm@il@com  Sun Dec 23 20:18:59 2018
+From: webb@julie @ending from gm@il@com (Julie Webbs)
+Date: Sun, 23 Dec 2018 19:18:59 +0000
+Subject: [R-meta] FE Model
+In-Reply-To: <8a06cf86d0c34d3298fba52295c4aec1@UM-MAIL3214.unimaas.nl>
+References: <CAOQbByi7f6dBz7dDfQV=GEaVS_NC=ic=GpZ+k0EqZazuh8-zEg@mail.gmail.com>
+ <CAOQbByjAa5ajZHt+tVJ-LhKA1BNPooMqPdAH7Z7n7NY68heykQ@mail.gmail.com>
+ <9e7013b8abca4402882dba8b5e80dbbf@UM-MAIL3214.unimaas.nl>
+ <CAOQbByi4Cx68uHvtk+h7BmUOwRaye_Y+WBpT6bc=1y3mTPxO5g@mail.gmail.com>
+ <8a06cf86d0c34d3298fba52295c4aec1@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAOQbByjigVbcAoCV92psX+AbC++QFCvKuDyNyB_VsNRtz8=_FA@mail.gmail.com>
+
+On Sun, Dec 23, 2018 at 7:10 PM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Please reply to the mailing list, not just to me. Also, please provide a
+> fully reproducible example.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Julie Webbs [mailto:webbsjulie at gmail.com]
+> Sent: Sunday, 23 December, 2018 19:31
+> To: Viechtbauer, Wolfgang (SP)
+> Subject: Re: [R-meta] FE Model
+>
+> Thank you, Wolfgang
+>
+> Here is the data. If you use the method= "FE",  the label  will read  the
+> "RE Model" , not the  "FE Model" in the forest plot. tau^2= 0. Thank you
+> for your help.
+>
+> Study   Ne      Me      Se      Nc      Mc      Sc
+> Study 1 80      71      12      80      69      8
+> Study 2 69      83      11      69      80      9
+> Study 3 92      87      10      92      85      8
+>
+> On Sun, Dec 23, 2018 at 5:43 PM Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Hi Julie,
+>
+> Could you provide a reproducible example illustrating the issue?
+>
+> This works just fine:
+>
+> yi <- c(.1, .2, .3)
+> vi <- rep(.01, 3)
+> res <- rma(yi, vi, method="FE")
+> forest(res)
+>
+> Maybe tau^2 is estimated to be zero in your case? Then the plot will look
+> the same, except for the labeling:
+>
+> res <- rma(yi, vi)
+> res
+> forest(res)
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Julie Webbs
+> Sent: Sunday, 23 December, 2018 18:23
+> To: r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] FE Model
+>
+> Sorry i meant I get the RE Model
+>
+> On Sun, Dec 23, 2018 at 5:18 PM Julie Webbs <webbsjulie at gmail.com> wrote:
+>
+> > Hi
+> > I have set method = "FE" in rma(), but in the forest plot , I get the RM
+> > Model, and the results do not change when I use method = "FE" in metafor.
+> > Is it a bug or I missed something?
+> > Any help?
+> > Julie
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Sun Dec 23 20:49:54 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Sun, 23 Dec 2018 19:49:54 +0000
+Subject: [R-meta] FE Model
+In-Reply-To: <CAOQbByjigVbcAoCV92psX+AbC++QFCvKuDyNyB_VsNRtz8=_FA@mail.gmail.com>
+References: <CAOQbByi7f6dBz7dDfQV=GEaVS_NC=ic=GpZ+k0EqZazuh8-zEg@mail.gmail.com>
+ <CAOQbByjAa5ajZHt+tVJ-LhKA1BNPooMqPdAH7Z7n7NY68heykQ@mail.gmail.com>
+ <9e7013b8abca4402882dba8b5e80dbbf@UM-MAIL3214.unimaas.nl>
+ <CAOQbByi4Cx68uHvtk+h7BmUOwRaye_Y+WBpT6bc=1y3mTPxO5g@mail.gmail.com>
+ <8a06cf86d0c34d3298fba52295c4aec1@UM-MAIL3214.unimaas.nl>
+ <CAOQbByjigVbcAoCV92psX+AbC++QFCvKuDyNyB_VsNRtz8=_FA@mail.gmail.com>
+Message-ID: <40956ee1d60149b0a91550e78c612727@UM-MAIL3214.unimaas.nl>
+
+This is not a reproducible example. For details on how to create reproducible examples, please see:
+
+- https://stackoverflow.com/questions/5963269/how-to-make-a-great-r-reproducible-example
+- http://adv-r.had.co.nz/Reproducibility.html
+- https://cran.r-project.org/web/packages/reprex/vignettes/reprex-dos-and-donts.html
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Julie Webbs
+Sent: Sunday, 23 December, 2018 20:19
+To: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] FE Model
+
+On Sun, Dec 23, 2018 at 7:10 PM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Please reply to the mailing list, not just to me. Also, please provide a
+> fully reproducible example.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Julie Webbs [mailto:webbsjulie at gmail.com]
+> Sent: Sunday, 23 December, 2018 19:31
+> To: Viechtbauer, Wolfgang (SP)
+> Subject: Re: [R-meta] FE Model
+>
+> Thank you, Wolfgang
+>
+> Here is the data. If you use the method= "FE",  the label  will read  the
+> "RE Model" , not the  "FE Model" in the forest plot. tau^2= 0. Thank you
+> for your help.
+>
+> Study   Ne      Me      Se      Nc      Mc      Sc
+> Study 1 80      71      12      80      69      8
+> Study 2 69      83      11      69      80      9
+> Study 3 92      87      10      92      85      8
+>
+> On Sun, Dec 23, 2018 at 5:43 PM Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Hi Julie,
+>
+> Could you provide a reproducible example illustrating the issue?
+>
+> This works just fine:
+>
+> yi <- c(.1, .2, .3)
+> vi <- rep(.01, 3)
+> res <- rma(yi, vi, method="FE")
+> forest(res)
+>
+> Maybe tau^2 is estimated to be zero in your case? Then the plot will look
+> the same, except for the labeling:
+>
+> res <- rma(yi, vi)
+> res
+> forest(res)
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Julie Webbs
+> Sent: Sunday, 23 December, 2018 18:23
+> To: r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] FE Model
+>
+> Sorry i meant I get the RE Model
+>
+> On Sun, Dec 23, 2018 at 5:18 PM Julie Webbs <webbsjulie at gmail.com> wrote:
+>
+> > Hi
+> > I have set method = "FE" in rma(), but in the forest plot , I get the RM
+> > Model, and the results do not change when I use method = "FE" in metafor.
+> > Is it a bug or I missed something?
+> > Any help?
+> > Julie
+
+
+From @v@nmeter @ending from northwell@edu  Mon Dec 24 14:20:18 2018
+From: @v@nmeter @ending from northwell@edu (Van Meter, Anna)
+Date: Mon, 24 Dec 2018 13:20:18 +0000
+Subject: [R-meta] question about effect size estimates using Berkey
+Message-ID: <BL0PR1901MB216277BD05F4ED40C1AE2B4CAEBB0@BL0PR1901MB2162.namprd19.prod.outlook.com>
+
+Hello,
+
+I  have a question about inconsistent results that I am getting when  trying to calculate effect sizes using the Berkey  method. The data are prevalence rates from different studies and some  studies include multiple prevalence rates, which may reflect the same  people. For example, one study could report the prevalence for bipolar I  and for the full bipolar spectrum, which would  include those with bipolar I, plus others who have other subtypes of  bipolar disorder. There are three potential prevalence categories ?  bipolar I, bipolar I & II, all bipolar.
+
+I have created two binary dummy codes to represent which subtypes are included in each sample ? inc2yn (bipolar I & II) and nosyn (all bipolar). There is also a code that says which of the three categories an effect size  belongs to (threegroup) and is coded 1 (bipolar I), 2 (bipolar I & II) or 3 (all bipolar).
+
+Id refers to individual effects  sizes, articleno is the study, so Ids are nested within articleno.
+
+There are 27 effect sizes from 18 studies. There are 13 bipolar I effects, 7 bipolar I & II effects, and 7 all bipolar  effects.
+
+Initially, I ran the following code to get estimates for the three effect sizes:
+resmvberkey0<-rma.mv(yi, berkeyV, data=kidtall1, mods= cbind(inc2yn, nosyn), slab = paste(reference),random = list((~  1 | Id), ~ 1 | articleno), method="ML")
+
+Then, to get an estimate for bipolar I & II (for example). I would use the following command:
+predict(resmvberkey0, transf=transf.ilogit, newmods = cbind(1,0))
+
+Later,  when I was making a forest plot, I wanted to get estimates from a model  that did not include moderators (it  seems that you cannot include moderators in the addpoly command). This  led me to use the subset command to get estimates for each effect size  separately:
+resmvberkey0bp1_2<-rma.mv(yi, berkeyV, data=kidtall1, subset=threegroup==2, random = list((~ 1 | Id), ~ 1 | articleno),  method="ML")
+predict(resmvberkey0bp1_2, transf=transf.ilogit)
+
+The rates I get by manipulating the moderators to estimate for a single category are different from the rates I get  when I use the subset command:
+moderator result for bipolar I = .11%
+subset result for bipolar I = .15%
+
+moderator result for bipolar I & II = .18%
+subset result for bipolar I & II is .17%
+
+moderator result for all bipolar is 1.51%
+subset result for all bipolar is 3.56%
+
+Any thoughts about why these results would be so different ? and why ? would be greatly appreciated.
+
+Thank you,
+Anna
+
+Anna Van Meter, PhD
+Assistant Professor, The Feinstein Institute for Medical Research
+Adjunct Assistant Professor, Ferkauf Graduate School of Psychology, Yeshiva University
+The Zucker Hillside Hospital, Division of Psychiatry Research
+75-59 263rd Street
+Glen Oaks, NY 11004
+718.470.5813
+
+
+
+The information contained in this electronic e-mail transmission and any attachments are intended only for the use of the individual or entity to whom or to which it is addressed, and may contain information that is privileged, confidential and exempt from disclosure under applicable law. If the reader of this communication is not the intended recipient, or the employee or agent responsible for delivering this communication to the intended recipient, you are hereby notified that any dissemination, distribution, copying or disclosure of this communication and any attachment is strictly prohibited. If you have received this transmission in error, please notify the sender immediately by telephone and electronic mail, and delete the original communication and any attachment from any computer, server or other electronic recording or storage device or medium. Receipt by anyone other than the intended recipient is not a waiver of any attorney-client, physician-patient or other privilege.
+	[[alternative HTML version deleted]]
+
+
+From li@t@ @ending from dewey@myzen@co@uk  Mon Dec 24 14:21:04 2018
+From: li@t@ @ending from dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 24 Dec 2018 13:21:04 +0000
+Subject: [R-meta] question about effect size estimates using Berkey
+In-Reply-To: <BL0PR1901MB216236B3B38253E3A416862CAEBA0@BL0PR1901MB2162.namprd19.prod.outlook.com>
+References: <BL0PR1901MB216236B3B38253E3A416862CAEBA0@BL0PR1901MB2162.namprd19.prod.outlook.com>
+Message-ID: <b87383ec-194a-7a4d-b71f-cddaed6d5789@dewey.myzen.co.uk>
+
+Dear Anna
+
+I am not an authority on multivariate meta-analysis but a similar 
+phenomenon is well known for univariate so I suspect that the situation 
+is that when you use a moderator you are using all the data-set to 
+estimate variances whereas when you subset you are just using that subset.
+
+http://www.metafor-project.org/doku.php/tips:comp_two_independent_estimates
+
+Explains the situation for the univariate case.
+
+Michael
+
+On 23/12/2018 16:40, Van Meter, Anna wrote:
+> Hello,
+> 
+> 
+> 
+> I have a question about inconsistent results that I am getting when trying to calculate effect sizes using the Berkey method. The data are prevalence rates from different studies and some studies include multiple prevalence rates, which may reflect the same people. For example, one study could report the prevalence for bipolar I and for the full bipolar spectrum, which would include those with bipolar I, plus others who have other subtypes of bipolar disorder. There are three potential prevalence categories ? bipolar I, bipolar I & II, all bipolar.
+> 
+> 
+> 
+> I have created two binary dummy codes to represent which subtypes are included in each sample ? inc2yn (bipolar I & II) and nosyn (all bipolar). There is also a code that says which of the three categories an effect size belongs to (threegroup) and is coded 1 (bipolar I), 2 (bipolar I & II) or 3 (all bipolar).
+> 
+> 
+> 
+> Id refers to individual effects sizes, articleno is the study, so Ids are nested within articleno.
+> 
+> 
+> 
+> There are 27 effect sizes from 18 studies. There are 13 bipolar I effects, 7 bipolar I & II effects, and 7 all bipolar effects.
+> 
+> 
+> 
+> Initially, I ran the following code to get estimates for the three effect sizes:
+> 
+> resmvberkey0<-rma.mv(yi, berkeyV, data=kidtall1, mods= cbind(inc2yn, nosyn), slab = paste(reference),random = list((~ 1 | Id), ~ 1 | articleno), method="ML")
+> 
+> 
+> 
+> Then, to get an estimate for bipolar I & II (for example). I would use the following command:
+> 
+> predict(resmvberkey0, transf=transf.ilogit, newmods = cbind(1,0))
+> 
+> 
+> 
+> Later, when I was making a forest plot, I wanted to get estimates from a model that did not include moderators (it seems that you cannot include moderators in the addpoly command). This led me to use the subset command to get estimates for each effect size separately:
+> 
+> resmvberkey0bp1_2<-rma.mv(yi, berkeyV, data=kidtall1, subset=threegroup==2, random = list((~ 1 | Id), ~ 1 | articleno), method="ML")
+> 
+> predict(resmvberkey0bp1_2, transf=transf.ilogit)
+> 
+> 
+> 
+> The rates I get by manipulating the moderators to estimate for a single category are different from the rates I get when I use the subset command:
+> 
+> moderator result for bipolar I = .11%
+> 
+> subset result for bipolar I = .15%
+> 
+> 
+> 
+> moderator result for bipolar I & II = .18%
+> 
+> subset result for bipolar I & II is .17%
+> 
+> 
+> 
+> moderator result for all bipolar is 1.51%
+> 
+> subset result for all bipolar is 3.56%
+> 
+> 
+> 
+> Any thoughts about why these results would be so different ? and why ? would be greatly appreciated.
+> 
+> 
+> 
+> Thank you,
+> 
+> Anna
+> 
+> 
+> Anna Van Meter, PhD
+> 
+> Assistant Professor, The Feinstein Institute for Medical Research
+> 
+> Adjunct Assistant Professor, Ferkauf Graduate School of Psychology, Yeshiva University
+> 
+> The Zucker Hillside Hospital, Division of Psychiatry Research
+> 
+> 75-59 263rd Street
+> 
+> Glen Oaks, NY 11004
+> 
+> 718.470.5813
+> 
+> 
+> 
+> The information contained in this electronic e-mail transmission and any attachments are intended only for the use of the individual or entity to whom or to which it is addressed, and may contain information that is privileged, confidential and exempt from disclosure under applicable law. If the reader of this communication is not the intended recipient, or the employee or agent responsible for delivering this communication to the intended recipient, you are hereby notified that any dissemination, distribution, copying or disclosure of this communication and any attachment is strictly prohibited. If you have received this transmission in error, please notify the sender immediately by telephone and electronic mail, and delete the original communication and any attachment from any computer, server or other electronic recording or storage device or medium. Receipt by anyone other than the intended recipient is not a waiver of any attorney-client, physician-patient or other privilege.
+> 	[[alternative HTML version deleted]]
+> 
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+From @v@nmeter @ending from northwell@edu  Mon Dec 24 16:25:01 2018
+From: @v@nmeter @ending from northwell@edu (Van Meter, Anna)
+Date: Mon, 24 Dec 2018 15:25:01 +0000
+Subject: [R-meta] 
+ [EXTERNAL] Re: question about effect size estimates using Berkey
+In-Reply-To: <b87383ec-194a-7a4d-b71f-cddaed6d5789@dewey.myzen.co.uk>
+References: <BL0PR1901MB216236B3B38253E3A416862CAEBA0@BL0PR1901MB2162.namprd19.prod.outlook.com>,
+ <b87383ec-194a-7a4d-b71f-cddaed6d5789@dewey.myzen.co.uk>
+Message-ID: <BL0PR1901MB216235998D6D4ACBDE527C7FAEBB0@BL0PR1901MB2162.namprd19.prod.outlook.com>
+
+Dear Michael,
+
+
+Thank you - this is very helpful!
+
+
+A few follow-up questions for the group:
+
+*I was using the Berkey method to account for the fact that individuals might be represented in multiple prevalence groups. Is that still necessary with this approach that allows the heterogeneity to be different within subgroup, or is it better to estimate with the Konstantopolous (yi, vi) approach?
+
+*If it is still better to use Berkey (which I suspect is the case), does the struct="DIAG" command account for the block diagonal or is struct="UN" better?
+
+*I had been using ML as the estimator, but this example is using REML. I'm sure this topic has been addressed before, so if someone could point me to information about which is best in this scenario, I would appreciate it.
+
+*Finally, when I run a simple model with only the prevalence type (threegroup) as a moderator:
+
+resmvberkeyhybrid<-rma.mv(yi, berkeyV, mods = ~ newgroup, random = ~ newgroup | articleno, struct="DIAG", data=kidtall1, digits=3)
+
+I get separate coefficients for two of the three groups, but when I include other moderators in the model:
+
+resmvberkeyhybridmods<-rma.mv(yi, berkeyV, mods=cbind(newgroup, yearpub_center, USA, multiinformantyn, broad, age_center, lifetime), random = ~ newgroup | articleno, struct="DIAG",  data=kidtall1, digits=3)
+
+I get only one coefficient for threegroup. I'm not sure why this would change.
+
+
+Many thanks!
+
+
+Best,
+
+Anna
+
+
+________________________________
+From: Michael Dewey <lists at dewey.myzen.co.uk>
+Sent: Monday, December 24, 2018 8:21 AM
+To: Van Meter, Anna; r-sig-meta-analysis at r-project.org
+Subject: [EXTERNAL] Re: [R-meta] question about effect size estimates using Berkey
+
+External Email. Use Caution.
+
+Dear Anna
+
+
+
+I am not an authority on multivariate meta-analysis but a similar
+
+phenomenon is well known for univariate so I suspect that the situation
+
+is that when you use a moderator you are using all the data-set to
+
+estimate variances whereas when you subset you are just using that subset.
+
+
+
+https://urldefense.proofpoint.com/v2/url?u=http-3A__www.metafor-2Dproject.org_doku.php_tips-3Acomp-5Ftwo-5Findependent-5Festimates&d=DwIGaQ&c=vq5m7Kktb9l80A_wDJ5D-g&r=OFmh4IthkcBq02H-yJ16iDBLgPO6gowYXXX_q2XHqM4&m=SXa8XpjoFTkt_9HG0Tvy95QYkD_jMndIHm8F_pTNA74&s=oJkLUH50LltjfymgGZSoxa1WShj4GH0nAc2WyPDlZV8&e=
+
+
+
+Explains the situation for the univariate case.
+
+
+
+Michael
+
+
+
+On 23/12/2018 16:40, Van Meter, Anna wrote:
+
+> Hello,
+
+>
+
+>
+
+>
+
+> I have a question about inconsistent results that I am getting when trying to calculate effect sizes using the Berkey method. The data are prevalence rates from different studies and some studies include multiple prevalence rates, which may reflect the same people. For example, one study could report the prevalence for bipolar I and for the full bipolar spectrum, which would include those with bipolar I, plus others who have other subtypes of bipolar disorder. There are three potential prevalence categories ? bipolar I, bipolar I & II, all bipolar.
+
+>
+
+>
+
+>
+
+> I have created two binary dummy codes to represent which subtypes are included in each sample ? inc2yn (bipolar I & II) and nosyn (all bipolar). There is also a code that says which of the three categories an effect size belongs to (threegroup) and is coded 1 (bipolar I), 2 (bipolar I & II) or 3 (all bipolar).
+
+>
+
+>
+
+>
+
+> Id refers to individual effects sizes, articleno is the study, so Ids are nested within articleno.
+
+>
+
+>
+
+>
+
+> There are 27 effect sizes from 18 studies. There are 13 bipolar I effects, 7 bipolar I & II effects, and 7 all bipolar effects.
+
+>
+
+>
+
+>
+
+> Initially, I ran the following code to get estimates for the three effect sizes:
+
+>
+
+> resmvberkey0<-rma.mv(yi, berkeyV, data=kidtall1, mods= cbind(inc2yn, nosyn), slab = paste(reference),random = list((~ 1 | Id), ~ 1 | articleno), method="ML")
+
+>
+
+>
+
+>
+
+> Then, to get an estimate for bipolar I & II (for example). I would use the following command:
+
+>
+
+> predict(resmvberkey0, transf=transf.ilogit, newmods = cbind(1,0))
+
+>
+
+>
+
+>
+
+> Later, when I was making a forest plot, I wanted to get estimates from a model that did not include moderators (it seems that you cannot include moderators in the addpoly command). This led me to use the subset command to get estimates for each effect size separately:
+
+>
+
+> resmvberkey0bp1_2<-rma.mv(yi, berkeyV, data=kidtall1, subset=threegroup==2, random = list((~ 1 | Id), ~ 1 | articleno), method="ML")
+
+>
+
+> predict(resmvberkey0bp1_2, transf=transf.ilogit)
+
+>
+
+>
+
+>
+
+> The rates I get by manipulating the moderators to estimate for a single category are different from the rates I get when I use the subset command:
+
+>
+
+> moderator result for bipolar I = .11%
+
+>
+
+> subset result for bipolar I = .15%
+
+>
+
+>
+
+>
+
+> moderator result for bipolar I & II = .18%
+
+>
+
+> subset result for bipolar I & II is .17%
+
+>
+
+>
+
+>
+
+> moderator result for all bipolar is 1.51%
+
+>
+
+> subset result for all bipolar is 3.56%
+
+>
+
+>
+
+>
+
+> Any thoughts about why these results would be so different ? and why ? would be greatly appreciated.
+
+>
+
+>
+
+>
+
+> Thank you,
+
+>
+
+> Anna
+
+>
+
+>
+
+> Anna Van Meter, PhD
+
+>
+
+> Assistant Professor, The Feinstein Institute for Medical Research
+
+>
+
+> Adjunct Assistant Professor, Ferkauf Graduate School of Psychology, Yeshiva University
+
+>
+
+> The Zucker Hillside Hospital, Division of Psychiatry Research
+
+>
+
+> 75-59 263rd Street
+
+>
+
+> Glen Oaks, NY 11004
+
+>
+
+> 718.470.5813
+
+>
+
+>
+
+>
+
+> The information contained in this electronic e-mail transmission and any attachments are intended only for the use of the individual or entity to whom or to which it is addressed, and may contain information that is privileged, confidential and exempt from disclosure under applicable law. If the reader of this communication is not the intended recipient, or the employee or agent responsible for delivering this communication to the intended recipient, you are hereby notified that any dissemination, distribution, copying or disclosure of this communication and any attachment is strictly prohibited. If you have received this transmission in error, please notify the sender immediately by telephone and electronic mail, and delete the original communication and any attachment from any computer, server or other electronic recording or storage device or medium. Receipt by anyone other than the intended recipient is not a waiver of any attorney-client, physician-patient or other privilege.
+
+>        [[alternative HTML version deleted]]
+
+>
+
+>
+
+> _______________________________________________
+
+> R-sig-meta-analysis mailing list
+
+> R-sig-meta-analysis at r-project.org
+
+> https://urldefense.proofpoint.com/v2/url?u=https-3A__stat.ethz.ch_mailman_listinfo_r-2Dsig-2Dmeta-2Danalysis&d=DwIGaQ&c=vq5m7Kktb9l80A_wDJ5D-g&r=OFmh4IthkcBq02H-yJ16iDBLgPO6gowYXXX_q2XHqM4&m=SXa8XpjoFTkt_9HG0Tvy95QYkD_jMndIHm8F_pTNA74&s=_IybPi_-FLjrvka2ICpDICE9sqABp-xdoKU8bjdO2-Y&e=
+
+>
+
+
+
+--
+
+Michael
+
+https://urldefense.proofpoint.com/v2/url?u=http-3A__www.dewey.myzen.co.uk_home.html&d=DwIGaQ&c=vq5m7Kktb9l80A_wDJ5D-g&r=OFmh4IthkcBq02H-yJ16iDBLgPO6gowYXXX_q2XHqM4&m=SXa8XpjoFTkt_9HG0Tvy95QYkD_jMndIHm8F_pTNA74&s=BGjriTMX2UobNycy1XbI-y6N2tFKMj4-aiwzBFTx-js&e=
+
+
+
+The information contained in this electronic e-mail transmission and any attachments are intended only for the use of the individual or entity to whom or to which it is addressed, and may contain information that is privileged, confidential and exempt from disclosure under applicable law. If the reader of this communication is not the intended recipient, or the employee or agent responsible for delivering this communication to the intended recipient, you are hereby notified that any dissemination, distribution, copying or disclosure of this communication and any attachment is strictly prohibited. If you have received this transmission in error, please notify the sender immediately by telephone and electronic mail, and delete the original communication and any attachment from any computer, server or other electronic recording or storage device or medium. Receipt by anyone other than the intended recipient is not a waiver of any attorney-client, physician-patient or other privilege.
+	[[alternative HTML version deleted]]
+
+
+From @v@nmeter @ending from northwell@edu  Sun Dec 30 04:42:32 2018
+From: @v@nmeter @ending from northwell@edu (Van Meter, Anna)
+Date: Sun, 30 Dec 2018 03:42:32 +0000
+Subject: [R-meta] order of effect sizes in data file changes results
+Message-ID: <BL0PR1901MB216258231638892CC69A8D6CAEB10@BL0PR1901MB2162.namprd19.prod.outlook.com>
+
+Hello,
+
+
+As described in a previous post, I am conducting a meta analysis of bipolar disorder prevalence rates. Some studies report multiple prevalence rates; for example, one study could report the prevalence for bipolar I and for the full bipolar spectrum, which would include people with bipolar I, plus other people who have other subtypes of bipolar disorder. There are three potential prevalence categories: bipolar I, bipolar I & II, all bipolar.
+
+
+I am using the Berkey approach to account for the overlap in effect sizes and, based on a helpful response, have set the model up as follows to estimate the average prevalence for each subtype (threegroup is a dummycode for the subtype, articleno is the study ID):
+
+resmvberkeyhybrid<-rma.mv(yi, berkeyV, mods = ~ threegroup, random = ~ threegroup | articleno, struct="UN", method="ML",data=kidtall1, digits=4)
+
+
+My question:
+
+I have noticed that the results of the model change depending on how the .csv data file is ordered, why would the order of the data file matter? And, what is the correct way to order the data file? My guess would be first by articleno and then by threegroup.
+
+
+Thank you for your help!
+
+
+Best,
+
+Anna
+
+
+The information contained in this electronic e-mail transmission and any attachments are intended only for the use of the individual or entity to whom or to which it is addressed, and may contain information that is privileged, confidential and exempt from disclosure under applicable law. If the reader of this communication is not the intended recipient, or the employee or agent responsible for delivering this communication to the intended recipient, you are hereby notified that any dissemination, distribution, copying or disclosure of this communication and any attachment is strictly prohibited. If you have received this transmission in error, please notify the sender immediately by telephone and electronic mail, and delete the original communication and any attachment from any computer, server or other electronic recording or storage device or medium. Receipt by anyone other than the intended recipient is not a waiver of any attorney-client, physician-patient or other privilege.
+	[[alternative HTML version deleted]]
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Sun Dec 30 16:27:25 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Sun, 30 Dec 2018 15:27:25 +0000
+Subject: [R-meta] order of effect sizes in data file changes results
+In-Reply-To: <BL0PR1901MB216258231638892CC69A8D6CAEB10@BL0PR1901MB2162.namprd19.prod.outlook.com>
+References: <BL0PR1901MB216258231638892CC69A8D6CAEB10@BL0PR1901MB2162.namprd19.prod.outlook.com>
+Message-ID: <945eff2ad56d4f6f8cb51216441cddf9@UM-MAIL3214.unimaas.nl>
+
+Dear Anna,
+
+I suspect that the 'V' matrix (in your case, berkeyV) is not aligned with the data (yi). For example:
+
+library(metafor)
+dat <- dat.berkey1998
+dat
+
+V <- bldiag(lapply(split(dat[,c("v1i", "v2i")], dat$trial), as.matrix))
+V
+
+# one can see here that the 2x2 blocks along the diagonal of V are in fact the variances and covariances as given by the variables 'v1i' and 'v2i' in 'dat'
+
+rma.mv(yi, V, mods = ~ outcome - 1, random = ~ outcome | trial, struct="UN", data=dat)
+
+# but now let's change the order of the data
+
+myorder <- order(dat$author)
+dat <- dat[myorder,]
+dat
+
+# since the V matrix is unchanged, it is now not in the correct order anymore, so the following results are nonsense
+
+rma.mv(yi, V, mods = ~ outcome - 1, random = ~ outcome | trial, struct="UN", data=dat)
+
+# so we have to order the V matrix in the same way as the data
+
+V <- V[myorder, myorder]
+
+rma.mv(yi, V, mods = ~ outcome - 1, random = ~ outcome | trial, struct="UN", data=dat)
+
+# same results as in the beginning
+
+Also, one has to be careful when using things like split(). It will order the splits by the splitting variable:
+
+dat
+split(dat, dat$trial)
+
+Note that the order of the data in 'dat' and the splits are not in the same order. This can also lead to a misalignment. So, to be safe, first order the data by the variable that will be used in split() (as in the very beginning, where the data are already ordered by 'trial').
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Van Meter, Anna
+Sent: Sunday, 30 December, 2018 4:43
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] order of effect sizes in data file changes results
+
+Hello,
+
+As described in a previous post, I am conducting a meta analysis of bipolar disorder prevalence rates. Some studies report multiple prevalence rates; for example, one study could report the prevalence for bipolar I and for the full bipolar spectrum, which would include people with bipolar I, plus other people who have other subtypes of bipolar disorder. There are three potential prevalence categories: bipolar I, bipolar I & II, all bipolar.
+
+I am using the Berkey approach to account for the overlap in effect sizes and, based on a helpful response, have set the model up as follows to estimate the average prevalence for each subtype (threegroup is a dummycode for the subtype, articleno is the study ID):
+
+resmvberkeyhybrid<-rma.mv(yi, berkeyV, mods = ~ threegroup, random = ~ threegroup | articleno, struct="UN", method="ML",data=kidtall1, digits=4)
+
+My question:
+
+I have noticed that the results of the model change depending on how the .csv data file is ordered, why would the order of the data file matter? And, what is the correct way to order the data file? My guess would be first by articleno and then by threegroup.
+
+Thank you for your help!
+
+Best,
+Anna
+
+
+From wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl  Sun Dec 30 16:37:56 2018
+From: wolfg@ng@viechtb@uer @ending from m@@@trichtuniver@ity@nl (Viechtbauer, Wolfgang (SP))
+Date: Sun, 30 Dec 2018 15:37:56 +0000
+Subject: [R-meta] 
+ [EXTERNAL] Re: question about effect size estimates using Berkey
+In-Reply-To: <BL0PR1901MB216235998D6D4ACBDE527C7FAEBB0@BL0PR1901MB2162.namprd19.prod.outlook.com>
+References: <BL0PR1901MB216236B3B38253E3A416862CAEBA0@BL0PR1901MB2162.namprd19.prod.outlook.com>,
+ <b87383ec-194a-7a4d-b71f-cddaed6d5789@dewey.myzen.co.uk>
+ <BL0PR1901MB216235998D6D4ACBDE527C7FAEBB0@BL0PR1901MB2162.namprd19.prod.outlook.com>
+Message-ID: <50a2523fa27946f4ae1e5c159b697c2f@UM-MAIL3214.unimaas.nl>
+
+See responses below.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-
+>project.org] On Behalf Of Van Meter, Anna
+>Sent: Monday, 24 December, 2018 16:25
+>To: Michael Dewey; r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] [EXTERNAL] Re: question about effect size estimates
+>using Berkey
+>
+>Dear Michael,
+>
+>Thank you - this is very helpful!
+>
+>A few follow-up questions for the group:
+>
+>*I was using the Berkey method to account for the fact that individuals
+>might be represented in multiple prevalence groups. Is that still
+>necessary with this approach that allows the heterogeneity to be
+>different within subgroup, or is it better to estimate with the
+>Konstantopolous (yi, vi) approach?
+
+Whether one should allow for different amounts of heterogeneity across subgroups or not is an empirical question (i.e., it depends on whether the amount of heterogeneity differs across subgroups or not), so without seeing the data, I cannot answer that. However, you could do LRTs (using the anova() function) to compare models where the amount differs versus not and see whether the model with different amounts of heterogeneity gives a significantly better fit.
+
+>*If it is still better to use Berkey (which I suspect is the case), does
+>the struct="DIAG" command account for the block diagonal or is
+>struct="UN" better?
+
+DIAG would assume that the true effects within studies are uncorrelated, which seems not very plausible (but again, this is an empirical question).
+
+>*I had been using ML as the estimator, but this example is using REML.
+>I'm sure this topic has been addressed before, so if someone could point
+>me to information about which is best in this scenario, I would
+>appreciate it.
+
+In general, I would use REML. ML estimates of variance components are known to have negative bias, so will tend to be too small on average. REML counteracts this and usually gives unbiased estimates.
+
+>*Finally, when I run a simple model with only the prevalence type
+>(threegroup) as a moderator:
+>
+>resmvberkeyhybrid<-rma.mv(yi, berkeyV, mods = ~ newgroup, random = ~
+>newgroup | articleno, struct="DIAG", data=kidtall1, digits=3)
+>
+>I get separate coefficients for two of the three groups, but when I
+>include other moderators in the model:
+>
+>resmvberkeyhybridmods<-rma.mv(yi, berkeyV, mods=cbind(newgroup,
+>yearpub_center, USA, multiinformantyn, broad, age_center, lifetime),
+>random = ~ newgroup | articleno, struct="DIAG",  data=kidtall1, digits=3)
+>
+>I get only one coefficient for threegroup. I'm not sure why this would
+>change.
+
+Using '~ newgroup' makes use of formula syntax, so the entire machinery in R that deals with formulas is used. For example, factors get coded appropriately. If you just pass a matrix to mods (as you do with cbind()), then you have do the coding yourself. In most cases, you want to use formulas. So, use:
+
+mods = ~ newgroup + yearpub_center + USA + multiinformantyn + broad + age_center + lifetime
+
+>Many thanks!
+>
+>Best,
+>Anna
+
+From @v@nmeter @ending from northwell@edu  Sun Dec 30 23:21:00 2018
+From: @v@nmeter @ending from northwell@edu (Van Meter, Anna)
+Date: Sun, 30 Dec 2018 22:21:00 +0000
+Subject: [R-meta] order of effect sizes in data file changes results
+In-Reply-To: <945eff2ad56d4f6f8cb51216441cddf9@UM-MAIL3214.unimaas.nl>
+References: <BL0PR1901MB216258231638892CC69A8D6CAEB10@BL0PR1901MB2162.namprd19.prod.outlook.com>,
+ <945eff2ad56d4f6f8cb51216441cddf9@UM-MAIL3214.unimaas.nl>
+Message-ID: <BL0PR1901MB216293AE01D27B1405881175AEB10@BL0PR1901MB2162.namprd19.prod.outlook.com>
+
+Dear Wolfgang,
+
+
+Thank you very much for your response to this and to my other question, I really appreciate your help!
+
+
+I have two follow-up questions:
+
+  *   In order to ensure that the V matrix is created in the right order for the analyses, in which I am estimating three outcomes, what is the best way to sort the data file? Currently I have it sorted first by reference (outer factor) and then by outcome (threegroup; inner factor).
+  *   When I run the following code, I get large, negative rho values on the off-diagonal. I'm not sure what this means conceptually or if it indicates  problems for downstream  analyses.
+
+resmvberkeyhybrid<-rma.mv(yi,   berkeyV, mods = ~ factor(threegroup), random = ~ threegroup |   reference, struct="UN", method="REML",data=kidtall1, digits=4,  slab =  kidtall1$reference)
+
+Multivariate Meta-Analysis Model (k = 28; method: REML)
+
+Variance Components:
+
+outer factor: reference  (nlvls = 19)
+inner factor: threegroup (nlvls = 3)
+
+            estim    sqrt  k.lvl  fixed  level
+tau^2.1    1.6240  1.2744     13     no      1
+tau^2.2    0.1989  0.4460      7     no      2
+tau^2.3    0.6270  0.7918      8     no      3
+
+     rho.1    rho.2    rho.3    1   2   3
+1        1  -0.8995  -0.7788    -  no  no
+2  -0.8995        1   0.9746    4   -  no
+3  -0.7788   0.9746        1    4   1   -
+
+Thank you!
+
+Anna
+
+
+________________________________
+From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: Sunday, December 30, 2018 10:27 AM
+To: Van Meter, Anna; r-sig-meta-analysis at r-project.org
+Subject: [EXTERNAL] RE: order of effect sizes in data file changes results
+
+External Email. Use Caution.
+
+Dear Anna,
+
+I suspect that the 'V' matrix (in your case, berkeyV) is not aligned with the data (yi). For example:
+
+library(metafor)
+dat <- dat.berkey1998
+dat
+
+V <- bldiag(lapply(split(dat[,c("v1i", "v2i")], dat$trial), as.matrix))
+V
+
+# one can see here that the 2x2 blocks along the diagonal of V are in fact the variances and covariances as given by the variables 'v1i' and 'v2i' in 'dat'
+
+rma.mv(yi, V, mods = ~ outcome - 1, random = ~ outcome | trial, struct="UN", data=dat)
+
+# but now let's change the order of the data
+
+myorder <- order(dat$author)
+dat <- dat[myorder,]
+dat
+
+# since the V matrix is unchanged, it is now not in the correct order anymore, so the following results are nonsense
+
+rma.mv(yi, V, mods = ~ outcome - 1, random = ~ outcome | trial, struct="UN", data=dat)
+
+# so we have to order the V matrix in the same way as the data
+
+V <- V[myorder, myorder]
+
+rma.mv(yi, V, mods = ~ outcome - 1, random = ~ outcome | trial, struct="UN", data=dat)
+
+# same results as in the beginning
+
+Also, one has to be careful when using things like split(). It will order the splits by the splitting variable:
+
+dat
+split(dat, dat$trial)
+
+Note that the order of the data in 'dat' and the splits are not in the same order. This can also lead to a misalignment. So, to be safe, first order the data by the variable that will be used in split() (as in the very beginning, where the data are already ordered by 'trial').
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Van Meter, Anna
+Sent: Sunday, 30 December, 2018 4:43
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] order of effect sizes in data file changes results
+
+Hello,
+
+As described in a previous post, I am conducting a meta analysis of bipolar disorder prevalence rates. Some studies report multiple prevalence rates; for example, one study could report the prevalence for bipolar I and for the full bipolar spectrum, which would include people with bipolar I, plus other people who have other subtypes of bipolar disorder. There are three potential prevalence categories: bipolar I, bipolar I & II, all bipolar.
+
+I am using the Berkey approach to account for the overlap in effect sizes and, based on a helpful response, have set the model up as follows to estimate the average prevalence for each subtype (threegroup is a dummycode for the subtype, articleno is the study ID):
+
+resmvberkeyhybrid<-rma.mv(yi, berkeyV, mods = ~ threegroup, random = ~ threegroup | articleno, struct="UN", method="ML",data=kidtall1, digits=4)
+
+My question:
+
+I have noticed that the results of the model change depending on how the .csv data file is ordered, why would the order of the data file matter? And, what is the correct way to order the data file? My guess would be first by articleno and then by threegroup.
+
+Thank you for your help!
+
+Best,
+Anna
+
+
+The information contained in this electronic e-mail transmission and any attachments are intended only for the use of the individual or entity to whom or to which it is addressed, and may contain information that is privileged, confidential and exempt from disclosure under applicable law. If the reader of this communication is not the intended recipient, or the employee or agent responsible for delivering this communication to the intended recipient, you are hereby notified that any dissemination, distribution, copying or disclosure of this communication and any attachment is strictly prohibited. If you have received this transmission in error, please notify the sender immediately by telephone and electronic mail, and delete the original communication and any attachment from any computer, server or other electronic recording or storage device or medium. Receipt by anyone other than the intended recipient is not a waiver of any attorney-client, physician-patient or other privilege.
+	[[alternative HTML version deleted]]
+
+

@@ -1,0 +1,2313 @@
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Sep  2 11:40:27 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 2 Sep 2020 09:40:27 +0000
+Subject: [R-meta] Calculating effect size for subsets of data
+In-Reply-To: <706df0b0a3e54348848c8fb21ea7e0a2@hertie-school.org>
+References: <706df0b0a3e54348848c8fb21ea7e0a2@hertie-school.org>
+Message-ID: <9960a533172f40d38640818ac5f7289c@UM-MAIL3213.unimaas.nl>
+
+Dear Tarun,
+
+If I understand you correctly, then there should be 16 different combinations of A, B, C, and D but one of them (A=B=C=D=0) cannot occur, so essentially there are 15 combinations that were observed. As a result, you should have gotten a warning when fitting the model that a redundant predictor was dropped from the model. Let's consider a simpler case with just A and B:
+
+set.seed(1234)
+k <- 900
+A <- c(rep(0,k/3), rep(1,k/3), rep(1,k/3))
+B <- c(rep(1,k/3), rep(0,k/3), rep(1,k/3))
+vi <- rep(.01, k)
+yi <- rnorm(k, 0.5 * A + 0.1 * B + 0.3*A*B, sqrt(vi))
+
+A <- factor(A)
+B <- factor(B)
+
+res <- rma(yi, vi, mods = ~ A*B)
+res
+
+These are the model results:
+
+         estimate      se      zval    pval    ci.lb    ci.ub 
+intrcpt   -0.3019  0.0100  -30.1904  <.0001  -0.3215  -0.2823  *** 
+A1         0.7963  0.0082   97.5319  <.0001   0.7803   0.8123  *** 
+B1         0.4032  0.0082   49.3825  <.0001   0.3872   0.4192  ***
+
+The results are a bit tricky to interpret, so I would suggest a different parameterization:
+
+res <- rma(yi, vi, mods = ~ A:B + 0)
+res
+
+       estimate      se      zval    pval   ci.lb   ci.ub 
+A1:B0    0.4944  0.0058   85.6397  <.0001  0.4831  0.5058  *** 
+A0:B1    0.1013  0.0058   17.5462  <.0001  0.0900  0.1126  *** 
+A1:B1    0.8976  0.0058  155.4771  <.0001  0.8863  0.9090  ***
+
+Now we can clearly see that A1:B0 is the estimated effect when A is given alone, A0:B1 is the estimated effect when B is given alone, and A1:B1 is the estimated effect when A and B are given together.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Tarun Khanna
+>Sent: Monday, 31 August, 2020 13:11
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Calculating effect size for subsets of data
+>
+>Dear all,
+>
+>I am conducting a meta-analysis of effect of certain interventions on
+>household energy consumption. In my data set I have a dummy variable for
+>each of the sub-interventions: A,B,C,D such that intersection of A=0 & B=0 &
+>C=0 & D=0 is zero. Each effect size may be associated with multiple
+>interventions though.
+>
+>I have calculated an aggregate effect size across interventions and then
+>effect size by sub-intervention. But I also want to compare if the effect of
+>the sub-interventions differs from each other. I thought about including the
+>sub-regression dummies as controls in the meta regression:
+>
+>rma (yi, vi, method = "REML", data = data, mods ~ A*B*C*D)
+>
+>The problem in interpreting the output of this regression is that there is
+>no base category left for the intercept to denote. Can I perhaps run the
+>model by supressing the intercept? Or what would be the interpretation of
+>the intercept in this case?
+>
+>Thanks in advance!
+>
+>Best
+>
+>Tarun
+>Tarun Khanna
+>PhD Researcher
+>Hertie School
+>
+>Friedrichstra?e 180
+>10117 Berlin ? Germany
+>khanna at hertie-school.org ? www.hertie-school.org<http://www.hertie-
+>school.org/>
+
+From @|mon@onr7 @end|ng |rom gm@||@com  Wed Sep  2 18:47:36 2020
+From: @|mon@onr7 @end|ng |rom gm@||@com (Richard Simonson)
+Date: Wed, 2 Sep 2020 12:47:36 -0400
+Subject: [R-meta] Metareg: Significant reduction in tau-squared but no
+ change in i-squared
+Message-ID: <CAGUSXQmoceSfQG6koA4AcEuh5bnxBiG1r+EcFnzaBEuBAXtdnQ@mail.gmail.com>
+
+I've conducted a meta-regression with metareg on a random-effects
+meta-analysis and am attempting to describe the results. The output of the
+model is at the end of my description
+
+Based on the regression model, I'm given that our R-squared is 12%, which I
+take that to mean ~23% of the heterogeneity was accounted for when
+covarying the model.
+
+I also see that there was a reduction in tau-squared from the random
+effects meta-analysis to the meta-regression, but no change in I-squared.
+
+Can someone help me understand why, with a positive non-zero r-squared,
+there's a change in tau-squared but not in I-squared?
+
+Which one is more feasible to report that we were able to account for some
+of the heterogeneity?
+
+Thanks!
+
+Meta output:
+I-squared: 87%
+tau-squared: .27
+
+Meta-reg output
+tau^2 (estimated amount of residual heterogeneity):     0.2426 (SE = 0.2570)
+tau (square root of estimated tau^2 value):                    0.4925
+I^2 (residual heterogeneity / unaccounted variability):    86.68%
+H^2 (unaccounted variability / sampling variability):       7.51
+R^2 (amount of heterogeneity accounted for):               12.25%
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Sep  3 11:06:37 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 3 Sep 2020 09:06:37 +0000
+Subject: [R-meta] Metareg: Significant reduction in tau-squared but no
+ change in i-squared
+In-Reply-To: <CAGUSXQmoceSfQG6koA4AcEuh5bnxBiG1r+EcFnzaBEuBAXtdnQ@mail.gmail.com>
+References: <CAGUSXQmoceSfQG6koA4AcEuh5bnxBiG1r+EcFnzaBEuBAXtdnQ@mail.gmail.com>
+Message-ID: <37d9591318c24f7db04525441a925737@UM-MAIL3213.unimaas.nl>
+
+Dear Richard,
+
+See comments below.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Richard Simonson
+>Sent: Wednesday, 02 September, 2020 18:48
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Metareg: Significant reduction in tau-squared but no
+>change in i-squared
+>
+>I've conducted a meta-regression with metareg on a random-effects
+>meta-analysis and am attempting to describe the results. The output of the
+>model is at the end of my description
+>
+>Based on the regression model, I'm given that our R-squared is 12%, which I
+>take that to mean ~23% of the heterogeneity was accounted for when
+>covarying the model.
+
+Not sure where you get the 23% from. The R^2 of 12% means that (an estimated) 12% of the heterogeneity was accounted for (by the moderator(s) included in the model).
+
+>I also see that there was a reduction in tau-squared from the random
+>effects meta-analysis to the meta-regression, but no change in I-squared.
+>
+>Can someone help me understand why, with a positive non-zero r-squared,
+>there's a change in tau-squared but not in I-squared?
+
+First of all, all these things (I^2 in a model without moderators, I^2 in a meta-regression model, and R^2) are estimates, so they can simply be 'off'. For example, it can happen that tau^2 or I^2 actually increase when including a moderator in a model, although in theory that doesn't make sense.
+
+Also, I^2 in a meta-regression model has a different interpretation than in a model without moderators. In a model without moderators, I^2 is an estimate how much of the total variability (which is composed of heterogeneity and sampling variability) is due to heterogeneity. However, in a meta-regression model, I^2 is an estimate how much of the *unaccounted for variability* (which is composed of residual / unaccounted for heterogeneity and sampling variability) is due to the residual / unaccounted for heterogeneity. That's different than asking how much of the *total variability* is due to residual / unaccounted for heterogeneity. So I^2 in a meta-regression model is a bit of a strange statistic anyway and I am not sure how many people actually grasp its correct interpretation.
+
+As a more technical point: The way I^2 is computed in meta-regression models is also a bit strange. The way the 'typical' sampling variance is computed under such models actually depends on the moderators included in the model, which one could argue is a bit odd. But given that people typically compute I^2 with (Q-df)/df (where Q could be the test for heterogeneity or the test for residual heterogeneity) this is what happens.
+
+>Which one is more feasible to report that we were able to account for some
+>of the heterogeneity?
+
+In meta-regression models, I would report R^2 and not report I^2. You can also report the test for residual heterogeneity, so if somebody feels the need to compute I^2 based on that, they always can.
+
+>Thanks!
+>
+>Meta output:
+>I-squared: 87%
+>tau-squared: .27
+>
+>Meta-reg output
+>tau^2 (estimated amount of residual heterogeneity):     0.2426 (SE = 0.2570)
+>tau (square root of estimated tau^2 value):                    0.4925
+>I^2 (residual heterogeneity / unaccounted variability):    86.68%
+>H^2 (unaccounted variability / sampling variability):       7.51
+>R^2 (amount of heterogeneity accounted for):               12.25%
+
+
+From @|mon@onr7 @end|ng |rom gm@||@com  Thu Sep  3 14:15:03 2020
+From: @|mon@onr7 @end|ng |rom gm@||@com (Richard Simonson)
+Date: Thu, 3 Sep 2020 08:15:03 -0400
+Subject: [R-meta] Metareg: Significant reduction in tau-squared but no
+ change in i-squared
+In-Reply-To: <37d9591318c24f7db04525441a925737@UM-MAIL3213.unimaas.nl>
+References: <CAGUSXQmoceSfQG6koA4AcEuh5bnxBiG1r+EcFnzaBEuBAXtdnQ@mail.gmail.com>
+ <37d9591318c24f7db04525441a925737@UM-MAIL3213.unimaas.nl>
+Message-ID: <CAGUSXQkMKwiS1n7F7VNHuaoM7nbZVdPXE3=EPWp4uSABEwAquA@mail.gmail.com>
+
+Thank you, Dr. Wolfganag, this explanation was very helpful!
+
+23% was a typo on my end. I meant to say 12%
+
+On Thu, Sep 3, 2020 at 5:06 AM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Richard,
+>
+> See comments below.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org]
+> >On Behalf Of Richard Simonson
+> >Sent: Wednesday, 02 September, 2020 18:48
+> >To: r-sig-meta-analysis at r-project.org
+> >Subject: [R-meta] Metareg: Significant reduction in tau-squared but no
+> >change in i-squared
+> >
+> >I've conducted a meta-regression with metareg on a random-effects
+> >meta-analysis and am attempting to describe the results. The output of the
+> >model is at the end of my description
+> >
+> >Based on the regression model, I'm given that our R-squared is 12%, which
+> I
+> >take that to mean ~23% of the heterogeneity was accounted for when
+> >covarying the model.
+>
+> Not sure where you get the 23% from. The R^2 of 12% means that (an
+> estimated) 12% of the heterogeneity was accounted for (by the moderator(s)
+> included in the model).
+>
+> >I also see that there was a reduction in tau-squared from the random
+> >effects meta-analysis to the meta-regression, but no change in I-squared.
+> >
+> >Can someone help me understand why, with a positive non-zero r-squared,
+> >there's a change in tau-squared but not in I-squared?
+>
+> First of all, all these things (I^2 in a model without moderators, I^2 in
+> a meta-regression model, and R^2) are estimates, so they can simply be
+> 'off'. For example, it can happen that tau^2 or I^2 actually increase when
+> including a moderator in a model, although in theory that doesn't make
+> sense.
+>
+> Also, I^2 in a meta-regression model has a different interpretation than
+> in a model without moderators. In a model without moderators, I^2 is an
+> estimate how much of the total variability (which is composed of
+> heterogeneity and sampling variability) is due to heterogeneity. However,
+> in a meta-regression model, I^2 is an estimate how much of the *unaccounted
+> for variability* (which is composed of residual / unaccounted for
+> heterogeneity and sampling variability) is due to the residual /
+> unaccounted for heterogeneity. That's different than asking how much of the
+> *total variability* is due to residual / unaccounted for heterogeneity. So
+> I^2 in a meta-regression model is a bit of a strange statistic anyway and I
+> am not sure how many people actually grasp its correct interpretation.
+>
+> As a more technical point: The way I^2 is computed in meta-regression
+> models is also a bit strange. The way the 'typical' sampling variance is
+> computed under such models actually depends on the moderators included in
+> the model, which one could argue is a bit odd. But given that people
+> typically compute I^2 with (Q-df)/df (where Q could be the test for
+> heterogeneity or the test for residual heterogeneity) this is what happens.
+>
+> >Which one is more feasible to report that we were able to account for some
+> >of the heterogeneity?
+>
+> In meta-regression models, I would report R^2 and not report I^2. You can
+> also report the test for residual heterogeneity, so if somebody feels the
+> need to compute I^2 based on that, they always can.
+>
+> >Thanks!
+> >
+> >Meta output:
+> >I-squared: 87%
+> >tau-squared: .27
+> >
+> >Meta-reg output
+> >tau^2 (estimated amount of residual heterogeneity):     0.2426 (SE =
+> 0.2570)
+> >tau (square root of estimated tau^2 value):                    0.4925
+> >I^2 (residual heterogeneity / unaccounted variability):    86.68%
+> >H^2 (unaccounted variability / sampling variability):       7.51
+> >R^2 (amount of heterogeneity accounted for):               12.25%
+>
+
+
+-- 
+
+Thank you,
+
+Richard J. Simonson
+
+HFES ERAU Chapter President
+
+PhD Candidate
+
+Department of Human Factors and Behavioral Neurobiology
+
+Embry-Riddle Aeronautical University
+
+	[[alternative HTML version deleted]]
+
+
+From e|o22 @end|ng |rom c@m@@c@uk  Fri Sep  4 12:22:30 2020
+From: e|o22 @end|ng |rom c@m@@c@uk (Emanuele F. Osimo)
+Date: Fri, 4 Sep 2020 11:22:30 +0100
+Subject: [R-meta] Need to specify meta analysis weights
+Message-ID: <CAO_hj6O7SP9h0P+heLNuimd3BXxCbBNFc6j6udiK2GLGfh=JdA@mail.gmail.com>
+
+Dear all,
+I am conducting a random-effects meta-analysis of 4 longitudinal studies
+measuring a blood inflammatory marker earlier on in life, and an unrelated
+outcome (measured in an interview) years later.
+The studies are not uniform in N (one is about 80k people, the 2 smallest
+are about 2k people) and in time to follow up (ranging from 8 to 21 years).
+I have odds ratios  and 95% confidence intervals for the outcome based on
+cut-offs of the baseline marker (e.g. outcome for inflamed vs outcome for
+non-inflamed).
+
+I have 2 questions for you:
+1- if I use weighting by N, as recommended by Cochrane, I am basically
+reporting the findings of the larger study, which gets 88% of the weight.
+The larger study is possibly qualitatively less good than the 2 smallest
+studies. What do you suggest to use for weighting? Is there any compound
+weighting methods that takes into account, say, study quality, N and
+inverse variance?
+2- time to follow-up: even if I am not measuring a difference in outcome
+over time, but just the risk of an outcome after an exposure, do I need to
+adjust for time to follow-up? And how?
+
+Many thanks in advance for your time and thoughts on this.
+
+Best wishes,
+
+Emanuele
+
+	[[alternative HTML version deleted]]
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Fri Sep  4 12:54:59 2020
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Fri, 4 Sep 2020 12:54:59 +0200
+Subject: [R-meta] Need to specify meta analysis weights
+In-Reply-To: <CAO_hj6O7SP9h0P+heLNuimd3BXxCbBNFc6j6udiK2GLGfh=JdA@mail.gmail.com>
+References: <CAO_hj6O7SP9h0P+heLNuimd3BXxCbBNFc6j6udiK2GLGfh=JdA@mail.gmail.com>
+Message-ID: <5177f30f-49e5-0ea0-9bf3-897bc372c52f@imbi.uni-freiburg.de>
+
+Dear Emanuele,
+
+To your first question: First, Cochrane doesn't recommend weighting by 
+N. Cochrane (and others) recommend weighting by inverse variance, and in 
+the case of a binary outcome (you mention odds ratios) it is even better 
+to use a generalised linear mixed model (GLMM), e.g., logistic 
+regression. Also random effect models are available. A random effect 
+model is suitable to mitigate the effect of the largest study, or to 
+upweight smaller studies, which seems to be desired in your case.
+
+To the second question: One possibility would be meta-regression with 
+length of follow-up as a covariate. Is length of follow-up a study-level 
+covariate, or an individual-level covariate? There is no problem in the 
+first case, but it may be problematic in the second case, when each 
+individual has a different length of follow-up.
+
+Best,
+
+Gerta
+
+Am 04.09.2020 um 12:22 schrieb Emanuele F. Osimo:
+> Dear all,
+> I am conducting a random-effects meta-analysis of 4 longitudinal studies
+> measuring a blood inflammatory marker earlier on in life, and an unrelated
+> outcome (measured in an interview) years later.
+> The studies are not uniform in N (one is about 80k people, the 2 smallest
+> are about 2k people) and in time to follow up (ranging from 8 to 21 years).
+> I have odds ratios  and 95% confidence intervals for the outcome based on
+> cut-offs of the baseline marker (e.g. outcome for inflamed vs outcome for
+> non-inflamed).
+>
+> I have 2 questions for you:
+> 1- if I use weighting by N, as recommended by Cochrane, I am basically
+> reporting the findings of the larger study, which gets 88% of the weight.
+> The larger study is possibly qualitatively less good than the 2 smallest
+> studies. What do you suggest to use for weighting? Is there any compound
+> weighting methods that takes into account, say, study quality, N and
+> inverse variance?
+> 2- time to follow-up: even if I am not measuring a difference in outcome
+> over time, but just the risk of an outcome after an exposure, do I need to
+> adjust for time to follow-up? And how?
+>
+> Many thanks in advance for your time and thoughts on this.
+>
+> Best wishes,
+>
+> Emanuele
+>
+> 	[[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+
+From t@@@uere@@|g @end|ng |rom gmx@de  Sun Sep  6 14:25:22 2020
+From: t@@@uere@@|g @end|ng |rom gmx@de (Tobias Saueressig)
+Date: Sun, 6 Sep 2020 14:25:22 +0200
+Subject: [R-meta] Computing treatment effects with 95%CI from a
+ meta-regression output
+Message-ID: <trinity-717fb885-58ce-4a94-88db-0623d4d2c6fa-1599395122324@3c-app-gmx-bap18>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200906/1dc71564/attachment.html>
+
+From jepu@to @end|ng |rom gm@||@com  Sun Sep  6 16:53:21 2020
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Sun, 6 Sep 2020 09:53:21 -0500
+Subject: [R-meta] Computing treatment effects with 95%CI from a
+ meta-regression output
+In-Reply-To: <trinity-717fb885-58ce-4a94-88db-0623d4d2c6fa-1599395122324@3c-app-gmx-bap18>
+References: <trinity-717fb885-58ce-4a94-88db-0623d4d2c6fa-1599395122324@3c-app-gmx-bap18>
+Message-ID: <1654DE20-6D73-4DFE-BD5D-D271863EBC23@gmail.com>
+
+The easiest thing to do is probably to simply recalculate the model after omitting the intercept term:
+
+robu(formula = es ~ 0 + Time, data = SMD,studynum = study, var.eff.size = var,rho = .8, small = TRUE, modelweights = "CORR")
+
+Sent from my iPhone
+
+> On Sep 6, 2020, at 7:25 AM, Tobias Saueressig <t.saueressig at gmx.de> wrote:
+> 
+> robu(formula = es ~ 1 + Time, data = SMD,studynum = study, var.eff.size = var,rho = .8, small = TRUE, modelweights = "CORR")
+
+
+From t@@@uere@@|g @end|ng |rom gmx@de  Sun Sep  6 17:21:58 2020
+From: t@@@uere@@|g @end|ng |rom gmx@de (Tobias Saueressig)
+Date: Sun, 6 Sep 2020 17:21:58 +0200
+Subject: [R-meta] Computing treatment effects with 95%CI from a
+ meta-regression output
+In-Reply-To: <1654DE20-6D73-4DFE-BD5D-D271863EBC23@gmail.com>
+References: <trinity-717fb885-58ce-4a94-88db-0623d4d2c6fa-1599395122324@3c-app-gmx-bap18>
+ <1654DE20-6D73-4DFE-BD5D-D271863EBC23@gmail.com>
+Message-ID: <trinity-39cb9323-0763-489b-8e59-9adb59fafe56-1599405718912@3c-app-gmx-bap63>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200906/53debdf7/attachment.html>
+
+From jepu@to @end|ng |rom gm@||@com  Sun Sep  6 21:37:37 2020
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Sun, 6 Sep 2020 14:37:37 -0500
+Subject: [R-meta] Computing treatment effects with 95%CI from a
+ meta-regression output
+In-Reply-To: <trinity-39cb9323-0763-489b-8e59-9adb59fafe56-1599405718912@3c-app-gmx-bap63>
+References: <trinity-717fb885-58ce-4a94-88db-0623d4d2c6fa-1599395122324@3c-app-gmx-bap18>
+ <1654DE20-6D73-4DFE-BD5D-D271863EBC23@gmail.com>
+ <trinity-39cb9323-0763-489b-8e59-9adb59fafe56-1599405718912@3c-app-gmx-bap63>
+Message-ID: <CAFUVuJwHLqfvj1tN-2RiUaf1kXMJO-JNoTQQC9+6Atxv2uOs=g@mail.gmail.com>
+
+That makes sense. RVE won't work and is not appropriate if you only have a
+single study falling into a given category. For it to work, there need to
+be multiple independent studies that contribute effects to a given
+category.
+
+On Sun, Sep 6, 2020 at 10:22 AM Tobias Saueressig <t.saueressig at gmx.de>
+wrote:
+
+> Hello James,
+>
+> thank you. It worked. In cases were there was only a single study it gave
+> alot of NaNs. But I have the CIs from the analysis with the intercept in
+> it.
+>
+> Regards
+>
+> Tobias
+>
+>
+>
+> *Gesendet:* Sonntag, 06. September 2020 um 16:53 Uhr
+> *Von:* "James Pustejovsky" <jepusto at gmail.com>
+> *An:* "Tobias Saueressig" <t.saueressig at gmx.de>
+> *Cc:* "r-sig-meta-analysisr-project.org" <
+> r-sig-meta-analysis at r-project.org>
+> *Betreff:* Re: [R-meta] Computing treatment effects with 95%CI from a
+> meta-regression output
+> The easiest thing to do is probably to simply recalculate the model after
+> omitting the intercept term:
+>
+> robu(formula = es ~ 0 + Time, data = SMD,studynum = study, var.eff.size =
+> var,rho = .8, small = TRUE, modelweights = "CORR")
+>
+> Sent from my iPhone
+>
+> > On Sep 6, 2020, at 7:25 AM, Tobias Saueressig <t.saueressig at gmx.de>
+> wrote:
+> >
+> > robu(formula = es ~ 1 + Time, data = SMD,studynum = study, var.eff.size
+> = var,rho = .8, small = TRUE, modelweights = "CORR")
+>
+
+	[[alternative HTML version deleted]]
+
+
+From t@s@ueressig m@iii@g oii gmx@de  Sun Sep  6 22:17:57 2020
+From: t@s@ueressig m@iii@g oii gmx@de (t@s@ueressig m@iii@g oii gmx@de)
+Date: Sun, 06 Sep 2020 22:17:57 +0200
+Subject: [R-meta] Computing treatment effects with 95%CI from a
+ meta-regression output
+In-Reply-To: <CAFUVuJwHLqfvj1tN-2RiUaf1kXMJO-JNoTQQC9+6Atxv2uOs=g@mail.gmail.com>
+Message-ID: <70b67ae1-ab7d-4cb0-ab5e-522e5981c4e6@email.android.com>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200906/3e04b056/attachment-0001.html>
+
+From e|o22 @end|ng |rom c@m@@c@uk  Mon Sep  7 15:38:48 2020
+From: e|o22 @end|ng |rom c@m@@c@uk (Emanuele F. Osimo)
+Date: Mon, 7 Sep 2020 14:38:48 +0100
+Subject: [R-meta] Need to specify meta analysis weights
+In-Reply-To: <5177f30f-49e5-0ea0-9bf3-897bc372c52f@imbi.uni-freiburg.de>
+References: <CAO_hj6O7SP9h0P+heLNuimd3BXxCbBNFc6j6udiK2GLGfh=JdA@mail.gmail.com>
+ <5177f30f-49e5-0ea0-9bf3-897bc372c52f@imbi.uni-freiburg.de>
+Message-ID: <CAO_hj6O38OBtLYC6bLVie4sqdpmm8E4XtogNybgPHnxZ3e0z=A@mail.gmail.com>
+
+Dear Gerta,
+
+many thanks for your reply.
+A couple of follow-up questions:
+
+1) does using inverse variance to weight studies hold when only few studies
+are included, and one is much bigger than the others?
+2) why is rma.glmm better than rma.uni which I have used in R to apply
+random effect models for ORs? Is there a way to apply rma.glmm using
+log(OR) and the standard error of the OR (which is what I have available)
+instead of the contingency tables it requires?
+
+Many thanks again for your help.
+
+Best wishes,
+
+Emanuele
+
+
+On Fri, 4 Sep 2020 at 11:55, Gerta Ruecker <ruecker at imbi.uni-freiburg.de>
+wrote:
+
+> Dear Emanuele,
+>
+> To your first question: First, Cochrane doesn't recommend weighting by
+> N. Cochrane (and others) recommend weighting by inverse variance, and in
+> the case of a binary outcome (you mention odds ratios) it is even better
+> to use a generalised linear mixed model (GLMM), e.g., logistic
+> regression. Also random effect models are available. A random effect
+> model is suitable to mitigate the effect of the largest study, or to
+> upweight smaller studies, which seems to be desired in your case.
+>
+> To the second question: One possibility would be meta-regression with
+> length of follow-up as a covariate. Is length of follow-up a study-level
+> covariate, or an individual-level covariate? There is no problem in the
+> first case, but it may be problematic in the second case, when each
+> individual has a different length of follow-up.
+>
+> Best,
+>
+> Gerta
+>
+> Am 04.09.2020 um 12:22 schrieb Emanuele F. Osimo:
+> > Dear all,
+> > I am conducting a random-effects meta-analysis of 4 longitudinal studies
+> > measuring a blood inflammatory marker earlier on in life, and an
+> unrelated
+> > outcome (measured in an interview) years later.
+> > The studies are not uniform in N (one is about 80k people, the 2 smallest
+> > are about 2k people) and in time to follow up (ranging from 8 to 21
+> years).
+> > I have odds ratios  and 95% confidence intervals for the outcome based on
+> > cut-offs of the baseline marker (e.g. outcome for inflamed vs outcome for
+> > non-inflamed).
+> >
+> > I have 2 questions for you:
+> > 1- if I use weighting by N, as recommended by Cochrane, I am basically
+> > reporting the findings of the larger study, which gets 88% of the weight.
+> > The larger study is possibly qualitatively less good than the 2 smallest
+> > studies. What do you suggest to use for weighting? Is there any compound
+> > weighting methods that takes into account, say, study quality, N and
+> > inverse variance?
+> > 2- time to follow-up: even if I am not measuring a difference in outcome
+> > over time, but just the risk of an outcome after an exposure, do I need
+> to
+> > adjust for time to follow-up? And how?
+> >
+> > Many thanks in advance for your time and thoughts on this.
+> >
+> > Best wishes,
+> >
+> > Emanuele
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list
+> > R-sig-meta-analysis at r-project.org
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+> --
+>
+> Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+>
+> Institute of Medical Biometry and Statistics,
+> Faculty of Medicine and Medical Center - University of Freiburg
+>
+> Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+>
+> Phone:    +49/761/203-6673
+> Fax:      +49/761/203-6680
+> Mail:     ruecker at imbi.uni-freiburg.de
+> Homepage:
+> https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Mon Sep  7 16:22:31 2020
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Mon, 7 Sep 2020 16:22:31 +0200
+Subject: [R-meta] Need to specify meta analysis weights
+In-Reply-To: <CAO_hj6O38OBtLYC6bLVie4sqdpmm8E4XtogNybgPHnxZ3e0z=A@mail.gmail.com>
+References: <CAO_hj6O7SP9h0P+heLNuimd3BXxCbBNFc6j6udiK2GLGfh=JdA@mail.gmail.com>
+ <5177f30f-49e5-0ea0-9bf3-897bc372c52f@imbi.uni-freiburg.de>
+ <CAO_hj6O38OBtLYC6bLVie4sqdpmm8E4XtogNybgPHnxZ3e0z=A@mail.gmail.com>
+Message-ID: <5170f63d-e998-67c7-0ab7-ef6781a4037a@imbi.uni-freiburg.de>
+
+Dear Emanuele,
+
+My answers see inline below.
+
+Am 07.09.2020 um 15:38 schrieb Emanuele F. Osimo:
+> Dear Gerta,
+>
+> many thanks for your reply.
+> A couple of follow-up?questions:
+>
+> 1) does using inverse variance to weight studies hold when only few 
+> studies are included, and one is much bigger than the others?
+
+Inverse variance weighting is relatively uncontroversial if data are 
+continuous and the fixed (more precise: the common) effect model is 
+used. (In parentheses: There have been a few controversies with respect 
+to the random effects model, but the majority of statisticians would 
+recommend it.) For binary data, the inverse variance method had also 
+been recommended for a long time, but most of us become more and more 
+aware that the two-stage methods are not optimal, particularly in case 
+of rare events.
+
+If one study is much bigger than the others, the philosophy of the 
+common effect model says that the large study provides the most precise 
+estimate, and consequently dominates the result.
+
+The philosophy of the random effects model says that each study somehow 
+has it own rights and therefore gives a little more weight to the 
+smaller studies. But if there are only few of them, the problem is that 
+the heterogeneity variance becomes difficult to estimate.
+
+> 2) why is rma.glmm better than rma.uni which I have used in R to apply 
+> random effect models for ORs? Is there a way to apply rma.glmm using 
+> log(OR) and the standard error of the OR (which is what I have 
+> available) instead of the contingency tables it requires?
+
+As I am not very used to metafor (I mostly use meta), there are others 
+more qualified to answer this. If I understand this correctly, rma.glmm 
+uses a one-stage approach which avoids the problems with two-stage 
+approaches mentioned above.
+
+I am not sure whether you make a distinction between OR and logOR? There 
+is no difference between the models with respect to this - they all 
+model the log of the OR, and the standard errors you have most probably 
+also refer to the log OR.
+
+Best,
+
+Gerta
+
+>
+> Many thanks again for your help.
+>
+> Best wishes,
+>
+> Emanuele
+>
+>
+> On Fri, 4 Sep 2020 at 11:55, Gerta Ruecker 
+> <ruecker at imbi.uni-freiburg.de <mailto:ruecker at imbi.uni-freiburg.de>> 
+> wrote:
+>
+>     Dear Emanuele,
+>
+>     To your first question: First, Cochrane doesn't recommend
+>     weighting by
+>     N. Cochrane (and others) recommend weighting by inverse variance,
+>     and in
+>     the case of a binary outcome (you mention odds ratios) it is even
+>     better
+>     to use a generalised linear mixed model (GLMM), e.g., logistic
+>     regression. Also random effect models are available. A random effect
+>     model is suitable to mitigate the effect of the largest study, or to
+>     upweight smaller studies, which seems to be desired in your case.
+>
+>     To the second question: One possibility would be meta-regression with
+>     length of follow-up as a covariate. Is length of follow-up a
+>     study-level
+>     covariate, or an individual-level covariate? There is no problem
+>     in the
+>     first case, but it may be problematic in the second case, when each
+>     individual has a different length of follow-up.
+>
+>     Best,
+>
+>     Gerta
+>
+>     Am 04.09.2020 um 12:22 schrieb Emanuele F. Osimo:
+>     > Dear all,
+>     > I am conducting a random-effects meta-analysis of 4 longitudinal
+>     studies
+>     > measuring a blood inflammatory marker earlier on in life, and an
+>     unrelated
+>     > outcome (measured in an interview) years later.
+>     > The studies are not uniform in N (one is about 80k people, the 2
+>     smallest
+>     > are about 2k people) and in time to follow up (ranging from 8 to
+>     21 years).
+>     > I have odds ratios? and 95% confidence intervals for the outcome
+>     based on
+>     > cut-offs of the baseline marker (e.g. outcome for inflamed vs
+>     outcome for
+>     > non-inflamed).
+>     >
+>     > I have 2 questions for you:
+>     > 1- if I use weighting by N, as recommended by Cochrane, I am
+>     basically
+>     > reporting the findings of the larger study, which gets 88% of
+>     the weight.
+>     > The larger study is possibly qualitatively less good than the 2
+>     smallest
+>     > studies. What do you suggest to use for weighting? Is there any
+>     compound
+>     > weighting methods that takes into account, say, study quality, N and
+>     > inverse variance?
+>     > 2- time to follow-up: even if I am not measuring a difference in
+>     outcome
+>     > over time, but just the risk of an outcome after an exposure, do
+>     I need to
+>     > adjust for time to follow-up? And how?
+>     >
+>     > Many thanks in advance for your time and thoughts on this.
+>     >
+>     > Best wishes,
+>     >
+>     > Emanuele
+>     >
+>     >? ? ? ?[[alternative HTML version deleted]]
+>     >
+>     > _______________________________________________
+>     > R-sig-meta-analysis mailing list
+>     > R-sig-meta-analysis at r-project.org
+>     <mailto:R-sig-meta-analysis at r-project.org>
+>     > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+>     -- 
+>
+>     Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+>
+>     Institute of Medical Biometry and Statistics,
+>     Faculty of Medicine and Medical Center - University of Freiburg
+>
+>     Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+>
+>     Phone:? ? +49/761/203-6673
+>     Fax:? ? ? +49/761/203-6680
+>     Mail: ruecker at imbi.uni-freiburg.de
+>     <mailto:ruecker at imbi.uni-freiburg.de>
+>     Homepage:
+>     https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+>
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Sep  7 20:33:14 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 7 Sep 2020 18:33:14 +0000
+Subject: [R-meta] Need to specify meta analysis weights
+In-Reply-To: <5170f63d-e998-67c7-0ab7-ef6781a4037a@imbi.uni-freiburg.de>
+References: <CAO_hj6O7SP9h0P+heLNuimd3BXxCbBNFc6j6udiK2GLGfh=JdA@mail.gmail.com>
+ <5177f30f-49e5-0ea0-9bf3-897bc372c52f@imbi.uni-freiburg.de>
+ <CAO_hj6O38OBtLYC6bLVie4sqdpmm8E4XtogNybgPHnxZ3e0z=A@mail.gmail.com>
+ <5170f63d-e998-67c7-0ab7-ef6781a4037a@imbi.uni-freiburg.de>
+Message-ID: <f5700fc95a454cb8be7e4daeb6241fba@UM-MAIL3214.unimaas.nl>
+
+Just chiming in briefly here: The answer to 2) is No. If you only have the log odds ratios and corresponding standard errors, then you cannot use rma.glmm(). To fit logistic regression models, you need the 2x2 table counts.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Gerta Ruecker
+>Sent: Monday, 07 September, 2020 16:23
+>To: Emanuele F. Osimo
+>Cc: r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] Need to specify meta analysis weights
+>
+>Dear Emanuele,
+>
+>My answers see inline below.
+>
+>Am 07.09.2020 um 15:38 schrieb Emanuele F. Osimo:
+>> Dear Gerta,
+>>
+>> many thanks for your reply.
+>> A couple of follow-up?questions:
+>>
+>> 1) does using inverse variance to weight studies hold when only few
+>> studies are included, and one is much bigger than the others?
+>
+>Inverse variance weighting is relatively uncontroversial if data are
+>continuous and the fixed (more precise: the common) effect model is
+>used. (In parentheses: There have been a few controversies with respect
+>to the random effects model, but the majority of statisticians would
+>recommend it.) For binary data, the inverse variance method had also
+>been recommended for a long time, but most of us become more and more
+>aware that the two-stage methods are not optimal, particularly in case
+>of rare events.
+>
+>If one study is much bigger than the others, the philosophy of the
+>common effect model says that the large study provides the most precise
+>estimate, and consequently dominates the result.
+>
+>The philosophy of the random effects model says that each study somehow
+>has it own rights and therefore gives a little more weight to the
+>smaller studies. But if there are only few of them, the problem is that
+>the heterogeneity variance becomes difficult to estimate.
+>
+>> 2) why is rma.glmm better than rma.uni which I have used in R to apply
+>> random effect models for ORs? Is there a way to apply rma.glmm using
+>> log(OR) and the standard error of the OR (which is what I have
+>> available) instead of the contingency tables it requires?
+>
+>As I am not very used to metafor (I mostly use meta), there are others
+>more qualified to answer this. If I understand this correctly, rma.glmm
+>uses a one-stage approach which avoids the problems with two-stage
+>approaches mentioned above.
+>
+>I am not sure whether you make a distinction between OR and logOR? There
+>is no difference between the models with respect to this - they all
+>model the log of the OR, and the standard errors you have most probably
+>also refer to the log OR.
+>
+>Best,
+>
+>Gerta
+
+From d|egogr@do@b @end|ng |rom gm@||@com  Fri Sep 18 08:40:24 2020
+From: d|egogr@do@b @end|ng |rom gm@||@com (Diego Grados Bedoya)
+Date: Fri, 18 Sep 2020 08:40:24 +0200
+Subject: [R-meta] variable importance in the context of meta-analysis
+Message-ID: <CANkiHXkGeL4ZPjhspx8xzxrL2FJEmEfgJp-6XYhc7v0VdUa-rg@mail.gmail.com>
+
+Dear all,
+
+I was exploring model specification alternatives in the context of
+meta-analysis and I discovered the glmulti r package. The main function of
+this package fits all possible models that could be constructed using
+combinations of the moderators/predictors. However, there is something that
+triggered my attention: the definition of the variable importance. The
+relative importance value for a particular predictor is equal to the sum of
+the Akaike weights for the models in which the predictor appears. Is this
+conceptually and/or mathematically acceptable? I could not find
+references related to it.
+
+Thanks in advance,
+
+Kind regards,
+
+Diego
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep 18 11:58:16 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Fri, 18 Sep 2020 09:58:16 +0000
+Subject: [R-meta] variable importance in the context of meta-analysis
+In-Reply-To: <CANkiHXkGeL4ZPjhspx8xzxrL2FJEmEfgJp-6XYhc7v0VdUa-rg@mail.gmail.com>
+References: <CANkiHXkGeL4ZPjhspx8xzxrL2FJEmEfgJp-6XYhc7v0VdUa-rg@mail.gmail.com>
+Message-ID: <86d0ec8a35f048e7b0450be7d50a378a@UM-MAIL3214.unimaas.nl>
+
+Dear Diego,
+
+Yes, this makes sense. The Akaike weight of a model is the estimated probability that the model is the best model (in the sense of how 'best' is defined under such an information-theoretic approach) in the candidate set. So, by adding up the weights for all models that contain the predictor of interest, you get, roughly speaking, the probability that the predictor is relevant.
+
+As references, you could take a look at the book "Model Selection and Multimodel Inference" by Burnham and Anderson or the somewhat shorter/condensed "Model Based Inference in the Life Sciences: A Primer on Evidence" by Anderson.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Diego Grados Bedoya
+>Sent: Friday, 18 September, 2020 8:40
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] variable importance in the context of meta-analysis
+>
+>Dear all,
+>
+>I was exploring model specification alternatives in the context of
+>meta-analysis and I discovered the glmulti r package. The main function of
+>this package fits all possible models that could be constructed using
+>combinations of the moderators/predictors. However, there is something that
+>triggered my attention: the definition of the variable importance. The
+>relative importance value for a particular predictor is equal to the sum of
+>the Akaike weights for the models in which the predictor appears. Is this
+>conceptually and/or mathematically acceptable? I could not find
+>references related to it.
+>
+>Thanks in advance,
+>
+>Kind regards,
+>
+>Diego
+
+
+From m|xu89 @end|ng |rom gm@||@com  Thu Sep 24 19:45:02 2020
+From: m|xu89 @end|ng |rom gm@||@com (Mika Manninen)
+Date: Thu, 24 Sep 2020 18:45:02 +0100
+Subject: [R-meta] Multivariate meta-analysis - moderator analysis and tau
+ squared
+Message-ID: <CAJh4eGmHCQ4iNaYqPjcdKPRRdJmNCsvYwXDyvt5-37Ak9eifAA@mail.gmail.com>
+
+ Hello,
+
+I am doing a meta-analysis looking at the effect of a teaching intervention
+(versus control) on six types of motivation/behavioural regulation.
+Theoretically and empirically these constructs form a continuum in which
+the continuum neighbours are most strongly positively correlated and the
+furthest from one another most negatively correlated.
+
+I received help from Professors Wolfgang Viechtbauer and James Pustejovsky
+already in July with the variance-covariance matrix computation. Thank you
+again!
+
+Now with all data collected, I have a few additional questions.regarding.
+
+1. Warning message "positive definite"
+2. Getting Q and I squared values from a multivariate meta-analysis output
+3. and 4.Interpreting moderator analysis with categorical moderators
+(Egger-type test, too for publication bias)
+5. Suggestion for reporting forest plot and funnel plot for this type of
+analysis (137 effects and 37 studies in the original datafile).
+
+A subsample of data and relevant analyses can be done with the code
+provided below. The aforementioned questions are blended into the text to
+make answering them easier.
+__________
+
+#Install metafor package before proceeding with meta-analysis
+
+library("metafor", lib.loc="~/R/R-4.0.0/library")
+
+#Create the dataframe (without covariance matrix)
+
+meta <- structure(list(Author = c("Abula et al., 2018", "Abula et al.,
+2018",
+                          "Abula et al., 2018", "Abula et al., 2018",
+"Abula et al., 2018",
+                          "Barkoukis et al., 2020", "Barkoukis et al.,
+2020", "Barkoukis et al., 2020",
+                          "Barkoukis et al., 2020", "Behzadnia et al.,
+2017", "Behzadnia et al., 2017",
+                          "Behzadnia et al., 2017", "Behzadnia et al.,
+2017", "Chang et al., 2016",
+                          "Chang et al., 2016", "Chang et al., 2016",
+"Chang et al., 2016",
+                          "Chang et al., 2016", "Cheon et al., 2010",
+"Cheon et al., 2010",
+                          "Cheon et al., 2010", "Cheon et al., 2010",
+"Cheon et al., 2010",
+                          "Cheon et al., 2012", "Cheon et al., 2015",
+"Cheon et al., 2016",
+                          "Edmunds et al., 2008", "Edmunds et al., 2008",
+"Edmunds et al., 2008",
+                          "Edmunds et al., 2008", "Edmunds et al., 2008",
+"Edmunds et al., 2008",
+                          "Fin et al., 2019", "Fin et al., 2019", "Fin et
+al., 2019", "Fin et al., 2019",
+                          "Fin et al., 2019", "Franco et al., 2017",
+"Fransen etal., 2018",
+                          "Gillison et al., 2013", "Gillison et al., 2013",
+"Gillison et al., 2013",
+                          "Gillison et al., 2013", "Gillison et al., 2013",
+"Gonz?lez-Cutre et al., 2018",
+                          "Gonz?lez-Cutre et al., 2018", "Gonz?lez-Cutre et
+al., 2018",
+                          "Gonz?lez-Cutre et al., 2018", "Gonz?lez-Cutre et
+al., 2018",
+                          "Gonz?lez-Cutre et al., 2018", "Ha et al., 2019",
+"Ha et al., 2019"),
+study = c(1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4,
+                         4, 4, 5, 5, 5, 5, 5, 6, 7, 8, 9, 9, 9, 9, 9, 9,
+10, 10, 10, 10,
+                         10, 11, 12, 13, 13, 13, 13, 13, 14, 14, 14, 14,
+14, 14, 15, 15),
+outcome = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+                              15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+26, 27, 28, 29, 30,
+                              31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
+42, 43, 44, 45, 46,
+                              47, 48, 49, 50, 51, 52),
+motivation = c(1, 3, 4, 5, 6, 1, 3, 4, 5, 1, 3, 4, 5, 1, 3, 4, 5, 6, 1, 3,
+4, 5, 6, 6, 6, 6, 1, 2,
+                              3, 4, 5, 6, 1, 3, 4, 5, 6, 1, 1, 1, 3, 4, 5,
+6, 1, 2, 3, 4, 5,
+                              6, 1, 3),
+g = c(0.528464772324917, 0.0589694070444635, 0.282008465683339,
+      -0.0920405520247558, 0.0404267845152442, 0.419921031000001,
+0.288692999072491,
+      -0.129114905405604, 0.0153234677481859, 1.692130349854,
+1.5655112070775,
+      0.797525006036895, 0.202220243923423, 0.560898338638158,
+0.120018930689234,
+      0.320629566196145, -0.0255557448041566, -0.356052957510261,
+0.836181226696161,
+      0.945619432746331, -1.14695724875324, -0.316929747502631,
+-0.444939499881025,
+      -0.103827982870712, -0.124551198480087, -0.270481778614604,
+0.193279463967818,
+      -0.220165204655694, 0.328515459564001, -0.661405951944594,
+-0.0588677781991213,
+      0.381443142567869, 0.405279105271576, -0.0689560292055143,
+-0.406763178319009,
+      -1.28981574597883, -0.12834586771615, 0.493626759881918,
+0.527629708371335,
+      0.14237493801129, 0.181922479878477, -0.012193145480936,
+-0.476411871637917,
+      -0.239292055322439, 0.135428894231014, -0.140303735152328,
+-0.125317079792252,
+      -0.199539217658822, 0.347519633564979, -0.0569303505457916,
+0.0331393420421724,
+      0.127165941804818),
+v = c(0.0126374422978132, 0.0136501896827314,
+      0.0172092970523336, 0.0158304677686747, 0.015196984404496,
+0.0117016875107911,
+      0.0129905670084342, 0.0160782230295901, 0.0130349120410749,
+0.166244292906422,
+      0.172788985120758, 0.169998384821774, 0.147236242254395,
+0.026050596807523,
+      0.0280225511437046, 0.0353688036495172, 0.0324162425207384,
+0.0316517208270417,
+      0.125246076172345, 0.143299200337245, 0.182870602701095,
+0.148364422975138,
+      0.144468441612776, 0.00274503202263367, 0.00657178221924943,
+      0.00378625733110702, 0.0567043412519983, 0.0698128695544358,
+      0.064578154151857, 0.083501070217046, 0.0737350489050993,
+0.0721490273295586,
+      0.0536371594302375, 0.0589692454871346, 0.0750760396309753,
+0.0825343404161793,
+      0.0657659083731156, 0.0622812720119753, 0.0317147286821705,
+0.0165661561004418,
+      0.0186223247379937, 0.023286686815142, 0.0220852914411238,
+0.0207926243477567,
+      0.0402229479672577, 0.0494884645771515, 0.045350892784268,
+0.0568053388291199,
+      0.0531589046798887, 0.0504220144875667, 0.00506476243264833,
+      0.00572614282481596),
+setting = c(0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1,
+            1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0),
+scope = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 2, 2, 2, 2,
+2, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 1, 1, 1, 1, 1, 3, 3, 3,
+3, 3, 3, 3, 3),
+typei = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 0, 0),
+typec = c(0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0,
+0, 0, 0, 0, 0),
+length = c(2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 1, 1,
+1, 1, 1, 1, 1, 1),
+age = c(1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1,
+1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0),
+oq = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2,
+1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1,
+1, 1, 1, 1),
+mqi = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1,
+1, 1, 1, 1, 1),
+tq = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,
+1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1,
+1, 1, 1, 1)),
+row.names = c(NA,-52L), class = c("tbl_df", "tbl", "data.frame"))
+
+View(meta)
+
+corlist <- list(structure(c(1, NA, 0.96, 0.34, -0.33, -0.66, NA, NA, NA,
+                 NA, NA, NA, 0.96, NA, 1, 0.55, -0.12, -0.5, 0.34, NA,
+0.55, 1,
+                 0.53, 0.05, -0.33, NA, -0.12, 0.53, 1, 0.72, -0.66, NA,
+-0.5,
+                 0.05, 0.72, 1), .Dim = c(6L, 6L)), structure(c(1, NA,
+0.374,
+                                                                0.034,
+0.108, NA, NA, NA, NA, NA, NA, NA, 0.374, NA, 1, 0.261,
+                                                                0.22, NA,
+0.034, NA, 0.261, 1, 0.381, NA, 0.108, NA, 0.22, 0.381,
+                                                                1, NA, NA,
+NA, NA, NA, NA, NA), .Dim = c(6L, 6L)), structure(c(1,
+
+                                                   NA, 0.96, 0.34, -0.33,
+NA, NA, NA, NA, NA, NA, NA, 0.96, NA,
+
+                                                   1, 0.55, -0.12, NA,
+0.34, NA, 0.55, 1, 0.53, NA, -0.33, NA, -0.12,
+
+                                                   0.53, 1, NA, NA, NA, NA,
+NA, NA, NA), .Dim = c(6L, 6L)), structure(c(1,
+
+
+                                            NA, 0.96, 0.34, -0.33, -0.66,
+NA, NA, NA, NA, NA, NA, 0.96, NA,
+
+
+                                            1, 0.55, -0.12, -0.5, 0.34, NA,
+0.55, 1, 0.53, 0.05, -0.33, NA,
+
+
+                                            -0.12, 0.53, 1, 0.72, -0.66,
+NA, -0.5, 0.05, 0.72, 1), .Dim = c(6L,
+
+
+
+                                6L)), structure(c(1, NA, 0.85, 0.35, 0.06,
+-0.44, NA, NA, NA,
+
+
+
+                                                  NA, NA, NA, 0.85, NA, 1,
+0.59, 0.46, -0.14, 0.35, NA, 0.59, 1,
+
+
+
+                                                  0.71, 0.27, 0.06, NA,
+0.46, 0.71, 1, 0.52, -0.44, NA, -0.14,
+
+
+
+                                                  0.27, 0.52, 1), .Dim =
+c(6L, 6L)), structure(c(NA, NA, NA, NA,
+
+
+
+
+                     NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+NA, NA, NA,
+
+
+
+
+                     NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+NA, NA, 1
+
+
+
+                                                  ), .Dim = c(6L, 6L)),
+structure(c(NA, NA, NA, NA, NA, NA, NA,
+
+
+
+
+        NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+
+
+
+
+        NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, 1), .Dim = c(6L,
+
+
+
+
+                                                                     6L)),
+structure(c(NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+
+
+
+
+
+           NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+
+
+
+
+
+           NA, NA, NA, NA, NA, NA, NA, NA, 1), .Dim = c(6L, 6L)),
+structure(c(1,
+
+
+
+
+
+
+  0.79, 0.84, 0.24, -0.2, -0.5, 0.79, 1, 0.93, 0.47, 0, -0.31,
+
+
+
+
+
+
+  0.84, 0.93, 1, 0.57, -0.07, -0.52, 0.24, 0.47, 0.57, 1, 0.43,
+
+
+
+
+
+
+  0.01, -0.2, 0, -0.07, 0.43, 1, 0.55, -0.5, -0.31, -0.52, 0.01,
+
+
+
+
+
+
+  0.55, 1), .Dim = c(6L, 6L)), structure(c(1, NA, 0.96, 0.34, -0.33,
+
+
+
+
+
+
+                                           -0.66, NA, NA, NA, NA, NA, NA,
+0.96, NA, 1, 0.55, -0.12, -0.5,
+
+
+
+
+
+
+                                           0.34, NA, 0.55, 1, 0.53, 0.05,
+-0.33, NA, -0.12, 0.53, 1, 0.72,
+
+
+
+
+
+
+                                           -0.66, NA, -0.5, 0.05, 0.72, 1),
+.Dim = c(6L, 6L)), structure(c(1,
+
+
+
+
+
+
+
+                               NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+NA, NA, NA, NA, NA,
+
+
+
+
+
+
+
+                               NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+NA, NA, NA, NA, NA,
+
+
+
+
+
+
+
+                               NA, NA, NA), .Dim = c(6L, 6L)),
+structure(c(1, NA, NA, NA, NA,
+
+
+
+
+
+
+
+
+ NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+
+
+
+
+
+
+
+
+ NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA), .Dim = c(6L,
+
+
+
+
+
+
+
+
+                                                                     6L)),
+structure(c(1, NA, 0.96, 0.34, -0.33, -0.66, NA, NA, NA,
+
+
+
+
+
+
+
+
+
+           NA, NA, NA, 0.96, NA, 1, 0.55, -0.12, -0.5, 0.34, NA, 0.55, 1,
+
+
+
+
+
+
+
+
+
+           0.53, 0.05, -0.33, NA, -0.12, 0.53, 1, 0.72, -0.66, NA, -0.5,
+
+
+
+
+
+
+
+
+
+           0.05, 0.72, 1), .Dim = c(6L, 6L)), structure(c(1, 0.76, 0.96,
+
+
+
+
+
+
+
+
+
+                                                          0.34, -0.33,
+-0.66, 0.76, 1, 0.62, 0.25, -0.09, -0.41, 0.96,
+
+
+
+
+
+
+
+
+
+                                                          0.62, 1, 0.55,
+-0.12, -0.5, 0.34, 0.25, 0.55, 1, 0.53, 0.05,
+
+
+
+
+
+
+
+
+
+                                                          -0.33, -0.09,
+-0.12, 0.53, 1, 0.72, -0.66, -0.41, -0.5, 0.05,
+
+
+
+
+
+
+
+
+
+                                                          0.72, 1), .Dim =
+c(6L, 6L)), structure(c(1, NA, 0.79, NA, NA,
+
+
+
+
+
+
+
+
+
+
+                       NA, NA, NA, NA, NA, NA, NA, 0.79, NA, 1, NA, NA, NA,
+NA, NA,
+
+
+
+
+
+
+
+
+
+
+                       NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA,
+NA, NA, NA
+
+
+
+
+
+
+
+
+
+                                                          ), .Dim = c(6L,
+6L)))
+# A correlation matrix for the levels of motivation actually observed -
+omitting NAs (by W.Viechtbauer, July2020)
+mots <- split(meta$motivation, meta$study)
+corlist <- mapply(function(rmat, mots) rmat[mots,mots], corlist, mots)
+corlist
+
+#Creating the covariance matrix - V-matrix function (w. Viechtbauer, July
+2020)
+
+Vfun <- function(vi,rmat) {
+  if (length(vi) == 1L) {
+    matrix(vi)
+  } else {
+    S <- diag(sqrt(vi))
+    S %*% rmat %*% S
+  }
+}
+
+V <- mapply(Vfun, split(meta$v, meta$study), corlist)
+V
+
+#Here I sometimes get the following warning message: "V appears to be not
+positive definite". 1. Should this be ignored?
+
+#The multivariate model (all clear so far, except for positive definite
+warning):
+
+res <- rma.mv(g, V, mods = ~ factor(motivation) - 1, random = ~
+factor(motivation) | study, struct="UN", data=meta)
+res
+
+#Each level of motivation has its own variance component in the output
+(tau). 2. How could I obtain the Q-values (and consequently I squared) to
+report?
+
+#If I now wanted to do a moderator analysis with each level of motivation
+using the categorical variable "setting"
+#to see if there is significant difference between the two settings for
+motivation 1,2,3 etc. 3. Would the following be correct?
+
+res <-  rma.mv(g, V, mods = ~ factor(motivation)+
+factor(motivation):I(setting) -1, random = ~ factor(motivation) | study,
+struct="UN", data=meta)
+res
+
+res <- rma.mv(g, V, mods = ~ factor(motivation)*I(setting) -1, random = ~
+factor(motivation) | study, struct="UN", data=meta)
+res
+
+#I am not exactly sure what I should be interpreting. I would like to know
+if setting moderates the effect of the intervention on motivation levels
+1,2,3,4,5,6 (or can I do that - is the comparison done "overall"? )
+
+#Same goes for the Egger's type test, 4. how should the results of the
+moderator analyses be interpreted if I were to use the variance estimate or
+its inverse (v) as the predictor to test for publication bias/funnel plot
+asymmetry
+
+#5. Any other advice to report the results (e.g., how to display the forest
+plot and is there any sense to do a funnel plot?)
+
+###Thank you in advance!###
+
+Mika
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Thu Sep 24 20:21:33 2020
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 24 Sep 2020 13:21:33 -0500
+Subject: [R-meta] 
+ Multivariate meta-analysis - moderator analysis and tau squared
+In-Reply-To: <CAJh4eGmHCQ4iNaYqPjcdKPRRdJmNCsvYwXDyvt5-37Ak9eifAA@mail.gmail.com>
+References: <CAJh4eGmHCQ4iNaYqPjcdKPRRdJmNCsvYwXDyvt5-37Ak9eifAA@mail.gmail.com>
+Message-ID: <CAFUVuJz7zB18y=t-NYK8Bdn9nH5riDgpW6x-Uod+yN=LLHf5Lw@mail.gmail.com>
+
+Hi Mika,
+
+Comments below.
+
+James
+
+On Thu, Sep 24, 2020 at 12:45 PM Mika Manninen <mixu89 at gmail.com> wrote:
+
+
+> #Here I sometimes get the following warning message: "V appears to be not
+> positive definite". 1. Should this be ignored?
+>
+
+This means that one of your input correlation matrices is not positive
+definite, i.e., it is not a valid correlation matrix. It could be due to a
+typo or rounding of the entries. You can find the offending matrix using
+the following
+
+isPosDef <- function(x) all(eigen(x)$values > 0)
+sapply(corlist, isPosDef)
+
+Although it's probably a minor issue, I would still suggest correcting
+before proceeding.
+
+#Each level of motivation has its own variance component in the output
+> (tau). 2. How could I obtain the Q-values (and consequently I squared) to
+> report?
+>
+>
+I would recommend reporting the tau estimates directly. Because they are
+model parameters, they are more meaningful and more directly interpretable
+than Q or I-squared.
+
+As far as Q, there are a number of different ways to define Q in
+multivariate models (or generally, models with multiple variance
+components), some of which are global rather than being specific to the
+dimension of the outcome. Do you want to report Q as a global description
+of excess heterogeneity, or do you want something specific to the outcome
+dimension?
+
+
+> #If I now wanted to do a moderator analysis with each level of motivation
+> using the categorical variable "setting"
+> #to see if there is significant difference between the two settings for
+> motivation 1,2,3 etc. 3. Would the following be correct?
+>
+> res <-  rma.mv(g, V, mods = ~ factor(motivation)+
+> factor(motivation):I(setting) -1, random = ~ factor(motivation) | study,
+> struct="UN", data=meta)
+> res
+>
+> res <- rma.mv(g, V, mods = ~ factor(motivation)*I(setting) -1, random = ~
+> factor(motivation) | study, struct="UN", data=meta)
+> res
+>
+> #I am not exactly sure what I should be interpreting. I would like to know
+> if setting moderates the effect of the intervention on motivation levels
+> 1,2,3,4,5,6 (or can I do that - is the comparison done "overall"? )
+>
+> Is your question about setting moderates for *any* motivation level? Or
+whether it moderates for  *specific* motivation levels?
+
+If it is the former, then you can do a likelihood ratio test comparing the
+model with moderator to the model without. You would, however, have to
+switch to using ML rather than REML estimation for the variance components.
+Syntax as follows:
+
+res_ML <- rma.mv(g, V, mods = ~ factor(motivation) - 1,
+                 random = ~ factor(motivation) | study,
+                 struct="UN", data = meta,
+                 method = "ML")
+mod_ML <- update(res_ML, mods = ~ factor(motivation)*I(setting) -1)
+anova(res_ML, mod_ML)
+
+If it is the latter, then the first set of syntax gives you coefficient
+estimates for the difference in average effect size between setting = 1
+versus setting = 0, for each distinct level of motivation, so you can
+interpret those coefficients (CIs, t-tests) directly. If you're looking at
+the t-tests for all six levels, it would be prudent to use a correction for
+multiple comparisons.
+
+
+> #Same goes for the Egger's type test, 4. how should the results of the
+> moderator analyses be interpreted if I were to use the variance estimate or
+> its inverse (v) as the predictor to test for publication bias/funnel plot
+> asymmetry
+>
+
+If these effect sizes are standardized mean differences, then you'll need
+to use a modified measure of precision rather than the variance or standard
+error of the effect sizes. Details here:
+https://www.jepusto.com/publication/testing-for-funnel-plot-asymmetry-of-smds/
+
+There are at least two ways to implement Egger's test in this setting. One
+would be to simply add the modified measure of precision as a predictor. A
+significant slope coefficient would be indicative of small-study effects.
+Alternately, you could interact the predictor with the levels of motivation
+and then report the likelihood ratio test, as with the previous question.
+It is hard to say which approach is more powerful generally. Perhaps others
+on the listserv have insights.
+
+
+> #5. Any other advice to report the results (e.g., how to display the forest
+> plot and is there any sense to do a funnel plot?)
+>
+
+You could make a forest plot with the points and whiskers in different
+color shades corresponding to the levels of motivation. Alternately, make
+separate forest plots per level of motivation. Similarly, a funnel plot
+with points in different colors corresponding to the levels of motiviation,
+or make separate funnels per level of motivation.
+
+	[[alternative HTML version deleted]]
+
+
+From juhyung2 @end|ng |rom @t@n|ord@edu  Fri Sep 25 19:17:29 2020
+From: juhyung2 @end|ng |rom @t@n|ord@edu (Ju Lee)
+Date: Fri, 25 Sep 2020 17:17:29 +0000
+Subject: [R-meta] Dear Wolfgang
+Message-ID: <BYAPR02MB555945D348FBE4162C91C847F7360@BYAPR02MB5559.namprd02.prod.outlook.com>
+
+Dear Wolfgang,
+
+I hope you are well.
+I wanted to make a very basic inquiry about mixed-effect models with studies that have multiple treatment groups in a single experiment. I am more familiar with traditional meta-analysis where in each experiment, only a control and a single treatment group (perhaps the highest, or lowest treatment) are compared to generate effect sizes.
+
+However, is it possible to generate multiple effect sizes (based on comparison of a single control with different treatment levels in a single experiment) from such individual experiment and run mixed-effect models to generate grand mean effect size. In this specific analysis, treatments are continuous variable (pH level). I suspect that this, of course, violates independence among effect sizes, but by applying the covariance-variance matrix to account for the shared control group, is it legit way to run the mixed effect analysis this way.
+
+The reason we want to do this is because we want to run a moderator test whether pH level might influence effect sizes, and also because there are not many publications that we can include in this analysis.
+
+I would deeply appreciate your insights, Wolfgang!
+Best regards,
+JU
+
+	[[alternative HTML version deleted]]
+
+
+From b|||y@goette @end|ng |rom gm@||@com  Fri Sep 25 19:38:58 2020
+From: b|||y@goette @end|ng |rom gm@||@com (Billy Goette)
+Date: Fri, 25 Sep 2020 12:38:58 -0500
+Subject: [R-meta] Multilevel Meta-regression with Multiple Level Covariates
+Message-ID: <CAP8W3OPb_8znAehT9AwmEYE8=9=5AZgHsJ6eNf-ik9TyLwrZvg@mail.gmail.com>
+
+Hope this finds everyone well,
+
+I was hoping to get some feedback on addressing some practical concerns
+with an idea for a meta-analysis that I have. At the core, I'm concerned
+with the interpretability of the data analysis, so I'm trying to check
+whether this is even possible before I start the study.
+
+My field commonly administers lists of words that a participant must read
+correctly. Item difficulty is often summarized in studies as the proportion
+of respondents who got an item correct over the total sample size. Studies
+use different word-reading tests and lists of varying length (usually
+between 20 and 50). Each test differs in how long the words are
+presented, how many words are presented at a time, etc. I'm interested in
+whether certain word-specific variables (e.g., frequency of word in
+English) are related to the item difficulty (i.e., proportion of people who
+answer it correctly).
+
+My current conceptualization of the problem is as a multilevel
+meta-regression. The effect size is computed from the proportion of correct
+answers to each word which is nested within study and within tests. I would
+have multiple covariates (i.e., word traits) for each effect size,
+covariates at the study level (i.e., average sample demographics), and
+covariates at the test level (i.e., administration differences). My concern
+is that these are too many predictors to include in a meta-regression, and
+I also am anticipating that I won't have any information about
+the covariance matrix of the effect sizes. Any recommendations, words of
+warning, caveats, or suggestions would be incredibly helpful since I'm
+early in the process.
+
+Thank you!
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Tue Sep 29 03:17:09 2020
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Mon, 28 Sep 2020 20:17:09 -0500
+Subject: [R-meta] 
+ Multilevel Meta-regression with Multiple Level Covariates
+In-Reply-To: <CAP8W3OPb_8znAehT9AwmEYE8=9=5AZgHsJ6eNf-ik9TyLwrZvg@mail.gmail.com>
+References: <CAP8W3OPb_8znAehT9AwmEYE8=9=5AZgHsJ6eNf-ik9TyLwrZvg@mail.gmail.com>
+Message-ID: <CAFUVuJxWrgq4Pdm_9ugvXUYfjyi5rLD4bgxcpMO_zfqMjqAK0A@mail.gmail.com>
+
+Hi Billy,
+
+The approach you describe seems reasonable to me. Whether you've got too
+many predictors will depend on how many studies' worth of data you are able
+to gather and on the distribution of the item-level, study-level, and
+test-level characteristics. Not knowing the correlations between items does
+complicate things a bit, but could be handled using robust variance
+estimation methods.
+
+One way to set up this problem might be by using proportion of successes as
+the effect size metric, modeled by a binomial distribution (where the
+number of trials = number of respondents to that item), and where the
+probability of success is related to the covariates via a logit (or probit)
+link. Combining this with RVE for standard errors gives you something like
+a GEE model.
+
+James
+
+On Fri, Sep 25, 2020 at 12:39 PM Billy Goette <billy.goette at gmail.com>
+wrote:
+
+> Hope this finds everyone well,
+>
+> I was hoping to get some feedback on addressing some practical concerns
+> with an idea for a meta-analysis that I have. At the core, I'm concerned
+> with the interpretability of the data analysis, so I'm trying to check
+> whether this is even possible before I start the study.
+>
+> My field commonly administers lists of words that a participant must read
+> correctly. Item difficulty is often summarized in studies as the proportion
+> of respondents who got an item correct over the total sample size. Studies
+> use different word-reading tests and lists of varying length (usually
+> between 20 and 50). Each test differs in how long the words are
+> presented, how many words are presented at a time, etc. I'm interested in
+> whether certain word-specific variables (e.g., frequency of word in
+> English) are related to the item difficulty (i.e., proportion of people who
+> answer it correctly).
+>
+> My current conceptualization of the problem is as a multilevel
+> meta-regression. The effect size is computed from the proportion of correct
+> answers to each word which is nested within study and within tests. I would
+> have multiple covariates (i.e., word traits) for each effect size,
+> covariates at the study level (i.e., average sample demographics), and
+> covariates at the test level (i.e., administration differences). My concern
+> is that these are too many predictors to include in a meta-regression, and
+> I also am anticipating that I won't have any information about
+> the covariance matrix of the effect sizes. Any recommendations, words of
+> warning, caveats, or suggestions would be incredibly helpful since I'm
+> early in the process.
+>
+> Thank you!
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From o@er @end|ng |rom po@t@bgu@@c@||  Tue Sep 29 18:13:17 2020
+From: o@er @end|ng |rom po@t@bgu@@c@|| (Jennifer Oser)
+Date: Tue, 29 Sep 2020 19:13:17 +0300
+Subject: [R-meta] query re: multi-level analysis in metafor with missing
+ standard errors
+Message-ID: <CAMWjx1NRGz5tGYdV6h4Y2LkD5sNPvmyzgQxMEs8XhLfHP21-Xg@mail.gmail.com>
+
+Hi all,
+
+My co-authors and I are conducting a multi-level meta-analysis, and I write
+with a question about calculating the sampling variance to use in the rma.mv
+argument. We followed the approach of calculating the sampling variance (v)
+by squaring the standard error, as documented in "Doing Meta-Analysis in R"
+here:
+https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/fitting-a-three-level-model.html.
+However, most of the regressions in the studies that meet our inclusion
+criteria report on standardized coefficients without reporting standard
+errors, and therefore cannot be included in the multi-level analysis using
+this approach.
+
+Our question is therefore: Is there a way to conduct a multi-level analysis
+that calculates the relevant sampling variance based on regression outputs
+that report standardized coefficients but do not report standard errors? We
+know that it is possible to do conversions for an effect size in
+non-multi-level studies, but we have not yet seen documentation on how to
+do this sort of conversion for multi-level meta-analysis based on
+regression outputs.
+
+If the answer is a definitive ?No, this is not possible (at least at this
+time)? ? this would also be a useful answer, as we have conducted
+vote-counting tests in our paper, and can report on those results along
+with the multi-level findings from the smaller number of effects that do
+include the necessary information.
+
+If the answer is ?Yes, this is possible but it?s complicated?? - any advice
+and/or references for addressing this issue would be greatly appreciated,
+and we are happy to provide more information on the analysis as useful. We
+are in the final stages of revising a paper that has received very positive
+feedback in various conferences (on the topic of political efficacy and
+online political participation), and would be grateful for leads that would
+help us conduct as rigorous and comprehensive an analysis as possible.
+
+Best wishes,
+Jenny
+
+
+*Dr. Jennifer Oser*
+
+Department of Politics & Government | Ben-Gurion University of the Negev
+
+Department website
+<http://in.bgu.ac.il/en/humsos/politics/Pages/staff/jennifer_oser.aspx>
+| Research
+and teaching website <http://www.jenniferoser.com/>
+
+	[[alternative HTML version deleted]]
+
+
+From m|xu89 @end|ng |rom gm@||@com  Tue Sep 29 20:57:06 2020
+From: m|xu89 @end|ng |rom gm@||@com (Mika Manninen)
+Date: Tue, 29 Sep 2020 19:57:06 +0100
+Subject: [R-meta] 
+ Multivariate meta-analysis - moderator analysis and tau squared
+In-Reply-To: <CAFUVuJz7zB18y=t-NYK8Bdn9nH5riDgpW6x-Uod+yN=LLHf5Lw@mail.gmail.com>
+References: <CAJh4eGmHCQ4iNaYqPjcdKPRRdJmNCsvYwXDyvt5-37Ak9eifAA@mail.gmail.com>
+ <CAFUVuJz7zB18y=t-NYK8Bdn9nH5riDgpW6x-Uod+yN=LLHf5Lw@mail.gmail.com>
+Message-ID: <CAJh4eGnSu-TB0TXrzDnmko5qus-uVLniCgcqHa27esrCL63DdA@mail.gmail.com>
+
+James,
+
+Thank you very much for your detailed answer!
+
+I took some time to learn (first time doing the multivariate analyses) and
+I would have 4 quick follow-up questions.
+
+1. Follow-up on moderators (especially categorical moderators with more
+than two levels).
+2. About calculating the I squared and the need for Qs
+3. About influential study diagnostics (reestimate = FALSE)
+4. About calculating the modified precision estimate for the Egger's type
+test based on
+https://www.jepusto.com/publication/testing-for-funnel-plot-asymmetry-of-smds/
+
+The data and main analysis can be generated with the code from my original
+message (sorry about the correlations being all over the place).
+
+The follow-up questions and related code are presented below
+_____________________________________
+
+###1. About moderators
+
+#The moderators were selected a priori and the purpose was to all of the
+moderators for each level of motivation (increased risk noted!)
+
+#In my understanding here the latter half of the output is the difference
+to the corresponding motivation level on the first half (categorical
+moderator level 0)
+setting_res <- rma.mv(g, V, mods = ~ factor(motivation)*I(setting) -1,
+random = ~ factor(motivation) | study, struct="UN", data=meta)
+setting_res
+
+#Is there a simple way to get the mean effect and its CIs for all the
+motivations levels and setting levels? Usually the -1 addition
+#provides this, but is it that with the multivariate model, the level 1
+moderator effects need to be subtracted/added from the level 0 to have
+#mean effects for all the levels of motivation with different moderators?
+
+#Also, there are a few moderators with more than two levels (example with
+three). Would the following be the correct way to run the analysis in this
+case?
+#Again, would the level 1 and level 2 estimates be the differences from the
+level 0 estimates? So, the mean effects sizes for all the levels can be
+gained by subtraction/addition to and from the level 0
+
+length_res <- rma.mv(g, V, mods = ~ factor(motivation)*factor(length)-1,
+random = ~ factor(motivation) | study, struct="UN", data=meta, method =
+"ML")
+length_res
+
+### 2. About calculating the I squared
+#Which of these three methods would you recommend using? Also, if I am
+reporting taus and I squared, would not this suffice and Qs could be left
+unreported?
+
+#Constructing a block diagonal of the variance-covariance matrix (V from
+the original message).
+
+c <- bldiag(V)
+
+##I2 computations from metafor-project.org
+
+#1st option (solving W, X, and P)
+
+W <- solve(c)
+X <- model.matrix(res)
+P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W
+100 * res$tau2 / (res$tau2 + (res$k-res$p)/sum(diag(P)))
+
+#2nd option. P comes from the code above (not sure if I computed the W
+correct by assigning the bldiag function - constructs a block diagonal
+matrix) )
+
+c(100 * res$tau2[1] / (res$tau2[1] + (sum(meta$motivation ==
+1)-1)/sum(diag(P)[meta$motivation == 1])),
+  100 * res$tau2[2] / (res$tau2[2] + (sum(meta$motivation ==
+2)-1)/sum(diag(P)[meta$motivation == 2])),
+  100 * res$tau2[3] / (res$tau2[3] + (sum(meta$motivation ==
+3)-1)/sum(diag(P)[meta$motivation == 3])),
+  100 * res$tau2[4] / (res$tau2[4] + (sum(meta$motivation ==
+4)-1)/sum(diag(P)[meta$motivation == 4])),
+  100 * res$tau2[5] / (res$tau2[5] + (sum(meta$motivation ==
+5)-1)/sum(diag(P)[meta$motivation == 5])),
+  100 * res$tau2[6] / (res$tau2[6] + (sum(meta$motivation ==
+6)-1)/sum(diag(P)[meta$motivation == 6])))
+
+#3rd option (Jackson 2012) ( %s lower than with the previous two approaches)
+
+res.R <- rma.mv(g, V, mods = ~ factor(motivation) - 1, random = ~
+factor(motivation) | study, struct="UN", data=meta)
+res.R
+res.F <- rma.mv(g, V, mods = ~ factor(motivation) - 1, data=meta)
+
+c(100 * (vcov(res.R)[1,1] - vcov(res.F)[1,1]) / vcov(res.R)[1,1],
+  100 * (vcov(res.R)[2,2] - vcov(res.F)[2,2]) / vcov(res.R)[2,2],
+  100 * (vcov(res.R)[3,3] - vcov(res.F)[3,3]) / vcov(res.R)[3,3],
+  100 * (vcov(res.R)[4,4] - vcov(res.F)[4,4]) / vcov(res.R)[4,4],
+  100 * (vcov(res.R)[5,5] - vcov(res.F)[5,5]) / vcov(res.R)[5,5],
+  100 * (vcov(res.R)[6,6] - vcov(res.F)[6,6]) / vcov(res.R)[6,6])
+
+### 3. About influential studies
+#Is setting the reestimate to FALSE on cooks.distance and dfbetas okay?
+Otherwise, the diagnostics resulted in NAs.
+
+#Cooks distance on each outcome (Mahalanobis distance)
+
+cd <- cooks.distance(res, reestimate = FALSE)
+cd
+plot(cd, type="o", pch=19)
+
+#Cooks distance clustered by study
+
+cd <- cooks.distance(res, ncpus = 1, cluster = meta$study, reestimate =
+FALSE)
+cd
+plot(cd, type="o", pch=19)
+
+#Dfbetas (Change in sds)
+
+dfb <- dfbetas(res, ncpus = 1, reestimate = FALSE)
+dfb
+plot(dfb, type="o", pch=19)
+
+#Hatvalues
+
+hats <- hatvalues(res, ncpus = 1)
+hats
+plot(hats, type="o", pch=19)
+
+
+### 4. About calculating a modified precision estimate for Egger's type
+test
+#Could mprc (after running the code) be used in the Egger's test as a
+moderator/modified precision estimate to keep up with the articles
+recommendations?
+
+weight <- weights(res, type = "diagonal")
+View(weight)
+
+mprec <- sqrt(weight)
+View(mprec)
+
+###Thank you very much in advance!###
+
+
+
+to 24. syysk. 2020 klo 19.21 James Pustejovsky (jepusto at gmail.com)
+kirjoitti:
+
+> Hi Mika,
+>
+> Comments below.
+>
+> James
+>
+> On Thu, Sep 24, 2020 at 12:45 PM Mika Manninen <mixu89 at gmail.com> wrote:
+>
+>
+>> #Here I sometimes get the following warning message: "V appears to be not
+>> positive definite". 1. Should this be ignored?
+>>
+>
+> This means that one of your input correlation matrices is not positive
+> definite, i.e., it is not a valid correlation matrix. It could be due to a
+> typo or rounding of the entries. You can find the offending matrix using
+> the following
+>
+> isPosDef <- function(x) all(eigen(x)$values > 0)
+> sapply(corlist, isPosDef)
+>
+> Although it's probably a minor issue, I would still suggest correcting
+> before proceeding.
+>
+> #Each level of motivation has its own variance component in the output
+>> (tau). 2. How could I obtain the Q-values (and consequently I squared) to
+>> report?
+>>
+>>
+> I would recommend reporting the tau estimates directly. Because they are
+> model parameters, they are more meaningful and more directly interpretable
+> than Q or I-squared.
+>
+> As far as Q, there are a number of different ways to define Q in
+> multivariate models (or generally, models with multiple variance
+> components), some of which are global rather than being specific to the
+> dimension of the outcome. Do you want to report Q as a global description
+> of excess heterogeneity, or do you want something specific to the outcome
+> dimension?
+>
+>
+>> #If I now wanted to do a moderator analysis with each level of motivation
+>> using the categorical variable "setting"
+>> #to see if there is significant difference between the two settings for
+>> motivation 1,2,3 etc. 3. Would the following be correct?
+>>
+>> res <-  rma.mv(g, V, mods = ~ factor(motivation)+
+>> factor(motivation):I(setting) -1, random = ~ factor(motivation) | study,
+>> struct="UN", data=meta)
+>> res
+>>
+>> res <- rma.mv(g, V, mods = ~ factor(motivation)*I(setting) -1, random = ~
+>> factor(motivation) | study, struct="UN", data=meta)
+>> res
+>>
+>> #I am not exactly sure what I should be interpreting. I would like to know
+>> if setting moderates the effect of the intervention on motivation levels
+>> 1,2,3,4,5,6 (or can I do that - is the comparison done "overall"? )
+>>
+>> Is your question about setting moderates for *any* motivation level? Or
+> whether it moderates for  *specific* motivation levels?
+>
+> If it is the former, then you can do a likelihood ratio test comparing the
+> model with moderator to the model without. You would, however, have to
+> switch to using ML rather than REML estimation for the variance components.
+> Syntax as follows:
+>
+> res_ML <- rma.mv(g, V, mods = ~ factor(motivation) - 1,
+>                  random = ~ factor(motivation) | study,
+>                  struct="UN", data = meta,
+>                  method = "ML")
+> mod_ML <- update(res_ML, mods = ~ factor(motivation)*I(setting) -1)
+> anova(res_ML, mod_ML)
+>
+> If it is the latter, then the first set of syntax gives you coefficient
+> estimates for the difference in average effect size between setting = 1
+> versus setting = 0, for each distinct level of motivation, so you can
+> interpret those coefficients (CIs, t-tests) directly. If you're looking at
+> the t-tests for all six levels, it would be prudent to use a correction for
+> multiple comparisons.
+>
+>
+>> #Same goes for the Egger's type test, 4. how should the results of the
+>> moderator analyses be interpreted if I were to use the variance estimate
+>> or
+>> its inverse (v) as the predictor to test for publication bias/funnel plot
+>> asymmetry
+>>
+>
+> If these effect sizes are standardized mean differences, then you'll need
+> to use a modified measure of precision rather than the variance or standard
+> error of the effect sizes. Details here:
+>
+> https://www.jepusto.com/publication/testing-for-funnel-plot-asymmetry-of-smds/
+>
+> There are at least two ways to implement Egger's test in this setting. One
+> would be to simply add the modified measure of precision as a predictor. A
+> significant slope coefficient would be indicative of small-study effects.
+> Alternately, you could interact the predictor with the levels of motivation
+> and then report the likelihood ratio test, as with the previous question.
+> It is hard to say which approach is more powerful generally. Perhaps others
+> on the listserv have insights.
+>
+>
+>> #5. Any other advice to report the results (e.g., how to display the
+>> forest
+>> plot and is there any sense to do a funnel plot?)
+>>
+>
+> You could make a forest plot with the points and whiskers in different
+> color shades corresponding to the levels of motivation. Alternately, make
+> separate forest plots per level of motivation. Similarly, a funnel plot
+> with points in different colors corresponding to the levels of motiviation,
+> or make separate funnels per level of motivation.
+>
+
+	[[alternative HTML version deleted]]
+
+
+From b|||y@goette @end|ng |rom gm@||@com  Tue Sep 29 23:26:58 2020
+From: b|||y@goette @end|ng |rom gm@||@com (Billy Goette)
+Date: Tue, 29 Sep 2020 16:26:58 -0500
+Subject: [R-meta] 
+ Multilevel Meta-regression with Multiple Level Covariates
+In-Reply-To: <CAFUVuJxWrgq4Pdm_9ugvXUYfjyi5rLD4bgxcpMO_zfqMjqAK0A@mail.gmail.com>
+References: <CAP8W3OPb_8znAehT9AwmEYE8=9=5AZgHsJ6eNf-ik9TyLwrZvg@mail.gmail.com>
+ <CAFUVuJxWrgq4Pdm_9ugvXUYfjyi5rLD4bgxcpMO_zfqMjqAK0A@mail.gmail.com>
+Message-ID: <CAP8W3ONRAygTbjkS1YmZV8_4tPcZRUy31TqsasFtgCzuicYa+A@mail.gmail.com>
+
+This is an interesting framework (GEE that is) that I was not previously
+familiar with. I appreciate bringing my attention to this. I agree that a
+binomial distribution is more intuitive to what I'm trying to answer. If I
+had actual, item-level data for a sample (i.e., each participant's
+responses -- either 0 or 1 -- to each item), then I would use GLMM assuming
+a binomial, though really Bernoulli, distribution to do an item response
+theory model. The idea of doing this meta-analysis actually came from
+trying to figure out how to do that kind of analysis on summary level data
+since I don't have that individual-level data.
+
+For my own edification, is this something that is doable in metafor? I
+don't see how to specify a non-gaussian distribution in rma.mv, but I'm
+also no expert on the metafor package. Cursory googling brought my
+attention to gee and geepack packages for R, but it doesn't seem like it's
+possible to include more than one cluster in those packages. I could do
+this in lme4, but I believe that their estimation method is still
+inappropriate for meta-analysis (though maybe this has been changed? it's
+been a while since I looked at multilevel meta-analysis in lme4 since rma.mv
+works so well).
+
+Also, is there any guidance on how many studies should be collected for
+these kinds of analyses? I suspect that this is a relatively specific
+meta-analysis, and it sounds like rules-of-thumbs will be biased if the
+distribution of moderators is restricted or sparse. Any good Monte Carlo
+simulation methods that could be used to check the extent to which the
+model has too few studies to estimate the various moderators?
+
+On Mon, Sep 28, 2020 at 8:17 PM James Pustejovsky <jepusto at gmail.com> wrote:
+
+> Hi Billy,
+>
+> The approach you describe seems reasonable to me. Whether you've got too
+> many predictors will depend on how many studies' worth of data you are able
+> to gather and on the distribution of the item-level, study-level, and
+> test-level characteristics. Not knowing the correlations between items does
+> complicate things a bit, but could be handled using robust variance
+> estimation methods.
+>
+> One way to set up this problem might be by using proportion of successes
+> as the effect size metric, modeled by a binomial distribution (where the
+> number of trials = number of respondents to that item), and where the
+> probability of success is related to the covariates via a logit (or probit)
+> link. Combining this with RVE for standard errors gives you something like
+> a GEE model.
+>
+> James
+>
+> On Fri, Sep 25, 2020 at 12:39 PM Billy Goette <billy.goette at gmail.com>
+> wrote:
+>
+>> Hope this finds everyone well,
+>>
+>> I was hoping to get some feedback on addressing some practical concerns
+>> with an idea for a meta-analysis that I have. At the core, I'm concerned
+>> with the interpretability of the data analysis, so I'm trying to check
+>> whether this is even possible before I start the study.
+>>
+>> My field commonly administers lists of words that a participant must read
+>> correctly. Item difficulty is often summarized in studies as the
+>> proportion
+>> of respondents who got an item correct over the total sample size. Studies
+>> use different word-reading tests and lists of varying length (usually
+>> between 20 and 50). Each test differs in how long the words are
+>> presented, how many words are presented at a time, etc. I'm interested in
+>> whether certain word-specific variables (e.g., frequency of word in
+>> English) are related to the item difficulty (i.e., proportion of people
+>> who
+>> answer it correctly).
+>>
+>> My current conceptualization of the problem is as a multilevel
+>> meta-regression. The effect size is computed from the proportion of
+>> correct
+>> answers to each word which is nested within study and within tests. I
+>> would
+>> have multiple covariates (i.e., word traits) for each effect size,
+>> covariates at the study level (i.e., average sample demographics), and
+>> covariates at the test level (i.e., administration differences). My
+>> concern
+>> is that these are too many predictors to include in a meta-regression, and
+>> I also am anticipating that I won't have any information about
+>> the covariance matrix of the effect sizes. Any recommendations, words of
+>> warning, caveats, or suggestions would be incredibly helpful since I'm
+>> early in the process.
+>>
+>> Thank you!
+>>
+>>         [[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Wed Sep 30 18:02:14 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Wed, 30 Sep 2020 18:02:14 +0200
+Subject: [R-meta] 
+ =?utf-8?q?Deeks=E2=80=99_funnel_plot_asymmetry_test_for?=
+ =?utf-8?q?_publication_bias?=
+In-Reply-To: <trinity-32167754-52c3-4ff0-b11f-110f005e5d13-1597054010384@3c-app-gmx-bap33>
+References: <trinity-32167754-52c3-4ff0-b11f-110f005e5d13-1597054010384@3c-app-gmx-bap33>
+Message-ID: <2065f5e0-b5b0-8528-1e5a-430ff99cf194@imbi.uni-freiburg.de>
+
+Am 10.08.20 um 12:06 schrieb Tobias Saueressig:
+
+> Hello,
+> I am performing a diagnostic accuracy meta-analysis. As a check for 
+> publication bias/small study effects I want to use the Deeks' funnel 
+> plot asymmetry test for publication bias. I could not find a 
+> implementation in a software program. Does anybody know if there is a 
+> package that contains this test?
+
+Probably, a little bit late, however, for the record and future queries. ;-)
+
+I implemented the Deeks' test in R package *meta*. In order to use it 
+one has to conduct a meta-analysis with /metabin()/ using the diagnostic 
+odds ratio as summary measure. Then, R function /metabias()/ conducts 
+the linear regression test using the inverse of the square root of the 
+effective study size.
+
+Using Wolfgang's example dataset:
+
+dat <- read.table(header = TRUE, text = "
+tp np? tn? nn
+10 25? 47? 53
+15 24? 29? 32
+10 14? 44? 47
+13 23 123 123
+10 32? 55? 56
+16 61 184 186
+12 49 137 138
+13 26? 66? 74
+16 80? NA? NA
+24 42? 55? 57
+17 27? 85? 91
+ ?5 22? 45? 46
+18 31 240 245
+24 28 104 104
+26 55? 81? 89")
+
+library(meta)
+settings.meta(digits = 2)
+
+## Drop study with missing information and conduct meta-analysis
+##
+dat.nomiss <- subset(dat, !is.na(tn))
+##
+m <- metabin(tp, np, nn - tn, nn, data = dat.nomiss,
+ ???????????? sm = "DOR", addincr = TRUE)
+
+## Funnel plot with inverse of square root of effective study size on y-axis
+##
+funnel(m, yaxis = "ess", xlim = c(1, 1100), ylim = c(0.15, 0), studlab = 
+TRUE)
+## same result with meta, > 4.15-1:
+## funnel(m, xlim = c(1, 1100), studlab = TRUE)
+
+## Deeks' test for funnel plot asymmetry
+##
+metabias(m)
+
+Best wishes, Guido
+
+
+	[[alternative HTML version deleted]]
+
+
+From t@s@ueressig m@iii@g oii gmx@de  Wed Sep 30 18:09:06 2020
+From: t@s@ueressig m@iii@g oii gmx@de (t@s@ueressig m@iii@g oii gmx@de)
+Date: Wed, 30 Sep 2020 18:09:06 +0200
+Subject: [R-meta] 
+ =?utf-8?q?Deeks=E2=80=99_funnel_plot_asymmetry_test_for?=
+ =?utf-8?q?_publication_bias?=
+In-Reply-To: <2065f5e0-b5b0-8528-1e5a-430ff99cf194@imbi.uni-freiburg.de>
+Message-ID: <bf7faa27-bcd3-41c6-b758-a0ca491903f0@email.android.com>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20200930/60702392/attachment.html>
+

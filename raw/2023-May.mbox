@@ -1,0 +1,3210 @@
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Mon May  1 11:15:19 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Mon, 1 May 2023 09:15:19 +0000
+Subject: [R-meta] sandwhich estimator with geeglm object
+Message-ID: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear experts,
+
+I would be grateful if anyone can address my confusion concerning robust variance estimation (especially via the implementation of clubsandwich package).
+
+First question:
+geeglm object refers to the regression model fitted by Generalized Estimating Equations (GEE), which can be implemented in package geepack. Given that GEE already calculates cluster robust errors to account for mids-specified var-cov structure (e.g., autocorrelation), why clubsandwich still calculate robust errors for geeglm object
+
+Second question:
+GEE basically relaxes the assumption about var-cov structure and it uses a working var-cov structure (usually misspecified) to get beta coefficient and then uses the sandwich estimator to estimate sampling variances Var(beta) or standard error SE(beta). In this sense, GEE is equivalent to generalized least squares (say fitted by gls()) with CRVE. Am I correct?
+
+
+Best,
+Yefeng
+
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Mon May  1 16:55:04 2023
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Mon, 1 May 2023 09:55:04 -0500
+Subject: [R-meta] sandwhich estimator with geeglm object
+In-Reply-To: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+
+Hi Yefeng,
+
+geeglm is currently available in the development version of clubSandwich.
+We are including support for GEE models because clubSandwich implements
+small-sample corrections to the sandwich variance estimator and to the
+degrees of freedom, which are not available in geepack. McCaffrey and Bell
+(2006; https://doi.org/10.1002/sim.2502) showed that these small-sample
+corrections perform better than the standard sandwich estimators and
+large-sample test statistics implemented in geepack.
+
+GEE is not equivalent to GLS. Rather, geepack::geeglm() is to glm() as
+nlme::gls() is to lm(). GEE models allow non-linear link functions for the
+conditional expectation of the outcome. Of course, gls is a special case of
+geeglm with an identity link function (just as lm is a special case of
+glm).
+
+James
+
+On Mon, May 1, 2023 at 4:15?AM Yefeng Yang via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> Dear experts,
+>
+> I would be grateful if anyone can address my confusion concerning robust
+> variance estimation (especially via the implementation of clubsandwich
+> package).
+>
+> First question:
+> geeglm object refers to the regression model fitted by Generalized
+> Estimating Equations (GEE), which can be implemented in package geepack.
+> Given that GEE already calculates cluster robust errors to account for
+> mids-specified var-cov structure (e.g., autocorrelation), why clubsandwich
+> still calculate robust errors for geeglm object
+>
+> Second question:
+> GEE basically relaxes the assumption about var-cov structure and it uses a
+> working var-cov structure (usually misspecified) to get beta coefficient
+> and then uses the sandwich estimator to estimate sampling variances
+> Var(beta) or standard error SE(beta). In this sense, GEE is equivalent to
+> generalized least squares (say fitted by gls()) with CRVE. Am I correct?
+>
+>
+> Best,
+> Yefeng
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @eb@@t|@n@roeh| @end|ng |rom un|-tueb|ngen@de  Mon May  1 20:13:10 2023
+From: @eb@@t|@n@roeh| @end|ng |rom un|-tueb|ngen@de (=?utf-8?B?UsO2aGwsIFNlYmFzdGlhbg==?=)
+Date: Mon, 1 May 2023 18:13:10 +0000
+Subject: [R-meta] 
+ Moderator analysis: Subsample analysis vs. model without
+ intercept in CHE models.
+In-Reply-To: <CAFUVuJymBV9MRZuBMSpuc_WgbFegNhgRB6+NzkmcwKxhEqkhLg@mail.gmail.com>
+References: <6c66e3752c7c4a43bed56544b934a33f@uni-tuebingen.de>
+ <CAFUVuJymBV9MRZuBMSpuc_WgbFegNhgRB6+NzkmcwKxhEqkhLg@mail.gmail.com>
+Message-ID: <dcdfce8545e545fabed562d1d21ce8d8@uni-tuebingen.de>
+
+Hi James,
+
+thank you for your very detailed and helpful answer.
+
+?So which approach is correct? I would argue that this is a question that requires context knowledge to answer. Is it *theoretically* reasonable to partially pool across subjects? Or to partially pool across teaching aspects? Or both (i.e., do all subjects and all teaching aspects in one model)? ?
+I find the question of the theoretical justifiability of "borrowing" information between effect sizes or subsamples not easy to answer. I already find the theoretical justifiability of ?correlated correlations? difficult to comprehend in terms of content of the included studies.
+
+Here are some more details about the structure of our data: We are analyzing studies that report correlations between teaching characteristics and learning outcomes. Most of the studies report several teaching characteristics and their correlations with one outcome Y for one subject. We coded the teaching characteristics using categories a, b, c?. We are interested in the overall correlation between teaching characteristics and Y. Additionally, we want to know if the correlations differ with regard of the teaching categories (a, b, c?) and with regard of the subject of the class.
+Most of the studies reported only one subject or sample and only one effect within several teaching categories (a,b,c?). The ES within one study are usually measured with a multidimensional questionnaire using the same sample. So they are dependent within the sample. Usually, a, b, c are correlated to each other (average r=.50). Therefore we assumed, that the correlations/ES within one sample (a ~~ Y, b~~Y, c~~Y,?) are correlated with rho = 0.5 and estimated a correlated and hierarchical effects model.
+Is it at all correct to assume that if a, b, c.... correlate with each other, then also the correlations with Y (i.e., a ~~ Y, b~~Y...) correlate with each other? Or would a hierarchical effects model (possibly with CRVE) be sufficient?
+
+Different subjects were measured with different samples. Most of the studies included only measures of one subject, few studies (n=4) of several subjects within one study, using the same questionnaire (and different learning achievement tests). One study reported effects of several samples of the same subject, using the same questionnaire.
+Therefore, I also tested a 4-level random model with study / sample(subject) / ES, but this fitted only very slightly better to the data and the variance distribution between the different levels is not stable. Best model fit was reached using correlated effects within samples, nested in a hierarchical structure ?study / ES? without considering the sample-level in the hierarchical structure.
+
+So, in conclusion, one could argue both for and against joint estimation / pooling based on the theoretical assumptions and data structure. After some consideration, I am tending towards the following: the different teaching subjects use similar or even the same measurement methods for the teaching characteristics. Both instructional aspects and learning achievement are collected through similar measurement methods (student questionnaires and tests), and the former have been found to be correlated with each other (see above). So it should actually be possible to pool. The only argument against this would be that, based on some theoretical considerations, we suspect differential effects with respect to some aspects of instruction and subjects, which, however, can only be proven in a few cases.
+Is this argumentation regarding the choice of model comprehensible and stringent?
+
+Thank you!
+Kind regards,
+Sebastian
+
+
+Von: James Pustejovsky <jepusto at gmail.com>
+Gesendet: Freitag, 28. April 2023 17:12
+An: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: R?hl, Sebastian <sebastian.roehl at uni-tuebingen.de>
+Betreff: Re: [R-meta] Moderator analysis: Subsample analysis vs. model without intercept in CHE models.
+
+Hi Sebastian,
+
+The two approaches you're looking at differ in multiple respects.
+
+Your first approach looks at the subset where tq_ca == 1 and estimates a model with both math and language outcomes. The effect sizes for different subjects are modeled as correlated due to the study-level random effect (which is common across outcomes) and to the assumed correlation between the ES estimates as represented in V_mat_ca. Because of the correlation between ES for different subjects, the average effects will be estimated by "borrowing information" (or partially pooling) across subjects, which has the effect of pulling the estimates towards each other a bit.
+
+If you wanted to estimate average ES for each subject without the borrowing of information, based only on the ES for that subject, you could do:
+
+V_mat_ca_sub <- impute_covariance_matrix(daten_ca$class_var,
+                                       cluster = daten_ca$studynr,
+                                       subgroup = daten_ca$subject,
+                                       r = rho,
+                                       smooth_vi = TRUE)
+model_ca_sub <- rma.mv<http://rma.mv/>(r_gesamt_z, V_mat_ca_sub, random =list(~ subject | studynr, ~ subject | nummer), struct = c("DIAG","DIAG"),
+                        mods =~ -1 + subject_math + subject_langall,
+                        data=daten_ca)
+robust(model_ca_sub, daten_ca$studynr)
+
+Comparing this to your first approach would let you isolate the consequences of borrowing information.
+
+Your second approach looks at each subject area in separate models, but includes data from multiple teaching aspects. The effect sizes for different teaching aspects are modeled as correlated due to the study-level random effect (which is now common across teaching aspects) and to the assumed correlation between ES estimates. Again, because of these correlations, the average effects for each teaching aspect will be estimated by borrowing information across teaching aspects. You could adapt the code above but use subgroups by tq instead of by subject to isolate how the borrowing of information affects the estimates from your second set of models.
+
+So which approach is correct? I would argue that this is a question that requires context knowledge to answer. Is it *theoretically* reasonable to partially pool across subjects? Or to partially pool across teaching aspects? Or both (i.e., do all subjects and all teaching aspects in one model)?
+
+James
+
+On Fri, Apr 28, 2023 at 5:38?AM R?hl, Sebastian via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>> wrote:
+Hello,
+I am currently conducting an analysis of about 500 ES in 50 teaching studies. Two ordinal moderators appear here: The teaching subject (e.g. math, language...) and the teaching aspect (e.g. athmosphere, clarity...).  I'm using a correlated and hierarchical model using "impute_covariance_matrix" from clubSandwich package.
+I have a problem with differing estimates using different ways in conducting moderator analyses.
+For example, I would like to analyze how ES for athmosphere differ between math and language subjects. A simple selection of the subset via "subset =" in the rma.mv<http://rma.mv> function is not possible, because the imputed covariance matrix does not have the correct dimensioning.
+
+I have compared two possibilities (syntaxes at the end of this message):
+A: I select only all ES related to athmosphere in math and language subjects and impute the covariance matrix for them. Then I analyze them with the subject as moderator, using a model without intercept.
+Result:
+                 estimate      se?     tval?  df?    pval?    ci.lb<http://ci.lb>?    ci.ub?
+subject_math       0.1262  0.0204    6.1888   12   <.0001    0.0818    0.1707   ***
+subject_langall   -0.0809  0.0102   -7.9658   12   <.0001   -0.1030   -0.0588   ***
+(these are nearly the same estimates as using two subsets for ES with "math & atmosphere" and "language & atmosphere" and conducting separate analyses.)
+
+B: I form two subsets for the subjects math and language, impute the covariance matrix and analyze "atmosphere" for the two subsets separately with the teaching aspects as moderator, using a model without intercept.
+
+Math:          tq_ca           0.2088  0.0378   5.5213   17   <.0001    0.1290   0.2885   ***
+
+Language:      tq_ca          -0.0227 0.0230 -0.9863 2.42 0.4120 -0.1065 0.0614
+
+The numbers of effect sizes and studies are correct in the respective subsets and analyses.
+Noteworthy: an analysis of all teaching aspects across all subjects in an interceptless model yields an estimate of about 0.20 for "atmosphere". In contrast, if I select only the subset with athmosphere ES, the result is an Estimate of 0.13.
+Where do these large differences in the estimates come from and what would be the correct approach?
+
+Thanks a lot for your help!
+
+Best,
+Sebastian
+
+
+Syntax A:
+daten_ca <- subset(daten, (daten$tq_ca==1 & (daten$subject_math==1 | daten$subject_langall==1)))
+V_mat_ca <- impute_covariance_matrix(daten_ca$class_var,
+                                       cluster = daten_ca$studynr,
+                                       r = rho,
+                                       smooth_vi = TRUE)
+model_ca <- rma.mv<http://rma.mv>(r_gesamt_z, V_mat_ca, random =~ 1 | studynr / nummer,
+                        mods =~ -1 + subject_math + subject_langall,
+                        data=daten_ca)
+robust(model_ca, daten_ca$studynr)
+
+Syntax B:
+daten_math <- subset(daten, daten$subject_math==1)
+daten_langall <- subset(daten, daten$subject_langall==1)
+V_mat_math <- impute_covariance_matrix(daten_math$class_var,
+                                       cluster = daten_math$samplenr,
+                                       r = rho,
+                                       smooth_vi = TRUE)
+V_mat_langall <- impute_covariance_matrix(daten_langall$class_var,
+                                       cluster = daten_langall$samplenr,
+                                       r = rho,
+                                       smooth_vi = TRUE)
+model_math <- rma.mv<http://rma.mv>(r_gesamt_z, V_mat_math, random =~ 1 | studynr / nummer,
+                     mods =~ -1 + tq_ca + tq_cm + tq_cont + tq_pract + tq_assess +
+                       tq_sup_em + tq_sup_learn + tq_adapt + tq_srl + tq_all + tq_other,
+                     data=daten_math)
+robust(model_math, daten_math$studynr)
+
+model_langall <- rma.mv<http://rma.mv>(r_gesamt_z, V_mat_langall, random =~ 1 | studynr / nummer,
+                     mods =~ -1 + tq_ca + tq_cm + tq_cont + tq_pract + tq_assess +
+                       tq_sup_em + tq_sup_learn + tq_adapt + tq_srl + tq_all + tq_other,
+                     data=daten_langall)
+robust(model_langall, daten_langall$studynr)
+
+****************************
+Dr. Sebastian R?hl
+Eberhard Karls Universit?t T?bingen
+Institute for Educational Science
+T?bingen School of Education (T?SE)
+Wilhelmstra?e 31 / Room 302
+D-72074 T?bingen
+Germany
+
+Phone: +49 7071 29-75527
+Fax: +49 7071 29-35309
+Email: sebastian.roehl at uni-tuebingen.de<mailto:sebastian.roehl at uni-tuebingen.de><mailto:sebastian.roehl at uni-tuebingen.de<mailto:sebastian.roehl at uni-tuebingen.de>>
+Twitter: @sebastian_roehl  @ResTeacherEdu
+
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Tue May  2 01:54:20 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Mon, 1 May 2023 23:54:20 +0000
+Subject: [R-meta] sandwhich estimator with geeglm object
+In-Reply-To: <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+References: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+Message-ID: <MEAPR01MB5415755D4052111887276B219D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear James,
+Thanks for your clarity. Sorry that my second question is not that clear. I know GEE can accommodate error distributions other than Gaussian distribution. The situation I want to ask is the normal error distribution (or identity link function). I want to confirm that normal error distribution, whether GEE (fitted by geepack::geeglm() is theoretically equivalent to GLS + sandwich estimator (fitted by nlme::gls() + clubsandwhich). We assume both cases use the naive robust error. Because your answer "gls is a special case of geeglm with an identity link function" does not mention gls + sandwich estimator, so I want to confirm. Very much appreciate your time to address my confusion.
+
+Best,
+Yefeng
+________________________________
+From: James Pustejovsky <jepusto at gmail.com>
+Sent: Tuesday, 2 May 2023 0:55
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+Subject: Re: [R-meta] sandwhich estimator with geeglm object
+
+Hi Yefeng,
+
+geeglm is currently available in the development version of clubSandwich. We are including support for GEE models because clubSandwich implements small-sample corrections to the sandwich variance estimator and to the degrees of freedom, which are not available in geepack. McCaffrey and Bell (2006; https://doi.org/10.1002/sim.2502) showed that these small-sample corrections perform better than the standard sandwich estimators and large-sample test statistics implemented in geepack.
+
+GEE is not equivalent to GLS. Rather, geepack::geeglm() is to glm() as nlme::gls() is to lm(). GEE models allow non-linear link functions for the conditional expectation of the outcome. Of course, gls is a special case of geeglm with an identity link function (just as lm is a special case of glm).
+
+James
+
+On Mon, May 1, 2023 at 4:15?AM Yefeng Yang via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>> wrote:
+Dear experts,
+
+I would be grateful if anyone can address my confusion concerning robust variance estimation (especially via the implementation of clubsandwich package).
+
+First question:
+geeglm object refers to the regression model fitted by Generalized Estimating Equations (GEE), which can be implemented in package geepack. Given that GEE already calculates cluster robust errors to account for mids-specified var-cov structure (e.g., autocorrelation), why clubsandwich still calculate robust errors for geeglm object
+
+Second question:
+GEE basically relaxes the assumption about var-cov structure and it uses a working var-cov structure (usually misspecified) to get beta coefficient and then uses the sandwich estimator to estimate sampling variances Var(beta) or standard error SE(beta). In this sense, GEE is equivalent to generalized least squares (say fitted by gls()) with CRVE. Am I correct?
+
+
+Best,
+Yefeng
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Tue May  2 02:19:55 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Tue, 2 May 2023 00:19:55 +0000
+Subject: [R-meta] sandwhich estimator with geeglm object
+In-Reply-To: <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+References: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+Message-ID: <MEAPR01MB5415F973537CD4099A53ACC09D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear James,
+Probably, it is more clear if I ask "whether glm + RVE is equal to gee?". gee is doing RVE on the fly, while glm + RVE uses a post-hoc way to calculate robust errors when dealing with correlated errors (e.g., repeated measurements).
+Best,
+Yefeng
+
+________________________________
+From: James Pustejovsky <jepusto at gmail.com>
+Sent: Tuesday, 2 May 2023 0:55
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+Subject: Re: [R-meta] sandwhich estimator with geeglm object
+
+Hi Yefeng,
+
+geeglm is currently available in the development version of clubSandwich. We are including support for GEE models because clubSandwich implements small-sample corrections to the sandwich variance estimator and to the degrees of freedom, which are not available in geepack. McCaffrey and Bell (2006; https://doi.org/10.1002/sim.2502) showed that these small-sample corrections perform better than the standard sandwich estimators and large-sample test statistics implemented in geepack.
+
+GEE is not equivalent to GLS. Rather, geepack::geeglm() is to glm() as nlme::gls() is to lm(). GEE models allow non-linear link functions for the conditional expectation of the outcome. Of course, gls is a special case of geeglm with an identity link function (just as lm is a special case of glm).
+
+James
+
+On Mon, May 1, 2023 at 4:15?AM Yefeng Yang via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>> wrote:
+Dear experts,
+
+I would be grateful if anyone can address my confusion concerning robust variance estimation (especially via the implementation of clubsandwich package).
+
+First question:
+geeglm object refers to the regression model fitted by Generalized Estimating Equations (GEE), which can be implemented in package geepack. Given that GEE already calculates cluster robust errors to account for mids-specified var-cov structure (e.g., autocorrelation), why clubsandwich still calculate robust errors for geeglm object
+
+Second question:
+GEE basically relaxes the assumption about var-cov structure and it uses a working var-cov structure (usually misspecified) to get beta coefficient and then uses the sandwich estimator to estimate sampling variances Var(beta) or standard error SE(beta). In this sense, GEE is equivalent to generalized least squares (say fitted by gls()) with CRVE. Am I correct?
+
+
+Best,
+Yefeng
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Tue May  2 04:39:29 2023
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Mon, 1 May 2023 21:39:29 -0500
+Subject: [R-meta] sandwhich estimator with geeglm object
+In-Reply-To: <MEAPR01MB5415F973537CD4099A53ACC09D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+ <MEAPR01MB5415F973537CD4099A53ACC09D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <CAFUVuJzfiNKCDhxnfNJYM=3=uVsdcSDhXehWm8ZVU7O2JhXdCQ@mail.gmail.com>
+
+Hi Yefeng,
+
+Yes, this is correct if we're speaking on a very broad level. Broadly,
+geepack::geeglm() with an identity link function fits the same type of
+model as nlme::gls(), but geepack::geeglm() uses sandwich variance
+estimation whereas nlme::gls() uses model-based variance estimation.
+Running nlme::gls() with clubSandwich::vcovCR() will give you sandwich
+variance estimation. The CR1 and CR3 sandwich estimators can be calculated
+from both packages for comparison purposes.
+
+There is one other difference that should be noted though:
+geepack::geeglm() uses moment estimators for the parameters of the working
+model (such as variance coefficients, auto-correlation terms, etc.). In
+contrast, nlme::gls() uses maximum likelihood or restricted maximum
+likelihood estimation for these parameters. This difference in estimation
+strategies can lead to numerical differences in the model coefficient
+estimates calculated by the two packages  (and therefore also differences
+in the sandwich standard errors generated by geepack::geeglm versus by
+clubSandwich::vcovCR.gls).
+
+James
+
+On Mon, May 1, 2023 at 7:19?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au> wrote:
+
+> Dear James,
+> Probably, it is more clear if I ask "whether glm + RVE is equal to gee?".
+> gee is doing RVE on the fly, while glm + RVE uses a post-hoc way to
+> calculate robust errors when dealing with correlated errors (e.g., repeated
+> measurements).
+> Best,
+> Yefeng
+>
+> ------------------------------
+> *From:* James Pustejovsky <jepusto at gmail.com>
+> *Sent:* Tuesday, 2 May 2023 0:55
+> *To:* R Special Interest Group for Meta-Analysis <
+> r-sig-meta-analysis at r-project.org>
+> *Cc:* Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> *Subject:* Re: [R-meta] sandwhich estimator with geeglm object
+>
+> Hi Yefeng,
+>
+> geeglm is currently available in the development version of clubSandwich.
+> We are including support for GEE models because clubSandwich implements
+> small-sample corrections to the sandwich variance estimator and to the
+> degrees of freedom, which are not available in geepack. McCaffrey and Bell
+> (2006; https://doi.org/10.1002/sim.2502) showed that these small-sample
+> corrections perform better than the standard sandwich estimators and
+> large-sample test statistics implemented in geepack.
+>
+> GEE is not equivalent to GLS. Rather, geepack::geeglm() is to glm() as
+> nlme::gls() is to lm(). GEE models allow non-linear link functions for the
+> conditional expectation of the outcome. Of course, gls is a special case of
+> geeglm with an identity link function (just as lm is a special case of
+> glm).
+>
+> James
+>
+> On Mon, May 1, 2023 at 4:15?AM Yefeng Yang via R-sig-meta-analysis <
+> r-sig-meta-analysis at r-project.org> wrote:
+>
+> Dear experts,
+>
+> I would be grateful if anyone can address my confusion concerning robust
+> variance estimation (especially via the implementation of clubsandwich
+> package).
+>
+> First question:
+> geeglm object refers to the regression model fitted by Generalized
+> Estimating Equations (GEE), which can be implemented in package geepack.
+> Given that GEE already calculates cluster robust errors to account for
+> mids-specified var-cov structure (e.g., autocorrelation), why clubsandwich
+> still calculate robust errors for geeglm object
+>
+> Second question:
+> GEE basically relaxes the assumption about var-cov structure and it uses a
+> working var-cov structure (usually misspecified) to get beta coefficient
+> and then uses the sandwich estimator to estimate sampling variances
+> Var(beta) or standard error SE(beta). In this sense, GEE is equivalent to
+> generalized least squares (say fitted by gls()) with CRVE. Am I correct?
+>
+>
+> Best,
+> Yefeng
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Tue May  2 05:27:27 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Tue, 2 May 2023 03:27:27 +0000
+Subject: [R-meta] sandwhich estimator with geeglm object
+In-Reply-To: <CAFUVuJzfiNKCDhxnfNJYM=3=uVsdcSDhXehWm8ZVU7O2JhXdCQ@mail.gmail.com>
+References: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+ <MEAPR01MB5415F973537CD4099A53ACC09D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJzfiNKCDhxnfNJYM=3=uVsdcSDhXehWm8ZVU7O2JhXdCQ@mail.gmail.com>
+Message-ID: <MEAPR01MB54158103A3B21ECF1C3E36F19D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Hi James,
+
+Brilliant! You addressed my another question beforehand. I compared the results from geepack::geeglm() and nlme::gls() + clubSandwich::vcovCR(), and found slight differences between them. I am going to ask why. But you addressed it already. Very much appreciated.
+
+BTW, what is your opinion of using this interactive way (moment estimator) to estimate within-group correlations (e.g., auto-correlation terms). I mean likelihood approach won't work if the distribution is misspecified (because we do not know the within-group correlations and we need to estimate it in geepack::geeglm()). This is a sort of dilemma. If we put this in the context of meta-analysis, metafor::rma.mv does not allow for estimating within-group correlations from data, although it can by using an iterative way to find the maximum likelihood. What do you think?
+
+Cheers,
+Yefeng
+
+
+________________________________
+From: James Pustejovsky <jepusto at gmail.com>
+Sent: Tuesday, 2 May 2023 12:39
+To: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] sandwhich estimator with geeglm object
+
+Hi Yefeng,
+
+Yes, this is correct if we're speaking on a very broad level. Broadly, geepack::geeglm() with an identity link function fits the same type of model as nlme::gls(), but geepack::geeglm() uses sandwich variance estimation whereas nlme::gls() uses model-based variance estimation. Running nlme::gls() with clubSandwich::vcovCR() will give you sandwich variance estimation. The CR1 and CR3 sandwich estimators can be calculated from both packages for comparison purposes.
+
+There is one other difference that should be noted though: geepack::geeglm() uses moment estimators for the parameters of the working model (such as variance coefficients, auto-correlation terms, etc.). In contrast, nlme::gls() uses maximum likelihood or restricted maximum likelihood estimation for these parameters. This difference in estimation strategies can lead to numerical differences in the model coefficient estimates calculated by the two packages  (and therefore also differences in the sandwich standard errors generated by geepack::geeglm versus by clubSandwich::vcovCR.gls).
+
+James
+
+On Mon, May 1, 2023 at 7:19?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au<mailto:yefeng.yang1 at unsw.edu.au>> wrote:
+Dear James,
+Probably, it is more clear if I ask "whether glm + RVE is equal to gee?". gee is doing RVE on the fly, while glm + RVE uses a post-hoc way to calculate robust errors when dealing with correlated errors (e.g., repeated measurements).
+Best,
+Yefeng
+
+________________________________
+From: James Pustejovsky <jepusto at gmail.com<mailto:jepusto at gmail.com>>
+Sent: Tuesday, 2 May 2023 0:55
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>>
+Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au<mailto:yefeng.yang1 at unsw.edu.au>>
+Subject: Re: [R-meta] sandwhich estimator with geeglm object
+
+Hi Yefeng,
+
+geeglm is currently available in the development version of clubSandwich. We are including support for GEE models because clubSandwich implements small-sample corrections to the sandwich variance estimator and to the degrees of freedom, which are not available in geepack. McCaffrey and Bell (2006; https://doi.org/10.1002/sim.2502) showed that these small-sample corrections perform better than the standard sandwich estimators and large-sample test statistics implemented in geepack.
+
+GEE is not equivalent to GLS. Rather, geepack::geeglm() is to glm() as nlme::gls() is to lm(). GEE models allow non-linear link functions for the conditional expectation of the outcome. Of course, gls is a special case of geeglm with an identity link function (just as lm is a special case of glm).
+
+James
+
+On Mon, May 1, 2023 at 4:15?AM Yefeng Yang via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>> wrote:
+Dear experts,
+
+I would be grateful if anyone can address my confusion concerning robust variance estimation (especially via the implementation of clubsandwich package).
+
+First question:
+geeglm object refers to the regression model fitted by Generalized Estimating Equations (GEE), which can be implemented in package geepack. Given that GEE already calculates cluster robust errors to account for mids-specified var-cov structure (e.g., autocorrelation), why clubsandwich still calculate robust errors for geeglm object
+
+Second question:
+GEE basically relaxes the assumption about var-cov structure and it uses a working var-cov structure (usually misspecified) to get beta coefficient and then uses the sandwich estimator to estimate sampling variances Var(beta) or standard error SE(beta). In this sense, GEE is equivalent to generalized least squares (say fitted by gls()) with CRVE. Am I correct?
+
+
+Best,
+Yefeng
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Tue May  2 21:24:42 2023
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Tue, 2 May 2023 14:24:42 -0500
+Subject: [R-meta] sandwhich estimator with geeglm object
+In-Reply-To: <MEAPR01MB54158103A3B21ECF1C3E36F19D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+ <MEAPR01MB5415F973537CD4099A53ACC09D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJzfiNKCDhxnfNJYM=3=uVsdcSDhXehWm8ZVU7O2JhXdCQ@mail.gmail.com>
+ <MEAPR01MB54158103A3B21ECF1C3E36F19D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <CAFUVuJwS-X7TKi8dTxY-+s+m5ZTrGcaFj45uryVG9cV7wyjTMQ@mail.gmail.com>
+
+Responses below.
+
+On Mon, May 1, 2023 at 10:27?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+wrote:
+
+> BTW, what is your opinion of using this interactive way (moment estimator)
+> to estimate within-group correlations (e.g., auto-correlation terms). I
+> mean likelihood approach won't work if the distribution is misspecified
+> (because we do not know the within-group correlations and we need to
+> estimate it in geepack::geeglm()). This is a sort of dilemma.
+>
+
+I don't have any strong prior. I would guess that the performance of these
+variance component estimators (or more generally, dependence structure
+estimators) could be rather specific to the context you're looking at. For
+instance, it might depend on whether the data are balanced repeated
+measures or imbalance with unequal numbers of repeated measures, on the
+number of independent clusters, etc. Hard to say. Doing some monte carlo
+simulations could help sort out what method to use.
+
+
+> If we put this in the context of meta-analysis, metafor::rma.mv does not
+> allow for estimating within-group correlations from data, although it can
+> by using an iterative way to find the maximum likelihood. What do you think?
+>
+>
+If I follow what you mean, I think you're talking about trying to estimate
+rho (the correlation between sampling errors) instead of just imputing a
+value of rho.  If I recall, Wolfgang and I have both toyed with this idea a
+bit. It's feasible to do this using nlme::lme(). The problem is that the
+REML estimation method in nlme when you have a fixed variance structure at
+level 1 is still a bit suspect---might have a bug in it, since it doesn't
+agree with metafor::rma.mv().
+
+
+> Cheers,
+> Yefeng
+>
+>
+> ------------------------------
+> *From:* James Pustejovsky <jepusto at gmail.com>
+> *Sent:* Tuesday, 2 May 2023 12:39
+> *To:* Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> *Cc:* R Special Interest Group for Meta-Analysis <
+> r-sig-meta-analysis at r-project.org>
+> *Subject:* Re: [R-meta] sandwhich estimator with geeglm object
+>
+> Hi Yefeng,
+>
+> Yes, this is correct if we're speaking on a very broad level. Broadly,
+> geepack::geeglm() with an identity link function fits the same type of
+> model as nlme::gls(), but geepack::geeglm() uses sandwich variance
+> estimation whereas nlme::gls() uses model-based variance estimation.
+> Running nlme::gls() with clubSandwich::vcovCR() will give you sandwich
+> variance estimation. The CR1 and CR3 sandwich estimators can be calculated
+> from both packages for comparison purposes.
+>
+> There is one other difference that should be noted though:
+> geepack::geeglm() uses moment estimators for the parameters of the working
+> model (such as variance coefficients, auto-correlation terms, etc.). In
+> contrast, nlme::gls() uses maximum likelihood or restricted maximum
+> likelihood estimation for these parameters. This difference in estimation
+> strategies can lead to numerical differences in the model coefficient
+> estimates calculated by the two packages  (and therefore also differences
+> in the sandwich standard errors generated by geepack::geeglm versus by
+> clubSandwich::vcovCR.gls).
+>
+> James
+>
+> On Mon, May 1, 2023 at 7:19?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> wrote:
+>
+> Dear James,
+> Probably, it is more clear if I ask "whether glm + RVE is equal to gee?".
+> gee is doing RVE on the fly, while glm + RVE uses a post-hoc way to
+> calculate robust errors when dealing with correlated errors (e.g., repeated
+> measurements).
+> Best,
+> Yefeng
+>
+> ------------------------------
+> *From:* James Pustejovsky <jepusto at gmail.com>
+> *Sent:* Tuesday, 2 May 2023 0:55
+> *To:* R Special Interest Group for Meta-Analysis <
+> r-sig-meta-analysis at r-project.org>
+> *Cc:* Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> *Subject:* Re: [R-meta] sandwhich estimator with geeglm object
+>
+> Hi Yefeng,
+>
+> geeglm is currently available in the development version of clubSandwich.
+> We are including support for GEE models because clubSandwich implements
+> small-sample corrections to the sandwich variance estimator and to the
+> degrees of freedom, which are not available in geepack. McCaffrey and Bell
+> (2006; https://doi.org/10.1002/sim.2502) showed that these small-sample
+> corrections perform better than the standard sandwich estimators and
+> large-sample test statistics implemented in geepack.
+>
+> GEE is not equivalent to GLS. Rather, geepack::geeglm() is to glm() as
+> nlme::gls() is to lm(). GEE models allow non-linear link functions for the
+> conditional expectation of the outcome. Of course, gls is a special case of
+> geeglm with an identity link function (just as lm is a special case of
+> glm).
+>
+> James
+>
+> On Mon, May 1, 2023 at 4:15?AM Yefeng Yang via R-sig-meta-analysis <
+> r-sig-meta-analysis at r-project.org> wrote:
+>
+> Dear experts,
+>
+> I would be grateful if anyone can address my confusion concerning robust
+> variance estimation (especially via the implementation of clubsandwich
+> package).
+>
+> First question:
+> geeglm object refers to the regression model fitted by Generalized
+> Estimating Equations (GEE), which can be implemented in package geepack.
+> Given that GEE already calculates cluster robust errors to account for
+> mids-specified var-cov structure (e.g., autocorrelation), why clubsandwich
+> still calculate robust errors for geeglm object
+>
+> Second question:
+> GEE basically relaxes the assumption about var-cov structure and it uses a
+> working var-cov structure (usually misspecified) to get beta coefficient
+> and then uses the sandwich estimator to estimate sampling variances
+> Var(beta) or standard error SE(beta). In this sense, GEE is equivalent to
+> generalized least squares (say fitted by gls()) with CRVE. Am I correct?
+>
+>
+> Best,
+> Yefeng
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From yh342 @end|ng |rom n@u@edu  Wed May  3 01:21:08 2023
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Tue, 2 May 2023 16:21:08 -0700
+Subject: [R-meta] Plotting the correlation among true/random effects across
+ categories
+Message-ID: <CA+dzWjqKEQaW8WqLg-GwRxo1P=2c5UXwgzo5zNQ1KebB5Fgzxg@mail.gmail.com>
+
+Hello Colleagues,
+
+I was wondering if there is a way to scatterplot the correlation between
+the categories of variable "outcome" (AL and PD) which is estimated to be
+rho = .7752 in my model below?
+
+model <- rma.mv(yi~ outcome, vi, data =  dat.berkey1998,
+                random = ~ outcome | trial, struct = "UN")
+
+    rho.AL  rho.PD    AL  PD
+AL       1             -   5
+PD  0.7752       1    no   -
+
+Thanks,
+Yuhang
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed May  3 09:34:54 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 3 May 2023 07:34:54 +0000
+Subject: [R-meta] sandwhich estimator with geeglm object
+In-Reply-To: <CAFUVuJwS-X7TKi8dTxY-+s+m5ZTrGcaFj45uryVG9cV7wyjTMQ@mail.gmail.com>
+References: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+ <MEAPR01MB5415F973537CD4099A53ACC09D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJzfiNKCDhxnfNJYM=3=uVsdcSDhXehWm8ZVU7O2JhXdCQ@mail.gmail.com>
+ <MEAPR01MB54158103A3B21ECF1C3E36F19D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJwS-X7TKi8dTxY-+s+m5ZTrGcaFj45uryVG9cV7wyjTMQ@mail.gmail.com>
+Message-ID: <a7ab0833cad14aefad7b1937096feebc@maastrichtuniversity.nl>
+
+Just a few comments from my side:
+
+1) While rma.mv() is not designed to estimate a parameterized V matrix, one can easily do this manually. I think this is what Yefeng meant with "iterative way to find the maximum likelihood". For example, if we assume a constant correlation between the sampling errors within studies, one can just repeatedly construct the corresponding V matrix (e.g., with vcalc()), fit the model with rma.mv(), extract the log likelihood (with logLik()), and find the value of the correlation that maximizes the log likelihood.
+
+A special case of this is the so-called 'Riley model' where the within- and between-study correlations are assumed to be identical. This can be fitted in the same manner, since rma.mv() also allows fixing variance/correlation components (so in the iterative steps above, the same correlation is used to construct V and in rma.mv(..., rho=<value>).
+
+Indeed, I have played around with this for a couple examples. When allowing the within- and between-study correlations to differ, then one often runs into the issue that one of the two correlations wants to drift towards a bound (+-1). With enough data, it is possible though to fit such a model.
+
+2) As for using moment estimators versus (RE)ML: Likelihood-based methods are often quite robust to violations of the distributional assumptions, especially when it comes to estimating the fixed effects and their SEs. For constructing prediction intervals, distributional assumptions are more crucial, but this is a step after the model fitting and will affect both methods equally unless one uses non-parametric methods for constructing such intervals.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of James Pustejovsky via R-sig-meta-analysis
+>Sent: Tuesday, 02 May, 2023 21:25
+>To: Yefeng Yang
+>Cc: James Pustejovsky; R Special Interest Group for Meta-Analysis
+>Subject: Re: [R-meta] sandwhich estimator with geeglm object
+>
+>Responses below.
+>
+>On Mon, May 1, 2023 at 10:27?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>wrote:
+>
+>> BTW, what is your opinion of using this interactive way (moment estimator)
+>> to estimate within-group correlations (e.g., auto-correlation terms). I
+>> mean likelihood approach won't work if the distribution is misspecified
+>> (because we do not know the within-group correlations and we need to
+>> estimate it in geepack::geeglm()). This is a sort of dilemma.
+>
+>I don't have any strong prior. I would guess that the performance of these
+>variance component estimators (or more generally, dependence structure
+>estimators) could be rather specific to the context you're looking at. For
+>instance, it might depend on whether the data are balanced repeated
+>measures or imbalance with unequal numbers of repeated measures, on the
+>number of independent clusters, etc. Hard to say. Doing some monte carlo
+>simulations could help sort out what method to use.
+>
+>> If we put this in the context of meta-analysis, metafor::rma.mv does not
+>> allow for estimating within-group correlations from data, although it can
+>> by using an iterative way to find the maximum likelihood. What do you think?
+>
+>If I follow what you mean, I think you're talking about trying to estimate
+>rho (the correlation between sampling errors) instead of just imputing a
+>value of rho.  If I recall, Wolfgang and I have both toyed with this idea a
+>bit. It's feasible to do this using nlme::lme(). The problem is that the
+>REML estimation method in nlme when you have a fixed variance structure at
+>level 1 is still a bit suspect---might have a bug in it, since it doesn't
+>agree with metafor::rma.mv().
+>
+>> Cheers,
+>> Yefeng
+>>
+>> ------------------------------
+>> *From:* James Pustejovsky <jepusto at gmail.com>
+>> *Sent:* Tuesday, 2 May 2023 12:39
+>> *To:* Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>> *Cc:* R Special Interest Group for Meta-Analysis <
+>> r-sig-meta-analysis at r-project.org>
+>> *Subject:* Re: [R-meta] sandwhich estimator with geeglm object
+>>
+>> Hi Yefeng,
+>>
+>> Yes, this is correct if we're speaking on a very broad level. Broadly,
+>> geepack::geeglm() with an identity link function fits the same type of
+>> model as nlme::gls(), but geepack::geeglm() uses sandwich variance
+>> estimation whereas nlme::gls() uses model-based variance estimation.
+>> Running nlme::gls() with clubSandwich::vcovCR() will give you sandwich
+>> variance estimation. The CR1 and CR3 sandwich estimators can be calculated
+>> from both packages for comparison purposes.
+>>
+>> There is one other difference that should be noted though:
+>> geepack::geeglm() uses moment estimators for the parameters of the working
+>> model (such as variance coefficients, auto-correlation terms, etc.). In
+>> contrast, nlme::gls() uses maximum likelihood or restricted maximum
+>> likelihood estimation for these parameters. This difference in estimation
+>> strategies can lead to numerical differences in the model coefficient
+>> estimates calculated by the two packages  (and therefore also differences
+>> in the sandwich standard errors generated by geepack::geeglm versus by
+>> clubSandwich::vcovCR.gls).
+>>
+>> James
+>>
+>> On Mon, May 1, 2023 at 7:19?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>> wrote:
+>>
+>> Dear James,
+>> Probably, it is more clear if I ask "whether glm + RVE is equal to gee?".
+>> gee is doing RVE on the fly, while glm + RVE uses a post-hoc way to
+>> calculate robust errors when dealing with correlated errors (e.g., repeated
+>> measurements).
+>> Best,
+>> Yefeng
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed May  3 09:51:01 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 3 May 2023 07:51:01 +0000
+Subject: [R-meta] 
+ Plotting the correlation among true/random effects across categories
+In-Reply-To: <CA+dzWjqKEQaW8WqLg-GwRxo1P=2c5UXwgzo5zNQ1KebB5Fgzxg@mail.gmail.com>
+References: <CA+dzWjqKEQaW8WqLg-GwRxo1P=2c5UXwgzo5zNQ1KebB5Fgzxg@mail.gmail.com>
+Message-ID: <0ea527d1900d4e69b7a6009a86a5dfe8@maastrichtuniversity.nl>
+
+You can extract the BLUPs of the random effects and create a scatterplot based on them:
+
+re <- ranef(model)
+re
+
+paired <- do.call(rbind, split(re[[1]]$intrcpt, dat.berkey1998$trial))
+paired
+
+plot(paired, pch=21, bg="gray", cex=1.5, lwd=1.2)
+
+And before somebody asks why cor(paired) does not yield 0.7752 (or why the values in var(paired) do not match up with the variances as estimated from the model), see for example:
+
+https://stats.stackexchange.com/q/69882/1934
+
+Or let me give a more technical explanation based on the standard RE model:
+
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+res <- rma(yi, vi, data=dat)
+res$tau2
+var(ranef(res)$pred)
+
+You will notice that the latter is smaller than tau^2. By the law of total variance:
+
+tau^2 = var(u_i) = E(var(u_i|y_i)) + var(E(u_i|y_i)).
+
+The conditional means of the random effects (which is what ranef() provides estimates of) are E(u_i|y_i) and hence their variance is only part of the total variance. Therefore, the estimate of tau^2 and the estimated variance of the BLUPs of the random effects will not match up.
+
+In more complex models, this then also affects things like the correlation between the BLUPs of the random effects.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Yuhang Hu via R-sig-meta-analysis
+>Sent: Wednesday, 03 May, 2023 1:21
+>To: R meta
+>Cc: Yuhang Hu
+>Subject: [R-meta] Plotting the correlation among true/random effects across
+>categories
+>
+>Hello Colleagues,
+>
+>I was wondering if there is a way to scatterplot the correlation between
+>the categories of variable "outcome" (AL and PD) which is estimated to be
+>rho = .7752 in my model below?
+>
+>model <- rma.mv(yi~ outcome, vi, data =  dat.berkey1998,
+>                random = ~ outcome | trial, struct = "UN")
+>
+>    rho.AL  rho.PD    AL  PD
+>AL       1             -   5
+>PD  0.7752       1    no   -
+>
+>Thanks,
+>Yuhang
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Wed May  3 13:16:53 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Wed, 3 May 2023 11:16:53 +0000
+Subject: [R-meta] sandwhich estimator with geeglm object
+In-Reply-To: <a7ab0833cad14aefad7b1937096feebc@maastrichtuniversity.nl>
+References: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+ <MEAPR01MB5415F973537CD4099A53ACC09D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJzfiNKCDhxnfNJYM=3=uVsdcSDhXehWm8ZVU7O2JhXdCQ@mail.gmail.com>
+ <MEAPR01MB54158103A3B21ECF1C3E36F19D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJwS-X7TKi8dTxY-+s+m5ZTrGcaFj45uryVG9cV7wyjTMQ@mail.gmail.com>
+ <a7ab0833cad14aefad7b1937096feebc@maastrichtuniversity.nl>
+Message-ID: <MEAPR01MB5415EF3BE30BDE5AE27744AA9D6C9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear both,
+
+Comment 1 from Wolfgang is exactly what I want to ask about within-study correlation.
+
+The reason why I ask about the GEE and the within-study correlation is that I did not find a solution for dependent 2?2 table data (or more generally,  non-normal outcome with correlated error). metafor::rma.glmm works only for independent data. I am thinking whether we can use weighted GEE to resolve this issue. I acknolwdge the beta coefficient from GEE is different from GLMM (the former is a marginal model giving a population-average estimate and the latter is a conditional model giving a subjective-specific estimate). Using GEE + small sample adjustment or GLM + small sample RVE seems the perfect solution for this. Any comment on this?
+
+Best,
+Yefeng
+________________________________
+From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: Wednesday, 3 May 2023 17:34
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>; Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+Cc: James Pustejovsky <jepusto at gmail.com>
+Subject: RE: [R-meta] sandwhich estimator with geeglm object
+
+Just a few comments from my side:
+
+1) While rma.mv() is not designed to estimate a parameterized V matrix, one can easily do this manually. I think this is what Yefeng meant with "iterative way to find the maximum likelihood". For example, if we assume a constant correlation between the sampling errors within studies, one can just repeatedly construct the corresponding V matrix (e.g., with vcalc()), fit the model with rma.mv(), extract the log likelihood (with logLik()), and find the value of the correlation that maximizes the log likelihood.
+
+A special case of this is the so-called 'Riley model' where the within- and between-study correlations are assumed to be identical. This can be fitted in the same manner, since rma.mv() also allows fixing variance/correlation components (so in the iterative steps above, the same correlation is used to construct V and in rma.mv(..., rho=<value>).
+
+Indeed, I have played around with this for a couple examples. When allowing the within- and between-study correlations to differ, then one often runs into the issue that one of the two correlations wants to drift towards a bound (+-1). With enough data, it is possible though to fit such a model.
+
+2) As for using moment estimators versus (RE)ML: Likelihood-based methods are often quite robust to violations of the distributional assumptions, especially when it comes to estimating the fixed effects and their SEs. For constructing prediction intervals, distributional assumptions are more crucial, but this is a step after the model fitting and will affect both methods equally unless one uses non-parametric methods for constructing such intervals.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of James Pustejovsky via R-sig-meta-analysis
+>Sent: Tuesday, 02 May, 2023 21:25
+>To: Yefeng Yang
+>Cc: James Pustejovsky; R Special Interest Group for Meta-Analysis
+>Subject: Re: [R-meta] sandwhich estimator with geeglm object
+>
+>Responses below.
+>
+>On Mon, May 1, 2023 at 10:27?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>wrote:
+>
+>> BTW, what is your opinion of using this interactive way (moment estimator)
+>> to estimate within-group correlations (e.g., auto-correlation terms). I
+>> mean likelihood approach won't work if the distribution is misspecified
+>> (because we do not know the within-group correlations and we need to
+>> estimate it in geepack::geeglm()). This is a sort of dilemma.
+>
+>I don't have any strong prior. I would guess that the performance of these
+>variance component estimators (or more generally, dependence structure
+>estimators) could be rather specific to the context you're looking at. For
+>instance, it might depend on whether the data are balanced repeated
+>measures or imbalance with unequal numbers of repeated measures, on the
+>number of independent clusters, etc. Hard to say. Doing some monte carlo
+>simulations could help sort out what method to use.
+>
+>> If we put this in the context of meta-analysis, metafor::rma.mv does not
+>> allow for estimating within-group correlations from data, although it can
+>> by using an iterative way to find the maximum likelihood. What do you think?
+>
+>If I follow what you mean, I think you're talking about trying to estimate
+>rho (the correlation between sampling errors) instead of just imputing a
+>value of rho.  If I recall, Wolfgang and I have both toyed with this idea a
+>bit. It's feasible to do this using nlme::lme(). The problem is that the
+>REML estimation method in nlme when you have a fixed variance structure at
+>level 1 is still a bit suspect---might have a bug in it, since it doesn't
+>agree with metafor::rma.mv().
+>
+>> Cheers,
+>> Yefeng
+>>
+>> ------------------------------
+>> *From:* James Pustejovsky <jepusto at gmail.com>
+>> *Sent:* Tuesday, 2 May 2023 12:39
+>> *To:* Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>> *Cc:* R Special Interest Group for Meta-Analysis <
+>> r-sig-meta-analysis at r-project.org>
+>> *Subject:* Re: [R-meta] sandwhich estimator with geeglm object
+>>
+>> Hi Yefeng,
+>>
+>> Yes, this is correct if we're speaking on a very broad level. Broadly,
+>> geepack::geeglm() with an identity link function fits the same type of
+>> model as nlme::gls(), but geepack::geeglm() uses sandwich variance
+>> estimation whereas nlme::gls() uses model-based variance estimation.
+>> Running nlme::gls() with clubSandwich::vcovCR() will give you sandwich
+>> variance estimation. The CR1 and CR3 sandwich estimators can be calculated
+>> from both packages for comparison purposes.
+>>
+>> There is one other difference that should be noted though:
+>> geepack::geeglm() uses moment estimators for the parameters of the working
+>> model (such as variance coefficients, auto-correlation terms, etc.). In
+>> contrast, nlme::gls() uses maximum likelihood or restricted maximum
+>> likelihood estimation for these parameters. This difference in estimation
+>> strategies can lead to numerical differences in the model coefficient
+>> estimates calculated by the two packages  (and therefore also differences
+>> in the sandwich standard errors generated by geepack::geeglm versus by
+>> clubSandwich::vcovCR.gls).
+>>
+>> James
+>>
+>> On Mon, May 1, 2023 at 7:19?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>> wrote:
+>>
+>> Dear James,
+>> Probably, it is more clear if I ask "whether glm + RVE is equal to gee?".
+>> gee is doing RVE on the fly, while glm + RVE uses a post-hoc way to
+>> calculate robust errors when dealing with correlated errors (e.g., repeated
+>> measurements).
+>> Best,
+>> Yefeng
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed May  3 13:45:24 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 3 May 2023 11:45:24 +0000
+Subject: [R-meta] sandwhich estimator with geeglm object
+In-Reply-To: <MEAPR01MB5415EF3BE30BDE5AE27744AA9D6C9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB54154E7E3E36826CF91AF1AA9D6E9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJxsNb5EhiVtSOdc8afCVodoDheYdP24-pU38hAzm3ZuQw@mail.gmail.com>
+ <MEAPR01MB5415F973537CD4099A53ACC09D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJzfiNKCDhxnfNJYM=3=uVsdcSDhXehWm8ZVU7O2JhXdCQ@mail.gmail.com>
+ <MEAPR01MB54158103A3B21ECF1C3E36F19D6F9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CAFUVuJwS-X7TKi8dTxY-+s+m5ZTrGcaFj45uryVG9cV7wyjTMQ@mail.gmail.com>
+ <a7ab0833cad14aefad7b1937096feebc@maastrichtuniversity.nl>
+ <MEAPR01MB5415EF3BE30BDE5AE27744AA9D6C9@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <0e4cd9daadc14d0eb38458f6ef78c93f@maastrichtuniversity.nl>
+
+You can also just use lme4::glmer() directly. Except for model="CM.EL", that is what rma.glmm() uses in the background by default. Other package options are glmmTMB and GLMMadaptive. This can handle multilevel structures. On the other hand, if the same participants were measured on multiple dichotomous response variables (or at multiple time points), then things are more tricky, since in principle one would need the IPD data to model this correctly. If one just has the aggregated counts for each response variable, then RVE might work (either with a multilevel logistic model or GEE).
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Yefeng Yang [mailto:yefeng.yang1 at unsw.edu.au]
+>Sent: Wednesday, 03 May, 2023 13:17
+>To: Viechtbauer, Wolfgang (NP); R Special Interest Group for Meta-Analysis
+>Cc: James Pustejovsky
+>Subject: Re: [R-meta] sandwhich estimator with geeglm object
+>
+>Dear both,
+>
+>Comment 1 from Wolfgang is exactly what I want to ask about within-study
+>correlation.
+>
+>The reason why I ask about the GEE and the within-study correlation is that I did
+>not find a solution for dependent 2?2 table data (or more generally,? non-normal
+>outcome with correlated error).?metafor::rma.glmm works?only?for independent
+>data. I am thinking whether we can use weighted GEE to resolve this issue. I
+>acknolwdge the beta coefficient from GEE is different from GLMM (the former is a
+>marginal model giving a population-average estimate and the latter is a
+>conditional model giving a subjective-specific estimate). Using GEE + small
+>sample adjustment or GLM +?small sample RVE seems the perfect solution for this.
+>Any comment on this?
+>
+>Best,
+>Yefeng
+>________________________________________
+>From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+>Sent: Wednesday, 3 May 2023 17:34
+>To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+>project.org>; Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>Cc: James Pustejovsky <jepusto at gmail.com>
+>Subject: RE: [R-meta] sandwhich estimator with geeglm object
+>
+>Just a few comments from my side:
+>
+>1) While rma.mv() is not designed to estimate a parameterized V matrix, one can
+>easily do this manually. I think this is what Yefeng meant with "iterative way to
+>find the maximum likelihood". For example, if we assume a constant correlation
+>between the sampling errors within studies, one can just repeatedly construct the
+>corresponding V matrix (e.g., with vcalc()), fit the model with rma.mv(), extract
+>the log likelihood (with logLik()), and find the value of the correlation that
+>maximizes the log likelihood.
+>
+>A special case of this is the so-called 'Riley model' where the within- and
+>between-study correlations are assumed to be identical. This can be fitted in the
+>same manner, since rma.mv() also allows fixing variance/correlation components
+>(so in the iterative steps above, the same correlation is used to construct V and
+>in rma.mv(..., rho=<value>).
+>
+>Indeed, I have played around with this for a couple examples. When allowing the
+>within- and between-study correlations to differ, then one often runs into the
+>issue that one of the two correlations wants to drift towards a bound (+-1). With
+>enough data, it is possible though to fit such a model.
+>
+>2) As for using moment estimators versus (RE)ML: Likelihood-based methods are
+>often quite robust to violations of the distributional assumptions, especially
+>when it comes to estimating the fixed effects and their SEs. For constructing
+>prediction intervals, distributional assumptions are more crucial, but this is a
+>step after the model fitting and will affect both methods equally unless one uses
+>non-parametric methods for constructing such intervals.
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>Behalf Of James Pustejovsky via R-sig-meta-analysis
+>>Sent: Tuesday, 02 May, 2023 21:25
+>>To: Yefeng Yang
+>>Cc: James Pustejovsky; R Special Interest Group for Meta-Analysis
+>>Subject: Re: [R-meta] sandwhich estimator with geeglm object
+>>
+>>Responses below.
+>>
+>>On Mon, May 1, 2023 at 10:27?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>>wrote:
+>>
+>>> BTW, what is your opinion of using this interactive way (moment estimator)
+>>> to estimate within-group correlations (e.g., auto-correlation terms). I
+>>> mean likelihood approach won't work if the distribution is misspecified
+>>> (because we do not know the within-group correlations and we need to
+>>> estimate it in geepack::geeglm()). This is a sort of dilemma.
+>>
+>>I don't have any strong prior. I would guess that the performance of these
+>>variance component estimators (or more generally, dependence structure
+>>estimators) could be rather specific to the context you're looking at. For
+>>instance, it might depend on whether the data are balanced repeated
+>>measures or imbalance with unequal numbers of repeated measures, on the
+>>number of independent clusters, etc. Hard to say. Doing some monte carlo
+>>simulations could help sort out what method to use.
+>>
+>>> If we put this in the context of meta-analysis, metafor::rma.mv does not
+>>> allow for estimating within-group correlations from data, although it can
+>>> by using an iterative way to find the maximum likelihood. What do you think?
+>>
+>>If I follow what you mean, I think you're talking about trying to estimate
+>>rho (the correlation between sampling errors) instead of just imputing a
+>>value of rho.? If I recall, Wolfgang and I have both toyed with this idea a
+>>bit. It's feasible to do this using nlme::lme(). The problem is that the
+>>REML estimation method in nlme when you have a fixed variance structure at
+>>level 1 is still a bit suspect---might have a bug in it, since it doesn't
+>>agree with metafor::rma.mv().
+>>
+>>> Cheers,
+>>> Yefeng
+>>>
+>>> ------------------------------
+>>> *From:* James Pustejovsky <jepusto at gmail.com>
+>>> *Sent:* Tuesday, 2 May 2023 12:39
+>>> *To:* Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>>> *Cc:* R Special Interest Group for Meta-Analysis <
+>>> r-sig-meta-analysis at r-project.org>
+>>> *Subject:* Re: [R-meta] sandwhich estimator with geeglm object
+>>>
+>>> Hi Yefeng,
+>>>
+>>> Yes, this is correct if we're speaking on a very broad level. Broadly,
+>>> geepack::geeglm() with an identity link function fits the same type of
+>>> model as nlme::gls(), but geepack::geeglm() uses sandwich variance
+>>> estimation whereas nlme::gls() uses model-based variance estimation.
+>>> Running nlme::gls() with clubSandwich::vcovCR() will give you sandwich
+>>> variance estimation. The CR1 and CR3 sandwich estimators can be calculated
+>>> from both packages for comparison purposes.
+>>>
+>>> There is one other difference that should be noted though:
+>>> geepack::geeglm() uses moment estimators for the parameters of the working
+>>> model (such as variance coefficients, auto-correlation terms, etc.). In
+>>> contrast, nlme::gls() uses maximum likelihood or restricted maximum
+>>> likelihood estimation for these parameters. This difference in estimation
+>>> strategies can lead to numerical differences in the model coefficient
+>>> estimates calculated by the two packages? (and therefore also differences
+>>> in the sandwich standard errors generated by geepack::geeglm versus by
+>>> clubSandwich::vcovCR.gls).
+>>>
+>>> James
+>>>
+>>> On Mon, May 1, 2023 at 7:19?PM Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+>>> wrote:
+>>>
+>>> Dear James,
+>>> Probably, it is more clear if I ask "whether glm + RVE is equal to gee?".
+>>> gee is doing RVE on the fly, while glm + RVE uses a post-hoc way to
+>>> calculate robust errors when dealing with correlated errors (e.g., repeated
+>>> measurements).
+>>> Best,
+>>> Yefeng
+
+From yh342 @end|ng |rom n@u@edu  Wed May  3 22:48:14 2023
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Wed, 3 May 2023 13:48:14 -0700
+Subject: [R-meta] 
+ Plotting the correlation among true/random effects across categories
+In-Reply-To: <0ea527d1900d4e69b7a6009a86a5dfe8@maastrichtuniversity.nl>
+References: <CA+dzWjqKEQaW8WqLg-GwRxo1P=2c5UXwgzo5zNQ1KebB5Fgzxg@mail.gmail.com>
+ <0ea527d1900d4e69b7a6009a86a5dfe8@maastrichtuniversity.nl>
+Message-ID: <CA+dzWjodsHrOnXFhUPO1ZJe=wH0jiQipNkQs4CJLFUZeoQhOtw@mail.gmail.com>
+
+Thank you very much, Wolfgang. Two quick follow-ups:
+
+1) To convert these estimated random deviations to true effects, I should
+add the fixed effect estimates (assuming I use 'outcome + 0' in model
+formula) for each category of outcome to its relevant column, right?
+
+AL = paired[,1] + model$b[1,1]
+PD = paired[,2] + model$b[2,1]
+plot(PD~AL, pch=21, bg="gray", cex=1.5, lwd=1.2)
+
+2) When using categorical variables (with "UN") to the left of |, I think
+we drop the intercept in the random-effects design matrix, so what is
+actually allowed to vary across the trials given that eac trial has only
+one instance of AL and PD in it?
+
+Thank you for your time.
+Yuhang
+
+On Wed, May 3, 2023 at 12:51?AM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> You can extract the BLUPs of the random effects and create a scatterplot
+> based on them:
+>
+> re <- ranef(model)
+> re
+>
+> paired <- do.call(rbind, split(re[[1]]$intrcpt, dat.berkey1998$trial))
+> paired
+>
+> plot(paired, pch=21, bg="gray", cex=1.5, lwd=1.2)
+>
+> And before somebody asks why cor(paired) does not yield 0.7752 (or why the
+> values in var(paired) do not match up with the variances as estimated from
+> the model), see for example:
+>
+> https://stats.stackexchange.com/q/69882/1934
+>
+> Or let me give a more technical explanation based on the standard RE model:
+>
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg,
+> data=dat.bcg)
+> res <- rma(yi, vi, data=dat)
+> res$tau2
+> var(ranef(res)$pred)
+>
+> You will notice that the latter is smaller than tau^2. By the law of total
+> variance:
+>
+> tau^2 = var(u_i) = E(var(u_i|y_i)) + var(E(u_i|y_i)).
+>
+> The conditional means of the random effects (which is what ranef()
+> provides estimates of) are E(u_i|y_i) and hence their variance is only part
+> of the total variance. Therefore, the estimate of tau^2 and the estimated
+> variance of the BLUPs of the random effects will not match up.
+>
+> In more complex models, this then also affects things like the correlation
+> between the BLUPs of the random effects.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On
+> >Behalf Of Yuhang Hu via R-sig-meta-analysis
+> >Sent: Wednesday, 03 May, 2023 1:21
+> >To: R meta
+> >Cc: Yuhang Hu
+> >Subject: [R-meta] Plotting the correlation among true/random effects
+> across
+> >categories
+> >
+> >Hello Colleagues,
+> >
+> >I was wondering if there is a way to scatterplot the correlation between
+> >the categories of variable "outcome" (AL and PD) which is estimated to be
+> >rho = .7752 in my model below?
+> >
+> >model <- rma.mv(yi~ outcome, vi, data =  dat.berkey1998,
+> >                random = ~ outcome | trial, struct = "UN")
+> >
+> >    rho.AL  rho.PD    AL  PD
+> >AL       1             -   5
+> >PD  0.7752       1    no   -
+> >
+> >Thanks,
+> >Yuhang
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed May  3 22:58:40 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 3 May 2023 20:58:40 +0000
+Subject: [R-meta] 
+ Plotting the correlation among true/random effects across categories
+In-Reply-To: <CA+dzWjodsHrOnXFhUPO1ZJe=wH0jiQipNkQs4CJLFUZeoQhOtw@mail.gmail.com>
+References: <CA+dzWjqKEQaW8WqLg-GwRxo1P=2c5UXwgzo5zNQ1KebB5Fgzxg@mail.gmail.com>
+ <0ea527d1900d4e69b7a6009a86a5dfe8@maastrichtuniversity.nl>
+ <CA+dzWjodsHrOnXFhUPO1ZJe=wH0jiQipNkQs4CJLFUZeoQhOtw@mail.gmail.com>
+Message-ID: <d1e11135727e4f3688e0bf498a654449@maastrichtuniversity.nl>
+
+Please see below for responses.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Yuhang Hu [mailto:yh342 at nau.edu]
+>Sent: Wednesday, 03 May, 2023 22:48
+>To: Viechtbauer, Wolfgang (NP)
+>Cc: R Special Interest Group for Meta-Analysis
+>Subject: Re: [R-meta] Plotting the correlation among true/random effects across
+>categories
+>
+>Thank you very much, Wolfgang. Two quick follow-ups:
+>
+>1) To convert these estimated random deviations to true effects, I should add the
+>fixed effect estimates (assuming I use 'outcome + 0' in model formula) for each
+>category of outcome to its relevant column, right?
+>
+>AL = paired[,1] + model$b[1,1]
+>PD = paired[,2] + model$b[2,1]
+>plot(PD~AL, pch=21, bg="gray", cex=1.5, lwd=1.2)
+
+Correct.
+
+>2) When using categorical variables (with "UN") to the left of |, I think we drop
+>the intercept in the random-effects design matrix, so what is actually allowed to
+>vary across the trials given that eac trial has only one instance of AL and PD in
+>it?
+
+Not entirely sure what you mean by this question. The help file explains what the different structures do:
+
+https://wviechtb.github.io/metafor/reference/rma.mv.html#specifying-random-effects
+
+>Thank you for your time.
+>Yuhang
+>
+>On Wed, May 3, 2023 at 12:51?AM Viechtbauer, Wolfgang (NP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>You can extract the BLUPs of the random effects and create a scatterplot based on
+>them:
+>
+>re <- ranef(model)
+>re
+>
+>paired <- do.call(rbind, split(re[[1]]$intrcpt, dat.berkey1998$trial))
+>paired
+>
+>plot(paired, pch=21, bg="gray", cex=1.5, lwd=1.2)
+>
+>And before somebody asks why cor(paired) does not yield 0.7752 (or why the values
+>in var(paired) do not match up with the variances as estimated from the model),
+>see for example:
+>
+>https://stats.stackexchange.com/q/69882/1934
+>
+>Or let me give a more technical explanation based on the standard RE model:
+>
+>dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+>res <- rma(yi, vi, data=dat)
+>res$tau2
+>var(ranef(res)$pred)
+>
+>You will notice that the latter is smaller than tau^2. By the law of total
+>variance:
+>
+>tau^2 = var(u_i) = E(var(u_i|y_i)) + var(E(u_i|y_i)).
+>
+>The conditional means of the random effects (which is what ranef() provides
+>estimates of) are E(u_i|y_i) and hence their variance is only part of the total
+>variance. Therefore, the estimate of tau^2 and the estimated variance of the
+>BLUPs of the random effects will not match up.
+>
+>In more complex models, this then also affects things like the correlation
+>between the BLUPs of the random effects.
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>Behalf Of Yuhang Hu via R-sig-meta-analysis
+>>Sent: Wednesday, 03 May, 2023 1:21
+>>To: R meta
+>>Cc: Yuhang Hu
+>>Subject: [R-meta] Plotting the correlation among true/random effects across
+>>categories
+>>
+>>Hello Colleagues,
+>>
+>>I was wondering if there is a way to scatterplot the correlation between
+>>the categories of variable "outcome" (AL and PD) which is estimated to be
+>>rho = .7752 in my model below?
+>>
+>>model <- rma.mv(yi~ outcome, vi, data =? dat.berkey1998,
+>>? ? ? ? ? ? ? ? random = ~ outcome | trial, struct = "UN")
+>>
+>>? ? rho.AL? rho.PD? ? AL? PD
+>>AL? ? ? ?1? ? ? ? ? ? ?-? ?5
+>>PD? 0.7752? ? ? ?1? ? no? ?-
+>>
+>>Thanks,
+>>Yuhang
+
+From nevo@@g|8 @end|ng |rom gm@||@com  Thu May  4 11:08:40 2023
+From: nevo@@g|8 @end|ng |rom gm@||@com (Nevo Sagi)
+Date: Thu, 4 May 2023 12:08:40 +0300
+Subject: [R-meta] Questions regarding REML and FE models and R^2 calculation
+ in metafor
+Message-ID: <CA+4peqGGyEeOfHYqpqs_3yzxhYKq7vhFVmm9VKYKj7HVUt4wFQ@mail.gmail.com>
+
+Dear list members,
+
+I conducted a meta-analysis on the role of climate in mediating a specific
+ecological process, using the *metafor *package in R.
+This is actually a meta-regression, using the rma.mv function, with
+*temperature *and *precipitation *as moderators, along with some other
+moderators related to experimental design. I also use reference as a random
+effect ('random = ~1|*Reference'*), as some references include more than
+one experiment.
+
+*1. FE vs REML model:*
+After reading Wolfgang Viechtbauer's blog post
+<https://wviechtb.github.io/metafor/reference/misc-models.html> on the
+differences between fixed-effects and random-effects models in the
+*metafor *package, I decided to use the FE method, because the studies I
+gathered are not a random sample of the population of hypothetical studies.
+Instead, the sample is biased by underrepresentation of some climates and
+overrepresentation of others.
+I wonder whether my interpretation of the difference between FE and REML
+models is correct, and would like to get some feedback on it.
+
+*2. R^2 calculation:*
+Reviewers of my manuscript required that I provide R-squared values for
+each of the climate moderators.
+Using the *metafor *package, only rma.uni models (where random variables
+cannot be specified) provide R^2 estimation.
+In a previous conversation in this mailing list, Wolfgang indicated that
+pseudo-R^2 can be calculated based on the variance (sigma2) reported by
+models including and excluding the moderator in question:
+*(res0$sigma2 - res1$sigma2) / res0$sigma2*
+*where 'res0' is the model without coefficients and 'res1' the model with.*
+
+I have two problems with this solution:
+1. FE models do not provide variance components (sigma2). Therefore, the
+pseudo R-squared can be calculated only for REML models. I guess this can
+be explained by the nature of the models, which I don't fully understand.
+2. When using REML models and performing the above calculation, I get weird
+results. For example, one of the pseudo R^2 values was above 1. This cannot
+mean that the moderator explained more than 100% of the variance in the
+effect size. How comparable is this pseudo R^2 for the standard R^2 of
+simpler models?
+
+
+To conclude, I will be glad to get feedback on both problems:
+1. Should I use a random-effect or fixed-effect model?
+2. How do I get a reliable R^2 or an alternative measure of goodness of fit
+for single-moderator models that include a random structure and a sampling
+variance?
+
+
+Thank you very much,
+
+Nevo Sagi
+
+
+-- 
+Dr. Nevo Sagi
+
+Prof. Dror Hawlena's Risk-Management Ecology Lab
+Department of Ecology, Evolution & Behavior
+The Alexander Silberman Institute of Life Sciences
+The Hebrew University of Jerusalem
+Edmond J. Safra Campus at Givat Ram, Jerusalem 9190401, Israel.
+
+	[[alternative HTML version deleted]]
+
+
+From yh342 @end|ng |rom n@u@edu  Thu May  4 23:38:33 2023
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Thu, 4 May 2023 14:38:33 -0700
+Subject: [R-meta] 
+ Plotting the correlation among true/random effects across categories
+In-Reply-To: <d1e11135727e4f3688e0bf498a654449@maastrichtuniversity.nl>
+References: <CA+dzWjqKEQaW8WqLg-GwRxo1P=2c5UXwgzo5zNQ1KebB5Fgzxg@mail.gmail.com>
+ <0ea527d1900d4e69b7a6009a86a5dfe8@maastrichtuniversity.nl>
+ <CA+dzWjodsHrOnXFhUPO1ZJe=wH0jiQipNkQs4CJLFUZeoQhOtw@mail.gmail.com>
+ <d1e11135727e4f3688e0bf498a654449@maastrichtuniversity.nl>
+Message-ID: <CA+dzWjowqu747iBsQzRR42AGi_Q+qM5EzGZTJ2BdvOAkC_+zmw@mail.gmail.com>
+
+Thank you very much, Wolfgang. Regarding my second (unclear) follow-up, I
+might have a conceptual misunderstanding that I hope to clear up.
+
+When we use a "categorical" moderator (with struct="UN") to the left of |
+(e.g., ~outcome | trial_id), conceptually it means that in each unique
+trial_id, we fit "effect_size ~ outcome+0", and obtain the Mean for each
+outcome category (say two categories). Then in the rma.mv() output, we get
+the variation in means of each category as well as the correlation between
+the means of the two categories across all unique trial_ids.
+
+Is my conceptual understanding correct?
+
+Thanks,
+Yuhang
+
+On Wed, May 3, 2023 at 1:59?PM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Please see below for responses.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Yuhang Hu [mailto:yh342 at nau.edu]
+> >Sent: Wednesday, 03 May, 2023 22:48
+> >To: Viechtbauer, Wolfgang (NP)
+> >Cc: R Special Interest Group for Meta-Analysis
+> >Subject: Re: [R-meta] Plotting the correlation among true/random effects
+> across
+> >categories
+> >
+> >Thank you very much, Wolfgang. Two quick follow-ups:
+> >
+> >1) To convert these estimated random deviations to true effects, I should
+> add the
+> >fixed effect estimates (assuming I use 'outcome + 0' in model formula)
+> for each
+> >category of outcome to its relevant column, right?
+> >
+> >AL = paired[,1] + model$b[1,1]
+> >PD = paired[,2] + model$b[2,1]
+> >plot(PD~AL, pch=21, bg="gray", cex=1.5, lwd=1.2)
+>
+> Correct.
+>
+> >2) When using categorical variables (with "UN") to the left of |, I think
+> we drop
+> >the intercept in the random-effects design matrix, so what is actually
+> allowed to
+> >vary across the trials given that eac trial has only one instance of AL
+> and PD in
+> >it?
+>
+> Not entirely sure what you mean by this question. The help file explains
+> what the different structures do:
+>
+>
+> https://wviechtb.github.io/metafor/reference/rma.mv.html#specifying-random-effects
+>
+> >Thank you for your time.
+> >Yuhang
+> >
+> >On Wed, May 3, 2023 at 12:51?AM Viechtbauer, Wolfgang (NP)
+> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >You can extract the BLUPs of the random effects and create a scatterplot
+> based on
+> >them:
+> >
+> >re <- ranef(model)
+> >re
+> >
+> >paired <- do.call(rbind, split(re[[1]]$intrcpt, dat.berkey1998$trial))
+> >paired
+> >
+> >plot(paired, pch=21, bg="gray", cex=1.5, lwd=1.2)
+> >
+> >And before somebody asks why cor(paired) does not yield 0.7752 (or why
+> the values
+> >in var(paired) do not match up with the variances as estimated from the
+> model),
+> >see for example:
+> >
+> >https://stats.stackexchange.com/q/69882/1934
+> >
+> >Or let me give a more technical explanation based on the standard RE
+> model:
+> >
+> >dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg,
+> data=dat.bcg)
+> >res <- rma(yi, vi, data=dat)
+> >res$tau2
+> >var(ranef(res)$pred)
+> >
+> >You will notice that the latter is smaller than tau^2. By the law of total
+> >variance:
+> >
+> >tau^2 = var(u_i) = E(var(u_i|y_i)) + var(E(u_i|y_i)).
+> >
+> >The conditional means of the random effects (which is what ranef()
+> provides
+> >estimates of) are E(u_i|y_i) and hence their variance is only part of the
+> total
+> >variance. Therefore, the estimate of tau^2 and the estimated variance of
+> the
+> >BLUPs of the random effects will not match up.
+> >
+> >In more complex models, this then also affects things like the correlation
+> >between the BLUPs of the random effects.
+> >
+> >Best,
+> >Wolfgang
+> >
+> >>-----Original Message-----
+> >>From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On
+> >>Behalf Of Yuhang Hu via R-sig-meta-analysis
+> >>Sent: Wednesday, 03 May, 2023 1:21
+> >>To: R meta
+> >>Cc: Yuhang Hu
+> >>Subject: [R-meta] Plotting the correlation among true/random effects
+> across
+> >>categories
+> >>
+> >>Hello Colleagues,
+> >>
+> >>I was wondering if there is a way to scatterplot the correlation between
+> >>the categories of variable "outcome" (AL and PD) which is estimated to be
+> >>rho = .7752 in my model below?
+> >>
+> >>model <- rma.mv(yi~ outcome, vi, data =  dat.berkey1998,
+> >>                random = ~ outcome | trial, struct = "UN")
+> >>
+> >>    rho.AL  rho.PD    AL  PD
+> >>AL       1             -   5
+> >>PD  0.7752       1    no   -
+> >>
+> >>Thanks,
+> >>Yuhang
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m@th|@@@b||mont @end|ng |rom gm@||@com  Tue May  9 22:27:43 2023
+From: m@th|@@@b||mont @end|ng |rom gm@||@com (Mathias Bilmont)
+Date: Tue, 9 May 2023 22:27:43 +0200
+Subject: [R-meta] SMD formula for between-groups pre/post data
+Message-ID: <CAOJ2cNj144zQcHwfkCCBCvJGJCiNCtAuz52=WPZ4pOmjj+pKBQ@mail.gmail.com>
+
+Hi everyone!
+
+I am conducting a meta analysis of RCTs that explores the efficacy of
+mindfulness on several physical health outcomes.
+
+All my main outcomes are measured on a continuous scale. For most of
+the studies, I have been able to gather means and SD of the two groups
+at pre- and post-tests (or, when this information was not available,
+means/SD change). However, in about 20% of the trials, no information
+on pre-test or mean change was reported.
+
+I would like to combine the studies with pre/post data with those that
+have reported only post data. I plan to make a meta regression to
+assess whether these two types of information lead to differences in
+effect size. However, I am not sure which is the best SMD formula to
+use for studies with pre/post data in this particular situation.
+
+I understand that if I wanted to pool the ?between-groups post-test
+SMD? with the ?within-group pre/post-tests SMD?, I would need to
+compute Cohen d-av for the pre/post group (ie, SMCR in escalc).
+However, because my meta-analysis is restricted to between group
+comparisons (either group differences on post data or group
+differences in score change from pre to post test), I wondered whether
+computing d-av for studies with pre/post data was still the best
+choice (or whether dz should be preferred).
+
+# code for the studies with pre/post or mean change data
+dav_grp1=metafor::escalc(m1i=grp1_pre, m2i=grp1_post, sd1i=grp1sd_pre,
+ri=corr, measure="SMCR")
+dav_grp2=metafor::escalc(m1i=grp2_pre, m2i=grp2_post, sd1i=grp2sd_pre,
+ri=corr, measure="SMCR")
+d = dav_grp1$yi - dav_grp2$yi
+var_d = dav_grp1$vi + dav_grp2$vi
+
+I initially planned to use the formula reported in Borenstein?s book
+to estimate the between-groups pre-post SMD but I saw in escalc code
+that this formula was not accurate. I thus prefer asking for advice.
+
+Many thanks for the help!
+Sincerely
+Mathias Bilmont
+University of Lille, France
+
+PS: I have dug through the list to explore whether this question has
+already been raised but I was not able to find a similar one.
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Wed May 10 01:31:50 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Tue, 9 May 2023 23:31:50 +0000
+Subject: [R-meta] SMD formula for between-groups pre/post data
+In-Reply-To: <CAOJ2cNj144zQcHwfkCCBCvJGJCiNCtAuz52=WPZ4pOmjj+pKBQ@mail.gmail.com>
+References: <CAOJ2cNj144zQcHwfkCCBCvJGJCiNCtAuz52=WPZ4pOmjj+pKBQ@mail.gmail.com>
+Message-ID: <MEAPR01MB54158E31D0D0F77868BA9ADF9D769@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+This topic has been asked not long ago. You might want to search the archived mailing.
+
+Best,
+Yefeng
+________________________________
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Mathias Bilmont via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Sent: Wednesday, 10 May 2023 6:27
+To: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Cc: Mathias Bilmont <mathias.bilmont at gmail.com>
+Subject: [R-meta] SMD formula for between-groups pre/post data
+
+Hi everyone!
+
+I am conducting a meta analysis of RCTs that explores the efficacy of
+mindfulness on several physical health outcomes.
+
+All my main outcomes are measured on a continuous scale. For most of
+the studies, I have been able to gather means and SD of the two groups
+at pre- and post-tests (or, when this information was not available,
+means/SD change). However, in about 20% of the trials, no information
+on pre-test or mean change was reported.
+
+I would like to combine the studies with pre/post data with those that
+have reported only post data. I plan to make a meta regression to
+assess whether these two types of information lead to differences in
+effect size. However, I am not sure which is the best SMD formula to
+use for studies with pre/post data in this particular situation.
+
+I understand that if I wanted to pool the ?between-groups post-test
+SMD? with the ?within-group pre/post-tests SMD?, I would need to
+compute Cohen d-av for the pre/post group (ie, SMCR in escalc).
+However, because my meta-analysis is restricted to between group
+comparisons (either group differences on post data or group
+differences in score change from pre to post test), I wondered whether
+computing d-av for studies with pre/post data was still the best
+choice (or whether dz should be preferred).
+
+# code for the studies with pre/post or mean change data
+dav_grp1=metafor::escalc(m1i=grp1_pre, m2i=grp1_post, sd1i=grp1sd_pre,
+ri=corr, measure="SMCR")
+dav_grp2=metafor::escalc(m1i=grp2_pre, m2i=grp2_post, sd1i=grp2sd_pre,
+ri=corr, measure="SMCR")
+d = dav_grp1$yi - dav_grp2$yi
+var_d = dav_grp1$vi + dav_grp2$vi
+
+I initially planned to use the formula reported in Borenstein?s book
+to estimate the between-groups pre-post SMD but I saw in escalc code
+that this formula was not accurate. I thus prefer asking for advice.
+
+Many thanks for the help!
+Sincerely
+Mathias Bilmont
+University of Lille, France
+
+PS: I have dug through the list to explore whether this question has
+already been raised but I was not able to find a similar one.
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From I@ht|@q@Ahmed @end|ng |rom vub@be  Thu May 11 10:52:50 2023
+From: I@ht|@q@Ahmed @end|ng |rom vub@be (Ishtiaq Ahmed)
+Date: Thu, 11 May 2023 08:52:50 +0000
+Subject: [R-meta] [meta] package query: Forest plot displaying the mean
+ weighted effect size with and without the outliers(meta.cont)
+Message-ID: <AM0PR01MB60831B6E8336DA1F1EE47DB486749@AM0PR01MB6083.eurprd01.prod.exchangelabs.com>
+
+Dear all,
+I hope you all are doing well. I am conducting a meta-analysis and am trying to produce a forest plot displaying the mean weighted effect size with and without the outliers. I looked on so many websites and tried a lot of syntaxes, however, didn't really find anything about what I am looking for.
+                                 Assume there are 5 studies in the meta-analysis. Outlier analyses showed that Studies 3 and 4 are outliers leading to an overestimation of the mean weighted ES. Accordingly, I calculate a mean ES with (k = 5) and without the outlier (k = 3). I would like to display the studies sorted according to their ES and report both Mean ESs in the forest plot. I would appreciate any help and/or advice.
+Study3 Study4
+Mean ES (k = 5) Mean ES (k = 3)
+
+My Reproducible code:
+Ishtiaq <- data.frame( nexp = c(20, 30, 25, 18, 22),
+ Pain_int_mean = c(-0.5, -0.8, -0.6, -1.2, -0.7),
+ Pain_int_sd = c(0.2, 0.3, 0.25, 0.18, 0.22),
+ ncon = c(18, 28, 23, 15, 20),
+Pain_con_mean = c(0.3, 0.2, 0.5, 0.4, 0.6),
+ Pain_con_sd = c(0.15, 0.25, 0.2, 0.18, 0.22),
+ study_label = c("Study 1", "Study 2", "Study 3", "Study 4", "Study 5"))
+
+# meta-analysis 1
+Pain_meta <- metacont(nexp, Pain_int_mean, Pain_int_sd, ncon, Pain_con_mean, Pain_con_sd, studlab = study_label, data = Ishtiaq, sm = 'SMD', method.smd = "Hedges", method.tau = "REML")
+
+# create forest plot
+ forest.meta(Pain_meta, sortvar = TE, studlab = TRUE, prediction = TRUE, test.overall.random = T, random = T, fixed = F ,label.right = "Favours control", col.label.right = "black", label.left = "Favours experimental", col.label.left = "black", col.square = "darkcyan", col.diamond = "darkblue", col.diamond.lines = "cyan4", col.predict = "red", print.tau2 = F, mlab = "RE Model for All Studies (k = 5)")
+#Remove studies with TE >5
+Pain_meta_out_removed <- abs(Pain_meta$TE) > 5
+## Then, create the meta-analysis with outliers removed
+Pain_meta_no_out = metacont(nexp, Pain_int_mean, Pain_int_sd, ncon, Pain_con_mean, Pain_con_sd, studlab = study_label, data = Ishtiaq[!Pain_meta_out_removed, ], sm = 'SMD', method.smd = "Hedges", method.tau = "REML", random = TRUE, fixed = FALSE)
+#add the effect size to the forest plot
+????????
+
+The addpoly works in metafor() package but I like the plots produced by forest.meta()  and it is easy to handle So, I want to ask if there is any option in the meta() package to add a polygon for ES with and without outliers?
+
+Thanks in advance.
+
+Best regards,
+
+Ishtiaq Ahmed
+
+	[[alternative HTML version deleted]]
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Thu May 11 11:35:21 2023
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?iso-8859-1?Q?Dr=2E_Gerta_R=FCcker?=)
+Date: Thu, 11 May 2023 09:35:21 +0000
+Subject: [R-meta] [meta] package query: Forest plot displaying the mean
+ weighted effect size with and without the outliers(meta.cont)
+In-Reply-To: <AM0PR01MB60831B6E8336DA1F1EE47DB486749@AM0PR01MB6083.eurprd01.prod.exchangelabs.com>
+References: <AM0PR01MB60831B6E8336DA1F1EE47DB486749@AM0PR01MB6083.eurprd01.prod.exchangelabs.com>
+Message-ID: <a946e35ee446413f9868c1c2448ae580@uniklinik-freiburg.de>
+
+Dear Ishtiaq Ahmed,
+
+Independently of the technical question (Guido may comment on), I would like to question your approach. In my view, it does not make sense to declare two of (only) five studies as "outliers", the more so, as their confidence intervals are at least partly overlapping with those of the other three studies, and they also are not attributed much less weight (sample size) than the others. For me, the forest plot doesn't seem to justify classifying these as outliers.
+
+It is trivial that excluding studies due to large effect sizes reduces heterogeneity and shifts the pooled effect. However, the aim of meta-analysis is not to minimize heterogeneity, but to accept and account for it. Excluding studies from analysis, also in sensitivity analyses, should be based on risk of bias, if at all, not on effect sizes. 
+
+Best,
+Gerta
+
+
+
+-----Urspr?ngliche Nachricht-----
+Von: Ishtiaq Ahmed via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> 
+Gesendet: Donnerstag, 11. Mai 2023 10:53
+An: r-sig-meta-analysis at r-project.org
+Cc: Ishtiaq Ahmed <Ishtiaq.Ahmed at vub.be>
+Betreff: [R-meta] [meta] package query: Forest plot displaying the mean weighted effect size with and without the outliers(meta.cont)
+
+Dear all,
+I hope you all are doing well. I am conducting a meta-analysis and am trying to produce a forest plot displaying the mean weighted effect size with and without the outliers. I looked on so many websites and tried a lot of syntaxes, however, didn't really find anything about what I am looking for.
+                                 Assume there are 5 studies in the meta-analysis. Outlier analyses showed that Studies 3 and 4 are outliers leading to an overestimation of the mean weighted ES. Accordingly, I calculate a mean ES with (k = 5) and without the outlier (k = 3). I would like to display the studies sorted according to their ES and report both Mean ESs in the forest plot. I would appreciate any help and/or advice.
+Study3 Study4
+Mean ES (k = 5) Mean ES (k = 3)
+
+My Reproducible code:
+Ishtiaq <- data.frame( nexp = c(20, 30, 25, 18, 22),
+ Pain_int_mean = c(-0.5, -0.8, -0.6, -1.2, -0.7),
+ Pain_int_sd = c(0.2, 0.3, 0.25, 0.18, 0.22),
+ ncon = c(18, 28, 23, 15, 20),
+Pain_con_mean = c(0.3, 0.2, 0.5, 0.4, 0.6),
+ Pain_con_sd = c(0.15, 0.25, 0.2, 0.18, 0.22),
+ study_label = c("Study 1", "Study 2", "Study 3", "Study 4", "Study 5"))
+
+# meta-analysis 1
+Pain_meta <- metacont(nexp, Pain_int_mean, Pain_int_sd, ncon, Pain_con_mean, Pain_con_sd, studlab = study_label, data = Ishtiaq, sm = 'SMD', method.smd = "Hedges", method.tau = "REML")
+
+# create forest plot
+ forest.meta(Pain_meta, sortvar = TE, studlab = TRUE, prediction = TRUE, test.overall.random = T, random = T, fixed = F ,label.right = "Favours control", col.label.right = "black", label.left = "Favours experimental", col.label.left = "black", col.square = "darkcyan", col.diamond = "darkblue", col.diamond.lines = "cyan4", col.predict = "red", print.tau2 = F, mlab = "RE Model for All Studies (k = 5)")
+#Remove studies with TE >5
+Pain_meta_out_removed <- abs(Pain_meta$TE) > 5
+## Then, create the meta-analysis with outliers removed
+Pain_meta_no_out = metacont(nexp, Pain_int_mean, Pain_int_sd, ncon, Pain_con_mean, Pain_con_sd, studlab = study_label, data = Ishtiaq[!Pain_meta_out_removed, ], sm = 'SMD', method.smd = "Hedges", method.tau = "REML", random = TRUE, fixed = FALSE)
+#add the effect size to the forest plot
+????????
+
+The addpoly works in metafor() package but I like the plots produced by forest.meta()  and it is easy to handle So, I want to ask if there is any option in the meta() package to add a polygon for ES with and without outliers?
+
+Thanks in advance.
+
+Best regards,
+
+Ishtiaq Ahmed
+
+	[[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From I@ht|@q@Ahmed @end|ng |rom vub@be  Thu May 11 11:43:40 2023
+From: I@ht|@q@Ahmed @end|ng |rom vub@be (Ishtiaq Ahmed)
+Date: Thu, 11 May 2023 09:43:40 +0000
+Subject: [R-meta] [meta] package query: Forest plot displaying the mean
+ weighted effect size with and without the outliers(meta.cont)
+In-Reply-To: <a946e35ee446413f9868c1c2448ae580@uniklinik-freiburg.de>
+References: <AM0PR01MB60831B6E8336DA1F1EE47DB486749@AM0PR01MB6083.eurprd01.prod.exchangelabs.com>
+ <a946e35ee446413f9868c1c2448ae580@uniklinik-freiburg.de>
+Message-ID: <AM0PR01MB6083837CC296D80AB46397BB86749@AM0PR01MB6083.eurprd01.prod.exchangelabs.com>
+
+Dear Gerta,
+Thank you for your reply. The data frame shared is not created in R just to make the code simple and reproducible. My original dataset has outliers identified via find.outliers(), influential  study analysis so, I wanted to remove from my data frame and than perform a meta-analysis to see if the effect size changes. My original data is very large and I am not able able to share it here so, I created a fake data in R and decide to remove 2 studies (by calling them outliers(just to create an example). Now I want to add the effect size to original forest plot.
+P.S: I am sorry to mention in my previous mail that it is auto-generated data in R.
+Regards
+Ishtiaq
+
+
+From: Dr. Gerta R?cker<mailto:gerta.ruecker at uniklinik-freiburg.de>
+Sent: Thursday, 11 May 2023 11:35
+To: R Special Interest Group for Meta-Analysis<mailto:r-sig-meta-analysis at r-project.org>
+Cc: Ishtiaq Ahmed<mailto:Ishtiaq.Ahmed at vub.be>
+Subject: AW: [meta] package query: Forest plot displaying the mean weighted effect size with and without the outliers(meta.cont)
+
+Dear Ishtiaq Ahmed,
+
+Independently of the technical question (Guido may comment on), I would like to question your approach. In my view, it does not make sense to declare two of (only) five studies as "outliers", the more so, as their confidence intervals are at least partly overlapping with those of the other three studies, and they also are not attributed much less weight (sample size) than the others. For me, the forest plot doesn't seem to justify classifying these as outliers.
+
+It is trivial that excluding studies due to large effect sizes reduces heterogeneity and shifts the pooled effect. However, the aim of meta-analysis is not to minimize heterogeneity, but to accept and account for it. Excluding studies from analysis, also in sensitivity analyses, should be based on risk of bias, if at all, not on effect sizes.
+
+Best,
+Gerta
+
+
+
+-----Urspr?ngliche Nachricht-----
+Von: Ishtiaq Ahmed via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Gesendet: Donnerstag, 11. Mai 2023 10:53
+An: r-sig-meta-analysis at r-project.org
+Cc: Ishtiaq Ahmed <Ishtiaq.Ahmed at vub.be>
+Betreff: [R-meta] [meta] package query: Forest plot displaying the mean weighted effect size with and without the outliers(meta.cont)
+
+Dear all,
+I hope you all are doing well. I am conducting a meta-analysis and am trying to produce a forest plot displaying the mean weighted effect size with and without the outliers. I looked on so many websites and tried a lot of syntaxes, however, didn't really find anything about what I am looking for.
+                                 Assume there are 5 studies in the meta-analysis. Outlier analyses showed that Studies 3 and 4 are outliers leading to an overestimation of the mean weighted ES. Accordingly, I calculate a mean ES with (k = 5) and without the outlier (k = 3). I would like to display the studies sorted according to their ES and report both Mean ESs in the forest plot. I would appreciate any help and/or advice.
+Study3 Study4
+Mean ES (k = 5) Mean ES (k = 3)
+
+My Reproducible code:
+Ishtiaq <- data.frame( nexp = c(20, 30, 25, 18, 22),
+ Pain_int_mean = c(-0.5, -0.8, -0.6, -1.2, -0.7),
+ Pain_int_sd = c(0.2, 0.3, 0.25, 0.18, 0.22),
+ ncon = c(18, 28, 23, 15, 20),
+Pain_con_mean = c(0.3, 0.2, 0.5, 0.4, 0.6),
+ Pain_con_sd = c(0.15, 0.25, 0.2, 0.18, 0.22),
+ study_label = c("Study 1", "Study 2", "Study 3", "Study 4", "Study 5"))
+
+# meta-analysis 1
+Pain_meta <- metacont(nexp, Pain_int_mean, Pain_int_sd, ncon, Pain_con_mean, Pain_con_sd, studlab = study_label, data = Ishtiaq, sm = 'SMD', method.smd = "Hedges", method.tau = "REML")
+
+# create forest plot
+ forest.meta(Pain_meta, sortvar = TE, studlab = TRUE, prediction = TRUE, test.overall.random = T, random = T, fixed = F ,label.right = "Favours control", col.label.right = "black", label.left = "Favours experimental", col.label.left = "black", col.square = "darkcyan", col.diamond = "darkblue", col.diamond.lines = "cyan4", col.predict = "red", print.tau2 = F, mlab = "RE Model for All Studies (k = 5)")
+#Remove studies with TE >5
+Pain_meta_out_removed <- abs(Pain_meta$TE) > 5
+## Then, create the meta-analysis with outliers removed
+Pain_meta_no_out = metacont(nexp, Pain_int_mean, Pain_int_sd, ncon, Pain_con_mean, Pain_con_sd, studlab = study_label, data = Ishtiaq[!Pain_meta_out_removed, ], sm = 'SMD', method.smd = "Hedges", method.tau = "REML", random = TRUE, fixed = FALSE)
+#add the effect size to the forest plot
+????????
+
+The addpoly works in metafor() package but I like the plots produced by forest.meta()  and it is easy to handle So, I want to ask if there is any option in the meta() package to add a polygon for ES with and without outliers?
+
+Thanks in advance.
+
+Best regards,
+
+Ishtiaq Ahmed
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+	[[alternative HTML version deleted]]
+
+
+From chuwe|||n90 @end|ng |rom hotm@||@com  Sat May 13 10:57:40 2023
+From: chuwe|||n90 @end|ng |rom hotm@||@com (chuweilin90)
+Date: Sat, 13 May 2023 16:57:40 +0800
+Subject: [R-meta] experiencing an problem in using metafor
+Message-ID: <ME3P282MB3522184CBE0EA98D16600AB7A87A9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230513/b9cff418/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: 1111.png
+Type: image/png
+Size: 38170 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230513/b9cff418/attachment-0001.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: chapter1.R
+Type: application/octet-stream
+Size: 6013 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230513/b9cff418/attachment-0001.obj>
+
+From chuwe|||n90 @end|ng |rom hotm@||@com  Sat May 13 10:57:40 2023
+From: chuwe|||n90 @end|ng |rom hotm@||@com (chuweilin90)
+Date: Sat, 13 May 2023 16:57:40 +0800
+Subject: [R-meta] experiencing an problem in using metafor
+Message-ID: <ME3P282MB3522184CBE0EA98D16600AB7A87A9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230513/b9cff418/attachment-0003.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: 1111.png
+Type: image/png
+Size: 38170 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230513/b9cff418/attachment-0003.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: chapter1.R
+Type: application/octet-stream
+Size: 6013 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230513/b9cff418/attachment-0003.obj>
+
+From beyene @end|ng |rom mcm@@ter@c@  Sun May 14 06:59:09 2023
+From: beyene @end|ng |rom mcm@@ter@c@ (Beyene, Joseph)
+Date: Sun, 14 May 2023 04:59:09 +0000
+Subject: [R-meta] experiencing an problem in using metafor
+In-Reply-To: <ME3P282MB3522184CBE0EA98D16600AB7A87A9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+References: <ME3P282MB3522184CBE0EA98D16600AB7A87A9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+Message-ID: <YT3PR01MB539181B7C3639A3F9BBAA22AD47B9@YT3PR01MB5391.CANPRD01.PROD.OUTLOOK.COM>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230514/48e57c80/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: 1111.png
+Type: image/png
+Size: 38170 bytes
+Desc: 1111.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230514/48e57c80/attachment-0001.png>
+
+From chuwe|||n90 @end|ng |rom hotm@||@com  Sun May 14 02:55:23 2023
+From: chuwe|||n90 @end|ng |rom hotm@||@com (chuweilin90)
+Date: Sun, 14 May 2023 08:55:23 +0800
+Subject: [R-meta] experiencing an problem in using metafor
+In-Reply-To: <ME3P282MB3522184CBE0EA98D16600AB7A87A9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+References: <ME3P282MB3522184CBE0EA98D16600AB7A87A9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+Message-ID: <ME3P282MB3522BD848D186E120E27A703A87B9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230514/fac5eb37/attachment-0002.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: 1111.png
+Type: image/png
+Size: 38170 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230514/fac5eb37/attachment-0002.png>
+
+From chuwe|||n90 @end|ng |rom hotm@||@com  Sun May 14 02:55:23 2023
+From: chuwe|||n90 @end|ng |rom hotm@||@com (chuweilin90)
+Date: Sun, 14 May 2023 08:55:23 +0800
+Subject: [R-meta] experiencing an problem in using metafor
+In-Reply-To: <ME3P282MB3522184CBE0EA98D16600AB7A87A9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+References: <ME3P282MB3522184CBE0EA98D16600AB7A87A9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+Message-ID: <ME3P282MB3522BD848D186E120E27A703A87B9@ME3P282MB3522.AUSP282.PROD.OUTLOOK.COM>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230514/fac5eb37/attachment-0003.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: 1111.png
+Type: image/png
+Size: 38170 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230514/fac5eb37/attachment-0003.png>
+
+From d|egothen @end|ng |rom gm@||@com  Fri May 19 18:03:41 2023
+From: d|egothen @end|ng |rom gm@||@com (=?UTF-8?Q?Diego_Gallego_Garc=C3=ADa?=)
+Date: Fri, 19 May 2023 13:03:41 -0300
+Subject: [R-meta] Issues when using rma.mv
+Message-ID: <CA+YMh51dPn-sW8B_a6ymF-sXzZZ6Mg8TAQpFp5GHc5wYy+5vaA@mail.gmail.com>
+
+Good morning,
+
+First post here, so I apologize if I do not explain my issue in the
+best way.
+
+I am currently conducting a review on the length of the dependence period
+(time that the nestling spends with parents) in birds. I want to test which
+ecological factors affect this variable.
+
+My raw dataset has one row per species and per study (i.e., there are some
+studies which account for more than one species, so I separate each species
+studied in each research), with its corresponding variables of the
+dependence period (PD: days), SD, N (number of individuals studied), etc...
+My raw dataset should look like this (dummy data):
+
+Study_ID       Species      Latitude     Body weight      Status
+          DP        N        SD
+1                    A                       50                3.4
+      Resident              45          3        1.81
+2                    A                       38                3.4
+      Migrant                32          1         N/A
+2                    B                        43               2.1
+      Migrant                33         11       3.45
+3                    B                        38               2.1
+      Resident               38          6        2.45
+3                    C                        12               3.6
+     Resident               159        2         0
+
+Now, as you may see, there are some studies with an n=1 (only one
+individual was examined), so there is no valid SD for the study (i.e.,
+N/A). Thus, for the escalc() formula, I should delete them. But what about
+the last example? There were two individuals studied in that paper, and
+both yielded the same result, so the SD is roughly 0.
+
+Afterwards, when using rma.mv for a mixed-effects model, those studies with
+SD=0 (then vi=0) are giving me problems. Specifically, there are some
+warnings in my models:
+
+Warning messages:
+1: There are outcomes with non-positive sampling variances.
+2: 'V' appears to be not positive definite.
+
+The model is the following:
+p1 <- rma.mv(data$yi, data$vi, mods= ~Latitude*Status,
+               random=~1|Species, data=data)
+
+Should I be worried about these warnings? Any way to fix them?
+
+I appreciate any help.
+Best,
+*MSc Diego Gallego Garc?a*
+
+Proyecto ?guila del Chaco - Chaco Eagle Project
+Center for the Study and Conservation of Raptors in Argentina *(CECARA)*
+Institute of Earth and Environmental Sciences of La Pampa *(INCITAP)*
+National Scientific and Technical Research Council *(CONICET)*
+
+<https://www.instagram.com/proyectoaguilachaco/>
+
+diegothen at gmail.com
+https://www.researchgate.net/profile/Diego_Gallego_Garcia
+
+	[[alternative HTML version deleted]]
+
+
+From m@@|e|n @end|ng |rom zoo|ogy@ubc@c@  Sat May 20 01:49:03 2023
+From: m@@|e|n @end|ng |rom zoo|ogy@ubc@c@ (Slein, Margaret)
+Date: Fri, 19 May 2023 23:49:03 +0000
+Subject: [R-meta] Questions about interpreting the intercept in a rma.mv
+ model
+Message-ID: <ABD5E967-719C-45B2-9AF0-2B3D7BC5B6E6@mail.ubc.ca>
+
+Hello,
+
+Currently working on a meta-analysis and wondering about how to interpret the intercept in a rma.mv output with lnRR as the effect size and several binary categorical moderators? When I put in the -1 to remove the intercept, it doesn?t provide the full estimates for levels across all categorical moderators? How do I get the model output to provide estimates for all levels of all categorical moderators ? is there an additional argument for this?
+
+Any help would be greatly appreciated.
+
+Cheers,
+Maggie
+
+	[[alternative HTML version deleted]]
+
+
+From rnorouz|@n @end|ng |rom gm@||@com  Sat May 20 03:38:17 2023
+From: rnorouz|@n @end|ng |rom gm@||@com (Reza Norouzian)
+Date: Fri, 19 May 2023 20:38:17 -0500
+Subject: [R-meta] Questions about interpreting the intercept in a rma.mv
+ model
+In-Reply-To: <ABD5E967-719C-45B2-9AF0-2B3D7BC5B6E6@mail.ubc.ca>
+References: <ABD5E967-719C-45B2-9AF0-2B3D7BC5B6E6@mail.ubc.ca>
+Message-ID: <CAKt3tz=vVTyGpjMa_EAZR5tpqQy2AqoSeKoeUTVrVDfrkmvMNQ@mail.gmail.com>
+
+Dear Maggie,
+
+This question has come up with some frequency on the list. For
+example, in the archives
+(https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/subject.html),
+I found the following post:
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004552.html
+which, I believe, exactly answers your questions.
+
+Kind regards,
+Reza
+
+
+
+On Fri, May 19, 2023 at 6:49?PM Slein, Margaret via
+R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+>
+> Hello,
+>
+> Currently working on a meta-analysis and wondering about how to interpret the intercept in a rma.mv output with lnRR as the effect size and several binary categorical moderators? When I put in the -1 to remove the intercept, it doesn?t provide the full estimates for levels across all categorical moderators? How do I get the model output to provide estimates for all levels of all categorical moderators ? is there an additional argument for this?
+>
+> Any help would be greatly appreciated.
+>
+> Cheers,
+> Maggie
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Sat May 20 15:23:39 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Sat, 20 May 2023 14:23:39 +0100
+Subject: [R-meta] Issues when using rma.mv
+In-Reply-To: <CA+YMh51dPn-sW8B_a6ymF-sXzZZ6Mg8TAQpFp5GHc5wYy+5vaA@mail.gmail.com>
+References: <CA+YMh51dPn-sW8B_a6ymF-sXzZZ6Mg8TAQpFp5GHc5wYy+5vaA@mail.gmail.com>
+Message-ID: <1c05fde2-af53-1858-618d-1e66b3bd7f41@dewey.myzen.co.uk>
+
+Dear Diego
+
+If you have all the raw data why do you not just analyse this as a 
+multi-level mode (or mixed effects model)? Perhaps I have misunderstood 
+here.
+
+Incidentally your mailer is set to send HTML so your post is mangled 
+since this is a plain text list.
+
+Michael
+
+On 19/05/2023 17:03, Diego Gallego Garc?a via R-sig-meta-analysis wrote:
+> Good morning,
+> 
+> First post here, so I apologize if I do not explain my issue in the
+> best way.
+> 
+> I am currently conducting a review on the length of the dependence period
+> (time that the nestling spends with parents) in birds. I want to test which
+> ecological factors affect this variable.
+> 
+> My raw dataset has one row per species and per study (i.e., there are some
+> studies which account for more than one species, so I separate each species
+> studied in each research), with its corresponding variables of the
+> dependence period (PD: days), SD, N (number of individuals studied), etc...
+> My raw dataset should look like this (dummy data):
+> 
+> Study_ID       Species      Latitude     Body weight      Status
+>            DP        N        SD
+> 1                    A                       50                3.4
+>        Resident              45          3        1.81
+> 2                    A                       38                3.4
+>        Migrant                32          1         N/A
+> 2                    B                        43               2.1
+>        Migrant                33         11       3.45
+> 3                    B                        38               2.1
+>        Resident               38          6        2.45
+> 3                    C                        12               3.6
+>       Resident               159        2         0
+> 
+> Now, as you may see, there are some studies with an n=1 (only one
+> individual was examined), so there is no valid SD for the study (i.e.,
+> N/A). Thus, for the escalc() formula, I should delete them. But what about
+> the last example? There were two individuals studied in that paper, and
+> both yielded the same result, so the SD is roughly 0.
+> 
+> Afterwards, when using rma.mv for a mixed-effects model, those studies with
+> SD=0 (then vi=0) are giving me problems. Specifically, there are some
+> warnings in my models:
+> 
+> Warning messages:
+> 1: There are outcomes with non-positive sampling variances.
+> 2: 'V' appears to be not positive definite.
+> 
+> The model is the following:
+> p1 <- rma.mv(data$yi, data$vi, mods= ~Latitude*Status,
+>                 random=~1|Species, data=data)
+> 
+> Should I be worried about these warnings? Any way to fix them?
+> 
+> I appreciate any help.
+> Best,
+> *MSc Diego Gallego Garc?a*
+> 
+> Proyecto ?guila del Chaco - Chaco Eagle Project
+> Center for the Study and Conservation of Raptors in Argentina *(CECARA)*
+> Institute of Earth and Environmental Sciences of La Pampa *(INCITAP)*
+> National Scientific and Technical Research Council *(CONICET)*
+> 
+> <https://www.instagram.com/proyectoaguilachaco/>
+> 
+> diegothen at gmail.com
+> https://www.researchgate.net/profile/Diego_Gallego_Garcia
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From d|egothen @end|ng |rom gm@||@com  Sun May 21 20:32:27 2023
+From: d|egothen @end|ng |rom gm@||@com (=?UTF-8?Q?Diego_Gallego_Garc=C3=ADa?=)
+Date: Sun, 21 May 2023 15:32:27 -0300
+Subject: [R-meta] Issues when using rma.mv
+In-Reply-To: <1c05fde2-af53-1858-618d-1e66b3bd7f41@dewey.myzen.co.uk>
+References: <CA+YMh51dPn-sW8B_a6ymF-sXzZZ6Mg8TAQpFp5GHc5wYy+5vaA@mail.gmail.com>
+ <1c05fde2-af53-1858-618d-1e66b3bd7f41@dewey.myzen.co.uk>
+Message-ID: <CA+YMh53cDHRMwe6ZoTc2YgQgKyeP-xoJxZgcMAk6_Oe4v575Fg@mail.gmail.com>
+
+Hi Michael,
+
+Thanks for your message. The idea of doing a meta-regression is to take
+into account the different effect sizes of each study (i.e., some studies
+have a bigger N, or a more accurate value of the variable that I am
+studying [the SD is higher or lower depending on the accuracy of the
+measurement). Thus, in order to take into account that the different
+studies are not done with the same accuracy, I need a way to "weigh" those
+issues. I may be wrong, but I think that that is the reason why we use
+these types of analyses while doing meta-analyses and reviews. That is why
+I am not doing a classic GLMM. Am I wrong?
+
+I do not know how I can present the data in a better format. My raw data
+(after the review) has different columns (i.e., Study ID, Species,
+Latitude, Body Weight, Migratory Status, DP (Dependence Period) and SD (of
+each study), as well as N (number of individuals studied in each study).
+That is why I am concerned, in my previous question, about the fact that
+different studies have an SD of 0 and, thus, give some issues in the
+warning while doing a rma.mv
+
+I appreciate the help given!
+*MSc Diego Gallego Garc?a*
+
+Proyecto ?guila del Chaco - Chaco Eagle Project
+Center for the Study and Conservation of Raptors in Argentina *(CECARA)*
+Institute of Earth and Environmental Sciences of La Pampa *(INCITAP)*
+National Scientific and Technical Research Council *(CONICET)*
+
+<https://www.instagram.com/proyectoaguilachaco/>
+
+diegothen at gmail.com
+https://www.researchgate.net/profile/Diego_Gallego_Garcia
+
+
+El s?b, 20 may 2023 a las 10:23, Michael Dewey (<lists at dewey.myzen.co.uk>)
+escribi?:
+
+> Dear Diego
+>
+> If you have all the raw data why do you not just analyse this as a
+> multi-level mode (or mixed effects model)? Perhaps I have misunderstood
+> here.
+>
+> Incidentally your mailer is set to send HTML so your post is mangled
+> since this is a plain text list.
+>
+> Michael
+>
+> On 19/05/2023 17:03, Diego Gallego Garc?a via R-sig-meta-analysis wrote:
+> > Good morning,
+> >
+> > First post here, so I apologize if I do not explain my issue in the
+> > best way.
+> >
+> > I am currently conducting a review on the length of the dependence period
+> > (time that the nestling spends with parents) in birds. I want to test
+> which
+> > ecological factors affect this variable.
+> >
+> > My raw dataset has one row per species and per study (i.e., there are
+> some
+> > studies which account for more than one species, so I separate each
+> species
+> > studied in each research), with its corresponding variables of the
+> > dependence period (PD: days), SD, N (number of individuals studied),
+> etc...
+> > My raw dataset should look like this (dummy data):
+> >
+> > Study_ID       Species      Latitude     Body weight      Status
+> >            DP        N        SD
+> > 1                    A                       50                3.4
+> >        Resident              45          3        1.81
+> > 2                    A                       38                3.4
+> >        Migrant                32          1         N/A
+> > 2                    B                        43               2.1
+> >        Migrant                33         11       3.45
+> > 3                    B                        38               2.1
+> >        Resident               38          6        2.45
+> > 3                    C                        12               3.6
+> >       Resident               159        2         0
+> >
+> > Now, as you may see, there are some studies with an n=1 (only one
+> > individual was examined), so there is no valid SD for the study (i.e.,
+> > N/A). Thus, for the escalc() formula, I should delete them. But what
+> about
+> > the last example? There were two individuals studied in that paper, and
+> > both yielded the same result, so the SD is roughly 0.
+> >
+> > Afterwards, when using rma.mv for a mixed-effects model, those studies
+> with
+> > SD=0 (then vi=0) are giving me problems. Specifically, there are some
+> > warnings in my models:
+> >
+> > Warning messages:
+> > 1: There are outcomes with non-positive sampling variances.
+> > 2: 'V' appears to be not positive definite.
+> >
+> > The model is the following:
+> > p1 <- rma.mv(data$yi, data$vi, mods= ~Latitude*Status,
+> >                 random=~1|Species, data=data)
+> >
+> > Should I be worried about these warnings? Any way to fix them?
+> >
+> > I appreciate any help.
+> > Best,
+> > *MSc Diego Gallego Garc?a*
+> >
+> > Proyecto ?guila del Chaco - Chaco Eagle Project
+> > Center for the Study and Conservation of Raptors in Argentina *(CECARA)*
+> > Institute of Earth and Environmental Sciences of La Pampa *(INCITAP)*
+> > National Scientific and Technical Research Council *(CONICET)*
+> >
+> > <https://www.instagram.com/proyectoaguilachaco/>
+> >
+> > diegothen at gmail.com
+> > https://www.researchgate.net/profile/Diego_Gallego_Garcia
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m@@|e|n @end|ng |rom zoo|ogy@ubc@c@  Mon May 22 21:19:12 2023
+From: m@@|e|n @end|ng |rom zoo|ogy@ubc@c@ (Slein, Margaret)
+Date: Mon, 22 May 2023 19:19:12 +0000
+Subject: [R-meta] Questions about interpreting the intercept in a rma.mv
+ model
+In-Reply-To: <CAKt3tz=vVTyGpjMa_EAZR5tpqQy2AqoSeKoeUTVrVDfrkmvMNQ@mail.gmail.com>
+References: <ABD5E967-719C-45B2-9AF0-2B3D7BC5B6E6@mail.ubc.ca>
+ <CAKt3tz=vVTyGpjMa_EAZR5tpqQy2AqoSeKoeUTVrVDfrkmvMNQ@mail.gmail.com>
+Message-ID: <94ED58F6-0ABE-4805-95EF-EC7C1BB50663@mail.ubc.ca>
+
+Hi Reza, 
+Thank you for the speedy reply, I really appreciate it. I have tried running your code from the second link you sent, but I have no luck in running the emmprep function --> am I missing something?
+
+#install the dev version of metafor
+#install.packages("emmeans")
+#install.packages("remotes")
+#remotes::install_github("wviechtb/metafor")
+#remotes::install_github("rvlenth/emmeans", dependencies = TRUE, build_opts = "")
+
+library(metafor)
+library(emmeans)
+
+trial <- rma.mv(yi, vi, mods = ~region + impact, method="ML", random = ~1|study_id, data=heatdome_ROM, dfs = "contain")
+grd <- metafor::emmprep(trial) #this does not run
+grd <- emmeans::emmprep(trial) #this does not run
+grd <- emmprep(trial) #this does not run
+emmeans(grd, ~region+impact)
+
+Any assistance with this would be greatly appreciated.
+
+Cheers, 
+Maggie
+
+
+?On 5/19/23, 6:39 PM, "Reza Norouzian" <rnorouzian at gmail.com <mailto:rnorouzian at gmail.com>> wrote:
+
+
+[CAUTION: Non-UBC Email]
+
+
+Dear Maggie,
+
+
+This question has come up with some frequency on the list. For
+example, in the archives
+(https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/subject.html <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/subject.html>),
+I found the following post:
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004552.html <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004552.html>
+which, I believe, exactly answers your questions.
+
+
+Kind regards,
+Reza
+
+
+
+
+
+
+On Fri, May 19, 2023 at 6:49 PM Slein, Margaret via
+R-sig-meta-analysis <r-sig-meta-analysis at r-project.org <mailto:r-sig-meta-analysis at r-project.org>> wrote:
+>
+> Hello,
+>
+> Currently working on a meta-analysis and wondering about how to interpret the intercept in a rma.mv output with lnRR as the effect size and several binary categorical moderators? When I put in the -1 to remove the intercept, it doesn?t provide the full estimates for levels across all categorical moderators? How do I get the model output to provide estimates for all levels of all categorical moderators ? is there an additional argument for this?
+>
+> Any help would be greatly appreciated.
+>
+> Cheers,
+> Maggie
+>
+> [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org <mailto:R-sig-meta-analysis at r-project.org>
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+
+
+
+
+From rnorouz|@n @end|ng |rom gm@||@com  Mon May 22 22:16:24 2023
+From: rnorouz|@n @end|ng |rom gm@||@com (Reza Norouzian)
+Date: Mon, 22 May 2023 15:16:24 -0500
+Subject: [R-meta] Questions about interpreting the intercept in a rma.mv
+ model
+In-Reply-To: <94ED58F6-0ABE-4805-95EF-EC7C1BB50663@mail.ubc.ca>
+References: <ABD5E967-719C-45B2-9AF0-2B3D7BC5B6E6@mail.ubc.ca>
+ <CAKt3tz=vVTyGpjMa_EAZR5tpqQy2AqoSeKoeUTVrVDfrkmvMNQ@mail.gmail.com>
+ <94ED58F6-0ABE-4805-95EF-EC7C1BB50663@mail.ubc.ca>
+Message-ID: <CAKt3tzmGAPQ380fTbAHowjgyGFa-gKcansvmMESDqEbNU4U5=w@mail.gmail.com>
+
+Hi Maggie,
+
+Without reproducible code, it's difficult to pinpoint what has gone
+wrong on your machine (e.g., an installation problem, a data/model
+issue, or something else).
+
+As an alternative, you can try the code provided in the article linked
+below. There, you'll need to first install the R programs by running
+code snippet #1 on p. 22. Then, you can do:
+
+post_rma(trial, ~region+impact)
+
+It also seems that you're using log response ratios as your effect
+size measure? if so, then in case, you prefer your marginal mean
+estimates to be reported on the original scale (i.e., ratio of the
+means), then you can do:
+
+post_rma(trial, ~region+impact, type = "response")
+
+Kind regards,
+Reza
+
+https://www.researchgate.net/publication/370656317_Meta-analysis_of_Second_Language_Research_with_Complex_Research_Designs
+
+
+Reza Norouzian (he/him/his)
+Senior Researcher for Multilingual Learners | Oregon Department of Education
+
+
+On Mon, May 22, 2023 at 2:19?PM Slein, Margaret <maslein at zoology.ubc.ca> wrote:
+>
+> Hi Reza,
+> Thank you for the speedy reply, I really appreciate it. I have tried running your code from the second link you sent, but I have no luck in running the emmprep function --> am I missing something?
+>
+> #install the dev version of metafor
+> #install.packages("emmeans")
+> #install.packages("remotes")
+> #remotes::install_github("wviechtb/metafor")
+> #remotes::install_github("rvlenth/emmeans", dependencies = TRUE, build_opts = "")
+>
+> library(metafor)
+> library(emmeans)
+>
+> trial <- rma.mv(yi, vi, mods = ~region + impact, method="ML", random = ~1|study_id, data=heatdome_ROM, dfs = "contain")
+> grd <- metafor::emmprep(trial) #this does not run
+> grd <- emmeans::emmprep(trial) #this does not run
+> grd <- emmprep(trial) #this does not run
+> emmeans(grd, ~region+impact)
+>
+> Any assistance with this would be greatly appreciated.
+>
+> Cheers,
+> Maggie
+>
+>
+> ?On 5/19/23, 6:39 PM, "Reza Norouzian" <rnorouzian at gmail.com <mailto:rnorouzian at gmail.com>> wrote:
+>
+>
+> [CAUTION: Non-UBC Email]
+>
+>
+> Dear Maggie,
+>
+>
+> This question has come up with some frequency on the list. For
+> example, in the archives
+> (https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/subject.html <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/subject.html>),
+> I found the following post:
+> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004552.html <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004552.html>
+> which, I believe, exactly answers your questions.
+>
+>
+> Kind regards,
+> Reza
+>
+>
+>
+>
+>
+>
+> On Fri, May 19, 2023 at 6:49 PM Slein, Margaret via
+> R-sig-meta-analysis <r-sig-meta-analysis at r-project.org <mailto:r-sig-meta-analysis at r-project.org>> wrote:
+> >
+> > Hello,
+> >
+> > Currently working on a meta-analysis and wondering about how to interpret the intercept in a rma.mv output with lnRR as the effect size and several binary categorical moderators? When I put in the -1 to remove the intercept, it doesn?t provide the full estimates for levels across all categorical moderators? How do I get the model output to provide estimates for all levels of all categorical moderators ? is there an additional argument for this?
+> >
+> > Any help would be greatly appreciated.
+> >
+> > Cheers,
+> > Maggie
+> >
+> > [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org <mailto:R-sig-meta-analysis at r-project.org>
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+>
+>
+>
+
+
+From Tor|@Pen@ @end|ng |rom @tonybrook@edu  Mon May 22 22:36:51 2023
+From: Tor|@Pen@ @end|ng |rom @tonybrook@edu (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+Date: Mon, 22 May 2023 16:36:51 -0400
+Subject: [R-meta] Question Re: Correcting for Statistical Artifacts
+Message-ID: <CAEmuQj8jRfqpQT_JwC5ksNU0syUSxCNjouFy=LTSVRbhWLgWBA@mail.gmail.com>
+
+Hello Listserv -
+
+I hope this note finds you well.
+
+I am working on a multilevel meta-analysis and a reviewer asked us to
+correct for statistical artifacts (e.g., measurement error).  The reviewer
+cited Wiernik & Dahlke (2020) which includes some code using the metafor
+package.
+
+I am still unclear on a couple of things related to these analyses.  First,
+can one apply these analyses to nested models?  Second, one needs observed
+selection-effect *u* ratios to conduct these models but I am not sure how
+to get these values to consequently conduct the models.  I copied and
+pasted example code from Wiernik & Dahlke (2020) below for reference.  The
+"ux" and "uy" values are the selection-effect *u *ratios.
+
+ma_results_r <-
+  ma_r(ma_method = "ad",
+  rxyi = rxyi,
+  n = n,
+  rxx = rxxi,
+  ryy = ryyi,
+  ux = ux,
+  uy = uy,
+  correct_rxx = TRUE,
+  correct_ryy = TRUE,
+  correct_rr_x = TRUE,
+  correct_rr_y = TRUE,
+  indirect_rr_x = TRUE,
+  indirect_rr_y = TRUE,
+  data = data_r_bvirr)
+
+Any guidance would be greatly appreciated!  Thank you in advance for your
+time and energy on addressing this question.  I especially wanted to get
+input from this group since these analyses are new to me.
+
+Best,
+Tori
+
+-- 
+*Tori Pe?a, Ph.D. *(she/her/ella)
+Cognitive Psychology
+Dept. of Psychology
+Stony Brook University
+Stony Brook, NY 11790-2500
+[image: Stony Brook University logo]
+
+	[[alternative HTML version deleted]]
+
+
+From gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de  Wed May 24 18:09:19 2023
+From: gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de (Dr. Guido Schwarzer)
+Date: Wed, 24 May 2023 16:09:19 +0000
+Subject: [R-meta] [meta] package query: Forest plot displaying the mean
+ weighted effect size with and without the outliers(meta.cont)
+Message-ID: <E9A29FC6-17A3-4124-ADD9-BB516B5F5BA8@uniklinik-freiburg.de>
+
+Ishtiaq,
+
+I have made some substantial changes to metamerge() in the development version of meta.
+
+The following R code should provide the forest plot with the added result.
+
+remotes::install_github("guido-s/meta", ref = "develop")
+library("meta")
+
+set.seed(1909)
+m1 <- metagen(c(8:1, 30, 50), runif(10, 2.5, 3.5), common = FALSE,
+  studlab = LETTERS[1:10], sm = "MD",
+  text.random = "Total (all studies)")
+m2 <- update(m1, exclude = 9:10,
+  text.random = "Total (without outliers)")
+
+m12 <- metamerge(m1, m2, keep = TRUE,
+  text.w.random1 = "RE-all", text.w.random2 = "RE-w/o",
+  taulabel1 = "all", taulabel2 = "w/o",
+  hetlabel1 = "All studies", hetlabel2 = "Without outliers")
+summary(m12)
+
+forest(m12, sortvar = TE)
+
+In addition, there is another function metaadd() which can be used to add some external meta-analysis results, e.g., from a Bayesian analysis, to a meta-analysis object.
+
+Best,
+Guido
+
+
+From Tor|@Pen@ @end|ng |rom @tonybrook@edu  Thu May 25 17:51:23 2023
+From: Tor|@Pen@ @end|ng |rom @tonybrook@edu (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+Date: Thu, 25 May 2023 11:51:23 -0400
+Subject: [R-meta] Question Re: Correcting for Statistical Artifacts
+Message-ID: <CAEmuQj-0hUiycU_GX7Z6JTvO+shvQqg1Dub7s-L0eKe5FAcwfg@mail.gmail.com>
+
+Hello Listserv -
+
+I'm sending this question out again in case it slipped through the cracks:
+
+I am working on a multilevel meta-analysis and a reviewer asked us to
+correct for statistical artifacts (e.g., measurement error).  The reviewer
+cited Wiernik & Dahlke (2020) which includes some code using the metafor
+package.
+
+I am still unclear on a couple of things related to these analyses.  First,
+can one apply these analyses to nested models?  Second, one needs observed
+selection-effect *u* ratios to conduct these models but I am not sure how
+to get these values to consequently conduct the models.  I copied and
+pasted example code from Wiernik & Dahlke (2020) below for reference.  The
+"ux" and "uy" values are the selection-effect *u *ratios.
+
+ma_results_r <-
+  ma_r(ma_method = "ad",
+  rxyi = rxyi,
+  n = n,
+  rxx = rxxi,
+  ryy = ryyi,
+  ux = ux,
+  uy = uy,
+  correct_rxx = TRUE,
+  correct_ryy = TRUE,
+  correct_rr_x = TRUE,
+  correct_rr_y = TRUE,
+  indirect_rr_x = TRUE,
+  indirect_rr_y = TRUE,
+  data = data_r_bvirr)
+
+Any guidance would be greatly appreciated!  Thank you in advance for your
+time and energy on addressing this question.  I especially wanted to get
+input from this group since these analyses are new to me.
+
+Best,
+Tori
+
+-- 
+*Tori Pe?a, Ph.D. *(she/her/ella)
+Cognitive Psychology
+Dept. of Psychology
+Stony Brook University
+Stony Brook, NY 11790-2500
+[image: Stony Brook University logo]
+
+	[[alternative HTML version deleted]]
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Fri May 26 04:01:22 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Fri, 26 May 2023 02:01:22 +0000
+Subject: [R-meta] Question Re: Correcting for Statistical Artifacts
+In-Reply-To: <CAEmuQj-0hUiycU_GX7Z6JTvO+shvQqg1Dub7s-L0eKe5FAcwfg@mail.gmail.com>
+References: <CAEmuQj-0hUiycU_GX7Z6JTvO+shvQqg1Dub7s-L0eKe5FAcwfg@mail.gmail.com>
+Message-ID: <MEAPR01MB54158711FD03C52CC27DA8A19D479@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear Tori
+
+The method mentioned is called bare-bones meta-analysis, which is a common method in the psychological meta-analysis (it is also called psychometric meta-analysis or called Hunter and Schmidt to remind the contributors of this method ).  The core idea is you need to correct for various artifacts in the effect size estimates (mostly in correlation but can be extended to other effect size measures). This includes, for example, using the reliability coefficient to account for measurement error (as suggested by your reviewer), and range restrictions. Schmidt and Hunter?s (2015) is the best reference for this. metafor can implement this with some tricks., But as far as I know there is a dedicated R package to do this, although I have not used it before - psychmeta package.
+
+Best,
+Yefeng
+
+
+________________________________
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Tori Pe?a via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Sent: Friday, 26 May 2023 1:51
+To: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Cc: Tori Pe?a <Tori.Pena at stonybrook.edu>
+Subject: [R-meta] Question Re: Correcting for Statistical Artifacts
+
+Hello Listserv -
+
+I'm sending this question out again in case it slipped through the cracks:
+
+I am working on a multilevel meta-analysis and a reviewer asked us to
+correct for statistical artifacts (e.g., measurement error).  The reviewer
+cited Wiernik & Dahlke (2020) which includes some code using the metafor
+package.
+
+I am still unclear on a couple of things related to these analyses.  First,
+can one apply these analyses to nested models?  Second, one needs observed
+selection-effect *u* ratios to conduct these models but I am not sure how
+to get these values to consequently conduct the models.  I copied and
+pasted example code from Wiernik & Dahlke (2020) below for reference.  The
+"ux" and "uy" values are the selection-effect *u *ratios.
+
+ma_results_r <-
+  ma_r(ma_method = "ad",
+  rxyi = rxyi,
+  n = n,
+  rxx = rxxi,
+  ryy = ryyi,
+  ux = ux,
+  uy = uy,
+  correct_rxx = TRUE,
+  correct_ryy = TRUE,
+  correct_rr_x = TRUE,
+  correct_rr_y = TRUE,
+  indirect_rr_x = TRUE,
+  indirect_rr_y = TRUE,
+  data = data_r_bvirr)
+
+Any guidance would be greatly appreciated!  Thank you in advance for your
+time and energy on addressing this question.  I especially wanted to get
+input from this group since these analyses are new to me.
+
+Best,
+Tori
+
+--
+*Tori Pe?a, Ph.D. *(she/her/ella)
+Cognitive Psychology
+Dept. of Psychology
+Stony Brook University
+Stony Brook, NY 11790-2500
+[image: Stony Brook University logo]
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From rnorouz|@n @end|ng |rom gm@||@com  Fri May 26 05:50:17 2023
+From: rnorouz|@n @end|ng |rom gm@||@com (Reza Norouzian)
+Date: Thu, 25 May 2023 22:50:17 -0500
+Subject: [R-meta] Question Re: Correcting for Statistical Artifacts
+In-Reply-To: <MEAPR01MB54158711FD03C52CC27DA8A19D479@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <CAEmuQj-0hUiycU_GX7Z6JTvO+shvQqg1Dub7s-L0eKe5FAcwfg@mail.gmail.com>
+ <MEAPR01MB54158711FD03C52CC27DA8A19D479@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <CAKt3tz=uvU=+1UPvR3UAVLLiVwK-mrH3GWugcupmQAnR+=G7iQ@mail.gmail.com>
+
+Tori,
+
+You may want to double-check with the psychmeta package's main author
+(Brenton Wiernik), but the methods as implemented in the psychmeta
+package don't seem to handle (multivariate) multilevel meta-regression
+models which broadly incorporate nested models that you're referring
+to.
+
+In addition, the well-known sources of the biases (e.g., measurement
+error, selection bias, ...) can potentially, if not commonly, occur
+together in the primary studies. But the available corrections can't
+simultaneously address those biases together (possibly they assume
+addressing one reduces the negative impact of the other).
+
+Also, I would imagine that the quantity and quality of the information
+needed for these corrections could considerably impact the validity of
+such corrections. In terms of quantity, for instance, if a good number
+of the individual studies don't report their reliability estimates,
+then depending on the situation, one may end up imputing them or
+finding the reliability estimates from sources other than the primary
+studies, if available. These could potentially create either
+difficulty in implementing or uncertainty in terms of how well the
+corrections might work.
+
+In terms of quality, the corrections always work with (use as input)
+*estimates* of, for instance, reliability or correlation reported in
+the primary studies. As such, one may wonder how well those estimates
+have done at representing their own *true values* in the first place
+before being used to correct some source of bias. This again could
+potentially create uncertainty in terms of how well the corrections
+might work in practice.
+
+Kind regards,
+Reza
+
+
+On Thu, May 25, 2023 at 9:01?PM Yefeng Yang via R-sig-meta-analysis
+<r-sig-meta-analysis at r-project.org> wrote:
+>
+> Dear Tori
+>
+> The method mentioned is called bare-bones meta-analysis, which is a common method in the psychological meta-analysis (it is also called psychometric meta-analysis or called Hunter and Schmidt to remind the contributors of this method ).  The core idea is you need to correct for various artifacts in the effect size estimates (mostly in correlation but can be extended to other effect size measures). This includes, for example, using the reliability coefficient to account for measurement error (as suggested by your reviewer), and range restrictions. Schmidt and Hunter?s (2015) is the best reference for this. metafor can implement this with some tricks., But as far as I know there is a dedicated R package to do this, although I have not used it before - psychmeta package.
+>
+> Best,
+> Yefeng
+>
+>
+> ________________________________
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Tori Pe?a via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+> Sent: Friday, 26 May 2023 1:51
+> To: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+> Cc: Tori Pe?a <Tori.Pena at stonybrook.edu>
+> Subject: [R-meta] Question Re: Correcting for Statistical Artifacts
+>
+> Hello Listserv -
+>
+> I'm sending this question out again in case it slipped through the cracks:
+>
+> I am working on a multilevel meta-analysis and a reviewer asked us to
+> correct for statistical artifacts (e.g., measurement error).  The reviewer
+> cited Wiernik & Dahlke (2020) which includes some code using the metafor
+> package.
+>
+> I am still unclear on a couple of things related to these analyses.  First,
+> can one apply these analyses to nested models?  Second, one needs observed
+> selection-effect *u* ratios to conduct these models but I am not sure how
+> to get these values to consequently conduct the models.  I copied and
+> pasted example code from Wiernik & Dahlke (2020) below for reference.  The
+> "ux" and "uy" values are the selection-effect *u *ratios.
+>
+> ma_results_r <-
+>   ma_r(ma_method = "ad",
+>   rxyi = rxyi,
+>   n = n,
+>   rxx = rxxi,
+>   ryy = ryyi,
+>   ux = ux,
+>   uy = uy,
+>   correct_rxx = TRUE,
+>   correct_ryy = TRUE,
+>   correct_rr_x = TRUE,
+>   correct_rr_y = TRUE,
+>   indirect_rr_x = TRUE,
+>   indirect_rr_y = TRUE,
+>   data = data_r_bvirr)
+>
+> Any guidance would be greatly appreciated!  Thank you in advance for your
+> time and energy on addressing this question.  I especially wanted to get
+> input from this group since these analyses are new to me.
+>
+> Best,
+> Tori
+>
+> --
+> *Tori Pe?a, Ph.D. *(she/her/ella)
+> Cognitive Psychology
+> Dept. of Psychology
+> Stony Brook University
+> Stony Brook, NY 11790-2500
+> [image: Stony Brook University logo]
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Sun May 28 13:41:35 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Sun, 28 May 2023 11:41:35 +0000
+Subject: [R-meta] account for uncertainty of predictors in meta-analysis
+Message-ID: <MEAPR01MB54153CEA38043B5E1991DCFA9D459@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear community,
+
+Do any experts have any ideas on how to use univariate methods to quantify the (bivariate) relationship between the two true outcomes? I know multivariate meta-analysis can do this. But I am asking whether it is possible to use any univariate methods to do this. See the details below based on an example dataset from metafor.
+
+Suppose my dataset has two outcomes PD and AL, which are contained in the column "outcome" in the dataset. Now I want to estimate the correlation or covariance between PD and AL.
+
+The multivariate approach is as follows:
+dat <- dat.berkey1998 # dataset from metafor
+rma.mv(yi, V, mods = ~ outcome - 1, random = ~ outcome | trial, struct="UN", data=dat)
+The correlation between the random effects in the output is the parameter of my interest.
+
+If we reshape the dataset to create two columns to contain PD and AL, separately, we can use an univariate method to estimate the correlation between them:
+rma.mv(PD ~ AL, V, random = ~ 1 | study/trial, data=dat)
+
+But in this way, we do not account for the uncertainty in AL. Or more precisely, the sampling variance in AL is not accounted for. So the estimated model coefficient is a sort of overall correlation between PD and AL, which is a sort of weighted average of correlation between true PD and AL and estimated PD and AL. Except for the Bayesian method (which uses the trick of measurement error), any solutions for this? This question can be generalized as when using estimated effect size or outcomes as predictors in the context of meta-analysis, what are the potential or best practices? Very much appreciate any comments.
+
+Best,
+Yefeng
+
+
+	[[alternative HTML version deleted]]
+
+
+From m|kew|cheung @end|ng |rom gm@||@com  Mon May 29 10:43:33 2023
+From: m|kew|cheung @end|ng |rom gm@||@com (Mike Cheung)
+Date: Mon, 29 May 2023 16:43:33 +0800
+Subject: [R-meta] account for uncertainty of predictors in meta-analysis
+In-Reply-To: <MEAPR01MB54153CEA38043B5E1991DCFA9D459@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB54153CEA38043B5E1991DCFA9D459@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <CADF7-FPu89rJ6R_LBjSwjzRxTAHUc=kHttQ0rS2b_eb4pFJa6A@mail.gmail.com>
+
+Hi Yefeng,
+
+Covariates in meta-regression are treated as a design matrix. I do not see
+how it can handle covariates with sampling variances.
+
+A structural equation modeling (SEM) approach can easily handle it. You may
+refer to
+https://stats.stackexchange.com/questions/58310/can-i-include-an-effect-size-as-an-independent-variable-in-a-meta-regression/58534
+for a discussion.
+
+Best,
+Mike
+
+On Sun, May 28, 2023 at 7:42?PM Yefeng Yang via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> Dear community,
+>
+> Do any experts have any ideas on how to use univariate methods to quantify
+> the (bivariate) relationship between the two true outcomes? I know
+> multivariate meta-analysis can do this. But I am asking whether it is
+> possible to use any univariate methods to do this. See the details below
+> based on an example dataset from metafor.
+>
+> Suppose my dataset has two outcomes PD and AL, which are contained in the
+> column "outcome" in the dataset. Now I want to estimate the correlation or
+> covariance between PD and AL.
+>
+> The multivariate approach is as follows:
+> dat <- dat.berkey1998 # dataset from metafor
+> rma.mv(yi, V, mods = ~ outcome - 1, random = ~ outcome | trial,
+> struct="UN", data=dat)
+> The correlation between the random effects in the output is the parameter
+> of my interest.
+>
+> If we reshape the dataset to create two columns to contain PD and AL,
+> separately, we can use an univariate method to estimate the correlation
+> between them:
+> rma.mv(PD ~ AL, V, random = ~ 1 | study/trial, data=dat)
+>
+> But in this way, we do not account for the uncertainty in AL. Or more
+> precisely, the sampling variance in AL is not accounted for. So the
+> estimated model coefficient is a sort of overall correlation between PD and
+> AL, which is a sort of weighted average of correlation between true PD and
+> AL and estimated PD and AL. Except for the Bayesian method (which uses the
+> trick of measurement error), any solutions for this? This question can be
+> generalized as when using estimated effect size or outcomes as predictors
+> in the context of meta-analysis, what are the potential or best practices?
+> Very much appreciate any comments.
+>
+> Best,
+> Yefeng
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From rnorouz|@n @end|ng |rom gm@||@com  Wed May 31 06:35:17 2023
+From: rnorouz|@n @end|ng |rom gm@||@com (Reza Norouzian)
+Date: Tue, 30 May 2023 23:35:17 -0500
+Subject: [R-meta] account for uncertainty of predictors in meta-analysis
+In-Reply-To: <CADF7-FPu89rJ6R_LBjSwjzRxTAHUc=kHttQ0rS2b_eb4pFJa6A@mail.gmail.com>
+References: <MEAPR01MB54153CEA38043B5E1991DCFA9D459@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <CADF7-FPu89rJ6R_LBjSwjzRxTAHUc=kHttQ0rS2b_eb4pFJa6A@mail.gmail.com>
+Message-ID: <CAKt3tz=uWd=-ENBTvUXo_APWVrSfr10EeE5JK=PvKSCL2w2LsA@mail.gmail.com>
+
+Yefeng,
+
+Along the same lines, I believe metafor gained the matreg() function a
+while back for conducting *post-hoc* latent regression from rma.mv()
+models. Using this approach, you can regress any of your outcome
+categories on another one and obtain a regression coefficient for it
+(code below).
+
+Kind regards,
+Reza
+
+V <- vcalc(vi=1, cluster=author, rvars=c(v1i, v2i), data=dat.berkey1998)
+
+mvml = rma.mv(yi, V, mods = ~ outcome + 0,
+              random = ~ outcome | trial, struct="UN",
+              data=dat.berkey1998,
+              method="ML", cvvc="varcov", control=list(nearpd=TRUE))
+
+# Predicting AL from PD:
+matreg(y="AL", x="PD", R=mvml$G, cov=TRUE, means=coef(mvml), V=mvml$vvc)
+
+# Predicting PD from AL:
+matreg(y="PD", x="AL", R=mvml$G, cov=TRUE, means=coef(mvml), V=mvml$vvc)
+
+
+On Mon, May 29, 2023 at 3:43?AM Mike Cheung via R-sig-meta-analysis
+<r-sig-meta-analysis at r-project.org> wrote:
+>
+> Hi Yefeng,
+>
+> Covariates in meta-regression are treated as a design matrix. I do not see
+> how it can handle covariates with sampling variances.
+>
+> A structural equation modeling (SEM) approach can easily handle it. You may
+> refer to
+> https://stats.stackexchange.com/questions/58310/can-i-include-an-effect-size-as-an-independent-variable-in-a-meta-regression/58534
+> for a discussion.
+>
+> Best,
+> Mike
+>
+> On Sun, May 28, 2023 at 7:42?PM Yefeng Yang via R-sig-meta-analysis <
+> r-sig-meta-analysis at r-project.org> wrote:
+>
+> > Dear community,
+> >
+> > Do any experts have any ideas on how to use univariate methods to quantify
+> > the (bivariate) relationship between the two true outcomes? I know
+> > multivariate meta-analysis can do this. But I am asking whether it is
+> > possible to use any univariate methods to do this. See the details below
+> > based on an example dataset from metafor.
+> >
+> > Suppose my dataset has two outcomes PD and AL, which are contained in the
+> > column "outcome" in the dataset. Now I want to estimate the correlation or
+> > covariance between PD and AL.
+> >
+> > The multivariate approach is as follows:
+> > dat <- dat.berkey1998 # dataset from metafor
+> > rma.mv(yi, V, mods = ~ outcome - 1, random = ~ outcome | trial,
+> > struct="UN", data=dat)
+> > The correlation between the random effects in the output is the parameter
+> > of my interest.
+> >
+> > If we reshape the dataset to create two columns to contain PD and AL,
+> > separately, we can use an univariate method to estimate the correlation
+> > between them:
+> > rma.mv(PD ~ AL, V, random = ~ 1 | study/trial, data=dat)
+> >
+> > But in this way, we do not account for the uncertainty in AL. Or more
+> > precisely, the sampling variance in AL is not accounted for. So the
+> > estimated model coefficient is a sort of overall correlation between PD and
+> > AL, which is a sort of weighted average of correlation between true PD and
+> > AL and estimated PD and AL. Except for the Bayesian method (which uses the
+> > trick of measurement error), any solutions for this? This question can be
+> > generalized as when using estimated effect size or outcomes as predictors
+> > in the context of meta-analysis, what are the potential or best practices?
+> > Very much appreciate any comments.
+> >
+> > Best,
+> > Yefeng
+> >
+> >
+> >         [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+

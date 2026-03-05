@@ -1,0 +1,2536 @@
+From edelponte at gmail.com  Fri Dec  1 13:06:18 2017
+From: edelponte at gmail.com (Emerson M. Del Ponte)
+Date: Fri, 1 Dec 2017 07:06:18 -0500
+Subject: [R-meta] MA of regression coefficients (as accuracy indicators) in
+ pre-post test
+Message-ID: <CFD70E72-E697-40C8-BC66-FE82A5A2D283@gmail.com>
+
+Dear All,
+
+I have collected data from primary studies where an assessment aid (diagrams) was developed and tested for improvements in accuracy and precision of visual assessments (% leaf area affected - disease symptoms) compared with unaided ones.
+
+A  sample of raters was used in each study (varied across studies). Each rater made two assessments (estimates of % leaf affected area) for a same sample of leaves (a range of values from 0 to 100%), first unaided (und) and then aided (aid) (pre-post test). 
+
+Visual estimates from each assessment (e.g. 50 ratings) were regressed against ?actual? values. Regression coefficients (beta1 and beta1) are measures of accuracy and the correlation coefficient (r) is a measure of precision. So, I have three variables for each rater.
+
+The data look like this:
+
+Study Rater	r_und	r_aid
+1		1	0.65		0.76
+1		2	0.76		0.90
+1		3 	0.80		0.90
+.		.	.		.
+
+Wolfgang has kindly helped me (more than two years ago!) to preliminary fit a multi-level model in metafor to summarize the gains precision (correlation coefficients). The effect-size was the absolute difference (r_aided - r_unaided) and there was a way to calculate sampling variance. 
+
+This worked fine, but I have been struggling to define what would be the appropriate approach to analyze gains in accuracy using beta1 and beta1. In a primary study, vote-couting was used to infer on the value of the aid based on number of raters with significant (P = 0.05) departures of beta1 and beta2 from 0 and 1, respectively, both unaided and aided. 
+
+My problem is that I cannot calculate an index (such as concordance correlation) for accuracy because raw data was not available (I have the correlation coefficient, which explains in part the overall accuracy or concordance). So, I don?t think that an estimate of absolute difference in beta1 and beta2 between aided and unaided estimate for each rater make sense? I can see (histograms) that, in general, b1 and b2 are closer to 0 and 1, respectively when using the aid. 
+
+What I did so far was to aggregate (means) each coefficients by study to then obtain the sampling variance (raters as samples) for the study. Then, a bivariate model was fitted to these data from k studies and the estimates of b1 and b2 were obtained for each condition. The data looks exactly like shown above, but with b1_und and b1_aid, etc. 
+
+I am not sure if there is a better way to analyze these data. Ideally, I would like to be able to calculate the concordance coefficient (which includes the correlation coefficient) but this seems not possible without the raw data.  What I have allows me to analyze separately precision and accuracy, but while the former seems OK (I have an effect-size and sampling variance for each rater), I am not sure how to better estimate gains in accuracy using the regression coefficients.
+
+Any thoughts or examples on this?
+
+Thanks,
+
+Emerson
+
+Prof. Emerson M. Del Ponte
+Departamento de Fitopatologia
+Universidade Federal de Vi?osa
+Vi?osa, MG - Brasil
++55 (31) 3899-1103
+Twitter: @edelponte	
+
+
+From matilde.vaghi at gmail.com  Fri Dec  1 12:43:04 2017
+From: matilde.vaghi at gmail.com (Matilde Vaghi)
+Date: Fri, 1 Dec 2017 11:43:04 +0000
+Subject: [R-meta] metafor-mota-analysis with between group moderator
+Message-ID: <CAJn-jwPJOtYyHFyb5-WzApxKxauTL4myj5DzXS1o5=JEE-mQqg@mail.gmail.com>
+
+Dear all,
+
+
+I am using metafor to conduct a between group meta-analysis to test if
+there is a difference between groups (controls vs. patients) on the
+continuous independent variable y.
+
+
+I need to check the influence of relevant moderator, in particular I obtain
+a between group difference on the variable y and I want to check if the
+finding remains significant after account for the effect of age (if the
+difference in the independent variable y is still difference once adjusted
+for age).
+
+
+On the metafor manual, a clear example shows how to assess the effect of a
+moderator (such as latitude) on the variable of interest. However, such
+example refers to the presence of a study-level moderator (each study was
+conducted at a different latitude, therefore one value is associated to
+each study). In my case, each study have two values (i.e, mean age controls
+and mean age patients). Therefore, it is not immediately clear how to adapt
+the following
+
+
+Rma(yi, vi, mods=cbind(Latitude), data=df)
+
+
+for situations in which there is one moderator variable but two values
+associated to it for each study. I tentatively computed a mean age per
+study ((mean age controls for study 1+ mean age patients for study1)/2;
+((mean age controls for study 2+ mean age patients for study2)/2 etc) to
+have one value per study but I am not sure this is the best way forward.
+
+
+Any advice would be highly appreciated. Many thanks and best wishes,
+
+Matilde
+
+	[[alternative HTML version deleted]]
+
+
+From jepusto at gmail.com  Fri Dec  1 15:37:57 2017
+From: jepusto at gmail.com (James Pustejovsky)
+Date: Fri, 1 Dec 2017 08:37:57 -0600
+Subject: [R-meta] MA of regression coefficients (as accuracy indicators)
+ in pre-post test
+In-Reply-To: <CFD70E72-E697-40C8-BC66-FE82A5A2D283@gmail.com>
+References: <CFD70E72-E697-40C8-BC66-FE82A5A2D283@gmail.com>
+Message-ID: <CAFUVuJwPihLrwi2jxRCi=E6ywi7a3CoeXCGzpme5nyqCUUggrA@mail.gmail.com>
+
+Emerson,
+
+Two quick questions to see if there is an easy solution:
+1) Do you mean Lin's concordance correlation (DOI: 10.2307/2532051)?
+2) Do you have (or can you extract) the means of the pre-test or post-test
+values for each rater?
+If the answers to both questions are "yes" then it is possible to compute
+an estimate of the concordance correlation from the available summary
+statistics.
+
+James
+
+On Fri, Dec 1, 2017 at 6:06 AM, Emerson M. Del Ponte <edelponte at gmail.com>
+wrote:
+
+> Dear All,
+>
+> I have collected data from primary studies where an assessment aid
+> (diagrams) was developed and tested for improvements in accuracy and
+> precision of visual assessments (% leaf area affected - disease symptoms)
+> compared with unaided ones.
+>
+> A  sample of raters was used in each study (varied across studies). Each
+> rater made two assessments (estimates of % leaf affected area) for a same
+> sample of leaves (a range of values from 0 to 100%), first unaided (und)
+> and then aided (aid) (pre-post test).
+>
+> Visual estimates from each assessment (e.g. 50 ratings) were regressed
+> against ?actual? values. Regression coefficients (beta1 and beta1) are
+> measures of accuracy and the correlation coefficient (r) is a measure of
+> precision. So, I have three variables for each rater.
+>
+> The data look like this:
+>
+> Study Rater     r_und   r_aid
+> 1               1       0.65            0.76
+> 1               2       0.76            0.90
+> 1               3       0.80            0.90
+> .               .       .               .
+>
+> Wolfgang has kindly helped me (more than two years ago!) to preliminary
+> fit a multi-level model in metafor to summarize the gains precision
+> (correlation coefficients). The effect-size was the absolute difference
+> (r_aided - r_unaided) and there was a way to calculate sampling variance.
+>
+> This worked fine, but I have been struggling to define what would be the
+> appropriate approach to analyze gains in accuracy using beta1 and beta1. In
+> a primary study, vote-couting was used to infer on the value of the aid
+> based on number of raters with significant (P = 0.05) departures of beta1
+> and beta2 from 0 and 1, respectively, both unaided and aided.
+>
+> My problem is that I cannot calculate an index (such as concordance
+> correlation) for accuracy because raw data was not available (I have the
+> correlation coefficient, which explains in part the overall accuracy or
+> concordance). So, I don?t think that an estimate of absolute difference in
+> beta1 and beta2 between aided and unaided estimate for each rater make
+> sense? I can see (histograms) that, in general, b1 and b2 are closer to 0
+> and 1, respectively when using the aid.
+>
+> What I did so far was to aggregate (means) each coefficients by study to
+> then obtain the sampling variance (raters as samples) for the study. Then,
+> a bivariate model was fitted to these data from k studies and the estimates
+> of b1 and b2 were obtained for each condition. The data looks exactly like
+> shown above, but with b1_und and b1_aid, etc.
+>
+> I am not sure if there is a better way to analyze these data. Ideally, I
+> would like to be able to calculate the concordance coefficient (which
+> includes the correlation coefficient) but this seems not possible without
+> the raw data.  What I have allows me to analyze separately precision and
+> accuracy, but while the former seems OK (I have an effect-size and sampling
+> variance for each rater), I am not sure how to better estimate gains in
+> accuracy using the regression coefficients.
+>
+> Any thoughts or examples on this?
+>
+> Thanks,
+>
+> Emerson
+>
+> Prof. Emerson M. Del Ponte
+> Departamento de Fitopatologia
+> Universidade Federal de Vi?osa
+> Vi?osa, MG - Brasil
+> +55 (31) 3899-1103 <+55%2031%203899-1103>
+> Twitter: @edelponte
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From lists at dewey.myzen.co.uk  Fri Dec  1 17:20:18 2017
+From: lists at dewey.myzen.co.uk (Michael Dewey)
+Date: Fri, 1 Dec 2017 16:20:18 +0000
+Subject: [R-meta] metafor-mota-analysis with between group moderator
+In-Reply-To: <CAJn-jwPJOtYyHFyb5-WzApxKxauTL4myj5DzXS1o5=JEE-mQqg@mail.gmail.com>
+References: <CAJn-jwPJOtYyHFyb5-WzApxKxauTL4myj5DzXS1o5=JEE-mQqg@mail.gmail.com>
+Message-ID: <b2a3d38f-ea4e-6a17-4a58-9604b9c9a205@dewey.myzen.co.uk>
+
+Dear Matilde
+
+I think you may need to use the so-called bivariate approach
+
+http://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+
+The example there is not identical to your problem but I think it is 
+close enough. If Wolfgang does not post saying I am talking rubbish then 
+try it and post again with any more queries.
+
+Michael
+
+On 01/12/2017 11:43, Matilde Vaghi wrote:
+> Dear all,
+> 
+> 
+> I am using metafor to conduct a between group meta-analysis to test if
+> there is a difference between groups (controls vs. patients) on the
+> continuous independent variable y.
+> 
+> 
+> I need to check the influence of relevant moderator, in particular I obtain
+> a between group difference on the variable y and I want to check if the
+> finding remains significant after account for the effect of age (if the
+> difference in the independent variable y is still difference once adjusted
+> for age).
+> 
+> 
+> On the metafor manual, a clear example shows how to assess the effect of a
+> moderator (such as latitude) on the variable of interest. However, such
+> example refers to the presence of a study-level moderator (each study was
+> conducted at a different latitude, therefore one value is associated to
+> each study). In my case, each study have two values (i.e, mean age controls
+> and mean age patients). Therefore, it is not immediately clear how to adapt
+> the following
+> 
+> 
+> Rma(yi, vi, mods=cbind(Latitude), data=df)
+> 
+> 
+> for situations in which there is one moderator variable but two values
+> associated to it for each study. I tentatively computed a mean age per
+> study ((mean age controls for study 1+ mean age patients for study1)/2;
+> ((mean age controls for study 2+ mean age patients for study2)/2 etc) to
+> have one value per study but I am not sure this is the best way forward.
+> 
+> 
+> Any advice would be highly appreciated. Many thanks and best wishes,
+> 
+> Matilde
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From wolfgang.viechtbauer at maastrichtuniversity.nl  Fri Dec  1 18:49:43 2017
+From: wolfgang.viechtbauer at maastrichtuniversity.nl (Viechtbauer Wolfgang (SP))
+Date: Fri, 1 Dec 2017 17:49:43 +0000
+Subject: [R-meta] metafor-mota-analysis with between group moderator
+In-Reply-To: <b2a3d38f-ea4e-6a17-4a58-9604b9c9a205@dewey.myzen.co.uk>
+References: <CAJn-jwPJOtYyHFyb5-WzApxKxauTL4myj5DzXS1o5=JEE-mQqg@mail.gmail.com>
+ <b2a3d38f-ea4e-6a17-4a58-9604b9c9a205@dewey.myzen.co.uk>
+Message-ID: <5f74758d6ac342e898bf7aaec5fd1588@UM-MAIL3216.unimaas.nl>
+
+Indeed, this might be one approach.
+
+But what is it that you want to examine, Matilde? 
+
+Whether the difference between the two groups (with respect to variable y) is associated with the average age of the total sample? Then computing the mean age (but maybe computing a weighted average of the mean age of the two groups in case the groups are not of equal size) and using that as a moderator is fine.
+
+But it sounds to me like you are wondering if the difference between the two groups (with respect to variable y) might be a confound of the two groups having different mean ages. In that case, you could use the *difference* in the mean age of the two groups as a moderator.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Michael Dewey
+Sent: Friday, 01 December, 2017 17:20
+To: Matilde Vaghi; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] metafor-mota-analysis with between group moderator
+
+Dear Matilde
+
+I think you may need to use the so-called bivariate approach
+
+http://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+
+The example there is not identical to your problem but I think it is 
+close enough. If Wolfgang does not post saying I am talking rubbish then 
+try it and post again with any more queries.
+
+Michael
+
+On 01/12/2017 11:43, Matilde Vaghi wrote:
+> Dear all,
+> 
+> I am using metafor to conduct a between group meta-analysis to test if
+> there is a difference between groups (controls vs. patients) on the
+> continuous independent variable y.
+> 
+> I need to check the influence of relevant moderator, in particular I obtain
+> a between group difference on the variable y and I want to check if the
+> finding remains significant after account for the effect of age (if the
+> difference in the independent variable y is still difference once adjusted
+> for age).
+> 
+> On the metafor manual, a clear example shows how to assess the effect of a
+> moderator (such as latitude) on the variable of interest. However, such
+> example refers to the presence of a study-level moderator (each study was
+> conducted at a different latitude, therefore one value is associated to
+> each study). In my case, each study have two values (i.e, mean age controls
+> and mean age patients). Therefore, it is not immediately clear how to adapt
+> the following
+> 
+> Rma(yi, vi, mods=cbind(Latitude), data=df)
+> 
+> for situations in which there is one moderator variable but two values
+> associated to it for each study. I tentatively computed a mean age per
+> study ((mean age controls for study 1+ mean age patients for study1)/2;
+> ((mean age controls for study 2+ mean age patients for study2)/2 etc) to
+> have one value per study but I am not sure this is the best way forward.
+> 
+> Any advice would be highly appreciated. Many thanks and best wishes,
+> 
+> Matilde
+
+
+From edelponte at gmail.com  Fri Dec  1 20:25:13 2017
+From: edelponte at gmail.com (Emerson M. Del Ponte)
+Date: Fri, 1 Dec 2017 14:25:13 -0500
+Subject: [R-meta] MA of regression coefficients (as accuracy indicators)
+ in pre-post test
+Message-ID: <E7F5ECEE-2133-4EB2-AA21-67B96E8E2DDB@gmail.com>
+
+James,
+1) Yes, and I have the Lin?s CCC for about 15% of the articles for which I have the raw data, or all estimates for the sample of leaves for each rater.
+2) No, what I have is only the regression coefficients and correlation coefficient (Pearson?s r)  (estimates regressed again actual values) for each rater. Wonder if there is a way to calculate the Lin?s bias coefficient (Cb) from the intercept and slope? The Lin?s CCC is r * Cb, and I have only r.
+Thanks,
+Emerson
+
+Emerson,
+
+Two quick questions to see if there is an easy solution:
+1) Do you mean Lin's concordance correlation (DOI: 10.2307/2532051)?
+2) Do you have (or can you extract) the means of the pre-test or post-test
+values for each rater?
+If the answers to both questions are "yes" then it is possible to compute
+an estimate of the concordance correlation from the available summary
+statistics.
+
+James
+
+On Fri, Dec 1, 2017 at 6:06 AM, Emerson M. Del Ponte <edelponte at gmail.com <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>>
+wrote:
+
+> Dear All,
+>
+> I have collected data from primary studies where an assessment aid
+> (diagrams) was developed and tested for improvements in accuracy and
+> precision of visual assessments (% leaf area affected - disease symptoms)
+> compared with unaided ones.
+>
+> A  sample of raters was used in each study (varied across studies). Each
+> rater made two assessments (estimates of % leaf affected area) for a same
+> sample of leaves (a range of values from 0 to 100%), first unaided (und)
+> and then aided (aid) (pre-post test).
+>
+> Visual estimates from each assessment (e.g. 50 ratings) were regressed
+> against ?actual? values. Regression coefficients (beta1 and beta1) are
+> measures of accuracy and the correlation coefficient (r) is a measure of
+> precision. So, I have three variables for each rater.
+>
+> The data look like this:
+>
+> Study Rater     r_und   r_aid
+> 1               1       0.65            0.76
+> 1               2       0.76            0.90
+> 1               3       0.80            0.90
+> .               .       .               .
+>
+> Wolfgang has kindly helped me (more than two years ago!) to preliminary
+> fit a multi-level model in metafor to summarize the gains precision
+> (correlation coefficients). The effect-size was the absolute difference
+> (r_aided - r_unaided) and there was a way to calculate sampling variance.
+>
+> This worked fine, but I have been struggling to define what would be the
+> appropriate approach to analyze gains in accuracy using beta1 and beta1. In
+> a primary study, vote-couting was used to infer on the value of the aid
+> based on number of raters with significant (P = 0.05) departures of beta1
+> and beta2 from 0 and 1, respectively, both unaided and aided.
+>
+> My problem is that I cannot calculate an index (such as concordance
+> correlation) for accuracy because raw data was not available (I have the
+> correlation coefficient, which explains in part the overall accuracy or
+> concordance). So, I don?t think that an estimate of absolute difference in
+> beta1 and beta2 between aided and unaided estimate for each rater make
+> sense? I can see (histograms) that, in general, b1 and b2 are closer to 0
+> and 1, respectively when using the aid.
+>
+> What I did so far was to aggregate (means) each coefficients by study to
+> then obtain the sampling variance (raters as samples) for the study. Then,
+> a bivariate model was fitted to these data from k studies and the estimates
+> of b1 and b2 were obtained for each condition. The data looks exactly like
+> shown above, but with b1_und and b1_aid, etc.
+>
+> I am not sure if there is a better way to analyze these data. Ideally, I
+> would like to be able to calculate the concordance coefficient (which
+> includes the correlation coefficient) but this seems not possible without
+> the raw data.  What I have allows me to analyze separately precision and
+> accuracy, but while the former seems OK (I have an effect-size and sampling
+> variance for each rater), I am not sure how to better estimate gains in
+> accuracy using the regression coefficients.
+>
+> Any thoughts or examples on this?
+>
+> Thanks,
+>
+> Emerson
+>
+> Prof. Emerson M. Del Ponte
+> Departamento de Fitopatologia
+> Universidade Federal de Vi?osa
+> Vi?osa, MG - Brasil
+> +55 (31) 3899-1103 <+55%2031%203899-1103>
+> Twitter: @edelponte
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+
+	[[alternative HTML version deleted]]
+
+
+	[[alternative HTML version deleted]]
+
+
+From jepusto at gmail.com  Sat Dec  2 04:18:44 2017
+From: jepusto at gmail.com (James Pustejovsky)
+Date: Fri, 1 Dec 2017 21:18:44 -0600
+Subject: [R-meta] MA of regression coefficients (as accuracy indicators)
+	in pre-post test
+In-Reply-To: <E7F5ECEE-2133-4EB2-AA21-67B96E8E2DDB@gmail.com>
+References: <E7F5ECEE-2133-4EB2-AA21-67B96E8E2DDB@gmail.com>
+Message-ID: <E9DC7746-3B04-4B8C-9C23-568E95B27143@gmail.com>
+
+Unfortunately I don?t think there is a way to calculate Cb (or the ccc) without knowing the mean of one of the variables. Without one or the other, I can?t see any way to determine the degree of shift (above or below the line y = x) in the regression line.
+
+> On Dec 1, 2017, at 1:25 PM, Emerson M. Del Ponte <edelponte at gmail.com> wrote:
+> 
+> James,
+> 1) Yes, and I have the Lin?s CCC for about 15% of the articles for which I have the raw data, or all estimates for the sample of leaves for each rater.
+> 2) No, what I have is only the regression coefficients and correlation coefficient (Pearson?s r)  (estimates regressed again actual values) for each rater. Wonder if there is a way to calculate the Lin?s bias coefficient (Cb) from the intercept and slope? The Lin?s CCC is r * Cb, and I have only r.
+> Thanks,
+> Emerson
+> 
+> Emerson,
+> 
+> Two quick questions to see if there is an easy solution:
+> 1) Do you mean Lin's concordance correlation (DOI: 10.2307/2532051)?
+> 2) Do you have (or can you extract) the means of the pre-test or post-test
+> values for each rater?
+> If the answers to both questions are "yes" then it is possible to compute
+> an estimate of the concordance correlation from the available summary
+> statistics.
+> 
+> James
+> 
+> On Fri, Dec 1, 2017 at 6:06 AM, Emerson M. Del Ponte <edelponte at gmail.com <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>>
+> wrote:
+> 
+>> Dear All,
+>> 
+>> I have collected data from primary studies where an assessment aid
+>> (diagrams) was developed and tested for improvements in accuracy and
+>> precision of visual assessments (% leaf area affected - disease symptoms)
+>> compared with unaided ones.
+>> 
+>> A  sample of raters was used in each study (varied across studies). Each
+>> rater made two assessments (estimates of % leaf affected area) for a same
+>> sample of leaves (a range of values from 0 to 100%), first unaided (und)
+>> and then aided (aid) (pre-post test).
+>> 
+>> Visual estimates from each assessment (e.g. 50 ratings) were regressed
+>> against ?actual? values. Regression coefficients (beta1 and beta1) are
+>> measures of accuracy and the correlation coefficient (r) is a measure of
+>> precision. So, I have three variables for each rater.
+>> 
+>> The data look like this:
+>> 
+>> Study Rater     r_und   r_aid
+>> 1               1       0.65            0.76
+>> 1               2       0.76            0.90
+>> 1               3       0.80            0.90
+>> .               .       .               .
+>> 
+>> Wolfgang has kindly helped me (more than two years ago!) to preliminary
+>> fit a multi-level model in metafor to summarize the gains precision
+>> (correlation coefficients). The effect-size was the absolute difference
+>> (r_aided - r_unaided) and there was a way to calculate sampling variance.
+>> 
+>> This worked fine, but I have been struggling to define what would be the
+>> appropriate approach to analyze gains in accuracy using beta1 and beta1. In
+>> a primary study, vote-couting was used to infer on the value of the aid
+>> based on number of raters with significant (P = 0.05) departures of beta1
+>> and beta2 from 0 and 1, respectively, both unaided and aided.
+>> 
+>> My problem is that I cannot calculate an index (such as concordance
+>> correlation) for accuracy because raw data was not available (I have the
+>> correlation coefficient, which explains in part the overall accuracy or
+>> concordance). So, I don?t think that an estimate of absolute difference in
+>> beta1 and beta2 between aided and unaided estimate for each rater make
+>> sense? I can see (histograms) that, in general, b1 and b2 are closer to 0
+>> and 1, respectively when using the aid.
+>> 
+>> What I did so far was to aggregate (means) each coefficients by study to
+>> then obtain the sampling variance (raters as samples) for the study. Then,
+>> a bivariate model was fitted to these data from k studies and the estimates
+>> of b1 and b2 were obtained for each condition. The data looks exactly like
+>> shown above, but with b1_und and b1_aid, etc.
+>> 
+>> I am not sure if there is a better way to analyze these data. Ideally, I
+>> would like to be able to calculate the concordance coefficient (which
+>> includes the correlation coefficient) but this seems not possible without
+>> the raw data.  What I have allows me to analyze separately precision and
+>> accuracy, but while the former seems OK (I have an effect-size and sampling
+>> variance for each rater), I am not sure how to better estimate gains in
+>> accuracy using the regression coefficients.
+>> 
+>> Any thoughts or examples on this?
+>> 
+>> Thanks,
+>> 
+>> Emerson
+>> 
+>> Prof. Emerson M. Del Ponte
+>> Departamento de Fitopatologia
+>> Universidade Federal de Vi?osa
+>> Vi?osa, MG - Brasil
+>> +55 (31) 3899-1103 <+55%2031%203899-1103>
+>> Twitter: @edelponte
+>> 
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+> 
+>    [[alternative HTML version deleted]]
+> 
+> 
+>    [[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From matilde.vaghi at gmail.com  Sat Dec  2 13:56:54 2017
+From: matilde.vaghi at gmail.com (Matilde Vaghi)
+Date: Sat, 2 Dec 2017 12:56:54 +0000
+Subject: [R-meta] metafor-mota-analysis with between group moderator
+In-Reply-To: <5f74758d6ac342e898bf7aaec5fd1588@UM-MAIL3216.unimaas.nl>
+References: <CAJn-jwPJOtYyHFyb5-WzApxKxauTL4myj5DzXS1o5=JEE-mQqg@mail.gmail.com>
+ <b2a3d38f-ea4e-6a17-4a58-9604b9c9a205@dewey.myzen.co.uk>
+ <5f74758d6ac342e898bf7aaec5fd1588@UM-MAIL3216.unimaas.nl>
+Message-ID: <8051AD29-4801-453C-A585-92D556A4EAEA@gmail.com>
+
+Thank you for very helpful feedback. 
+
+Wolfang, I would appreciate if you could disentangle the following for me . 
+
+My variable of interest is X. 
+
+Meta1 I run a meta-analysis on X [ by using escalc first with SMD for which I obtain yimeta1 and v1meta1; and then rma] and I do see a difference between the two groups. 
+
+meta2: However, I also have another measure which is AGE on which I run the meta-analysis and there is also a difference between the two groups. By using escalc, I obtained the SMD (standardized mean difference [yi]) which is also used for the meta-analysis [res<- rma(yimeta2, vimeta2, data=df)]
+
+As you pointed out, I want to see if the difference between the two groups (with respect to variable X, meta1) might be a confound of the two groups having different age (as assessed with meta-analysis 2). I therefore used the Standardized mean difference obtained with meta2 as a moderator [=SMD age]. [I need to use the standardized mean difference as age is only an example and the variable of interest here (which is not age) is assessed with different scale for each study]. 
+
+I do find a significant value of the intercept but not of SMD age on variable X. What does it mean exactly?  
+rma(yimeta1, vimeta1, mods = cbind(yimeta2), data = df)
+
+                estimate      se    zval    pval    ci.lb   ci.ub     
+intrcpt      xxx  xxx  xxx2  xxx   xxx  xxx  ***
+SMDage     xxx  xxxx xxx  xxx xxx  xxx
+
+Hope my explanation is sufficiently clear, 
+thank you very much and best wishes, 
+Matilde
+  
+
+> On 1 December 2017 at 17:49, Viechtbauer Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Indeed, this might be one approach.
+> 
+> But what is it that you want to examine, Matilde?
+> 
+> Whether the difference between the two groups (with respect to variable y) is associated with the average age of the total sample? Then computing the mean age (but maybe computing a weighted average of the mean age of the two groups in case the groups are not of equal size) and using that as a moderator is fine.
+> 
+> But it sounds to me like you are wondering if the difference between the two groups (with respect to variable y) might be a confound of the two groups having different mean ages. In that case, you could use the *difference* in the mean age of the two groups as a moderator.
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Michael Dewey
+> Sent: Friday, 01 December, 2017 17:20
+> To: Matilde Vaghi; r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] metafor-mota-analysis with between group moderator
+> 
+> Dear Matilde
+> 
+> I think you may need to use the so-called bivariate approach
+> 
+> http://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+> 
+> The example there is not identical to your problem but I think it is
+> close enough. If Wolfgang does not post saying I am talking rubbish then
+> try it and post again with any more queries.
+> 
+> Michael
+> 
+> On 01/12/2017 11:43, Matilde Vaghi wrote:
+> > Dear all,
+> >
+> > I am using metafor to conduct a between group meta-analysis to test if
+> > there is a difference between groups (controls vs. patients) on the
+> > continuous independent variable y.
+> >
+> > I need to check the influence of relevant moderator, in particular I obtain
+> > a between group difference on the variable y and I want to check if the
+> > finding remains significant after account for the effect of age (if the
+> > difference in the independent variable y is still difference once adjusted
+> > for age).
+> >
+> > On the metafor manual, a clear example shows how to assess the effect of a
+> > moderator (such as latitude) on the variable of interest. However, such
+> > example refers to the presence of a study-level moderator (each study was
+> > conducted at a different latitude, therefore one value is associated to
+> > each study). In my case, each study have two values (i.e, mean age controls
+> > and mean age patients). Therefore, it is not immediately clear how to adapt
+> > the following
+> >
+> > Rma(yi, vi, mods=cbind(Latitude), data=df)
+> >
+> > for situations in which there is one moderator variable but two values
+> > associated to it for each study. I tentatively computed a mean age per
+> > study ((mean age controls for study 1+ mean age patients for study1)/2;
+> > ((mean age controls for study 2+ mean age patients for study2)/2 etc) to
+> > have one value per study but I am not sure this is the best way forward.
+> >
+> > Any advice would be highly appreciated. Many thanks and best wishes,
+> >
+> > Matilde
+
+
+	[[alternative HTML version deleted]]
+
+
+From wolfgang.viechtbauer at maastrichtuniversity.nl  Sat Dec  2 15:13:22 2017
+From: wolfgang.viechtbauer at maastrichtuniversity.nl (Viechtbauer Wolfgang (SP))
+Date: Sat, 2 Dec 2017 14:13:22 +0000
+Subject: [R-meta] metafor-mota-analysis with between group moderator
+In-Reply-To: <8051AD29-4801-453C-A585-92D556A4EAEA@gmail.com>
+References: <CAJn-jwPJOtYyHFyb5-WzApxKxauTL4myj5DzXS1o5=JEE-mQqg@mail.gmail.com>
+ <b2a3d38f-ea4e-6a17-4a58-9604b9c9a205@dewey.myzen.co.uk>
+ <5f74758d6ac342e898bf7aaec5fd1588@UM-MAIL3216.unimaas.nl>
+ <8051AD29-4801-453C-A585-92D556A4EAEA@gmail.com>
+Message-ID: <fa87fbe4fced42ec9979de2b196457b4@UM-MAIL3216.unimaas.nl>
+
+Dear Matilde,
+
+Please subscribe to the mailing list (posts by non-subscribers have to be manually approved; also if somebody doesn't cc you on their reply, you would not see their response).
+
+The intercept of that model can be interpreted as the estimated average SMD when there is no age difference between the two groups. Since this differs significantly from 0, it suggests that the difference you observed in 'meta1' is not (solely) due to the groups differing in age.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Matilde Vaghi [mailto:matilde.vaghi at gmail.com] 
+Sent: Saturday, 02 December, 2017 13:57
+To: Viechtbauer Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] metafor-mota-analysis with between group moderator
+
+Thank you for very helpful feedback.?
+
+Wolfang, I would appreciate if you could disentangle the following for me .?
+
+My variable of interest is X.?
+
+Meta1 I run a meta-analysis on X [ by using escalc first with SMD for which I obtain yimeta1 and v1meta1; and then rma] and I do see a difference between the two groups.?
+
+meta2: However, I also have another measure which is AGE on which I run the meta-analysis and there is also a difference between the two groups. By using escalc, I obtained the SMD (standardized mean difference [yi]) which is also used for the meta-analysis [res<- rma(yimeta2, vimeta2, data=df)]
+
+As you pointed out, I want to see if the difference between the two groups (with respect to variable X, meta1) might be a confound of the two groups having different age (as assessed with meta-analysis 2). I therefore used the Standardized mean difference obtained with meta2 as a moderator [=SMD age]. [I need to use the standardized mean difference as age is only an example and the variable of interest here (which is not age) is assessed with different scale for each study].?
+
+I do find a significant value of the intercept but not of SMD age on variable X. What does it mean exactly???
+rma(yimeta1, vimeta1, mods = cbind(yimeta2), data = df)
+
+? ? ? ? ? ? ? ? estimate? ? ? se? ? zval? ? pval? ? ci.lb? ?ci.ub? ? ?
+intrcpt? ? ? xxx? xxx? xxx2? xxx? ?xxx? xxx? ***
+SMDage? ? ?xxx? xxxx?xxx? xxx xxx? xxx
+
+Hope my explanation is sufficiently clear,?
+thank you very much and best wishes,?
+Matilde
+
+On 1 December 2017 at 17:49, Viechtbauer Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Indeed, this might be one approach.
+
+But what is it that you want to examine, Matilde?
+
+Whether the difference between the two groups (with respect to variable y) is associated with the average age of the total sample? Then computing the mean age (but maybe computing a weighted average of the mean age of the two groups in case the groups are not of equal size) and using that as a moderator is fine.
+
+But it sounds to me like you are wondering if the difference between the two groups (with respect to variable y) might be a confound of the two groups having different mean ages. In that case, you could use the *difference* in the mean age of the two groups as a moderator.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Michael Dewey
+Sent: Friday, 01 December, 2017 17:20
+To: Matilde Vaghi; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] metafor-mota-analysis with between group moderator
+
+Dear Matilde
+
+I think you may need to use the so-called bivariate approach
+
+http://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+
+The example there is not identical to your problem but I think it is
+close enough. If Wolfgang does not post saying I am talking rubbish then
+try it and post again with any more queries.
+
+Michael
+
+On 01/12/2017 11:43, Matilde Vaghi wrote:
+> Dear all,
+>
+> I am using metafor to conduct a between group meta-analysis to test if
+> there is a difference between groups (controls vs. patients) on the
+> continuous independent variable y.
+>
+> I need to check the influence of relevant moderator, in particular I obtain
+> a between group difference on the variable y and I want to check if the
+> finding remains significant after account for the effect of age (if the
+> difference in the independent variable y is still difference once adjusted
+> for age).
+>
+> On the metafor manual, a clear example shows how to assess the effect of a
+> moderator (such as latitude) on the variable of interest. However, such
+> example refers to the presence of a study-level moderator (each study was
+> conducted at a different latitude, therefore one value is associated to
+> each study). In my case, each study have two values (i.e, mean age controls
+> and mean age patients). Therefore, it is not immediately clear how to adapt
+> the following
+>
+> Rma(yi, vi, mods=cbind(Latitude), data=df)
+>
+> for situations in which there is one moderator variable but two values
+> associated to it for each study. I tentatively computed a mean age per
+> study ((mean age controls for study 1+ mean age patients for study1)/2;
+> ((mean age controls for study 2+ mean age patients for study2)/2 etc) to
+> have one value per study but I am not sure this is the best way forward.
+>
+> Any advice would be highly appreciated. Many thanks and best wishes,
+>
+> Matilde
+
+From robross45 at yahoo.com.au  Mon Dec  4 18:29:16 2017
+From: robross45 at yahoo.com.au (robert ross)
+Date: Mon, 4 Dec 2017 17:29:16 +0000
+Subject: [R-meta] 2*2 ANOVA and meta-analysis
+Message-ID: <E75F4F52-D7E3-4476-8D7D-F46894160E7E@yahoo.com.au>
+
+Dear all,
+
+I?m performing a meta-analysis using the standardised mean difference. In most cases, effect sizes are calculated by comparing a control group and an experimental group using a t-test. However, a small number of relevant studies have two manipulations and use a 2*2 between subjects factorial ANOVA to test for a predicted crossover interaction. Popular effect sizes calculators for two way ANOVAs include a ?treatment factor? and an ?other factor? and generate an effect size in terms of the treatment factor. For example:
+
+http://www.campbellcollaboration.org/escalc/html/EffectSizeCalculator-SMD30.php
+
+With the studies I?m examining it doesn?t seem appropriate to treat one of the main effects as pertaining to the ?treatment factor? and the other as pertaining to the ?other factor? because both factors were of equal theoretical interest and both were manipulated.
+
+Is it possible (and appropriate) to use the interaction term from the studies with 2*2 factorial design in a meta-analysis that focuses on studies with simpler t-test based designs? If so, how could this be done? If it would not possible or appropriate, are there any alternatives? In some cases I have access to raw data, so I would be able to calculate effect sizes not reported in papers.
+
+Any comments (or pointers to relevant literature) would be much appreciated.
+
+Thanks,
+
+Rob
+	[[alternative HTML version deleted]]
+
+
+From theoneliberatedkaur at gmail.com  Tue Dec  5 06:29:49 2017
+From: theoneliberatedkaur at gmail.com (Mukht Kaur)
+Date: Tue, 5 Dec 2017 00:29:49 -0500
+Subject: [R-meta] modifying the default forest plot
+Message-ID: <CAM5U3X43brtF4CtcyPA-EFH_XFgbd+PCs5gnJdOZmg7FqAcctQ@mail.gmail.com>
+
+Hi everyone!
+
+I am new to meta-analysis methodology and I am using R software to do my
+quantitative synthesis. I am using random effects model to analyse my
+individual studies through rma function in metafor package.
+
+By using 'forest(mymodelname)', I have a basic forest plot where my
+individual studies are shown as Study 1, Study 2, and so on. How could I
+get the author and year instead? It would be better if I can get them
+arranged according to the observed effect size - is that possible? Also, I
+would like to change the title of my X axis to 'Estimated Effect Size'
+rather than the default title 'Observed Outcome'. Lastly, would it be
+possible to specify the exact weight assigned to each study in the forest
+plot?
+Many thanks in advance for your help.
+
+
+MK
+
+	[[alternative HTML version deleted]]
+
+
+From ken at kjbeath.com.au  Tue Dec  5 07:42:51 2017
+From: ken at kjbeath.com.au (Ken Beath)
+Date: Tue, 5 Dec 2017 17:42:51 +1100
+Subject: [R-meta] modifying the default forest plot
+In-Reply-To: <CAM5U3X43brtF4CtcyPA-EFH_XFgbd+PCs5gnJdOZmg7FqAcctQ@mail.gmail.com>
+References: <CAM5U3X43brtF4CtcyPA-EFH_XFgbd+PCs5gnJdOZmg7FqAcctQ@mail.gmail.com>
+Message-ID: <845B18C0-406C-49E7-A57C-1247D599AF43@kjbeath.com.au>
+
+In the calls there is an slab parameter, use that to label your studies.
+
+To get ordered studies sort them first, before calling the metafor routine.
+
+metafor takes the standard plot parameters so just adding them at the end should work. Look up plot in the help.
+
+I?m not certain what to do for the last as I?m not quite certain what you are asking for.
+
+Ken
+
+> On 5 Dec 2017, at 4:29 pm, Mukht Kaur <theoneliberatedkaur at gmail.com> wrote:
+> 
+> Hi everyone!
+> 
+> I am new to meta-analysis methodology and I am using R software to do my
+> quantitative synthesis. I am using random effects model to analyse my
+> individual studies through rma function in metafor package.
+> 
+> By using 'forest(mymodelname)', I have a basic forest plot where my
+> individual studies are shown as Study 1, Study 2, and so on. How could I
+> get the author and year instead? It would be better if I can get them
+> arranged according to the observed effect size - is that possible? Also, I
+> would like to change the title of my X axis to 'Estimated Effect Size'
+> rather than the default title 'Observed Outcome'. Lastly, would it be
+> possible to specify the exact weight assigned to each study in the forest
+> plot?
+> Many thanks in advance for your help.
+> 
+> 
+> MK
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+
+From ruecker at imbi.uni-freiburg.de  Tue Dec  5 09:58:28 2017
+From: ruecker at imbi.uni-freiburg.de (Gerta Ruecker)
+Date: Tue, 5 Dec 2017 09:58:28 +0100
+Subject: [R-meta] modifying the default forest plot
+In-Reply-To: <845B18C0-406C-49E7-A57C-1247D599AF43@kjbeath.com.au>
+References: <CAM5U3X43brtF4CtcyPA-EFH_XFgbd+PCs5gnJdOZmg7FqAcctQ@mail.gmail.com>
+ <845B18C0-406C-49E7-A57C-1247D599AF43@kjbeath.com.au>
+Message-ID: <c63eb3ae-2bdf-73d2-eb3c-178f0fb35ae3@imbi.uni-freiburg.de>
+
+Hi,
+
+What about using the R package meta that has the most flexible forest 
+function? You can specify all sorts of things, such as ordering, labels, 
+title, x-axis label, marker type, fonts, colours, whether the weights 
+should be plotted, and so on. See 
+https://cran.r-project.org/web/packages/meta/index.html .
+
+Best,
+
+Gerta
+
+
+-- Dr. rer. nat. Gerta R?cker, Dipl.-Math. Medical Faculty and Medical 
+Center - University of Freiburg Institute for Medical Biometry and 
+Statistics Stefan-Meier-Strasse 26, D-79104 Freiburg, Germany Phone +49 
+(0)761 2036673 Fax +49 (0)761 2036680 Mail ruecker at imbi.uni-freiburg.de 
+Web www.imbi.uni-freiburg.de/biom/
+
+Am 05.12.2017 um 07:42 schrieb Ken Beath:
+> In the calls there is an slab parameter, use that to label your studies.
+>
+> To get ordered studies sort them first, before calling the metafor routine.
+>
+> metafor takes the standard plot parameters so just adding them at the end should work. Look up plot in the help.
+>
+> I?m not certain what to do for the last as I?m not quite certain what you are asking for.
+>
+> Ken
+>
+>> On 5 Dec 2017, at 4:29 pm, Mukht Kaur <theoneliberatedkaur at gmail.com> wrote:
+>>
+>> Hi everyone!
+>>
+>> I am new to meta-analysis methodology and I am using R software to do my
+>> quantitative synthesis. I am using random effects model to analyse my
+>> individual studies through rma function in metafor package.
+>>
+>> By using 'forest(mymodelname)', I have a basic forest plot where my
+>> individual studies are shown as Study 1, Study 2, and so on. How could I
+>> get the author and year instead? It would be better if I can get them
+>> arranged according to the observed effect size - is that possible? Also, I
+>> would like to change the title of my X axis to 'Estimated Effect Size'
+>> rather than the default title 'Observed Outcome'. Lastly, would it be
+>> possible to specify the exact weight assigned to each study in the forest
+>> plot?
+>> Many thanks in advance for your help.
+>>
+>>
+>> MK
+>>
+>> 	[[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+	[[alternative HTML version deleted]]
+
+
+From sc at imbi.uni-freiburg.de  Tue Dec  5 10:56:41 2017
+From: sc at imbi.uni-freiburg.de (Guido Schwarzer)
+Date: Tue, 5 Dec 2017 10:56:41 +0100
+Subject: [R-meta] modifying the default forest plot
+In-Reply-To: <c63eb3ae-2bdf-73d2-eb3c-178f0fb35ae3@imbi.uni-freiburg.de>
+References: <CAM5U3X43brtF4CtcyPA-EFH_XFgbd+PCs5gnJdOZmg7FqAcctQ@mail.gmail.com>
+ <845B18C0-406C-49E7-A57C-1247D599AF43@kjbeath.com.au>
+ <c63eb3ae-2bdf-73d2-eb3c-178f0fb35ae3@imbi.uni-freiburg.de>
+Message-ID: <7e328e73-3ebd-8bd6-a1c9-30b38ab0f79b@imbi.uni-freiburg.de>
+
+Am 05.12.17 um 09:58 schrieb Gerta Ruecker:
+
+> Hi,
+>
+> What about using the R package meta that has the most flexible forest
+> function? You can specify all sorts of things, such as ordering, labels,
+> title, x-axis label, marker type, fonts, colours, whether the weights
+> should be plotted, and so on. See
+> https://cran.r-project.org/web/packages/meta/index.html .
+
+Just to give some examples. The forest plots in the attached PDF-file 
+were generated using the following R commands:
+
+library(meta)
+
+set.seed(666)
+##
+mean <- 1:5
+se.mean <- mean / 10
+author <- sample(LETTERS, 5)
+year <- 2005 + sample(-10:10, 5)
+
+m1 <- metagen(mean, se.mean, sm = "MD",
+ ????????????? studlab = paste(author, year))
+
+
+pdf("forest18.pdf", width = 9.75, height = 4)
+##
+forest(m1)
+forest(m1, sortvar = -TE)
+forest(m1, sortvar = year)
+forest(m1, xlab = "Estimated Effect Size")
+forest(m1, test.overall = TRUE, colgap.forest.left = "2cm")
+forest(m1, layout = "JAMA")
+forest(m1, layout = "RevMan5")
+##
+dev.off()
+
+
+You can use the arguments 'leftcols' and 'rightcols' to add / remove 
+columns from the left and right side of the forest plot.
+
+Best wishes,
+Guido
+
+-- 
+Dr. Guido Schwarzer (sc at imbi.uni-freiburg.de)
+Institute of Medical Biometry and Statistics
+Stefan-Meier-Str. 26, D-79104 Freiburg | Phone: +49 (0)761 203 6668
+http://www.imbi.uni-freiburg.de        | Fax:   +49 (0)761 203 6680
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: forest18.pdf
+Type: application/pdf
+Size: 14973 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20171205/143d33ae/attachment-0001.pdf>
+
+From wolfgang.viechtbauer at maastrichtuniversity.nl  Tue Dec  5 10:58:41 2017
+From: wolfgang.viechtbauer at maastrichtuniversity.nl (Viechtbauer Wolfgang (SP))
+Date: Tue, 5 Dec 2017 09:58:41 +0000
+Subject: [R-meta] modifying the default forest plot
+In-Reply-To: <CAM5U3X43brtF4CtcyPA-EFH_XFgbd+PCs5gnJdOZmg7FqAcctQ@mail.gmail.com>
+References: <CAM5U3X43brtF4CtcyPA-EFH_XFgbd+PCs5gnJdOZmg7FqAcctQ@mail.gmail.com>
+Message-ID: <31dc8ccb6650431b91de29b257f2820c@UM-MAIL3216.unimaas.nl>
+
+Ken already gave some pointers.
+
+1) How could I get the author and year instead? 
+
+Use the 'slab' argument. For example:
+
+slab=paste(dat$author, dat$year, sep=", "))
+
+(assuming that there are 'author' and 'year' variables in the data frame 'dat').
+
+2) It would be better if I can get them arranged according to the observed effect size - is that possible? 
+
+Use argument: order="obs"
+
+3) Also, I would like to change the title of my X axis to 'Estimated Effect Size'
+rather than the default title 'Observed Outcome'. 
+
+Use argument: xlab="Estimated Effect Size"
+
+4) Lastly, would it be possible to specify the exact weight assigned to each study in the forest plot?
+
+Use argument: showweights=TRUE
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Mukht Kaur
+Sent: Tuesday, 05 December, 2017 6:30
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] modifying the default forest plot
+
+Hi everyone!
+
+I am new to meta-analysis methodology and I am using R software to do my
+quantitative synthesis. I am using random effects model to analyse my
+individual studies through rma function in metafor package.
+
+By using 'forest(mymodelname)', I have a basic forest plot where my
+individual studies are shown as Study 1, Study 2, and so on. How could I
+get the author and year instead? It would be better if I can get them
+arranged according to the observed effect size - is that possible? Also, I
+would like to change the title of my X axis to 'Estimated Effect Size'
+rather than the default title 'Observed Outcome'. Lastly, would it be
+possible to specify the exact weight assigned to each study in the forest
+plot?
+Many thanks in advance for your help.
+
+MK
+
+
+From migueline at gmail.com  Tue Dec  5 11:32:25 2017
+From: migueline at gmail.com (=?UTF-8?Q?Miguel_Garc=C3=ADa_Kml?=)
+Date: Tue, 5 Dec 2017 11:32:25 +0100
+Subject: [R-meta] Direction of the effect sizes
+Message-ID: <CAHC=w4Xvih0rmx9nuWr2rUhF3WpQac8ws8FYxXRfSh2atwFKMw@mail.gmail.com>
+
+Hello everyone!
+
+A doubt has arisen that is perhaps quite basic/absurd, but which takes me
+into my head for a while. I will try to explain my doubt in the simplest
+way.
+
+Imagine that we have two styles of music (let's say classical and rock) and
+different psychological measures (scores in a memory task and levels of
+anxiety). Suppose that classical music is tremendously relaxing and
+therefore reduces anxiety levels, but it will worsen the results in memory
+tasks. On the other hand, rock music will increase anxiety levels, but will
+improve memorization. In this way, studies would display positive and
+negative effect sizes in memory scores and anxiety, which indicates
+effectiveness, no matter what the direction is (strange example, but it is
+easier to understand that way).
+
+Two doubts arise regarding this:
+
+1) Should I use the absolute values of the effect size? since, although
+some ES are negative, it indicates effectiveness as a whole (my
+meta-analysis is about effectiveness). For instance, classical music
+exposure might display relaxing effects (+ES) that are incompatible with
+memorization (-ES), but as a whole, it shows effectiveness regardless of
+the direction of the effect size.
+
+2) If I should use the absolute values, should I use them in all the
+analyzes? (i.e., meta-regression, funnel plot, influence diagnosis, etc.)
+Or perhaps just in the regression analysis to be able to explain the
+heterogeneity in terms of effectiveness? I am confused.
+
+I hope that I have explained my question correctly, and I apologize if it's
+too obvious. Thank you very much!
+
+Best,
+
+Miguel
+
+	[[alternative HTML version deleted]]
+
+
+From lists at dewey.myzen.co.uk  Tue Dec  5 14:16:29 2017
+From: lists at dewey.myzen.co.uk (Michael Dewey)
+Date: Tue, 5 Dec 2017 13:16:29 +0000
+Subject: [R-meta] Direction of the effect sizes
+In-Reply-To: <CAHC=w4Xvih0rmx9nuWr2rUhF3WpQac8ws8FYxXRfSh2atwFKMw@mail.gmail.com>
+References: <CAHC=w4Xvih0rmx9nuWr2rUhF3WpQac8ws8FYxXRfSh2atwFKMw@mail.gmail.com>
+Message-ID: <f3f65425-8fba-4d51-4a9e-d31aa3f6f2e5@dewey.myzen.co.uk>
+
+Dear Miguel
+
+I think the answer is going to depend on exactly what analysis you are 
+doing. If you analyse the studies in several separate m-a then I do not 
+see any problem as the differences come out in the interpretation. If 
+you are going to do a multi-level m-a with both outcomes and both 
+interventions included then the problem will be taken care of by the 
+effect of the moderators and possibly their interaction.
+
+I can see that things may in some cases be made easier by reflecting the 
+effect sizes (multiplying by -1) for some groups of studies but I find 
+it hard to think of a problem which would be solved by using absolute 
+values. I suppose if you were trying to detect a form of bias which 
+meant that too few studies near the null were available it might be 
+necessary.
+
+Michael
+
+On 05/12/2017 10:32, Miguel Garc?a Kml wrote:
+> Hello everyone!
+> 
+> A doubt has arisen that is perhaps quite basic/absurd, but which takes me
+> into my head for a while. I will try to explain my doubt in the simplest
+> way.
+> 
+> Imagine that we have two styles of music (let's say classical and rock) and
+> different psychological measures (scores in a memory task and levels of
+> anxiety). Suppose that classical music is tremendously relaxing and
+> therefore reduces anxiety levels, but it will worsen the results in memory
+> tasks. On the other hand, rock music will increase anxiety levels, but will
+> improve memorization. In this way, studies would display positive and
+> negative effect sizes in memory scores and anxiety, which indicates
+> effectiveness, no matter what the direction is (strange example, but it is
+> easier to understand that way).
+> 
+> Two doubts arise regarding this:
+> 
+> 1) Should I use the absolute values of the effect size? since, although
+> some ES are negative, it indicates effectiveness as a whole (my
+> meta-analysis is about effectiveness). For instance, classical music
+> exposure might display relaxing effects (+ES) that are incompatible with
+> memorization (-ES), but as a whole, it shows effectiveness regardless of
+> the direction of the effect size.
+> 
+> 2) If I should use the absolute values, should I use them in all the
+> analyzes? (i.e., meta-regression, funnel plot, influence diagnosis, etc.)
+> Or perhaps just in the regression analysis to be able to explain the
+> heterogeneity in terms of effectiveness? I am confused.
+> 
+> I hope that I have explained my question correctly, and I apologize if it's
+> too obvious. Thank you very much!
+> 
+> Best,
+> 
+> Miguel
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From wolfgang.viechtbauer at maastrichtuniversity.nl  Wed Dec  6 00:06:07 2017
+From: wolfgang.viechtbauer at maastrichtuniversity.nl (Viechtbauer Wolfgang (SP))
+Date: Tue, 5 Dec 2017 23:06:07 +0000
+Subject: [R-meta] modifying the default forest plot
+In-Reply-To: <CAM5U3X5-5kjOx8ikFfTZzrsNiBWNrmbmM0+eKWUuDgw2LVhVVw@mail.gmail.com>
+References: <CAM5U3X43brtF4CtcyPA-EFH_XFgbd+PCs5gnJdOZmg7FqAcctQ@mail.gmail.com>
+ <31dc8ccb6650431b91de29b257f2820c@UM-MAIL3216.unimaas.nl>
+ <CAM5U3X5-5kjOx8ikFfTZzrsNiBWNrmbmM0+eKWUuDgw2LVhVVw@mail.gmail.com>
+Message-ID: <ba66520d38564ff7b23959b57aa2c4a6@UM-MAIL3216.unimaas.nl>
+
+Please always cc the list.
+
+As for adjusting the arrangement of the various elements in the plot, you have two options:
+
+1) Make the plotting device wider. I don't know how you are creating the plot, but if you are doing this 'interactively', you can just do this by increasing the width of the window for the plot. If you are using something like png(), pdf(), or some other plotting device to save the plot, then you adjust the 'width' argument.
+
+2) You can also play around with the 'xlim' argument. First do this:
+
+print(forest(random13, showweights=TRUE, xlab='Estimated Effect Size', order="obs", slab=paste(play1$author, play1$year, sep=", ")))
+
+Note the default value for 'xlim'. Then rerun the forest() command as above (without the print()) but adjust 'xlim', that is, use xlim=c(lower, upper). Increase/decrease the lower and upper values to see how this affects the plot.
+
+To label elements, use text(). For example:
+
+text(lower, 15, "Author(s) and Year", pos=4)
+text(upper, 15, "ES [95% CI]",        pos=2)
+
+where lower/upper are the values you specified for xlim and you need to adjust the '15' depending on how many rows are in your forest plot (the second value of text() determines the y coordinate where the text is written). You can use text() to also add a label for the weights.
+
+You might also want to go through the examples at the end of help(forest.rma) to get an idea of what can be done.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Mukht Kaur [mailto:theoneliberatedkaur at gmail.com] 
+Sent: Tuesday, 05 December, 2017 23:31
+To: Viechtbauer Wolfgang (SP)
+Subject: Re: [R-meta] modifying the default forest plot
+
+Thank you guys! So I successfully made edits to my default forest plot using?
+forest (random13, showweights=TRUE, xlab='Estimated Effect Size', order="obs", slab=paste(play1$author, play1$year, sep=", "))
+
+The weights assigned are represented in the figure but they seem too close to the CIs. Is there a way to label them and CIs? I looked at other arguments which can be used for the 'forest' function. None seem applicable to the labelling I intend to do. Any ideas?
+
+On Tue, Dec 5, 2017 at 4:58 AM, Viechtbauer Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+Ken already gave some pointers.
+
+1) How could I get the author and year instead?
+
+Use the 'slab' argument. For example:
+
+slab=paste(dat$author, dat$year, sep=", "))
+
+(assuming that there are 'author' and 'year' variables in the data frame 'dat').
+
+2) It would be better if I can get them arranged according to the observed effect size - is that possible?
+
+Use argument: order="obs"
+
+3) Also, I would like to change the title of my X axis to 'Estimated Effect Size'
+rather than the default title 'Observed Outcome'.
+
+Use argument: xlab="Estimated Effect Size"
+
+4) Lastly, would it be possible to specify the exact weight assigned to each study in the forest plot?
+
+Use argument: showweights=TRUE
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Mukht Kaur
+Sent: Tuesday, 05 December, 2017 6:30
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] modifying the default forest plot
+
+Hi everyone!
+
+I am new to meta-analysis methodology and I am using R software to do my
+quantitative synthesis. I am using random effects model to analyse my
+individual studies through rma function in metafor package.
+
+By using 'forest(mymodelname)', I have a basic forest plot where my
+individual studies are shown as Study 1, Study 2, and so on. How could I
+get the author and year instead? It would be better if I can get them
+arranged according to the observed effect size - is that possible? Also, I
+would like to change the title of my X axis to 'Estimated Effect Size'
+rather than the default title 'Observed Outcome'. Lastly, would it be
+possible to specify the exact weight assigned to each study in the forest
+plot?
+Many thanks in advance for your help.
+
+MK
+
+From TZELNIKER at BWH.HARVARD.EDU  Wed Dec  6 03:08:12 2017
+From: TZELNIKER at BWH.HARVARD.EDU (Zelniker, Thomas)
+Date: Wed, 6 Dec 2017 02:08:12 +0000
+Subject: [R-meta] Testing for subgroup differences - meta (byvar) vs metafor
+Message-ID: <A47763B74B8F134782DFDD75CE45CA4219968C6C@PHSX10MB6.partners.org>
+
+Dear all,
+
+I am performing a meta-analysis of e.g. 4 trials. Each of these trials reports results for 2 subgroups (group A and group B). My aim is to meta-analyze and test for interaction between these two subgroups.
+The R package meta allows doing this very easily by including the term byvar. However, I am not able to replicate this with the package metafor. Could anyone explain to me how the byvar statement works?
+
+What would be the best approach?
+
+Please find below an example indicating the differences between metafor and meta:
+
+library(meta)
+library(metafor)
+rm(list = ls())
+data(Fleiss93cont)
+# Add some (fictious) grouping variables:
+Fleiss93cont$age <- c(55, 65, 55, 65, 55)
+Fleiss93cont$region <- c("Europe", "Europe", "Asia", "Asia", "Europe")
+Fleiss93cont$MD <- with(Fleiss93cont, mean.e - mean.c)
+Fleiss93cont$seMD <- with(Fleiss93cont, sqrt(sd.e^2/n.e + sd.c^2/n.c))
+
+meta_mod <- metagen(MD, seMD,
+                    byvar = region,
+                    data = Fleiss93cont,
+                    tau.common = F,
+                    method.tau = "REML",
+                    hakn = T,
+                    sm = "MD")
+
+# Here the results:
+meta_mod
+rma(y = MD, sei = seMD, mods = ~ region, data = Fleiss93cont, method = "REML", test = "knha", intercept = T)
+rma.mv(MD, V= seMD^2, mods = ~ region, method = "REML",  test="t", random = ~region|study, struct="DIAG", data=Fleiss93cont)
+
+Best regards,
+Thomas
+
+________________________________
+Dr. Thomas Zelniker, MD, MSc
+Research Fellow
+TIMI Study Group
+Brigham and Women's Hospital | Harvard Medical School
+60 Fenwood Rd. | Suite 7022-7024W | Boston, MA 02115 | Ph: 1-617-278-0326
+tzelniker at bwh.harvard.edu<mailto:tzelniker at partners.org>  | www.timi.org<http://www.timi.org/>
+
+
+
+
+
+The information in this e-mail is intended only for the ...{{dropped:14}}
+
+
+From wolfgang.viechtbauer at maastrichtuniversity.nl  Wed Dec  6 10:23:31 2017
+From: wolfgang.viechtbauer at maastrichtuniversity.nl (Viechtbauer Wolfgang (SP))
+Date: Wed, 6 Dec 2017 09:23:31 +0000
+Subject: [R-meta] Testing for subgroup differences - meta (byvar) vs
+	metafor
+In-Reply-To: <A47763B74B8F134782DFDD75CE45CA4219968C6C@PHSX10MB6.partners.org>
+References: <A47763B74B8F134782DFDD75CE45CA4219968C6C@PHSX10MB6.partners.org>
+Message-ID: <b35ec8a6677042148be4eba8cc049c8a@UM-MAIL3216.unimaas.nl>
+
+Hi Thomas,
+
+The results are the same, but you just have to go about things in different ways to get the same results. Start with:
+
+metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = TRUE,
+        method.tau = "REML", sm = "MD")
+rma(y = MD, sei = seMD, mods = ~ region - 1, data = Fleiss93cont,
+    method = "REML")
+
+So, assuming a common tau^2 value across subgroups and not using the K&H adjustment. By using 'mods = ~ region - 1' you get the estimate for each level of 'region'. If you leave out the - 1, then one level (in this case 'Asia') becomes the reference level and the coefficient for 'Europe' is the difference between the two levels.
+
+Now let's use the K&H / H&K adjustment:
+
+metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = TRUE,
+        method.tau = "REML", sm = "MD", hakn = TRUE)
+rma(y = MD, sei = seMD, mods = ~ region - 1, data = Fleiss93cont,
+    method = "REML", test = "knha")
+
+You will again get the same estimates, but the CIs are different. metagen() estimates a common tau^2 value and then applies the K&H adjustment separately within each subset. rma() also estimates a common tau^2 value but then applies the meta-regression version of the K&H adjustment. This will give different results. To get the same results, use:
+
+res <- rma(y = MD, sei = seMD, mods = ~ region - 1, data = Fleiss93cont,
+           method = "REML", test = "knha")
+rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test = "knha",
+    subset=region=="Asia", tau2 = res$tau2)
+rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test = "knha",
+    subset=region=="Europe", tau2 = res$tau2)
+
+So, first estimate the common tau^2 value and then fit separate RE models in each subset with the K&H adjustment and specify the value of the tau^2 from the first step.
+
+Now let's do this without assuming a common tau^2 value:
+
+metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = FALSE,
+        method.tau = "REML", sm = "MD")
+rma.mv(MD, V= seMD^2, mods = ~ region - 1, method = "REML", random = ~region|study,
+       struct="DIAG", data=Fleiss93cont)
+
+As you show, here one can use rma.mv() to accomplish the same thing and the results are the same. And now with K&H adjustment:
+
+metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = FALSE,
+        method.tau = "REML", sm = "MD", hakn = TRUE)
+rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test = "knha",
+    subset=region=="Asia")
+rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test = "knha",
+    subset=region=="Europe")
+
+So, for rma(), just fit RE models in each subset using the K&H adjustment and then the results are the same. And tau^2 is then of course estimated separately within each subset.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Zelniker, Thomas
+Sent: Wednesday, 06 December, 2017 3:08
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Testing for subgroup differences - meta (byvar) vs metafor
+
+Dear all,
+
+I am performing a meta-analysis of e.g. 4 trials. Each of these trials reports results for 2 subgroups (group A and group B). My aim is to meta-analyze and test for interaction between these two subgroups.
+The R package meta allows doing this very easily by including the term byvar. However, I am not able to replicate this with the package metafor. Could anyone explain to me how the byvar statement works?
+
+What would be the best approach?
+
+Please find below an example indicating the differences between metafor and meta:
+
+library(meta)
+library(metafor)
+rm(list = ls())
+data(Fleiss93cont)
+# Add some (fictious) grouping variables:
+Fleiss93cont$age <- c(55, 65, 55, 65, 55)
+Fleiss93cont$region <- c("Europe", "Europe", "Asia", "Asia", "Europe")
+Fleiss93cont$MD <- with(Fleiss93cont, mean.e - mean.c)
+Fleiss93cont$seMD <- with(Fleiss93cont, sqrt(sd.e^2/n.e + sd.c^2/n.c))
+
+meta_mod <- metagen(MD, seMD,
+                    byvar = region,
+                    data = Fleiss93cont,
+                    tau.common = F,
+                    method.tau = "REML",
+                    hakn = T,
+                    sm = "MD")
+
+# Here the results:
+meta_mod
+rma(y = MD, sei = seMD, mods = ~ region, data = Fleiss93cont, method = "REML", test = "knha", intercept = T)
+rma.mv(MD, V= seMD^2, mods = ~ region, method = "REML",  test="t", random = ~region|study, struct="DIAG", data=Fleiss93cont)
+
+Best regards,
+Thomas
+
+________________________________
+Dr. Thomas Zelniker, MD, MSc
+Research Fellow
+TIMI Study Group
+Brigham and Women's Hospital | Harvard Medical School
+60 Fenwood Rd. | Suite 7022-7024W | Boston, MA 02115 | Ph: 1-617-278-0326
+tzelniker at bwh.harvard.edu<mailto:tzelniker at partners.org>  | www.timi.org<http://www.timi.org/>
+
+
+From jepusto at gmail.com  Wed Dec  6 18:18:26 2017
+From: jepusto at gmail.com (James Pustejovsky)
+Date: Wed, 6 Dec 2017 11:18:26 -0600
+Subject: [R-meta] Testing for subgroup differences - meta (byvar) vs
+	metafor
+In-Reply-To: <b35ec8a6677042148be4eba8cc049c8a@UM-MAIL3216.unimaas.nl>
+References: <A47763B74B8F134782DFDD75CE45CA4219968C6C@PHSX10MB6.partners.org>
+ <b35ec8a6677042148be4eba8cc049c8a@UM-MAIL3216.unimaas.nl>
+Message-ID: <CAFUVuJx2q7fTKAQ=-2cdH=QADHqnOccA4fOmtJF9tb4S2MigEw@mail.gmail.com>
+
+I'll add one further difference between metagen and rma. In metagen, the
+test of the moderator is based on the usual large-sample chi-squared
+approximation, even if the CIs for the sub-group average effects use the
+Knapp-Hartung adjustment:
+
+metagen_fit <- metagen(MD, seMD, byvar = region, data = Fleiss93cont,
+tau.common = TRUE, method.tau = "REML", sm = "MD", hakn = TRUE)
+metagen_fit$Q.b.random
+pchisq(metagen_fit$Q.b.random, df = metagen_fit$df.Q.b, lower.tail = FALSE)
+
+If you fit the same model in metafor, the test of the moderator appears to
+use the meta-regression version of the Knapp-Hartung adjustment and an
+F-test with (k - p) degrees of freedom, where k is the number of studies
+and p is the number of coefficients in the meta-regression:
+
+rma_fit <- rma(y = MD, sei = seMD, mods = ~ region, data = Fleiss93cont,
+method = "REML", test = "knha")
+pf(rma_fit$QM, df1 = 1, df2 = 3, lower.tail = FALSE) # as an F test
+2 * pt(abs(rma_fit$zval[2]), df = 3, lower.tail = FALSE) # as a t test
+
+There is a similar discrepancy if we instead use rma.mv and test = "t". In
+that case (with two variance components), I doubt either version of the
+test is that great and it would probably be better to use some sort of
+Satterthwaite approximation for the degrees of freedom. Or get yourself
+more studies.
+
+James
+
+On Wed, Dec 6, 2017 at 3:23 AM, Viechtbauer Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Hi Thomas,
+>
+> The results are the same, but you just have to go about things in
+> different ways to get the same results. Start with:
+>
+> metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = TRUE,
+>         method.tau = "REML", sm = "MD")
+> rma(y = MD, sei = seMD, mods = ~ region - 1, data = Fleiss93cont,
+>     method = "REML")
+>
+> So, assuming a common tau^2 value across subgroups and not using the K&H
+> adjustment. By using 'mods = ~ region - 1' you get the estimate for each
+> level of 'region'. If you leave out the - 1, then one level (in this case
+> 'Asia') becomes the reference level and the coefficient for 'Europe' is the
+> difference between the two levels.
+>
+> Now let's use the K&H / H&K adjustment:
+>
+> metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = TRUE,
+>         method.tau = "REML", sm = "MD", hakn = TRUE)
+> rma(y = MD, sei = seMD, mods = ~ region - 1, data = Fleiss93cont,
+>     method = "REML", test = "knha")
+>
+> You will again get the same estimates, but the CIs are different.
+> metagen() estimates a common tau^2 value and then applies the K&H
+> adjustment separately within each subset. rma() also estimates a common
+> tau^2 value but then applies the meta-regression version of the K&H
+> adjustment. This will give different results. To get the same results, use:
+>
+> res <- rma(y = MD, sei = seMD, mods = ~ region - 1, data = Fleiss93cont,
+>            method = "REML", test = "knha")
+> rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test =
+> "knha",
+>     subset=region=="Asia", tau2 = res$tau2)
+> rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test =
+> "knha",
+>     subset=region=="Europe", tau2 = res$tau2)
+>
+> So, first estimate the common tau^2 value and then fit separate RE models
+> in each subset with the K&H adjustment and specify the value of the tau^2
+> from the first step.
+>
+> Now let's do this without assuming a common tau^2 value:
+>
+> metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = FALSE,
+>         method.tau = "REML", sm = "MD")
+> rma.mv(MD, V= seMD^2, mods = ~ region - 1, method = "REML", random =
+> ~region|study,
+>        struct="DIAG", data=Fleiss93cont)
+>
+> As you show, here one can use rma.mv() to accomplish the same thing and
+> the results are the same. And now with K&H adjustment:
+>
+> metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = FALSE,
+>         method.tau = "REML", sm = "MD", hakn = TRUE)
+> rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test =
+> "knha",
+>     subset=region=="Asia")
+> rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test =
+> "knha",
+>     subset=region=="Europe")
+>
+> So, for rma(), just fit RE models in each subset using the K&H adjustment
+> and then the results are the same. And tau^2 is then of course estimated
+> separately within each subset.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-
+> bounces at r-project.org] On Behalf Of Zelniker, Thomas
+> Sent: Wednesday, 06 December, 2017 3:08
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Testing for subgroup differences - meta (byvar) vs
+> metafor
+>
+> Dear all,
+>
+> I am performing a meta-analysis of e.g. 4 trials. Each of these trials
+> reports results for 2 subgroups (group A and group B). My aim is to
+> meta-analyze and test for interaction between these two subgroups.
+> The R package meta allows doing this very easily by including the term
+> byvar. However, I am not able to replicate this with the package metafor.
+> Could anyone explain to me how the byvar statement works?
+>
+> What would be the best approach?
+>
+> Please find below an example indicating the differences between metafor
+> and meta:
+>
+> library(meta)
+> library(metafor)
+> rm(list = ls())
+> data(Fleiss93cont)
+> # Add some (fictious) grouping variables:
+> Fleiss93cont$age <- c(55, 65, 55, 65, 55)
+> Fleiss93cont$region <- c("Europe", "Europe", "Asia", "Asia", "Europe")
+> Fleiss93cont$MD <- with(Fleiss93cont, mean.e - mean.c)
+> Fleiss93cont$seMD <- with(Fleiss93cont, sqrt(sd.e^2/n.e + sd.c^2/n.c))
+>
+> meta_mod <- metagen(MD, seMD,
+>                     byvar = region,
+>                     data = Fleiss93cont,
+>                     tau.common = F,
+>                     method.tau = "REML",
+>                     hakn = T,
+>                     sm = "MD")
+>
+> # Here the results:
+> meta_mod
+> rma(y = MD, sei = seMD, mods = ~ region, data = Fleiss93cont, method =
+> "REML", test = "knha", intercept = T)
+> rma.mv(MD, V= seMD^2, mods = ~ region, method = "REML",  test="t", random
+> = ~region|study, struct="DIAG", data=Fleiss93cont)
+>
+> Best regards,
+> Thomas
+>
+> ________________________________
+> Dr. Thomas Zelniker, MD, MSc
+> Research Fellow
+> TIMI Study Group
+> Brigham and Women's Hospital | Harvard Medical School
+> 60 Fenwood Rd. | Suite 7022-7024W | Boston, MA 02115 | Ph: 1-617-278-0326
+> tzelniker at bwh.harvard.edu<mailto:tzelniker at partners.org>  | www.timi.org<
+> http://www.timi.org/>
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From migueline at gmail.com  Wed Dec  6 18:57:09 2017
+From: migueline at gmail.com (=?UTF-8?Q?Miguel_Garc=C3=ADa_Kml?=)
+Date: Wed, 6 Dec 2017 18:57:09 +0100
+Subject: [R-meta] Direction of the effect sizes
+In-Reply-To: <f3f65425-8fba-4d51-4a9e-d31aa3f6f2e5@dewey.myzen.co.uk>
+References: <CAHC=w4Xvih0rmx9nuWr2rUhF3WpQac8ws8FYxXRfSh2atwFKMw@mail.gmail.com>
+ <f3f65425-8fba-4d51-4a9e-d31aa3f6f2e5@dewey.myzen.co.uk>
+Message-ID: <CAHC=w4UnJ+hBD=SANNMiitXDkSFpy0coWfC=7gG2aaCuqUnKug@mail.gmail.com>
+
+Dear Michael:
+
+Thank you very much for your help. What I did was to do the meta-analysis
+by groups to avoid this problem, but due to my inexperience I wanted to be
+sure that it was correct and my question made sense.
+
+However, I still worry about the sign, especially in the meta-regression
+since, for example, longer exposure times will produce larger effects (both
+positive and negative, depending on the music and task), and if I do not
+use the absolute values the effects will be canceled, implying something
+that is not correct. Does this reasoning make any sense?
+
+Miguel
+
+2017-12-05 14:16 GMT+01:00 Michael Dewey <lists at dewey.myzen.co.uk>:
+
+> Dear Miguel
+>
+> I think the answer is going to depend on exactly what analysis you are
+> doing. If you analyse the studies in several separate m-a then I do not see
+> any problem as the differences come out in the interpretation. If you are
+> going to do a multi-level m-a with both outcomes and both interventions
+> included then the problem will be taken care of by the effect of the
+> moderators and possibly their interaction.
+>
+> I can see that things may in some cases be made easier by reflecting the
+> effect sizes (multiplying by -1) for some groups of studies but I find it
+> hard to think of a problem which would be solved by using absolute values.
+> I suppose if you were trying to detect a form of bias which meant that too
+> few studies near the null were available it might be necessary.
+>
+> Michael
+>
+>
+> On 05/12/2017 10:32, Miguel Garc?a Kml wrote:
+>
+>> Hello everyone!
+>>
+>> A doubt has arisen that is perhaps quite basic/absurd, but which takes me
+>> into my head for a while. I will try to explain my doubt in the simplest
+>> way.
+>>
+>> Imagine that we have two styles of music (let's say classical and rock)
+>> and
+>> different psychological measures (scores in a memory task and levels of
+>> anxiety). Suppose that classical music is tremendously relaxing and
+>> therefore reduces anxiety levels, but it will worsen the results in memory
+>> tasks. On the other hand, rock music will increase anxiety levels, but
+>> will
+>> improve memorization. In this way, studies would display positive and
+>> negative effect sizes in memory scores and anxiety, which indicates
+>> effectiveness, no matter what the direction is (strange example, but it is
+>> easier to understand that way).
+>>
+>> Two doubts arise regarding this:
+>>
+>> 1) Should I use the absolute values of the effect size? since, although
+>> some ES are negative, it indicates effectiveness as a whole (my
+>> meta-analysis is about effectiveness). For instance, classical music
+>> exposure might display relaxing effects (+ES) that are incompatible with
+>> memorization (-ES), but as a whole, it shows effectiveness regardless of
+>> the direction of the effect size.
+>>
+>> 2) If I should use the absolute values, should I use them in all the
+>> analyzes? (i.e., meta-regression, funnel plot, influence diagnosis, etc.)
+>> Or perhaps just in the regression analysis to be able to explain the
+>> heterogeneity in terms of effectiveness? I am confused.
+>>
+>> I hope that I have explained my question correctly, and I apologize if
+>> it's
+>> too obvious. Thank you very much!
+>>
+>> Best,
+>>
+>> Miguel
+>>
+>>         [[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+>
+
+	[[alternative HTML version deleted]]
+
+
+From TZELNIKER at BWH.HARVARD.EDU  Wed Dec  6 20:10:55 2017
+From: TZELNIKER at BWH.HARVARD.EDU (Zelniker, Thomas)
+Date: Wed, 6 Dec 2017 19:10:55 +0000
+Subject: [R-meta] Testing for subgroup differences - meta (byvar) vs
+ metafor
+In-Reply-To: <CAFUVuJx2q7fTKAQ=-2cdH=QADHqnOccA4fOmtJF9tb4S2MigEw@mail.gmail.com>
+References: <A47763B74B8F134782DFDD75CE45CA4219968C6C@PHSX10MB6.partners.org>
+ <b35ec8a6677042148be4eba8cc049c8a@UM-MAIL3216.unimaas.nl>
+ <CAFUVuJx2q7fTKAQ=-2cdH=QADHqnOccA4fOmtJF9tb4S2MigEw@mail.gmail.com>
+Message-ID: <A47763B74B8F134782DFDD75CE45CA421996A044@PHSX10MB6.partners.org>
+
+Thank you both so much. This was very insightful! I truly appreciate your support.
+
+
+
+From: James Pustejovsky [mailto:jepusto at gmail.com]
+Sent: Wednesday, December 06, 2017 12:18 PM
+To: Viechtbauer Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Cc: Zelniker, Thomas <TZELNIKER at BWH.HARVARD.EDU>; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Testing for subgroup differences - meta (byvar) vs metafor
+
+I'll add one further difference between metagen and rma. In metagen, the test of the moderator is based on the usual large-sample chi-squared approximation, even if the CIs for the sub-group average effects use the Knapp-Hartung adjustment:
+
+metagen_fit <- metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = TRUE, method.tau = "REML", sm = "MD", hakn = TRUE)
+metagen_fit$Q.b.random
+pchisq(metagen_fit$Q.b.random, df = metagen_fit$df.Q.b, lower.tail = FALSE)
+
+If you fit the same model in metafor, the test of the moderator appears to use the meta-regression version of the Knapp-Hartung adjustment and an F-test with (k - p) degrees of freedom, where k is the number of studies and p is the number of coefficients in the meta-regression:
+
+rma_fit <- rma(y = MD, sei = seMD, mods = ~ region, data = Fleiss93cont, method = "REML", test = "knha")
+pf(rma_fit$QM, df1 = 1, df2 = 3, lower.tail = FALSE) # as an F test
+2 * pt(abs(rma_fit$zval[2]), df = 3, lower.tail = FALSE) # as a t test
+
+There is a similar discrepancy if we instead use rma.mv<http://rma.mv> and test = "t". In that case (with two variance components), I doubt either version of the test is that great and it would probably be better to use some sort of Satterthwaite approximation for the degrees of freedom. Or get yourself more studies.
+
+James
+
+On Wed, Dec 6, 2017 at 3:23 AM, Viechtbauer Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl<mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>> wrote:
+Hi Thomas,
+
+The results are the same, but you just have to go about things in different ways to get the same results. Start with:
+
+metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = TRUE,
+        method.tau = "REML", sm = "MD")
+rma(y = MD, sei = seMD, mods = ~ region - 1, data = Fleiss93cont,
+    method = "REML")
+
+So, assuming a common tau^2 value across subgroups and not using the K&H adjustment. By using 'mods = ~ region - 1' you get the estimate for each level of 'region'. If you leave out the - 1, then one level (in this case 'Asia') becomes the reference level and the coefficient for 'Europe' is the difference between the two levels.
+
+Now let's use the K&H / H&K adjustment:
+
+metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = TRUE,
+        method.tau = "REML", sm = "MD", hakn = TRUE)
+rma(y = MD, sei = seMD, mods = ~ region - 1, data = Fleiss93cont,
+    method = "REML", test = "knha")
+
+You will again get the same estimates, but the CIs are different. metagen() estimates a common tau^2 value and then applies the K&H adjustment separately within each subset. rma() also estimates a common tau^2 value but then applies the meta-regression version of the K&H adjustment. This will give different results. To get the same results, use:
+
+res <- rma(y = MD, sei = seMD, mods = ~ region - 1, data = Fleiss93cont,
+           method = "REML", test = "knha")
+rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test = "knha",
+    subset=region=="Asia", tau2 = res$tau2)
+rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test = "knha",
+    subset=region=="Europe", tau2 = res$tau2)
+
+So, first estimate the common tau^2 value and then fit separate RE models in each subset with the K&H adjustment and specify the value of the tau^2 from the first step.
+
+Now let's do this without assuming a common tau^2 value:
+
+metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = FALSE,
+        method.tau = "REML", sm = "MD")
+rma.mv<http://rma.mv>(MD, V= seMD^2, mods = ~ region - 1, method = "REML", random = ~region|study,
+       struct="DIAG", data=Fleiss93cont)
+
+As you show, here one can use rma.mv<http://rma.mv>() to accomplish the same thing and the results are the same. And now with K&H adjustment:
+
+metagen(MD, seMD, byvar = region, data = Fleiss93cont, tau.common = FALSE,
+        method.tau = "REML", sm = "MD", hakn = TRUE)
+rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test = "knha",
+    subset=region=="Asia")
+rma(y = MD, sei = seMD, data = Fleiss93cont, method = "REML", test = "knha",
+    subset=region=="Europe")
+
+So, for rma(), just fit RE models in each subset using the K&H adjustment and then the results are the same. And tau^2 is then of course estimated separately within each subset.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org<mailto:r-sig-meta-analysis-bounces at r-project.org>] On Behalf Of Zelniker, Thomas
+Sent: Wednesday, 06 December, 2017 3:08
+To: r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>
+Subject: [R-meta] Testing for subgroup differences - meta (byvar) vs metafor
+
+Dear all,
+
+I am performing a meta-analysis of e.g. 4 trials. Each of these trials reports results for 2 subgroups (group A and group B). My aim is to meta-analyze and test for interaction between these two subgroups.
+The R package meta allows doing this very easily by including the term byvar. However, I am not able to replicate this with the package metafor. Could anyone explain to me how the byvar statement works?
+
+What would be the best approach?
+
+Please find below an example indicating the differences between metafor and meta:
+
+library(meta)
+library(metafor)
+rm(list = ls())
+data(Fleiss93cont)
+# Add some (fictious) grouping variables:
+Fleiss93cont$age <- c(55, 65, 55, 65, 55)
+Fleiss93cont$region <- c("Europe", "Europe", "Asia", "Asia", "Europe")
+Fleiss93cont$MD <- with(Fleiss93cont, mean.e - mean.c)
+Fleiss93cont$seMD <- with(Fleiss93cont, sqrt(sd.e^2/n.e + sd.c^2/n.c))
+
+meta_mod <- metagen(MD, seMD,
+                    byvar = region,
+                    data = Fleiss93cont,
+                    tau.common = F,
+                    method.tau = "REML",
+                    hakn = T,
+                    sm = "MD")
+
+# Here the results:
+meta_mod
+rma(y = MD, sei = seMD, mods = ~ region, data = Fleiss93cont, method = "REML", test = "knha", intercept = T)
+rma.mv<http://rma.mv>(MD, V= seMD^2, mods = ~ region, method = "REML",  test="t", random = ~region|study, struct="DIAG", data=Fleiss93cont)
+
+Best regards,
+Thomas
+
+________________________________
+Dr. Thomas Zelniker, MD, MSc
+Research Fellow
+TIMI Study Group
+Brigham and Women's Hospital | Harvard Medical School
+60 Fenwood Rd. | Suite 7022-7024W | Boston, MA 02115 | Ph: 1-617-278-0326<tel:1-617-278-0326>
+tzelniker at bwh.harvard.edu<mailto:tzelniker at bwh.harvard.edu><mailto:tzelniker at partners.org<mailto:tzelniker at partners.org>>  | www.timi.org<http://www.timi.org><http://www.timi.org/>
+_______________________________________________
+R-sig-meta-analysis mailing list
+R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+
+The information in this e-mail is intended only for the person to whom it is
+addressed. If you believe this e-mail was sent to you in error and the e-mail
+contains patient information, please contact the Partners Compliance HelpLine at
+http://www.partners.org/complianceline . If the e-mail was sent to you in error
+but does not contain patient information, please contact the sender and properly
+dispose of the e-mail.
+
+	[[alternative HTML version deleted]]
+
+
+From lists at dewey.myzen.co.uk  Thu Dec  7 13:24:01 2017
+From: lists at dewey.myzen.co.uk (Michael Dewey)
+Date: Thu, 7 Dec 2017 12:24:01 +0000
+Subject: [R-meta] Direction of the effect sizes
+In-Reply-To: <CAHC=w4UnJ+hBD=SANNMiitXDkSFpy0coWfC=7gG2aaCuqUnKug@mail.gmail.com>
+References: <CAHC=w4Xvih0rmx9nuWr2rUhF3WpQac8ws8FYxXRfSh2atwFKMw@mail.gmail.com>
+ <f3f65425-8fba-4d51-4a9e-d31aa3f6f2e5@dewey.myzen.co.uk>
+ <CAHC=w4UnJ+hBD=SANNMiitXDkSFpy0coWfC=7gG2aaCuqUnKug@mail.gmail.com>
+Message-ID: <d58c72c0-367a-c5fa-4370-43519edccc4b@dewey.myzen.co.uk>
+
+Dear Miguel
+
+Can you show us an example of the model you are proposing? I think that 
+with a careful choice of moderators the problem may be solvable.
+
+On 06/12/2017 17:57, Miguel Garc?a Kml wrote:
+> Dear Michael:
+> 
+> Thank you very much for your help. What I did was to do the 
+> meta-analysis by groups to avoid this problem, but due to my 
+> inexperience I wanted to be sure that it was correct and my question 
+> made sense.
+> 
+> However, I still worry about the sign, especially in the meta-regression 
+> since, for example, longer exposure times will produce larger effects 
+> (both positive and negative, depending on the music and task), and if I 
+> do not use the absolute values the effects will be canceled, implying 
+> something that is not correct. Does this reasoning make any sense?
+> 
+> Miguel
+> 
+> 2017-12-05 14:16 GMT+01:00 Michael Dewey <lists at dewey.myzen.co.uk 
+> <mailto:lists at dewey.myzen.co.uk>>:
+> 
+>     Dear Miguel
+> 
+>     I think the answer is going to depend on exactly what analysis you
+>     are doing. If you analyse the studies in several separate m-a then I
+>     do not see any problem as the differences come out in the
+>     interpretation. If you are going to do a multi-level m-a with both
+>     outcomes and both interventions included then the problem will be
+>     taken care of by the effect of the moderators and possibly their
+>     interaction.
+> 
+>     I can see that things may in some cases be made easier by reflecting
+>     the effect sizes (multiplying by -1) for some groups of studies but
+>     I find it hard to think of a problem which would be solved by using
+>     absolute values. I suppose if you were trying to detect a form of
+>     bias which meant that too few studies near the null were available
+>     it might be necessary.
+> 
+>     Michael
+> 
+> 
+>     On 05/12/2017 10:32, Miguel Garc?a Kml wrote:
+> 
+>         Hello everyone!
+> 
+>         A doubt has arisen that is perhaps quite basic/absurd, but which
+>         takes me
+>         into my head for a while. I will try to explain my doubt in the
+>         simplest
+>         way.
+> 
+>         Imagine that we have two styles of music (let's say classical
+>         and rock) and
+>         different psychological measures (scores in a memory task and
+>         levels of
+>         anxiety). Suppose that classical music is tremendously relaxing and
+>         therefore reduces anxiety levels, but it will worsen the results
+>         in memory
+>         tasks. On the other hand, rock music will increase anxiety
+>         levels, but will
+>         improve memorization. In this way, studies would display
+>         positive and
+>         negative effect sizes in memory scores and anxiety, which indicates
+>         effectiveness, no matter what the direction is (strange example,
+>         but it is
+>         easier to understand that way).
+> 
+>         Two doubts arise regarding this:
+> 
+>         1) Should I use the absolute values of the effect size? since,
+>         although
+>         some ES are negative, it indicates effectiveness as a whole (my
+>         meta-analysis is about effectiveness). For instance, classical music
+>         exposure might display relaxing effects (+ES) that are
+>         incompatible with
+>         memorization (-ES), but as a whole, it shows effectiveness
+>         regardless of
+>         the direction of the effect size.
+> 
+>         2) If I should use the absolute values, should I use them in all the
+>         analyzes? (i.e., meta-regression, funnel plot, influence
+>         diagnosis, etc.)
+>         Or perhaps just in the regression analysis to be able to explain the
+>         heterogeneity in terms of effectiveness? I am confused.
+> 
+>         I hope that I have explained my question correctly, and I
+>         apologize if it's
+>         too obvious. Thank you very much!
+> 
+>         Best,
+> 
+>         Miguel
+> 
+>          ? ? ? ? [[alternative HTML version deleted]]
+> 
+>         _______________________________________________
+>         R-sig-meta-analysis mailing list
+>         R-sig-meta-analysis at r-project.org
+>         <mailto:R-sig-meta-analysis at r-project.org>
+>         https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>         <https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+> 
+> 
+>     -- 
+>     Michael
+>     http://www.dewey.myzen.co.uk/home.html
+>     <http://www.dewey.myzen.co.uk/home.html>
+> 
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From sc at imbi.uni-freiburg.de  Fri Dec  8 10:16:09 2017
+From: sc at imbi.uni-freiburg.de (Guido Schwarzer)
+Date: Fri, 8 Dec 2017 10:16:09 +0100
+Subject: [R-meta] R package meta (version 4.7-0) available
+Message-ID: <0b91f0f3-437c-8ce8-b09c-0374beda8747@imbi.uni-freiburg.de>
+
+Hi all,
+
+R package netmeta, version 0.9-7, is available on CRAN 
+(https://cran.r-project.org/package=netmeta).
+
+Main new features (since netmeta, version 0.9-6):
+
+- New function forest.netsplit() to produce forest plots with network, 
+direct, and indirect evidence
+
+- New function netcomb() to estimate additive network meta-analysis for 
+combinations of treatments
+
+- New default in function netsplit(): treatment comparisons are selected 
+from upper treatment estimates matrix, i.e., comparisons are "A vs B", 
+"A vs C", and "B vs C" for treatments "A", "B", and "C" instead of "B vs 
+A", etc.
+
+- League tables can be exported as CSV or Excel file
+
+- Zero treatment arm variance in multi-arm studies results in a warning 
+instead of an error message
+
+- Some bug fixes
+
+A complete list of changes providing more details is available on 
+https://cran.r-project.org/web/packages/netmeta/NEWS . See also 
+https://github.com/guido-s/netmeta .
+
+Best wishes,
+Guido
+
+Hi all,
+
+R package meta, version 4.9-0, is available on CRAN 
+(https://cran.r-project.org/package=meta).
+
+Main new features (since meta, version 4.8-4):
+
+- New function metabind() to combine meta-analysis objects, e.g. to 
+generate a forest plot with results of several subgroup analyses (using 
+new function forest.metabind())
+
+- New function metamean() to conduct meta-analysis of single means
+
+- Subgroup analyses implemented for generalised linear mixed models 
+(GLMMs) with and without assumption of common between-study variance 
+(arguments 'byvar' and 'tau.common')
+
+- Axis direction can be reversed for x-axis in forest plots
+
+- Source code version of meta can be installed without compilation, 
+i.e., without use of Rtools on Windows or 'Command-line tools for Xcode' 
+on macOS
+
+- Rank test for funnel plot asymmetry uses cor() from R package stats 
+instead of internal C routine (negligibly slower, however, no need for 
+compilation of source installs)
+
+A complete list of changes providing more details is available on 
+https://cran.r-project.org/web/packages/meta/NEWS . See also 
+https://github.com/guido-s/meta .
+
+Best wishes,
+Guido
+
+-- 
+Dr. Guido Schwarzer (sc at imbi.uni-freiburg.de)
+Institute of Medical Biometry and Statistics
+Stefan-Meier-Str. 26, D-79104 Freiburg | Phone: +49 (0)761 203 6668
+http://www.imbi.uni-freiburg.de        | Fax:   +49 (0)761 203 6680
+
+
+From sc at imbi.uni-freiburg.de  Fri Dec  8 10:20:31 2017
+From: sc at imbi.uni-freiburg.de (Guido Schwarzer)
+Date: Fri, 8 Dec 2017 10:20:31 +0100
+Subject: [R-meta] R package meta (version 4.7-0) available
+In-Reply-To: <0b91f0f3-437c-8ce8-b09c-0374beda8747@imbi.uni-freiburg.de>
+References: <0b91f0f3-437c-8ce8-b09c-0374beda8747@imbi.uni-freiburg.de>
+Message-ID: <75b732d1-8fb4-f2df-ac16-925337335704@imbi.uni-freiburg.de>
+
+... and R package netmeta, version 0.9-7. Copy & paste error - should 
+have been two separate emails. :-)
+
+Best wishes,
+Guido
+
+
+Am 08.12.17 um 10:16 schrieb Guido Schwarzer:
+> Hi all,
+>
+> R package netmeta, version 0.9-7, is available on CRAN 
+> (https://cran.r-project.org/package=netmeta).
+>
+> Main new features (since netmeta, version 0.9-6):
+>
+> - New function forest.netsplit() to produce forest plots with network, 
+> direct, and indirect evidence
+>
+> - New function netcomb() to estimate additive network meta-analysis 
+> for combinations of treatments
+>
+> - New default in function netsplit(): treatment comparisons are 
+> selected from upper treatment estimates matrix, i.e., comparisons are 
+> "A vs B", "A vs C", and "B vs C" for treatments "A", "B", and "C" 
+> instead of "B vs A", etc.
+>
+> - League tables can be exported as CSV or Excel file
+>
+> - Zero treatment arm variance in multi-arm studies results in a 
+> warning instead of an error message
+>
+> - Some bug fixes
+>
+> A complete list of changes providing more details is available on 
+> https://cran.r-project.org/web/packages/netmeta/NEWS . See also 
+> https://github.com/guido-s/netmeta .
+>
+> Best wishes,
+> Guido
+>
+> Hi all,
+>
+> R package meta, version 4.9-0, is available on CRAN 
+> (https://cran.r-project.org/package=meta).
+>
+> Main new features (since meta, version 4.8-4):
+>
+> - New function metabind() to combine meta-analysis objects, e.g. to 
+> generate a forest plot with results of several subgroup analyses 
+> (using new function forest.metabind())
+>
+> - New function metamean() to conduct meta-analysis of single means
+>
+> - Subgroup analyses implemented for generalised linear mixed models 
+> (GLMMs) with and without assumption of common between-study variance 
+> (arguments 'byvar' and 'tau.common')
+>
+> - Axis direction can be reversed for x-axis in forest plots
+>
+> - Source code version of meta can be installed without compilation, 
+> i.e., without use of Rtools on Windows or 'Command-line tools for 
+> Xcode' on macOS
+>
+> - Rank test for funnel plot asymmetry uses cor() from R package stats 
+> instead of internal C routine (negligibly slower, however, no need for 
+> compilation of source installs)
+>
+> A complete list of changes providing more details is available on 
+> https://cran.r-project.org/web/packages/meta/NEWS . See also 
+> https://github.com/guido-s/meta .
+>
+> Best wishes,
+> Guido
+
+
+From raynaud.armstrong at gmail.com  Fri Dec 15 01:36:56 2017
+From: raynaud.armstrong at gmail.com (Raynaud Armstrong)
+Date: Thu, 14 Dec 2017 19:36:56 -0500
+Subject: [R-meta] predicted intervals in metafor
+Message-ID: <CAJNHWOT8cW=yMJ1Di2RX5Lq8YERR1fwo7mWJ_t-u_xsKXXVbdg@mail.gmail.com>
+
+Hi there,
+I would like to calculate predicted intervals in addition to my pooled
+estimate and CIs as I have plenty of between-study variation in my
+meta-analysis. I am using metafor package and my summary estimated is an
+effect size (SMD) and not odds ratios. The examples I have come across
+mainly focus on odds ratios and I wonder what to do for SMDs.
+I would appreciate if someone could suggest what function to use.
+
+Thank you,
+Raynaud
+
+	[[alternative HTML version deleted]]
+
+
+From wolfgang.viechtbauer at maastrichtuniversity.nl  Fri Dec 15 09:38:02 2017
+From: wolfgang.viechtbauer at maastrichtuniversity.nl (Viechtbauer Wolfgang (SP))
+Date: Fri, 15 Dec 2017 08:38:02 +0000
+Subject: [R-meta] predicted intervals in metafor
+In-Reply-To: <CAJNHWOT8cW=yMJ1Di2RX5Lq8YERR1fwo7mWJ_t-u_xsKXXVbdg@mail.gmail.com>
+References: <CAJNHWOT8cW=yMJ1Di2RX5Lq8YERR1fwo7mWJ_t-u_xsKXXVbdg@mail.gmail.com>
+Message-ID: <21e67858f9fa4d0da29e345b41f77045@UM-MAIL3216.unimaas.nl>
+
+Dear Raynaud,
+
+Once you have the SMD values and corresponding sampling variances, the code is the same. Here is an example:
+
+library(metafor)
+
+### load data
+dat <- get(data(dat.normand1999))
+
+### calculate SMDs and corresponding sampling variances
+dat <- escalc(measure="SMD", m1i=m1i, sd1i=sd1i, n1i=n1i, m2i=m2i, sd2i=sd2i, n2i=n2i, data=dat)
+dat
+
+### meta-analysis of SMD values using a random-effects model
+res <- rma(yi, vi, data=dat)
+res
+
+### get prediction/credibility interval
+predict(res)
+
+If you have calculated the SMD values and variances yourself, you can skip the escalc() step and go straight to rma(). Adjust variables names as needed.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Raynaud Armstrong
+Sent: Friday, 15 December, 2017 1:37
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] predicted intervals in metafor
+
+Hi there,
+I would like to calculate predicted intervals in addition to my pooled
+estimate and CIs as I have plenty of between-study variation in my
+meta-analysis. I am using metafor package and my summary estimated is an
+effect size (SMD) and not odds ratios. The examples I have come across
+mainly focus on odds ratios and I wonder what to do for SMDs.
+I would appreciate if someone could suggest what function to use.
+
+Thank you,
+Raynaud
+
+
+From emilyrussell99 at outlook.com  Sun Dec 17 12:20:07 2017
+From: emilyrussell99 at outlook.com (Emily Russell)
+Date: Sun, 17 Dec 2017 11:20:07 +0000
+Subject: [R-meta] Using MAd agg function
+Message-ID: <CWLP265MB0244DB5CDB42C3EF4B679456CA090@CWLP265MB0244.GBRP265.PROD.OUTLOOK.COM>
+
+Dear All
+
+
+I wondered if anyone could help with an issue about aggregating effect sizes?  I have 3 effect sizes from one study that come from one sample and so I want to aggregate them into one.  The result of escalc is this
+
+
+Study       yi           vi
+Arnold  -0.2386 0.2014
+Arnold   0.4556 0.2052
+Arnold   0.0563 0.2001
+
+
+so then I used the agg function from MAd
+
+
+ag<-agg(id=Study, es=yi, var=vi,  cor=.5, method="BHHR", mod=NULL, data=ma)
+
+which gives the following which I think I can then use as one study in my meta-analysis
+
+      id         es              var
+1 Arnold 0.09111254 0.1348174
+
+Does this seem reasonable?  Also as I don't know the correlation between the three effect sizes I have just used the default of 0.5.  I suspect this is low, but that is just a guess - is that reasonable?
+
+Thanks
+
+Emily
+
+
+
+	[[alternative HTML version deleted]]
+
+
+From acdelre at gmail.com  Sun Dec 17 17:17:03 2017
+From: acdelre at gmail.com (A C Del Re)
+Date: Sun, 17 Dec 2017 08:17:03 -0800
+Subject: [R-meta] Using MAd agg function
+In-Reply-To: <CWLP265MB0244DB5CDB42C3EF4B679456CA090@CWLP265MB0244.GBRP265.PROD.OUTLOOK.COM>
+References: <CWLP265MB0244DB5CDB42C3EF4B679456CA090@CWLP265MB0244.GBRP265.PROD.OUTLOOK.COM>
+Message-ID: <CALsYQZe2hUQxVQt_j8MTncjR1WjtG6ja2W64F2n9dvRjBCtEPQ@mail.gmail.com>
+
+Hi Emily,
+
+Technically, yes, you have accounted for dependent effect sizes (ES) and
+could use this aggregate ES in further analyses. However, I think it
+depends on the actual outcomes and if it makes sense to aggregate. For
+example, 3 measures of psychological symptomology would probably make sense
+to combine (well depending on your research questions) but combining, say
+measures of intelligence, psychological traits, and physical endurance,
+might not.
+
+Regarding the estimated correlation, there are a few possibilities to
+consider: (1) check previous literature in your substantive area about the
+correlation among the outcomes and use that value as the estimate; (2) if
+there are enough studies providing each of these outcomes, check the
+correlation between them in your data and use that; (3) conduct sensitivity
+analyses at a few different correlation values and see if there are any
+substantial differences.
+
+Bill Hoyt and I just published an article examining this issue (and other
+issues with effect sizes) within psychotherapy studies. You can get it here:
+
+www.acdelre.com/pubs
+
+Hope this helps,
+
+AC
+
+-- 
+AC Del Re, PhD
+acdelre.com
+
+
+On Sun, Dec 17, 2017 at 3:20 AM, Emily Russell <emilyrussell99 at outlook.com>
+wrote:
+
+> Dear All
+>
+>
+> I wondered if anyone could help with an issue about aggregating effect
+> sizes?  I have 3 effect sizes from one study that come from one sample and
+> so I want to aggregate them into one.  The result of escalc is this
+>
+>
+> Study       yi           vi
+> Arnold  -0.2386 0.2014
+> Arnold   0.4556 0.2052
+> Arnold   0.0563 0.2001
+>
+>
+> so then I used the agg function from MAd
+>
+>
+> ag<-agg(id=Study, es=yi, var=vi,  cor=.5, method="BHHR", mod=NULL, data=ma)
+>
+> which gives the following which I think I can then use as one study in my
+> meta-analysis
+>
+>       id         es              var
+> 1 Arnold 0.09111254 0.1348174
+>
+> Does this seem reasonable?  Also as I don't know the correlation between
+> the three effect sizes I have just used the default of 0.5.  I suspect this
+> is low, but that is just a guess - is that reasonable?
+>
+> Thanks
+>
+> Emily
+>
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From E.vdrMeulen_1 at uvt.nl  Tue Dec 19 11:38:04 2017
+From: E.vdrMeulen_1 at uvt.nl (E. van der Meulen)
+Date: Tue, 19 Dec 2017 10:38:04 +0000
+Subject: [R-meta] Multilevel meta-analysis, mutually exclusive levels
+Message-ID: <308E92802C17934DA89241B47D245E2A2AC959B0@EXMBX101.campus.uvt.nl>
+
+Dear all,
+
+I have been struggling with a specific problem in conducting a multilevel meta-analysis. I will discuss my problem in more detail below. However, in essence the question is the following: in a multilevel structure for meta-analysis can a single study fall under multiple branches of a level that is higher than the study level.
+
+In more detail:
+
+The study context:  I am conducting a review on the predictive validity of a personality concept of soldiers (concept X) n the development of a range of mental health and functioning problems. In short the research question is: too which degree can the concept X predict mental health status of soldiers. Concept X has been longitudinally associated to a wide variety of mental health outcomes: PTSD, depression, alcohol abuse, anxiety problems, etc. The first part of the review is to conduct a meta-analysis for these different concept X and mental health outcomes associations separately without any MULTILEVEL meta-analysis.
+
+A second part is to test a series of moderators using multilevel meta-analysis, and that is where the problems start. I expect to find an effect of for example the time-lag between the measurement of concept X and mental health outcomes (the longer the time-lag, the lower the effect size). However, to make such analyses meaningful, I can only use the aggregate of all effect sizes available, regardless of the type of mental health outcome (otherwise I would have too few effect sizes).
+
+The multilevel moderator analysis problem: as longitudinal associations of concept X and different outcomes can not (and are not) similar, the assessment of the time-lag moderator might yield spurious relationships. For example, when concept X is correlated with PTSD at .10 and with depression on .30, but on the same account the typical time-lag in studies on PTSD is 3 years, and depression is only one week. Then a result could be that the time-lag is a significant moderator, however, due to the huge difference in time-lag and effect size magnitude in PTSD an depression studies, it is not the time-lag but the outcome measure that causes this significant effect. The most tangible manner in overcoming this problem would be to correct for the type of outcome measure (i.e. depression or PTSD as a predictor). However, this would lead to a high number of predictors (75 effect sizes and about 18 predictors). Therefore I made a multilevel model with four levels, from highest to lowest: level 4) mental health outcome, level 3) individual study, level 2) individual effect sizes and level 1) participant level. (In which the level 1 through 3 are similar to most 'typical' multilevel meta-analysis.) However, a consequence of this multilevel model is that several studies fall under multiple branches of level 4, as they conduct analyses on concept X associations with more than 1 mental health outcome (e.g. PTSD AND depression). In a typical multilevel analogy, consider a multilevel construct of classrooms, schools and school districts. In this a typical multilevel model with include a highest level of school districts (I and II), under which you might have several schools A, B and C, and several classrooms within each school (A1, A2, A3, B1, C1). In my model I would have the problem that my model includes the following:
+
+Schooldistrict level I --> School A and B ---> Classrooms A3 and B1
+Schooldistrict Level II --> School A and C ---> Classrooms A1, A2, and C1
+
+As you can see school A (or in my actual problem, the school is a study) falls both under Schooldistrict level I and II. However, the classrooms are only used a single time (or effect sizes only appear once). Is that a problem, that these categories are not mutually exclusive? Or even violating an assumption?
+
+My own model would like something like this:
+
+Mental health outcome (PTSD) ---> Study A and B ---> Effect size A1, A2 and B1 (all effect sizes of associations between PTSD and concept X).
+Mental health outcome (depression) --> Study A and C ---> Effect sizes A3 and C1 (all effect sizes of associations between depression and concept X).
+
+I could really use some input on this!
+
+Kind regards,
+
+Erik van der Meulen
+
+	[[alternative HTML version deleted]]
+
+
+From ayanagis at uwo.ca  Wed Dec 20 19:56:42 2017
+From: ayanagis at uwo.ca (Akifumi Yanagisawa)
+Date: Wed, 20 Dec 2017 18:56:42 +0000
+Subject: [R-meta] Question regarding Generalized Linear Mixed-effects Model
+ for Meta-analysis
+Message-ID: <42948535-731D-4A2A-B141-8BE9CAAE75B8@uwo.ca>
+
+Dear all,
+
+I am having some difficulty dealing with proportional data; the dependent variable is learning gain from an activity, in which means and SDs are converted into proportion. The learning gains are nested in each article; each article examined the learning gains from different types of activities and measured the learning gain at different timing (i.e., immediate post and delayed post). The main thing I would like to do is to get the estimated learning gain percentage and its confidence interval for each activity. 
+
+Using the rma.mv() function, I noticed that estimation values go over 100% sometimes; then I thought I should use generalized linear mixed effects model. On the metafor?s webpage (http://www.metafor-project.org/doku.php/todo), I found that the rma.glmm() command does not support Multilevel Models so far and suggested using the LME4 package. I have been trying to figure out how to do this by myself, but I am not sure if I am doing this right. I would appreciate it if you could see if my approach is appropriate and answer to some of my questions.
+
+(1) The approach I tried was, (1) calculated variance from means, SDs, and the numbers of participants by using the escalc function, and (2) then I tried ?results <- glmer (learning_gain ~ ACTIVITY * TEST_TYPE * TEST_TIMING + (1|article_number/participant_group) + (1|TEST_TIMING:participant_group), weights = 1/vi, family = binomial (link = logit))?. I use the sjPlot package for plotting and the emmeans package to get estiamted learning gain percentages.  Does this sound like the proper approach? Are there other options should I add?
+
+(2) Is it possible for me to get I^2 and H^2 values? I would like to know the proportion of variance explained by each the moderator.
+
+(3) Is there anyway I can conduct (a) Test for Residual Heterogeneity and (b) Test of Moderators? If so, which R package would you recommend? I noticed that the anova function does not provide p-values for the test, and the LmerTest package does not work with the glmer function, either.
+
+Any suggestions and comments will be greatly appreciated. Thank you for your help.
+
+Aki
+
+From robertobakker at gmail.com  Wed Dec 27 12:43:49 2017
+From: robertobakker at gmail.com (P. Roberto Bakker)
+Date: Wed, 27 Dec 2017 12:43:49 +0100
+Subject: [R-meta] forest() - weight
+Message-ID: <CAKDq9_Oq3kTj7KoCQFu+3b3eaR1_Xo0yUcf7ufRSbchvN5P_zw@mail.gmail.com>
+
+Hi everybody,
+
+Is it possible to include weights via forest() graph?
+
+Bw
+Roberto
+
+	[[alternative HTML version deleted]]
+
+
+From sc at imbi.uni-freiburg.de  Wed Dec 27 12:58:17 2017
+From: sc at imbi.uni-freiburg.de (Guido Schwarzer)
+Date: Wed, 27 Dec 2017 12:58:17 +0100
+Subject: [R-meta] forest() - weight
+In-Reply-To: <CAKDq9_Oq3kTj7KoCQFu+3b3eaR1_Xo0yUcf7ufRSbchvN5P_zw@mail.gmail.com>
+References: <CAKDq9_Oq3kTj7KoCQFu+3b3eaR1_Xo0yUcf7ufRSbchvN5P_zw@mail.gmail.com>
+Message-ID: <130106f6-869f-babd-1641-18df92f7d6af@imbi.uni-freiburg.de>
+
+Roberto,
+
+Please have a look at the following email exchange with subject 
+"[R-meta] modifying the default forest plot" which probably answers your 
+question:
+
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2017-December/thread.html#422
+
+Best wishes,
+Guido
+
+-- 
+Dr. Guido Schwarzer (sc at imbi.uni-freiburg.de)
+Institute of Medical Biometry and Statistics
+Stefan-Meier-Str. 26, D-79104 Freiburg | Phone: +49 (0)761 203 6668
+http://www.imbi.uni-freiburg.de        | Fax:   +49 (0)761 203 6680
+
+
+From robertobakker at gmail.com  Wed Dec 27 13:03:44 2017
+From: robertobakker at gmail.com (P. Roberto Bakker)
+Date: Wed, 27 Dec 2017 13:03:44 +0100
+Subject: [R-meta] forest() - weight
+In-Reply-To: <130106f6-869f-babd-1641-18df92f7d6af@imbi.uni-freiburg.de>
+References: <CAKDq9_Oq3kTj7KoCQFu+3b3eaR1_Xo0yUcf7ufRSbchvN5P_zw@mail.gmail.com>
+ <130106f6-869f-babd-1641-18df92f7d6af@imbi.uni-freiburg.de>
+Message-ID: <CAKDq9_MPMV0=7S54+OpyB6bC8yL3au4t9MY8thiXPDE-2Mgwsw@mail.gmail.com>
+
+Thank you, and my apologies, I should have looked first on this page.
+Best wishes,
+Roberto
+
+2017-12-27 12:58 GMT+01:00 Guido Schwarzer <sc at imbi.uni-freiburg.de>:
+
+> Roberto,
+>
+> Please have a look at the following email exchange with subject "[R-meta]
+> modifying the default forest plot" which probably answers your question:
+>
+> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2017-
+> December/thread.html#422
+>
+> Best wishes,
+> Guido
+>
+> --
+> Dr. Guido Schwarzer (sc at imbi.uni-freiburg.de)
+> Institute of Medical Biometry and Statistics
+> Stefan-Meier-Str. 26, D-79104 Freiburg
+> <https://maps.google.com/?q=Stefan-Meier-Str.+26,+D-79104+Freiburg&entry=gmail&source=g>
+> | Phone: +49 (0)761 203 6668
+> http://www.imbi.uni-freiburg.de        | Fax:   +49 (0)761 203 6680
+>
+>
+
+	[[alternative HTML version deleted]]
+
+

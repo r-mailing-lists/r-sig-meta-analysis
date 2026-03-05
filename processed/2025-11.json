@@ -1,0 +1,186 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2025-11",
+  "messages": [
+    {
+      "id": "msg-7339ddadbd5b",
+      "message_id": "<CAM0b4vh_3Gr3BGk38NE1K9kz4DgpcrnurQyAXfs2RFGy53ieUg@mail.gmail.com>",
+      "from_name": "Lindsay Gaudet",
+      "from_email_hash": "4b5cc3cadeb2623c11227577a163f806d23e47385242f49b40d7419c342261cf",
+      "date": "2025-11-14T16:52:51-07:00",
+      "subject": "[R-meta] Subgroups using metaprop",
+      "subject_clean": "[R-meta] Subgroups using metaprop",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "I am trying to do a meta-analysis of proportions using the inverse\nvariance method. Attempting subgroup analyses with 3 subgroups,\nregardless of the method to estimate tau or to estimate fixed (common)\nor random effects, returns an error. The error occurs regardless of\nthe number of studies in each group, and regardless of the analysis\nmethod chosen (i.e., other transformations, or attempting GLMM or\ndifferent methods to estimate tau). It does not occur when there are\nonly 2 subgroups.\n\nThe error that keeps coming up says: \"Error in .C(\"ruben\", lambda =\nas.double(lambda), h = as.integer(h), delta = as.double(delta),  :\n  \"ruben\" not available for .C() for package \"CompQuadForm\"\"\n\nMy code is below:\n\nlibrary (meta)\ndata <- structure(list(Study = c(\"Study A\", \"Study B\", \"Study C\",\n\"Study D\", \"Study E\", \"Study F\", \"Study G\", \"Study H\", \"Study I\",\n\"Study J\" ), Intensity = c(\"Low\", \"Moderate\", \"Moderate\", \"Moderate\",\n\"Moderate\", \"Moderate\", \"Moderate\", \"High\", \"Moderate\", \"High\"),\nevents = c(4769, 717, 3031, 1950, 857, 4925, 310, 1626, 1292, 221), n\n= c(64425, 3908, 23771, 12264, 5729, 16501, 1638, 7635, 4810, 3095)),\nclass = \"data.frame\", row.names = c(NA, -10L))\nmp <- metaprop(events, n,\n     data = data,\n     method = \"INVERSE\",\n     sm=\"PLOGIT\",\n     studlab = Study,\n     subgroup = Intensity)\n\nI would be very grateful if anyone has any insight into what is going on here.\n\nLindsay",
+      "body_snippet": "I am trying to do a meta-analysis of proportions using the inverse\nvariance method. Attempting subgroup analyses with 3 subgroups,\nregardless of the method to estimate tau or to estimate fixed (common",
+      "thread_id": "thread-7339ddadbd5b",
+      "thread_depth": 0,
+      "month": "2025-11"
+    },
+    {
+      "id": "msg-d6d445f4491e",
+      "message_id": "<078db5f9-c36a-4b16-9146-c63384e0b9e7@dewey.myzen.co.uk>",
+      "from_name": "Michael Dewey",
+      "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
+      "date": "2025-11-15T11:13:18Z",
+      "subject": "[R-meta] Subgroups using metaprop",
+      "subject_clean": "[R-meta] Subgroups using metaprop",
+      "in_reply_to": "<CAM0b4vh_3Gr3BGk38NE1K9kz4DgpcrnurQyAXfs2RFGy53ieUg@mail.gmail.com>",
+      "references": [
+        "<CAM0b4vh_3Gr3BGk38NE1K9kz4DgpcrnurQyAXfs2RFGy53ieUg@mail.gmail.com>"
+      ],
+      "body_plain": "Dear Lindsay\n\nWhen I run your code here it works seamlessly. Do you perhaps have old \nversions of one or other of the packages mentioned? Or are you using an \nincompatible version of R? I would suggest doing update.packages() to \nsee if that clears it. If you have an old version of R I would update \nthat first.\n\nMichael\n\nOn 14/11/2025 23:52, Lindsay Gaudet via R-sig-meta-analysis wrote:\n> I am trying to do a meta-analysis of proportions using the inverse\n> variance method. Attempting subgroup analyses with 3 subgroups,\n> regardless of the method to estimate tau or to estimate fixed (common)\n> or random effects, returns an error. The error occurs regardless of\n> the number of studies in each group, and regardless of the analysis\n> method chosen (i.e., other transformations, or attempting GLMM or\n> different methods to estimate tau). It does not occur when there are\n> only 2 subgroups.\n> \n> The error that keeps coming up says: \"Error in .C(\"ruben\", lambda =\n> as.double(lambda), h = as.integer(h), delta = as.double(delta),  :\n>    \"ruben\" not available for .C() for package \"CompQuadForm\"\"\n> \n> My code is below:\n> \n> library (meta)\n> data <- structure(list(Study = c(\"Study A\", \"Study B\", \"Study C\",\n> \"Study D\", \"Study E\", \"Study F\", \"Study G\", \"Study H\", \"Study I\",\n> \"Study J\" ), Intensity = c(\"Low\", \"Moderate\", \"Moderate\", \"Moderate\",\n> \"Moderate\", \"Moderate\", \"Moderate\", \"High\", \"Moderate\", \"High\"),\n> events = c(4769, 717, 3031, 1950, 857, 4925, 310, 1626, 1292, 221), n\n> = c(64425, 3908, 23771, 12264, 5729, 16501, 1638, 7635, 4810, 3095)),\n> class = \"data.frame\", row.names = c(NA, -10L))\n> mp <- metaprop(events, n,\n>       data = data,\n>       method = \"INVERSE\",\n>       sm=\"PLOGIT\",\n>       studlab = Study,\n>       subgroup = Intensity)\n> \n> I would be very grateful if anyone has any insight into what is going on here.\n> \n> Lindsay\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n-- \nMichael Dewey",
+      "body_snippet": "Dear Lindsay\n\nWhen I run your code here it works seamlessly. Do you perhaps have old \nversions of one or other of the packages mentioned? Or are you using an \nincompatible version of R? I would sugges",
+      "thread_id": "thread-7339ddadbd5b",
+      "thread_depth": 1,
+      "month": "2025-11"
+    },
+    {
+      "id": "msg-5e0511f16705",
+      "message_id": "<6300a3558bb440d884f3106abe111648@uniklinik-freiburg.de>",
+      "from_name": "Dr. Gerta Rücker",
+      "from_email_hash": "6b766b8c4a1ffaf9083fe27818a854193e128a5125eee63d75a02a45cef86821",
+      "date": "2025-11-15T14:53:28Z",
+      "subject": "[R-meta] Subgroups using metaprop",
+      "subject_clean": "[R-meta] Subgroups using metaprop",
+      "in_reply_to": "<078db5f9-c36a-4b16-9146-c63384e0b9e7@dewey.myzen.co.uk>",
+      "references": [
+        "<CAM0b4vh_3Gr3BGk38NE1K9kz4DgpcrnurQyAXfs2RFGy53ieUg@mail.gmail.com>",
+        "<078db5f9-c36a-4b16-9146-c63384e0b9e7@dewey.myzen.co.uk>"
+      ],
+      "body_plain": "Hi Lindsay,\nJust tried the same without noticing Michael's response (he was faster). The code runs smoothly with R version 4.5.1, meta version meta_8.2-1. Below you find the result. I would remove the common effect model in a subgroup analysis.\n\nBest,\nGerta\n\n        proportion           95%-CI %W(common) %W(random) Intensity\nStudy A     0.0740 [0.0720; 0.0761]       27.3       10.0       Low\nStudy B     0.1835 [0.1714; 0.1960]        3.6       10.0  Moderate\nStudy C     0.1275 [0.1233; 0.1318]       16.4       10.0  Moderate\nStudy D     0.1590 [0.1526; 0.1656]       10.2       10.0  Moderate\nStudy E     0.1496 [0.1404; 0.1591]        4.5       10.0  Moderate\nStudy F     0.2985 [0.2915; 0.3055]       21.4       10.0  Moderate\nStudy G     0.1893 [0.1706; 0.2091]        1.6        9.9  Moderate\nStudy H     0.2130 [0.2038; 0.2223]        7.9       10.0      High\nStudy I     0.2686 [0.2561; 0.2814]        5.9       10.0  Moderate\nStudy J     0.0714 [0.0626; 0.0811]        1.3        9.9      High\n\nNumber of studies: k = 10\nNumber of observations: o = 143776\nNumber of events: e = 19698\n\n                     proportion           95%-CI\nCommon effect model      0.1535 [0.1515; 0.1555]\nRandom effects model     0.1608 [0.1187; 0.2143]\n\nQuantifying heterogeneity (with 95%-CIs):\n tau^2 = 0.3226 [0.1518; 1.0801]; tau = 0.5680 [0.3896; 1.0393]\n I^2 = 99.9% [99.8%; 99.9%]; H = 26.82 [25.28; 28.44]\n\nTest of heterogeneity:\n       Q d.f. p-value\n 6471.43    9       0\n\nResults for subgroups (common effect model):\n                       k proportion           95%-CI       Q   I^2\nIntensity = Low        1     0.0740 [0.0720; 0.0761]    0.00    --\nIntensity = Moderate   7     0.1998 [0.1967; 0.2029] 2104.62 99.7%\nIntensity = High       2     0.1853 [0.1777; 0.1931]  279.96 99.6%\n\nTest for subgroup differences (common effect model):\n                     Q d.f. p-value\nBetween groups 4086.85    2       0\nWithin groups  2384.58    7       0\n\nResults for subgroups (random effects model):\n                       k proportion           95%-CI  tau^2    tau\nIntensity = Low        1     0.0740 [0.0720; 0.0761]     --     --\nIntensity = Moderate   7     0.1904 [0.1497; 0.2392] 0.1519 0.3897\nIntensity = High       2     0.1262 [0.0404; 0.3315] 0.7887 0.8881\n\nTest for subgroup differences (random effects model):\n                   Q d.f.  p-value\nBetween groups 53.53    2 < 0.0001\n\nDetails of meta-analysis methods:\n- Inverse variance method\n- Restricted maximum-likelihood estimator for tau^2\n- Q-Profile method for confidence interval of tau^2 and tau\n- Calculation of I^2 based on Q\n- Logit transformation\n- Clopper-Pearson confidence interval for individual studies\n\n\n\n\nUNIVERSIT?TSKLINIKUM FREIBURG\nInstitute for Medical Biometry and Statistics\n\nDr. Gerta R?cker\nGuest Scientist\n\nStefan-Meier-Stra?e 26 ? 79104 Freiburg\ngerta.ruecker at uniklinik-freiburg.de\n\nhttps://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker\n\n-----Urspr?ngliche Nachricht-----\nVon: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> Im Auftrag von Michael Dewey via R-sig-meta-analysis\nGesendet: Samstag, 15. November 2025 12:13\nAn: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>\nCc: Michael Dewey <lists at dewey.myzen.co.uk>; Lindsay Gaudet <lovstrom at ualberta.ca>\nBetreff: Re: [R-meta] Subgroups using metaprop\n\nDear Lindsay\n\nWhen I run your code here it works seamlessly. Do you perhaps have old \nversions of one or other of the packages mentioned? Or are you using an \nincompatible version of R? I would suggest doing update.packages() to \nsee if that clears it. If you have an old version of R I would update \nthat first.\n\nMichael\n\nOn 14/11/2025 23:52, Lindsay Gaudet via R-sig-meta-analysis wrote:\n> I am trying to do a meta-analysis of proportions using the inverse\n> variance method. Attempting subgroup analyses with 3 subgroups,\n> regardless of the method to estimate tau or to estimate fixed (common)\n> or random effects, returns an error. The error occurs regardless of\n> the number of studies in each group, and regardless of the analysis\n> method chosen (i.e., other transformations, or attempting GLMM or\n> different methods to estimate tau). It does not occur when there are\n> only 2 subgroups.\n> \n> The error that keeps coming up says: \"Error in .C(\"ruben\", lambda =\n> as.double(lambda), h = as.integer(h), delta = as.double(delta),  :\n>    \"ruben\" not available for .C() for package \"CompQuadForm\"\"\n> \n> My code is below:\n> \n> library (meta)\n> data <- structure(list(Study = c(\"Study A\", \"Study B\", \"Study C\",\n> \"Study D\", \"Study E\", \"Study F\", \"Study G\", \"Study H\", \"Study I\",\n> \"Study J\" ), Intensity = c(\"Low\", \"Moderate\", \"Moderate\", \"Moderate\",\n> \"Moderate\", \"Moderate\", \"Moderate\", \"High\", \"Moderate\", \"High\"),\n> events = c(4769, 717, 3031, 1950, 857, 4925, 310, 1626, 1292, 221), n\n> = c(64425, 3908, 23771, 12264, 5729, 16501, 1638, 7635, 4810, 3095)),\n> class = \"data.frame\", row.names = c(NA, -10L))\n> mp <- metaprop(events, n,\n>       data = data,\n>       method = \"INVERSE\",\n>       sm=\"PLOGIT\",\n>       studlab = Study,\n>       subgroup = Intensity)\n> \n> I would be very grateful if anyone has any insight into what is going on here.\n> \n> Lindsay\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n-- \nMichael Dewey\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis",
+      "body_snippet": "Hi Lindsay,\nJust tried the same without noticing Michael's response (he was faster). The code runs smoothly with R version 4.5.1, meta version meta_8.2-1. Below you find the result. I would remove the",
+      "thread_id": "thread-7339ddadbd5b",
+      "thread_depth": 2,
+      "month": "2025-11"
+    },
+    {
+      "id": "msg-3d25f8222484",
+      "message_id": "<CAGtj4DxD8Fcn5ywswgFk8AGfhx3V-GCA3H9URwKy405x3vGqGA@mail.gmail.com>",
+      "from_name": "Gladys Barragan-Jason",
+      "from_email_hash": "906da6aac6f82dece971501327e3304bcbc390b6f10381126f664ff1dc058929",
+      "date": "2025-11-17T15:59:47+01:00",
+      "subject": "[R-meta] meta-analysis of other values than effect size",
+      "subject_clean": "[R-meta] meta-analysis of other values than effect size",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear all,\n\nI would like to know whether it is possible to conduct a meta-analysis on\nthe mean values of a variable (for which I have sample size, standard\ndeviation, mean age, gender distribution, country etc.). Can such an\nanalysis be performed in a way similar to a meta-analysis of effect sizes\nwhere several samples came from the same study and which take the number of\nparticipants etc... into account?\n\nBest wishes,\n\nGladys\n-- \n\n------------------------------------------\n\nGladys Barragan-Jason, PhD.  Website\n<https://sites.google.com/view/gladysbarraganjason/home> / Site web\n<https://sites.google.com/view/frgladysbarragan-jason/accueil>\n\nCharg?e de recherche, CRCN\n\nStation d'Ecologie Th?orique et Exp?rimentale (SETE)\n\nCentre National de la Recherche Scientifique (CNRS)\n\n2 route du CNRS, 09200 Moulis\n\nEquipe LINKING\n\nGroupe de recherche RISE (Recherche Interdisciplinaire pour la\nSoutenabilit? Environnementale)\n\nCoordinatrice du r?seau ETHNOECO\n\n07 72 07 93 31\n\n[image: image.png][image: image.png]\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20251117/4431f1bb/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image004.png\nType: image/png\nSize: 7125 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20251117/4431f1bb/attachment-0002.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image003.png\nType: image/png\nSize: 7519 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20251117/4431f1bb/attachment-0003.png>",
+      "body_snippet": "Dear all,\n\nI would like to know whether it is possible to conduct a meta-analysis on\nthe mean values of a variable (for which I have sample size, standard\ndeviation, mean age, gender distribution, cou",
+      "thread_id": "thread-3d25f8222484",
+      "thread_depth": 0,
+      "month": "2025-11"
+    },
+    {
+      "id": "msg-19561323b25b",
+      "message_id": "<641d7c5e746043758399017903bcc05c@uniklinik-freiburg.de>",
+      "from_name": "Dr. Gerta Rücker",
+      "from_email_hash": "6b766b8c4a1ffaf9083fe27818a854193e128a5125eee63d75a02a45cef86821",
+      "date": "2025-11-17T15:11:42Z",
+      "subject": "[R-meta] meta-analysis of other values than effect size",
+      "subject_clean": "[R-meta] meta-analysis of other values than effect size",
+      "in_reply_to": "<CAGtj4DxD8Fcn5ywswgFk8AGfhx3V-GCA3H9URwKy405x3vGqGA@mail.gmail.com>",
+      "references": [
+        "<CAGtj4DxD8Fcn5ywswgFk8AGfhx3V-GCA3H9URwKy405x3vGqGA@mail.gmail.com>"
+      ],
+      "body_plain": "Hi Gladys,\nOf course this is possible, for example using function metamean() from R package meta. The main arguments are n, mean, sd, studlab, where sd is the standard deviation (not to be confused with the standard error), and studlab is a study label. See help(metamean). You can then also perform subgroup analyses or metaregression.\n\nBest,\nGerta\n\n\n\nUNIVERSIT?TSKLINIKUM FREIBURG\nInstitute for Medical Biometry and Statistics\n\nDr. Gerta R?cker\nGuest Scientist\n\nStefan-Meier-Stra?e 26 ? 79104 Freiburg\ngerta.ruecker at uniklinik-freiburg.de\n\nhttps://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker\n\nVon: Gladys Barragan-Jason via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>\nGesendet: Montag, 17. November 2025 16:00\nAn: R meta <r-sig-meta-analysis at r-project.org>\nCc: Gladys Barragan-Jason <gladou86 at gmail.com>\nBetreff: [R-meta] meta-analysis of other values than effect size\n\nDear all,\n\nI would like to know whether it is possible to conduct a meta-analysis on the mean values of a variable (for which I have sample size, standard deviation, mean age, gender distribution, country etc.). Can such an analysis be performed in a way similar to a meta-analysis of effect sizes where several samples came from the same study and which take the number of participants etc... into account?\n\nBest wishes,\n\nGladys\n--\n------------------------------------------\nGladys Barragan-Jason, PhD.  Website<https://sites.google.com/view/gladysbarraganjason/home> / Site web<https://sites.google.com/view/frgladysbarragan-jason/accueil>\nCharg?e de recherche, CRCN\nStation d'Ecologie Th?orique et Exp?rimentale (SETE)\nCentre National de la Recherche Scientifique (CNRS)\n2 route du CNRS, 09200 Moulis\nEquipe LINKING\nGroupe de recherche RISE (Recherche Interdisciplinaire pour la Soutenabilit? Environnementale)\nCoordinatrice du r?seau ETHNOECO\n07 72 07 93 31\n[cid:image001.png at 01DC57DC.DBD5B630][cid:image002.png at 01DC57DC.DBD5B630]\n\n\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20251117/0bd1523f/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image001.png\nType: image/png\nSize: 7519 bytes\nDesc: image001.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20251117/0bd1523f/attachment-0002.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image002.png\nType: image/png\nSize: 7125 bytes\nDesc: image002.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20251117/0bd1523f/attachment-0003.png>",
+      "body_snippet": "Hi Gladys,\nOf course this is possible, for example using function metamean() from R package meta. The main arguments are n, mean, sd, studlab, where sd is the standard deviation (not to be confused wi",
+      "thread_id": "thread-3d25f8222484",
+      "thread_depth": 1,
+      "month": "2025-11"
+    },
+    {
+      "id": "msg-668cf26cef7b",
+      "message_id": "<CAFUVuJzCXrBKMqduXiQ7J18sviyZSGioDK2s2o3_29C7sBE7LA@mail.gmail.com>",
+      "from_name": "James Pustejovsky",
+      "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
+      "date": "2025-11-17T09:12:16-06:00",
+      "subject": "[R-meta] meta-analysis of other values than effect size",
+      "subject_clean": "[R-meta] meta-analysis of other values than effect size",
+      "in_reply_to": "<CAGtj4DxD8Fcn5ywswgFk8AGfhx3V-GCA3H9URwKy405x3vGqGA@mail.gmail.com>",
+      "references": [
+        "<CAGtj4DxD8Fcn5ywswgFk8AGfhx3V-GCA3H9URwKy405x3vGqGA@mail.gmail.com>"
+      ],
+      "body_plain": "Hi Gladys,\n\nIn short, yes. It's entirely possible and conventional to use group means\n(or raw percentages, or group-specific SDs) as the effect size in a\nmeta-analysis. The metafor package's escalc() function provides options for\ncalculating the standard errors of such effect sizes; see details here:\nhttps://wviechtb.github.io/metafor/reference/escalc.html#-outcome-measures-for-individual-groups\nHere is an example of a synthesis that uses percentage as the effect size\nmetric:\nhttps://srcd.onlinelibrary.wiley.com/doi/full/10.1111/cdev.13039\n\nKind Regards,\nJames\n\nOn Mon, Nov 17, 2025 at 9:02?AM Gladys Barragan-Jason via\nR-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:\n\n> Dear all,\n>\n> I would like to know whether it is possible to conduct a meta-analysis on\n> the mean values of a variable (for which I have sample size, standard\n> deviation, mean age, gender distribution, country etc.). Can such an\n> analysis be performed in a way similar to a meta-analysis of effect sizes\n> where several samples came from the same study and which take the number of\n> participants etc... into account?\n>\n> Best wishes,\n>\n> Gladys\n> --\n>\n> ------------------------------------------\n>\n> Gladys Barragan-Jason, PhD.  Website\n> <https://sites.google.com/view/gladysbarraganjason/home> / Site web\n> <https://sites.google.com/view/frgladysbarragan-jason/accueil>\n>\n> Charg?e de recherche, CRCN\n>\n> Station d'Ecologie Th?orique et Exp?rimentale (SETE)\n>\n> Centre National de la Recherche Scientifique (CNRS)\n>\n> 2 route du CNRS, 09200 Moulis\n>\n> Equipe LINKING\n>\n> Groupe de recherche RISE (Recherche Interdisciplinaire pour la\n> Soutenabilit? Environnementale)\n>\n> Coordinatrice du r?seau ETHNOECO\n>\n> 07 72 07 93 31\n>\n> [image: image.png][image: image.png]\n>\n>\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20251117/8d211630/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image004.png\nType: image/png\nSize: 7125 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20251117/8d211630/attachment-0002.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image003.png\nType: image/png\nSize: 7519 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20251117/8d211630/attachment-0003.png>",
+      "body_snippet": "Hi Gladys,\n\nIn short, yes. It's entirely possible and conventional to use group means\n(or raw percentages, or group-specific SDs) as the effect size in a\nmeta-analysis. The metafor package's escalc() ",
+      "thread_id": "thread-3d25f8222484",
+      "thread_depth": 1,
+      "month": "2025-11"
+    },
+    {
+      "id": "msg-9d7c649e50f2",
+      "message_id": "<0f1752e561f0d41551c3d75962b80dba@transmittingscience.com>",
+      "from_name": "d@@@e@s@@z m@iii@g oii tr@@smitti@gscie@ce@com",
+      "from_email_hash": "944b6d1f2c2fc110429cf7a059a70ce59b8c16ed80d01e943ccb83c5085de915",
+      "date": "2025-11-22T09:28:01+01:00",
+      "subject": "[R-meta] Online course: Host and manage your R projects with Git & GitHub",
+      "subject_clean": "[R-meta] Online course: Host and manage your R projects with Git & GitHub",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear colleagues,\n\nTransmitting Science is offering a new edition of the course ?Host and \nmanage your R projects with Git & GitHub?\nCourse webpage: \nhttps://www.transmittingscience.com/courses/statistics-and-bioinformatics/host-and-manage-your-r-projects-with-git-on-github/\n\nDates and schedule: online live sessions on December 9th, 11th and 12th, \n2025.\n\nThe aim of this course is to introduce participants to version control \nwith Git and GitHub tailored for R-based projects. The course will cover \nboth the theoretical background and practical workflow of initializing a \nGit repository, branching, collaboration on GitHub, continuous \nintegration, and best practices for reproducible R projects.\n\nBy the end of the course, students will be able to:\n? Understand the principles of version control and collaboration in Git.\n? Setup and manage R projects in Git / GitHub.\n? Use branching, pull requests and merge workflows.\n? Implement continuous integration and reproducible workflows for R.\n\nInstruction will combine lectures, guided examples, and practical \nexercises.\n\nFor any question, please write to courses at transmittingscience.com\n\nBest regards,\nD?nae\n\n\n-- \nD?nae Sanz P?rez, PhD.\nCourses Coordinator\nUpcoming courses: \nhttps://www.transmittingscience.com/courses/#upcoming-courses\n\nTwitter: @transmitscience\nInstagram: @transmittingscience\nFacebook: @Transmittingscience",
+      "body_snippet": "Dear colleagues,\n\nTransmitting Science is offering a new edition of the course ?Host and \nmanage your R projects with Git & GitHub?\nCourse webpage: \nhttps://www.transmittingscience.com/courses/statist",
+      "thread_id": "thread-9d7c649e50f2",
+      "thread_depth": 0,
+      "month": "2025-11"
+    },
+    {
+      "id": "msg-7b3fc9d2c419",
+      "message_id": "<d4831208-6ea9-45ce-8b76-7d126477e024@dewey.myzen.co.uk>",
+      "from_name": "Michael Dewey",
+      "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
+      "date": "2025-11-22T12:00:03Z",
+      "subject": "[R-meta]  Online course: Host and manage your R projects with Git & GitHub",
+      "subject_clean": "[R-meta]  Online course: Host and manage your R projects with Git & GitHub",
+      "in_reply_to": "<0f1752e561f0d41551c3d75962b80dba@transmittingscience.com>",
+      "references": [
+        "<0f1752e561f0d41551c3d75962b80dba@transmittingscience.com>"
+      ],
+      "body_plain": "This list is for R and meta-analysis so your post is off-topic here. \nPlease stop spamming this list.\n\nOn 22/11/2025 08:28, D?nae Sanz P?rez via R-sig-meta-analysis wrote:\n> Dear colleagues,\n> \n> Transmitting Science is offering a new edition of the course ?Host and \n> manage your R projects with Git & GitHub?\n> Course webpage: https://www.transmittingscience.com/courses/statistics- \n> and-bioinformatics/host-and-manage-your-r-projects-with-git-on-github/\n> \n> Dates and schedule: online live sessions on December 9th, 11th and 12th, \n> 2025.\n> \n> The aim of this course is to introduce participants to version control \n> with Git and GitHub tailored for R-based projects. The course will cover \n> both the theoretical background and practical workflow of initializing a \n> Git repository, branching, collaboration on GitHub, continuous \n> integration, and best practices for reproducible R projects.\n> \n> By the end of the course, students will be able to:\n> ? Understand the principles of version control and collaboration in Git.\n> ? Setup and manage R projects in Git / GitHub.\n> ? Use branching, pull requests and merge workflows.\n> ? Implement continuous integration and reproducible workflows for R.\n> \n> Instruction will combine lectures, guided examples, and practical \n> exercises.\n> \n> For any question, please write to courses at transmittingscience.com\n> \n> Best regards,\n> D?nae\n> \n> \n\n-- \nMichael Dewey",
+      "body_snippet": "This list is for R and meta-analysis so your post is off-topic here. \nPlease stop spamming this list.\n\nOn 22/11/2025 08:28, D?nae Sanz P?rez via R-sig-meta-analysis wrote:\n> Dear colleagues,\n> \n> Tran",
+      "thread_id": "thread-9d7c649e50f2",
+      "thread_depth": 1,
+      "month": "2025-11"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-7339ddadbd5b",
+      "subject": "[R-meta] Subgroups using metaprop",
+      "message_count": 3,
+      "participants": [
+        "Dr. Gerta Rücker",
+        "Lindsay Gaudet",
+        "Michael Dewey"
+      ],
+      "started": "2025-11-14T16:52:51-07:00",
+      "last_reply": "2025-11-15T14:53:28+00:00",
+      "root_message_id": "msg-7339ddadbd5b"
+    },
+    {
+      "id": "thread-3d25f8222484",
+      "subject": "[R-meta] meta-analysis of other values than effect size",
+      "message_count": 3,
+      "participants": [
+        "Dr. Gerta Rücker",
+        "Gladys Barragan-Jason",
+        "James Pustejovsky"
+      ],
+      "started": "2025-11-17T15:59:47+01:00",
+      "last_reply": "2025-11-17T09:12:16-06:00",
+      "root_message_id": "msg-3d25f8222484"
+    },
+    {
+      "id": "thread-9d7c649e50f2",
+      "subject": "[R-meta] Online course: Host and manage your R projects with Git & GitHub",
+      "message_count": 2,
+      "participants": [
+        "Michael Dewey",
+        "d@@@e@s@@z m@iii@g oii tr@@smitti@gscie@ce@com"
+      ],
+      "started": "2025-11-22T09:28:01+01:00",
+      "last_reply": "2025-11-22T12:00:03+00:00",
+      "root_message_id": "msg-9d7c649e50f2"
+    }
+  ]
+}

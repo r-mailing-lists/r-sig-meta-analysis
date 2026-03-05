@@ -1,0 +1,3057 @@
+From j|deogbu @end|ng |rom y@hoo@com  Mon Jul  1 17:37:30 2019
+From: j|deogbu @end|ng |rom y@hoo@com (jideofor thomas)
+Date: Mon, 1 Jul 2019 15:37:30 +0000 (UTC)
+Subject: [R-meta] Impact of very high tau-square value.
+In-Reply-To: <9a9dd9df-3f33-25d9-18e4-8f2f610e3a96@imbi.uni-freiburg.de>
+References: <865310805.108424.1561534340962.ref@mail.yahoo.com>
+ <865310805.108424.1561534340962@mail.yahoo.com>
+ <9a9dd9df-3f33-25d9-18e4-8f2f610e3a96@imbi.uni-freiburg.de>
+Message-ID: <1391277954.1338731.1561995450072@mail.yahoo.com>
+
+ Dear Guido,
+Thanks for the feedback and the insight into the tau-value.
+My response is incidence rate? and measured per 10000 person per day.
+regards,Thomas Ogbu
+    On Wednesday, June 26, 2019, 02:28:23 AM PDT, Guido Schwarzer <sc at imbi.uni-freiburg.de> wrote:  
+ 
+ Dear Jide Ogbu,
+
+It is not possible to give any specific advice on your dataset as you do 
+not provide sufficient information. So, I will make some general comments.
+
+A plethora of methods to estimate tau-squared is available (Veroniki et 
+al., 2016) and they can give different estimates; see argument 'method' 
+in metafor.
+
+Furthermore, whether a tau-squared value of 32.8 is large depends on the 
+outcome measure (and for some outcomes on the underlying metric). This 
+value could be judged to be small if you are interested in a mean 
+difference - depending on your metric. However, if your outcome measure 
+is a standardized mean difference or a log odds ratio a tau-squared 
+value of 32.8 would be very extreme.
+
+Best wishes, Guido
+
+Veroniki AA, Jackson D, Viechtbauer W, Bender R, Bowden J, Knapp G, et 
+al. Methods to estimate the between-study variance and its uncertainty 
+in meta-analysis. Research Synthesis Methods. 2016;7:55?79.
+
+  
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Jul  2 11:49:49 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 2 Jul 2019 09:49:49 +0000
+Subject: [R-meta] Transformation of meta-regression coefficients to ORs
+In-Reply-To: <001101d52e8a$24b76160$6e262420$@upd.unibe.ch>
+References: <001101d52e8a$24b76160$6e262420$@upd.unibe.ch>
+Message-ID: <a7c2e3f18ef44cf2a0b05d6d809c0644@UM-MAIL3214.unimaas.nl>
+
+Dear Dirk,
+
+What effect size / outcome measure are you using for your analysis? If you are meta-analyzing logit transformed proportions, then exponentiating a beta coefficient will give you the odds ratio for the corresponding predictor. For example:
+
+library(metafor)
+
+dat <- escalc(measure="PLO", xi=xi, ni=ni, data=dat.debruin2009)
+dat
+
+res <- rma(yi, vi, mods = ~ scq + ethnicity + patients + select + sens, data=dat)
+res
+
+round(exp(coef(summary(res))[-1,c("estimate", "ci.lb", "ci.ub")]), 2)
+
+                 estimate ci.lb ci.ub
+scq                  1.06  1.02  1.10
+ethnicityother       0.39  0.19  0.80
+patientsstarting     1.41  0.81  2.46
+selectyes            0.72  0.38  1.38
+sens<400             0.66  0.33  1.31
+
+So, per one-unit increase in SCQ, the odds (in this case, of having an undetectable viral load) goes up by 6% (95% CI: 2% to 10%), or in other words, the odds ratio is 1.06 (95% CI: 1.02 to 1.10). Since we are comparing studies with different levels of SCQ, it might be more appropriate to say that in studies where SCQ is one point higher, the odds of an undetectable viral load are 6% higher (and if we want to be even more precise, we really should that "are on average 6% higher"). Similarly, in studies where the majority of participants are non-Caucasian, the odds are on average 61% lower (95% CI: 20% to 81%), or in other words, the odds ratio is 0.39 (95% CI: 0.19 to 0.80).
+
+But this only works for logit transformed proportions as the outcome. 
+
+For other ratio-type outcome measures that are log transformed (e.g., log risk ratios and log odds ratios), exponentiating a coefficient gives you a ratio as well, but it is actually the ratio of two ratios. For example:
+
+dat <- escalc(measure="OR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+dat
+
+res <- rma(yi, vi, mods = ~ ablat + year, data=dat)
+res
+
+round(exp(coef(summary(res))[-1,c("estimate", "ci.lb", "ci.ub")]), 2)
+
+      estimate ci.lb ci.ub
+ablat     0.97  0.95  0.99
+year      1.01  0.98  1.03
+
+So, in studies that are one more degree away from the equator (i.e., where absolute latitude increases by one unit), the odds ratio (i.e., the ratio of a TB infection in those vaccinated compared to those not vaccinated) goes down on average by 3% (95% CI: 1% to 5%), or the ratio of odds ratios is 0.97 (95% CI: 0.95 to 0.99).
+
+Those are essentially the two cases where you can go from the coefficients to either an odds ratio or a ratio of odds ratios (the latter can also be done, for example, with risk ratios -- then you get a ratio of risk ratios).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of dirk.richter at upd.unibe.ch
+Sent: Saturday, 29 June, 2019 16:52
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Transformation of meta-regression coefficients to ORs
+
+Dear mailing list members
+
+A reviewer of a paper I have authored has requested to transform the beta
+estimates of a meta-regression result into odds ratios. The analysis was
+conducted with the metafor rma.mv function. Although I understand the point
+of this suggestion, I have looked into several textbooks and review articles
+and have not found anything in this regard.
+Before I start searching for a code to do this, I would like to kindly ask
+for opinions on this issue. And if it is reasonable to do so I would be
+grateful to see a coding example.
+
+Many thanks in advance,
+Dirk Richter
+
+UNIVERSIT?RE PSYCHIATRISCHE DIENSTE BERN (UPD) AG
+ZENTRUM PSYCHIATRISCHE REHABILITATION
+
+Dirk Richter, Dr. phil. habil.
+Leiter Forschung und Entwicklung
+Murtenstrasse 46
+CH-3008 Bern
+Tel. +41 31 632 4707
+Mobil + 41 76 717 5220
+E-Mail: dirk.richter at upd.unibe.ch 
+
+Bern University Hospital for Mental Health
+Center for Psychiatric Rehabilitation
+Dirk Richter, Dr. phil., PhD
+Head of Research and Development
+Murtenstrasse 46
+CH-3008 Bern
+Switzerland
+Phone +41 31 632 4707
+Mobile Phone +41 76 717 5220
+
+
+From |@g111 @end|ng |rom em@||@unc@edu  Tue Jul  2 15:43:05 2019
+From: |@g111 @end|ng |rom em@||@unc@edu (Graybill, Lauren Aiko)
+Date: Tue, 2 Jul 2019 13:43:05 +0000
+Subject: [R-meta] Forest plot help!
+Message-ID: <BL0PR03MB4129429AABC973CBCB0FF318C1F80@BL0PR03MB4129.namprd03.prod.outlook.com>
+
+Hi everyone,
+
+I was hoping that folks on this mailing list may be able to help me out with some code. I'm working on a meta-analysis of incidence rates and would like to include a forest plot where the 95% confidence interval of each contributing estimate is symmetrical around the estimate (something we anticipate being asked about once we submit the manuscript for publication, so trying to get ahead here). This is possible if I plot natural log-transformed estimates, but for interpretability, I'd like to have everything exponentiated to the actual incidence rate per 100 PY. I imagine I may be able to achieve symmetrical 95% CIs if I plot log-transformed estimates and then change the label of the x-axis such that it shows exponentiated numbers...but I'm not sure how to do this. 
+
+Currently, I use the metarate function, followed by the forest function, where I plot the actual IR (not the log-transformed IR):
+
+crude_1fp <- metarate(event=Seroconversions, time=PY, data=ir, studlab=cite, 
+                    exclude=NULL, method="inverse", sm=("IRLN"), incr=0.5, allincr=FALSE, 
+                    level=(0.95), level.comb=(0.95), comb.fixed=FALSE, comb.random=TRUE, 
+                    prediction=TRUE, method.tau="REML", irscale=100, irunit="Person-Years", 
+                    title="HIV Incidence Rates")
+
+forest(crude_1fp, digits=1, fontsize=10, spacing=0.8, xlim=c(0,20), squaresize=0.75, 
+       overall=TRUE, prediction=TRUE, pooled.events=TRUE, pooled.times=TRUE, 
+       hetstat=TRUE, rightcols = c("effect", "ci"), rightlabs = c("Rate", "[95% CI]"), 
+       leftcols = c("studlab", "event", "time"), leftlabs = c("Study", "Events", "PY"), 
+       smlab = "Incidence Rate per 100 PY")
+
+I sense I may need to recode the forest plot using ggplot2, but was wondering if there is a quick fix with the forest function?
+
+Thanks so much in advance,
+Lauren
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Tue Jul  2 16:23:17 2019
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Tue, 2 Jul 2019 16:23:17 +0200
+Subject: [R-meta] Forest plot help!
+In-Reply-To: <BL0PR03MB4129429AABC973CBCB0FF318C1F80@BL0PR03MB4129.namprd03.prod.outlook.com>
+References: <BL0PR03MB4129429AABC973CBCB0FF318C1F80@BL0PR03MB4129.namprd03.prod.outlook.com>
+Message-ID: <de677826-9d21-1d65-4d19-b1de73d3ab3d@imbi.uni-freiburg.de>
+
+Dear Lauren,
+
+It is not possible with R package *meta* to show symmetrical CIs (i.e. 
+to use a logarithmic x-axis) and to print incidence rates per person 
+years. All information is printed either on the original scale (if 
+argument backtransf = TRUE, default) or on the logarithmic scale (if 
+argument backtransf = FALSE).
+
+In my view, the most natural way to plot single incidence rates (as well 
+as proportions) is on the original scale (with asymmetrical CIs). 
+Actually, all publications of meta-analyses with single proportions or 
+rates that I know of used this scale. Thus, I would expect that a 
+journal does not insist on symmetrical CIs for meta-analyses with single 
+proportions or rates.
+
+Best wishes, Guido
+
+-- 
+Dr. Guido Schwarzer
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Postal address: Stefan-Meier-Str. 26, D-79104 Freiburg
+
+Phone: +49/761/203-6668
+Mail: sc at imbi.uni-freiburg.de
+Homepage: http://www.imbi.uni-freiburg.de
+
+ORCID iD: https://orcid.org/0000-0001-6214-9087
+R-book: https://www.springer.com/gp/book/9783319214153
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Jul  2 16:41:57 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 2 Jul 2019 14:41:57 +0000
+Subject: [R-meta] Forest plot help!
+In-Reply-To: <BL0PR03MB4129429AABC973CBCB0FF318C1F80@BL0PR03MB4129.namprd03.prod.outlook.com>
+References: <BL0PR03MB4129429AABC973CBCB0FF318C1F80@BL0PR03MB4129.namprd03.prod.outlook.com>
+Message-ID: <dc75983245c24889b3b674cabae1b0a9@UM-MAIL3214.unimaas.nl>
+
+Hi Lauren,
+
+You can do this with metafor. Here is an example:
+
+library(metafor)
+
+### meta-analysis of log incidence rates (per 1000 person days)
+res <- rma(measure="IRLN", xi=x1i, ti=t1i/1000, data=dat.nielweise2008, slab=paste0(authors, ", ", year))
+res
+
+### forest plot of log incidence rates
+forest(res, refline=NA)
+
+### forest plot of incidence rates (transform estimates/bounds directly)
+forest(res, refline=NA, transf=exp)
+
+### forest plot of incidence rates (use log scale on x-axis)
+forest(res, refline=NA, atransf=exp)
+
+The last one does exactly what you are asking for.
+
+### some further tweaking
+forest(res, refline=NA, atransf=exp, xlim=c(-9, 9), at=log(c(.04, .2, 1, 5, 25)))
+text(-9, 11, "Author(s) and Year",      pos=4, font=2)
+text( 9, 11, "Incidence Rate [95% CI]", pos=2, font=2)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Graybill, Lauren Aiko
+Sent: Tuesday, 02 July, 2019 15:43
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Forest plot help!
+
+Hi everyone,
+
+I was hoping that folks on this mailing list may be able to help me out with some code. I'm working on a meta-analysis of incidence rates and would like to include a forest plot where the 95% confidence interval of each contributing estimate is symmetrical around the estimate (something we anticipate being asked about once we submit the manuscript for publication, so trying to get ahead here). This is possible if I plot natural log-transformed estimates, but for interpretability, I'd like to have everything exponentiated to the actual incidence rate per 100 PY. I imagine I may be able to achieve symmetrical 95% CIs if I plot log-transformed estimates and then change the label of the x-axis such that it shows exponentiated numbers...but I'm not sure how to do this. 
+
+Currently, I use the metarate function, followed by the forest function, where I plot the actual IR (not the log-transformed IR):
+
+crude_1fp <- metarate(event=Seroconversions, time=PY, data=ir, studlab=cite, 
+                    exclude=NULL, method="inverse", sm=("IRLN"), incr=0.5, allincr=FALSE, 
+                    level=(0.95), level.comb=(0.95), comb.fixed=FALSE, comb.random=TRUE, 
+                    prediction=TRUE, method.tau="REML", irscale=100, irunit="Person-Years", 
+                    title="HIV Incidence Rates")
+
+forest(crude_1fp, digits=1, fontsize=10, spacing=0.8, xlim=c(0,20), squaresize=0.75, 
+       overall=TRUE, prediction=TRUE, pooled.events=TRUE, pooled.times=TRUE, 
+       hetstat=TRUE, rightcols = c("effect", "ci"), rightlabs = c("Rate", "[95% CI]"), 
+       leftcols = c("studlab", "event", "time"), leftlabs = c("Study", "Events", "PY"), 
+       smlab = "Incidence Rate per 100 PY")
+
+I sense I may need to recode the forest plot using ggplot2, but was wondering if there is a quick fix with the forest function?
+
+Thanks so much in advance,
+Lauren
+
+
+From petrett@ @end|ng |rom un|n@@|t  Tue Jul  2 17:55:48 2019
+From: petrett@ @end|ng |rom un|n@@|t (Prof. Mario Petretta)
+Date: Tue, 2 Jul 2019 17:55:48 +0200
+Subject: [R-meta] It is possible to calculate the Hazzard Ratio and 95% CI
+ on different reference groups from summary available data?
+Message-ID: <001201d530ee$a19cdfa0$e4d69ee0$@unina.it>
+
+Dear mailing list members
+
+I am doing a meta-analysis on the prognostic value of diastolic blood
+pressure (BP). 
+A study reported the unadjusted hazard ratio (from Cox regression) for three
+categories: 
+
+1)	BP under 90 - hazard ratio 1 (reference)
+2)	BP 90 - 99 - hazard ratio 1.89 (95% CI 1.09, 3.33)
+3)	BP over 100 - hazard ratio 3.03 (95% 1.67, 5.56)
+
+It is possible to combine these hazard ratios and the 95% confidence
+intervals for three categories in two categories, considering together the
+reference category and the second category as a new reference vs the third
+category? 
+
+A more general question is: It is possible to convert hazard ratios and 95%
+CI for 3 or more categories to a hazard ratio for 2 categories, changing the
+reference category? 
+
+Thanks for your attention.
+
+
+___________________________________________
+Mario Petretta, MD, FAHA
+Associate Professor of Internal Medicine
+Department of Translational Medical Sciences
+Naples University "Federico II" - Italy
+
+
+From petrett@ @end|ng |rom un|n@@|t  Tue Jul  2 19:27:28 2019
+From: petrett@ @end|ng |rom un|n@@|t (Mario Petretta)
+Date: Tue, 2 Jul 2019 19:27:28 +0200
+Subject: [R-meta] 
+ It is possible to calculate the Hazzard Ratio and 95% CI
+ on different reference groups from summary available data?
+In-Reply-To: <001201d530ee$a19cdfa0$e4d69ee0$@unina.it>
+References: <001201d530ee$a19cdfa0$e4d69ee0$@unina.it>
+Message-ID: <29E3CE6A-CB95-4D7F-A446-B762683BC820@unina.it>
+
+Sorry for misspelling..Hazard Ratio 
+
+Inviato da iPad
+
+> Il giorno 2 lug 2019, alle ore 17:55, Prof. Mario Petretta <petretta at unina.it> ha scritto:
+> 
+> Dear mailing list members
+> 
+> I am doing a meta-analysis on the prognostic value of diastolic blood
+> pressure (BP). 
+> A study reported the unadjusted hazard ratio (from Cox regression) for three
+> categories: 
+> 
+> 1)    BP under 90 - hazard ratio 1 (reference)
+> 2)    BP 90 - 99 - hazard ratio 1.89 (95% CI 1.09, 3.33)
+> 3)    BP over 100 - hazard ratio 3.03 (95% 1.67, 5.56)
+> 
+> It is possible to combine these hazard ratios and the 95% confidence
+> intervals for three categories in two categories, considering together the
+> reference category and the second category as a new reference vs the third
+> category? 
+> 
+> A more general question is: It is possible to convert hazard ratios and 95%
+> CI for 3 or more categories to a hazard ratio for 2 categories, changing the
+> reference category? 
+> 
+> Thanks for your attention.
+> 
+> 
+> ___________________________________________
+> Mario Petretta, MD, FAHA
+> Associate Professor of Internal Medicine
+> Department of Translational Medical Sciences
+> Naples University "Federico II" - Italy
+> 
+> 
+> 
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Tue Jul  2 20:04:48 2019
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Tue, 2 Jul 2019 20:04:48 +0200
+Subject: [R-meta] 
+ It is possible to calculate the Hazzard Ratio and 95% CI
+ on different reference groups from summary available data?
+In-Reply-To: <001201d530ee$a19cdfa0$e4d69ee0$@unina.it>
+References: <001201d530ee$a19cdfa0$e4d69ee0$@unina.it>
+Message-ID: <7bb3aa7e-5f33-3d4a-cb61-1bcc3bc95c92@imbi.uni-freiburg.de>
+
+Dear Mario,
+
+I think this is not possible without further assumptions. You have not 
+enough information. Even if we assume that all arms in the study are of 
+equal size, the only thing we roughly know is that the hazard ratio 
+between arm 3 and the arm mixed of 1 and 2 is something like
+
+hr21 <- 1.89
+hr31 <- 3.03
+u21 <- 3.33
+l21 <- 1.09
+u31 <- 5.56
+l31 <- 1.67
+
+d21 <- log(hr21)
+d31 <- log(hr31)
+s21 <- (log(u21) - log(l21))/2/1.96
+s31 <- (log(u31) - log(l31))/2/1.96
+
+d12.3 <- d31 - d21/2 # assumes that arm 1 and arm 2 have equal 
+information size
+hr12.3 <- exp(d12.3)
+hr12.3?????????????? # about 2.2
+
+However, we do not know the covariance between the log hazard ratios 
+log(hr21) and log(hr31) which we would need to estimate the standard 
+error for this hazard ratio. This covariance is not zero because these 
+HRs are dependent, as both involve arm 1.
+
+The problem is the same as when having a triangle with two side lengths 
+known, but we do not know the angle between the known sides. Then we 
+cannot make inference about the third side.
+
+Best,
+
+Gerta
+
+
+Am 02.07.2019 um 17:55 schrieb Prof. Mario Petretta:
+> Dear mailing list members
+>
+> I am doing a meta-analysis on the prognostic value of diastolic blood
+> pressure (BP).
+> A study reported the unadjusted hazard ratio (from Cox regression) for three
+> categories:
+>
+> 1)	BP under 90 - hazard ratio 1 (reference)
+> 2)	BP 90 - 99 - hazard ratio 1.89 (95% CI 1.09, 3.33)
+> 3)	BP over 100 - hazard ratio 3.03 (95% 1.67, 5.56)
+>
+> It is possible to combine these hazard ratios and the 95% confidence
+> intervals for three categories in two categories, considering together the
+> reference category and the second category as a new reference vs the third
+> category?
+>
+> A more general question is: It is possible to convert hazard ratios and 95%
+> CI for 3 or more categories to a hazard ratio for 2 categories, changing the
+> reference category?
+>
+> Thanks for your attention.
+>
+>
+> ___________________________________________
+> Mario Petretta, MD, FAHA
+> Associate Professor of Internal Medicine
+> Department of Translational Medical Sciences
+> Naples University "Federico II" - Italy
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+From petrett@ @end|ng |rom un|n@@|t  Wed Jul  3 11:49:17 2019
+From: petrett@ @end|ng |rom un|n@@|t (Mario Petretta)
+Date: Wed, 3 Jul 2019 11:49:17 +0200
+Subject: [R-meta] R: It is possible to calculate the Hazard Ratio and 95% CI
+ on different reference groups from summary available data?
+In-Reply-To: <7bb3aa7e-5f33-3d4a-cb61-1bcc3bc95c92@imbi.uni-freiburg.de>
+References: <001201d530ee$a19cdfa0$e4d69ee0$@unina.it>
+ <7bb3aa7e-5f33-3d4a-cb61-1bcc3bc95c92@imbi.uni-freiburg.de>
+Message-ID: <00af01d53184$94d57980$be806c80$@it>
+
+Thank you so much for your kind, clear and complete answer.
+
+Mario
+
+-----Messaggio originale-----
+Da: Gerta Ruecker [mailto:ruecker at imbi.uni-freiburg.de] 
+Inviato: marted? 2 luglio 2019 20:05
+A: Prof. Mario Petretta; r-sig-meta-analysis at r-project.org
+Oggetto: Re: [R-meta] It is possible to calculate the Hazzard Ratio and 95% CI on different reference groups from summary available data?
+
+Dear Mario,
+
+I think this is not possible without further assumptions. You have not 
+enough information. Even if we assume that all arms in the study are of 
+equal size, the only thing we roughly know is that the hazard ratio 
+between arm 3 and the arm mixed of 1 and 2 is something like
+
+hr21 <- 1.89
+hr31 <- 3.03
+u21 <- 3.33
+l21 <- 1.09
+u31 <- 5.56
+l31 <- 1.67
+
+d21 <- log(hr21)
+d31 <- log(hr31)
+s21 <- (log(u21) - log(l21))/2/1.96
+s31 <- (log(u31) - log(l31))/2/1.96
+
+d12.3 <- d31 - d21/2 # assumes that arm 1 and arm 2 have equal 
+information size
+hr12.3 <- exp(d12.3)
+hr12.3               # about 2.2
+
+However, we do not know the covariance between the log hazard ratios 
+log(hr21) and log(hr31) which we would need to estimate the standard 
+error for this hazard ratio. This covariance is not zero because these 
+HRs are dependent, as both involve arm 1.
+
+The problem is the same as when having a triangle with two side lengths 
+known, but we do not know the angle between the known sides. Then we 
+cannot make inference about the third side.
+
+Best,
+
+Gerta
+
+
+Am 02.07.2019 um 17:55 schrieb Prof. Mario Petretta:
+> Dear mailing list members
+>
+> I am doing a meta-analysis on the prognostic value of diastolic blood
+> pressure (BP).
+> A study reported the unadjusted hazard ratio (from Cox regression) for three
+> categories:
+>
+> 1)	BP under 90 - hazard ratio 1 (reference)
+> 2)	BP 90 - 99 - hazard ratio 1.89 (95% CI 1.09, 3.33)
+> 3)	BP over 100 - hazard ratio 3.03 (95% 1.67, 5.56)
+>
+> It is possible to combine these hazard ratios and the 95% confidence
+> intervals for three categories in two categories, considering together the
+> reference category and the second category as a new reference vs the third
+> category?
+>
+> A more general question is: It is possible to convert hazard ratios and 95%
+> CI for 3 or more categories to a hazard ratio for 2 categories, changing the
+> reference category?
+>
+> Thanks for your attention.
+>
+>
+> ___________________________________________
+> Mario Petretta, MD, FAHA
+> Associate Professor of Internal Medicine
+> Department of Translational Medical Sciences
+> Naples University "Federico II" - Italy
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+From chbergm@ @end|ng |rom gm@||@com  Sat Jul  6 21:19:05 2019
+From: chbergm@ @end|ng |rom gm@||@com (Christina Bergmann)
+Date: Sat, 6 Jul 2019 21:19:05 +0200
+Subject: [R-meta] Multilevel random effects structure in rma.mv for MetaLab
+Message-ID: <CA+1S3=h0063VE9tpGY7HR0SaAs3DC9rGYK_AHWX5d7OQ945FyA@mail.gmail.com>
+
+Dear all,
+
+We are part of the team behind MetaLab (metalab.stanford.edu), an open
+platform for interactive, dynamic meta-analyses from developmental
+psychology. (We'd be happy to tell you more, just get in touch!)
+
+The meta-analyses on MetaLab are largely based on standardized mean
+differences, comparing responses either within or between participants.
+There is, of course, more structure in our data that we would like to model
+correctly, so we have a question concerning the correct random effects
+structure for our needs in rma.mv.
+
+Typically, we have 1-n effect sizes per participant group, and 1-n effect
+sizes from papers. Participant groups do usually not cross papers.
+
+The variables concerned are thus
+
+"unique_row": corresponds to unique effect sizes, equivalent to a row in
+the data file
+
+"paper": corresponds to unique paper, which can contain one or multiple
+effect sizes ("unique_row")
+
+"participant": corresponds to unique participants, can be different for
+each "unique_row" or contribute several "unique_row" within a "paper".
+
+We want to achieve two things:
+
+1. Nest "unique_row" within "paper" (clustering of effect sizes within a
+paper) - i.e. have effect-size level random effects for each record in our
+meta-analyses
+
+2. Allow correlated random effects for "participant" within "paper" (in
+case the same participant contributes multiple effect sizes)
+
+One formula that was proposed to us is the following:
+
+random = list(~ participant | paper, ~ unique_row | paper.participant)
+
+Where, as we understand, the former corresponds to the ~inner | outer
+structure. As to the latter, we are wondering whether it would correspond
+to the ~ 1 | id structure, and in this case we would not rather want to
+write
+
+random = list(~ participant | paper, ~ 1 | paper).
+
+Another question is whether the order in the list of random effects matters.
+
+If you would like to dig deeper, our code lives here:
+https://github.com/langcog/metalab2 - There is a github issue, if you would
+like to discuss more (because some datasets are more intricate and require
+a more complex approach - how fun)
+https://github.com/langcog/metalab2/issues/135
+
+An example dataset can be downloaded here:
+https://langcog.github.io/metalab2/dataset/inworddb.html
+
+It would then typically be analyzed with:
+
+rma.mv(d_calc, d_var_calc, random = list(~ same_infant_calc | short_cite, 1
+| short_cite), data = inworddb.csv)
+
+(where same_infant_calc = participant; short_cite = paper)
+
+Thanks in advance, everyone!
+
+Sho Tsuji and Christina Bergmann
+
+-- 
+Researcher at the Max Planck Institute for Psycholinguistics, Language
+Development Department, Nijmegen, The Netherlands
+Website: sites.google.com/site/chbergma
+Blog: cogtales.wordpress.com
+
+	[[alternative HTML version deleted]]
+
+
+From |ern@ndobor@zcz @end|ng |rom gm@||@com  Thu Jul 11 15:42:03 2019
+From: |ern@ndobor@zcz @end|ng |rom gm@||@com (Fernando Klitzke Borszcz)
+Date: Thu, 11 Jul 2019 10:42:03 -0300
+Subject: [R-meta] Help with meta-analisys of variation
+Message-ID: <CAGwdHmBjhV87p-AFnUgfj=-9V-igtpA8KwpXnUcAVxe4YjOXuw@mail.gmail.com>
+
+Hi all,
+
+I am conducting a meta-analysis about standard deviations of change between
+2 conditions in the metafor package. I am using effect sizes (lnSD) and
+their sampling variance, based on Nakagawa et al. (
+https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12309).
+However, many studies included in my analysis, the same subject produces
+multiple results (multiple time points). Thus, I should determine the
+variance-covariance matrix of the effects. However, I am not sure if it is
+appropriate to determine the variance-covariance matrix using any
+correlation value for this type of effect, because effects variances are
+based only on the sample size (1/2[n-1]). Is there any alternative to
+determine the variance-covariance matrix for this type of data, or I should
+just include the study as a random effect?
+
+Best wishes!
+
+Att.
+Fernando Borszcz
+
+
+<http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=webmail>
+Livre
+de v?rus. www.avg.com
+<http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=webmail>.
+<#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul 18 12:25:43 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 18 Jul 2019 10:25:43 +0000
+Subject: [R-meta] Help with meta-analisys of variation
+In-Reply-To: <CAGwdHmBjhV87p-AFnUgfj=-9V-igtpA8KwpXnUcAVxe4YjOXuw@mail.gmail.com>
+References: <CAGwdHmBjhV87p-AFnUgfj=-9V-igtpA8KwpXnUcAVxe4YjOXuw@mail.gmail.com>
+Message-ID: <d415a7cd54ef4c479abc5f4974b0ee8f@UM-MAIL3214.unimaas.nl>
+
+Dear Fernando,
+
+I am not sure I fully understand your question. My interpretation of your question/problem is as follows. You have studies that measure some property of interest in a group of a subjects at multiple timepoints. And for each timepoint, you compute ln(SD) with sampling variance 1/(2*(n-1)). But since multiple ln(SD) values are based on the same sample of subjects, you want to compute the covariance between those ln(SD) values and you are not sure how to do that. Is this the essence of your question?
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Fernando Klitzke Borszcz
+Sent: Thursday, 11 July, 2019 15:42
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Help with meta-analisys of variation
+
+Hi all,
+
+I am conducting a meta-analysis about standard deviations of change between
+2 conditions in the metafor package. I am using effect sizes (lnSD) and
+their sampling variance, based on Nakagawa et al. (
+https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12309).
+However, many studies included in my analysis, the same subject produces
+multiple results (multiple time points). Thus, I should determine the
+variance-covariance matrix of the effects. However, I am not sure if it is
+appropriate to determine the variance-covariance matrix using any
+correlation value for this type of effect, because effects variances are
+based only on the sample size (1/2[n-1]). Is there any alternative to
+determine the variance-covariance matrix for this type of data, or I should
+just include the study as a random effect?
+
+Best wishes!
+
+Att.
+Fernando Borszcz
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul 18 13:04:46 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 18 Jul 2019 11:04:46 +0000
+Subject: [R-meta] 
+ Multilevel random effects structure in rma.mv for MetaLab
+In-Reply-To: <CA+1S3=h0063VE9tpGY7HR0SaAs3DC9rGYK_AHWX5d7OQ945FyA@mail.gmail.com>
+References: <CA+1S3=h0063VE9tpGY7HR0SaAs3DC9rGYK_AHWX5d7OQ945FyA@mail.gmail.com>
+Message-ID: <e9b4b7eeb8034fd3acc9c4e0cbd0c473@UM-MAIL3214.unimaas.nl>
+
+Hi Sho, Hi Christina,
+
+If I understand the structure correctly, you have studies that may contain one or multiple participant groups and each participant group may contribute one or multiple effect sizes. So:
+
+study  group  effectid  d
+-------------------------
+1      1      1         .
+1      1      2         .
+2      1      3         .
+3      1      4         .
+3      1      5         .
+3      2      6         .
+3      2      7         .
+
+so in study 1, there is one group contributing two effect sizes, in study 2 there is one group contributing a single effect size, and in study 3 there are two groups, each contributing two effect sizes.
+
+I am a bit confused by your use of "participant". I interpreted this above as meaning groups of participants, but maybe I am misunderstanding and you have effect sizes on single participants (but then I am not sure how you are computing a standardized mean difference on a single subject, unless you are computing a d-like measure for single subject designs). And since you mentioned working with standardized mean differences, I interpret this as indicating that a group of participants actually consists of two groups, for two different treatments, but again, I may be misunderstanding you.
+
+Then one basic structure would be:
+
+res1 <- rma.mv(yi, vi, random = ~ 1 | study/group/effectid, data=dat)
+
+For groups contributing multiple effects, the sampling errors are correlated, so technically one would want to account for this by computing the covariances and including them in the V matrix, but if this is not possible, then the approach above at least accounts for the clustering through the random effects structure. Using cluster-robust inferences methods after fitting such a model would then be a good sensitivity check.
+
+The same model as above can be fitted with:
+
+res2 <- rma.mv(yi, vi, random = list(~ factor(group) | study, ~ 1 | effectid), data=dat)
+
+or with:
+
+dat$study.group <- paste(dat$study, dat$group)
+res3 <- rma.mv(yi, vi, random = list(~ 1 | study, ~ factor(effectid) | study.group), data=dat)
+
+These are all equivalent models, just parameterized differently. And to answer one of your question, no, the order of the elements in the list does not matter.
+
+You didn't define what "paper.participant" is supposed to stand for, but I assume you mean such a construction as above. But given the data structure above,
+
+random = list(~ participant | paper, ~ unique_row | paper.participant)
+
+would be overparameterized and
+
+random = list(~ participant | paper, ~ 1 | paper)
+
+doesn't account for heterogeneity at the lowest level, plus you would essentially be adding random effects twice at the paper level, so that's not a good idea.
+
+I am not sure if this really helps.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Christina Bergmann
+Sent: Saturday, 06 July, 2019 21:19
+To: sho tsuji; r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Multilevel random effects structure in rma.mv for MetaLab
+
+Dear all,
+
+We are part of the team behind MetaLab (metalab.stanford.edu), an open
+platform for interactive, dynamic meta-analyses from developmental
+psychology. (We'd be happy to tell you more, just get in touch!)
+
+The meta-analyses on MetaLab are largely based on standardized mean
+differences, comparing responses either within or between participants.
+There is, of course, more structure in our data that we would like to model
+correctly, so we have a question concerning the correct random effects
+structure for our needs in rma.mv.
+
+Typically, we have 1-n effect sizes per participant group, and 1-n effect
+sizes from papers. Participant groups do usually not cross papers.
+
+The variables concerned are thus
+
+"unique_row": corresponds to unique effect sizes, equivalent to a row in
+the data file
+
+"paper": corresponds to unique paper, which can contain one or multiple
+effect sizes ("unique_row")
+
+"participant": corresponds to unique participants, can be different for
+each "unique_row" or contribute several "unique_row" within a "paper".
+
+We want to achieve two things:
+
+1. Nest "unique_row" within "paper" (clustering of effect sizes within a
+paper) - i.e. have effect-size level random effects for each record in our
+meta-analyses
+
+2. Allow correlated random effects for "participant" within "paper" (in
+case the same participant contributes multiple effect sizes)
+
+One formula that was proposed to us is the following:
+
+random = list(~ participant | paper, ~ unique_row | paper.participant)
+
+Where, as we understand, the former corresponds to the ~inner | outer
+structure. As to the latter, we are wondering whether it would correspond
+to the ~ 1 | id structure, and in this case we would not rather want to
+write
+
+random = list(~ participant | paper, ~ 1 | paper).
+
+Another question is whether the order in the list of random effects matters.
+
+If you would like to dig deeper, our code lives here:
+https://github.com/langcog/metalab2 - There is a github issue, if you would
+like to discuss more (because some datasets are more intricate and require
+a more complex approach - how fun)
+https://github.com/langcog/metalab2/issues/135
+
+An example dataset can be downloaded here:
+https://langcog.github.io/metalab2/dataset/inworddb.html
+
+It would then typically be analyzed with:
+
+rma.mv(d_calc, d_var_calc, random = list(~ same_infant_calc | short_cite, 1
+| short_cite), data = inworddb.csv)
+
+(where same_infant_calc = participant; short_cite = paper)
+
+Thanks in advance, everyone!
+
+Sho Tsuji and Christina Bergmann
+
+-- 
+Researcher at the Max Planck Institute for Psycholinguistics, Language
+Development Department, Nijmegen, The Netherlands
+Website: sites.google.com/site/chbergma
+Blog: cogtales.wordpress.com
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul 18 13:10:04 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 18 Jul 2019 11:10:04 +0000
+Subject: [R-meta] Transformation of meta-regression coefficients to ORs
+In-Reply-To: <002501d531b7$6ab1a1a0$4014e4e0$@upd.unibe.ch>
+References: <001101d52e8a$24b76160$6e262420$@upd.unibe.ch>
+ <a7c2e3f18ef44cf2a0b05d6d809c0644@UM-MAIL3214.unimaas.nl>
+ <002501d531b7$6ab1a1a0$4014e4e0$@upd.unibe.ch>
+Message-ID: <ff07fa08f7fb4a53b9d1a72b7d1bab2a@UM-MAIL3214.unimaas.nl>
+
+Just as a (late) follow-up:
+
+If you are meta-analyzing ORs and then fit a meta-regression model, the coefficients cannot be converted to ORs (one can compute predicted ORs, but that's something different). The coefficients can be converted to ratios of ORs (by exponentiation, as illustrated in my previous answer) and that is something that people do occasionally do.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: dirk.richter at upd.unibe.ch [mailto:dirk.richter at upd.unibe.ch] 
+Sent: Wednesday, 03 July, 2019 17:53
+To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+Subject: AW: [R-meta] Transformation of meta-regression coefficients to ORs
+
+Dear Wolfgang,
+
+It is a log OR effect size. As we had univariate ORs in our paper for all
+potential moderators and then reported the coefficients of the multivariate
+regression analysis, the reviewer requested to make the effect sizes
+comparable. Is there any specific reason why multivariate regression
+analyses usually do not report ORs or RRs but betas? Wouldn't that help to a
+better understanding and interpretation?
+
+Anyway, perfect answer, the code worked smoothly and correctly. Many thanks
+once again!
+
+Best wishes from Switzerland,
+Dirk
+
+-----Urspr?ngliche Nachricht-----
+Von: Viechtbauer, Wolfgang (SP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> 
+Gesendet: Dienstag, 2. Juli 2019 11:50
+An: dirk.richter at upd.unibe.ch; r-sig-meta-analysis at r-project.org
+Betreff: RE: [R-meta] Transformation of meta-regression coefficients to ORs
+
+Dear Dirk,
+
+What effect size / outcome measure are you using for your analysis? If you
+are meta-analyzing logit transformed proportions, then exponentiating a beta
+coefficient will give you the odds ratio for the corresponding predictor.
+For example:
+
+library(metafor)
+
+dat <- escalc(measure="PLO", xi=xi, ni=ni, data=dat.debruin2009) dat
+
+res <- rma(yi, vi, mods = ~ scq + ethnicity + patients + select + sens,
+data=dat) res
+
+round(exp(coef(summary(res))[-1,c("estimate", "ci.lb", "ci.ub")]), 2)
+
+                 estimate ci.lb ci.ub
+scq                  1.06  1.02  1.10
+ethnicityother       0.39  0.19  0.80
+patientsstarting     1.41  0.81  2.46
+selectyes            0.72  0.38  1.38
+sens<400             0.66  0.33  1.31
+
+So, per one-unit increase in SCQ, the odds (in this case, of having an
+undetectable viral load) goes up by 6% (95% CI: 2% to 10%), or in other
+words, the odds ratio is 1.06 (95% CI: 1.02 to 1.10). Since we are comparing
+studies with different levels of SCQ, it might be more appropriate to say
+that in studies where SCQ is one point higher, the odds of an undetectable
+viral load are 6% higher (and if we want to be even more precise, we really
+should that "are on average 6% higher"). Similarly, in studies where the
+majority of participants are non-Caucasian, the odds are on average 61%
+lower (95% CI: 20% to 81%), or in other words, the odds ratio is 0.39 (95%
+CI: 0.19 to 0.80).
+
+But this only works for logit transformed proportions as the outcome. 
+
+For other ratio-type outcome measures that are log transformed (e.g., log
+risk ratios and log odds ratios), exponentiating a coefficient gives you a
+ratio as well, but it is actually the ratio of two ratios. For example:
+
+dat <- escalc(measure="OR", ai=tpos, bi=tneg, ci=cpos, di=cneg,
+data=dat.bcg) dat
+
+res <- rma(yi, vi, mods = ~ ablat + year, data=dat) res
+
+round(exp(coef(summary(res))[-1,c("estimate", "ci.lb", "ci.ub")]), 2)
+
+      estimate ci.lb ci.ub
+ablat     0.97  0.95  0.99
+year      1.01  0.98  1.03
+
+So, in studies that are one more degree away from the equator (i.e., where
+absolute latitude increases by one unit), the odds ratio (i.e., the ratio of
+a TB infection in those vaccinated compared to those not vaccinated) goes
+down on average by 3% (95% CI: 1% to 5%), or the ratio of odds ratios is
+0.97 (95% CI: 0.95 to 0.99).
+
+Those are essentially the two cases where you can go from the coefficients
+to either an odds ratio or a ratio of odds ratios (the latter can also be
+done, for example, with risk ratios -- then you get a ratio of risk ratios).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+On Behalf Of dirk.richter at upd.unibe.ch
+Sent: Saturday, 29 June, 2019 16:52
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Transformation of meta-regression coefficients to ORs
+
+Dear mailing list members
+
+A reviewer of a paper I have authored has requested to transform the beta
+estimates of a meta-regression result into odds ratios. The analysis was
+conducted with the metafor rma.mv function. Although I understand the point
+of this suggestion, I have looked into several textbooks and review articles
+and have not found anything in this regard.
+Before I start searching for a code to do this, I would like to kindly ask
+for opinions on this issue. And if it is reasonable to do so I would be
+grateful to see a coding example.
+
+Many thanks in advance,
+Dirk Richter
+
+UNIVERSIT?RE PSYCHIATRISCHE DIENSTE BERN (UPD) AG ZENTRUM PSYCHIATRISCHE
+REHABILITATION
+
+Dirk Richter, Dr. phil. habil.
+Leiter Forschung und Entwicklung
+Murtenstrasse 46
+CH-3008 Bern
+Tel. +41 31 632 4707
+Mobil + 41 76 717 5220
+E-Mail: dirk.richter at upd.unibe.ch 
+
+Bern University Hospital for Mental Health Center for Psychiatric
+Rehabilitation Dirk Richter, Dr. phil., PhD Head of Research and Development
+Murtenstrasse 46
+CH-3008 Bern
+Switzerland
+Phone +41 31 632 4707
+Mobile Phone +41 76 717 5220
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul 18 13:16:44 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 18 Jul 2019 11:16:44 +0000
+Subject: [R-meta] How to do a graph with all variables and interactions
+In-Reply-To: <CAAnf+jQMAHaVBv2sJq8-2sjNfFJvkxB2c_O9CSLwoFesxEuvvA@mail.gmail.com>
+References: <CAAnf+jQw_1ZDOjtv3XxvvBaV5TemjZAMj7jfDKrMPNmdKhX9Vw@mail.gmail.com>
+ <0240b18809cd4337bb69cf26f3114267@UM-MAIL3214.unimaas.nl>
+ <CAAnf+jQMAHaVBv2sJq8-2sjNfFJvkxB2c_O9CSLwoFesxEuvvA@mail.gmail.com>
+Message-ID: <815fcf79026a4235816d651653d2439b@UM-MAIL3214.unimaas.nl>
+
+I am catching up on some old posts here. Not sure if this is still relevant.
+
+Hi Rafael,
+
+Still not sure what you are trying to do here. There are only 4 possible combinations of the two factors here, so I don't understand what you mean when you say that you want to plot all variables and their interactions. Certainly, you cannot fit a model that includes all of these main effects and interactions, since that would be completely overparameterized. You could fit various models where you change the reference levels, but then you are providing redundant information. Again, there are only 4 parameters in this model to obtain a fully saturated fixed effects structure.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Rafael Rios [mailto:biorafaelrm at gmail.com] 
+Sent: Monday, 20 May, 2019 18:37
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: How to do a graph with all variables and interactions
+
+Dear Wolfgang,
+
+Thanks for the answers. I want to plot the mean and confidence intervals of all variables and their interactions in the same graph. In the example, they are var1A, var1B, var2C, var2D, var1A:var2C, var1A:var2D, var1B:var2C, and var1B:var2D. To obtain coefficients and confidence intervals, do I need to run a model for each variable and to the interaction? Will the values be different when compared with the full model? I tried to use different combinations but the estimates changed depending on the model. The advices on tests to investigate outleirs were very helpful! Thank you.
+
+Best wishes,
+
+Rafael.
+__________________________________________________________
+
+Dr. Rafael Rios Moura
+scientia amabilis
+
+Behavioral Ecologist, D.Sc.
+Postdoctoral Researcher
+Universidade Estadual de Campinas (UNICAMP)
+Campinas, S?o Paulo, Brazil
+
+ORCID:?http://orcid.org/0000-0002-7911-4734
+Curr?culo Lattes:?http://lattes.cnpq.br/4264357546465157
+Research Gate:?https://www.researchgate.net/profile/Rafael_Rios_Moura2
+
+Em seg, 20 de mai de 2019 ?s 12:49, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> escreveu:
+Dear Rafael,
+
+I am not sure what you are asking in the first part. As you have illustrated, one could plot predicted values (with corresponding CIs) in a forest plot, although the last predicted value is a bit strange. Maybe you meant (i.e., the combination of B and D):
+
+preds=predict(res,newmods=rbind(c(0,0,0),c(1,0,0),c(0,1,0),c(1,1,1)))
+
+You can also get the same with:
+
+res <- rma.mv(yi, vi, mods=~var1:var2-1, random=list(~1|school,~1|year), data=dat)
+forest(coef(res), diag(vcov(res)), slab=names(coef(res)))
+
+So, in what sense is this not satisfactory for your actual purposes?
+
+As for the second question:
+
+You could examine the data for potential outliers / influential cases with rstudent() and cooks.distance() at various levels (i.e., using the 'cluster' argument). So:
+
+rstudent(res)
+rstudent(res, cluster=dat$study)
+rstudent(res, cluster=dat$animal)
+...
+
+and the same with cooks.distance().
+
+There isn't a strict cutoff for the Cook's distances. I would just plot them and see if there are 'spikes'. So, using the earlier example:
+
+sav <- cooks.distance(res)
+plot(sav, type="o")
+
+# shows some spikes; probably multiple estimates from the same district that are influential:
+
+sav <- cooks.distance(res, cluster=dat$district)
+plot(sav, type="o")
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Rafael Rios [mailto:biorafaelrm at gmail.com] 
+Sent: Monday, 20 May, 2019 7:48
+To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+Subject: How to do a graph with all variables and interactions
+
+Dear Wolfgang and All,
+
+How can I graph all variables and interactions for a mixed-effects meta-analysis? I am providing an example bellow in wich part of the variables and an interaction can be vizualised in the forest plot. In addition, what are the most approppriate analyzes to investigate potential effects of outliers in more complex models, such as a multilevel meta-analysis controlling for phylogenetic non-independence? In case of using Cook's distance, what should be the value of cut-off value?
+
+library(metafor)
+dat <- dat.konstantopoulos2011
+dat$var1=c("A","B")
+dat$var2=c("C","C","D", "D")
+head(dat)
+res <- rma.mv(yi, vi, mods=~var1*var2, random=list(~1|school,~1|year), data=dat)
+summary(res)
+
+preds=predict(res,newmods=rbind(c(0,0,0),c(1,0,0),c(0,1,0),c(0,0,1)))
+forest(preds$pred, sei=preds$se, slab=c("intercept", "var1B", "var2D", "var1B:var2D"))
+
+Best wishes,
+
+Rafael.
+__________________________________________________________
+
+Dr. Rafael Rios Moura
+scientia amabilis
+
+Behavioral Ecologist, D.Sc.
+Postdoctoral Researcher
+Universidade Estadual de Campinas (UNICAMP)
+Campinas, S?o Paulo, Brazil
+
+ORCID:?http://orcid.org/0000-0002-7911-4734
+Curr?culo Lattes:?http://lattes.cnpq.br/4264357546465157
+Research Gate:?https://www.researchgate.net/profile/Rafael_Rios_Moura2
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul 18 13:34:03 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 18 Jul 2019 11:34:03 +0000
+Subject: [R-meta] Multilevel,
+ multivariate meta analysis on studies with multiple
+ outcomes and dependent effect sizes
+In-Reply-To: <7C7756C2-1073-42FB-BC9E-2C8109334FBA@jyu.fi>
+References: <7C7756C2-1073-42FB-BC9E-2C8109334FBA@jyu.fi>
+Message-ID: <7ae69912276940febea7ad3ebfc4ba03@UM-MAIL3214.unimaas.nl>
+
+Hi Neda,
+
+I don't think you ever received an answer.
+
+1) Since the levels of 'combination' are not always unique within 'studyID' (i.e., the same combination can appear multiple times within the same study), you should add one more level, namely the estimate level as another random effect. So:
+
+res1 <- rma.mv(yi, vi, data=mydata, mods=~factor(A)+factor(B)+C,
+                            random = ~1|studyID/combination/effectsizeID,
+                            method="REML", tdist=TRUE))
+
+Not trying to make this more complicated than necessary, but you could also consider using crossed random effects here for 'treatment' and 'control':
+
+mydata$treatment.in.study <- paste(mydata$studyID, mydata$treatment)
+mydata$control.in.study   <- paste(mydata$studyID, mydata$ control)
+
+res2 <- rma.mv(yi, vi, data=mydata, mods=~factor(A)+factor(B)+C,
+                            random = list(~ 1 | studyID, 
+                                          ~ 1 | treatment.in.study, 
+                                          ~ 1 | control.in.study, 
+                                          ~ 1 | effectsizeID),
+                            method="REML", tdist=TRUE))
+
+You could compare the fit of these models then:
+
+fitstats(res1, res2)
+
+I don't think these models are nested, so a likelihood ratio test would not be appropriate, but based on the AIC(c)/BIC values, you can still compare their fit.
+
+2) One can think of a network meta-analysis as a hierarchical model, so your second question isn't really answerable.
+
+3) I would always use the outermost level as the clustering variable when using cluster robust inference methods, so yes, using 'studyID' seems appropriate. And the robust() function gives you the same output for the fixed effects as the output for a model, so the interpretation is the same.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Nasiri Moghadam, Neda
+Sent: Wednesday, 29 May, 2019 10:38
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Multilevel, multivariate meta analysis on studies with multiple outcomes and dependent effect sizes
+
+Hi everyone,
+
+I?m doing a meta analysis to find the connection between environmental fluctuation and fitness performance of organisms. I have collected data (844 Hedge?s g mean difference effect sizes ) from 43 studies (multiple effect sizes per study).
+
+Dependency between effect sizes within each study arises from one of the following conditions:?
+
+1. several treatments (treatment.type) have been compared with a common control group,?
+2. several control conditions (control.type) have been compared with one treatment,?
+3. several control and treatment conditions have been compared together.?
+
+The treatment and control conditions are study-specific therefore there is no dependency between studies.?
+In each study effect of treatment has been assessed on different traits (growth, yield, survival and so on). The traits and their numbers are different between studies. The applied organism for the experiments is different between studies (insect, bacteria, virus and ...).
+
+Here is a data sample to clear my explanation:
+?
+Due to the dependency between effect sizes within each study (I don't know the covariances between the different outcomes) I combined information of the treatment.type and control.type in a new column (combination) using the paste function in R. I nested this column in study ID and included in the model as a random factor.?
+
+res <- rma.mv(yi,vi,data=mydata,mods=~factor(A)+factor(B)+C,
+>                           random = ~1|studyID/combination,
+>                           method="REML",tdist=TRUE))
+
+I've also made the phylogeny tree and correlation matrix between species. I'm going to include the species as a random factor in the model. I checked the likelihood profile plot for sigma^2.1 and sigma^2.2. In both cases the plot peaks at the estimate.?
+
+The distribution of the heterogeneity is as follows:
+
+level1: 59%,
+level2: 7%,
+level3: 32%?
+
+I obtained cluster robust standard error using the following command:?
+
+robust(res, cluster=mydata$studyID)
+
+The funnel plot is not symmetric and based on the cook's distance plot I have influential data points.
+
+Questions:
+
+1) Is the model correct based on the hierarchical structure in my data set (study > combination > trait > effect size)
+2) Isn't it better to use a network meta analysis instead of a three level model for my data set?
+3) Is it correct to use studyID as the cluster in robust() function and how should I interpret the output of robust() function?
+
+I?m happy to provide any additional information to facilitate feedback.
+Thank you for your help in advance.
+
+Bests,
+
+Neda N. Moghadam 
+Postdoctoral Researcher
+Department of Biological and Environmental Science
+P.O. Box 35, FI-40014?
+University of Jyv?skyl?, Finland
+Mobile: +4550393628
+Email: neda.n.nasiri-moghadam at jyu.fi
+Linkedin: linkedin.com/in/nedanasirimoghadam
+
+From |ern@ndobor@zcz @end|ng |rom gm@||@com  Thu Jul 18 14:34:44 2019
+From: |ern@ndobor@zcz @end|ng |rom gm@||@com (Fernando Klitzke Borszcz)
+Date: Thu, 18 Jul 2019 09:34:44 -0300
+Subject: [R-meta] Help with meta-analisys of variation
+In-Reply-To: <d415a7cd54ef4c479abc5f4974b0ee8f@UM-MAIL3214.unimaas.nl>
+References: <CAGwdHmBjhV87p-AFnUgfj=-9V-igtpA8KwpXnUcAVxe4YjOXuw@mail.gmail.com>
+ <d415a7cd54ef4c479abc5f4974b0ee8f@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAGwdHmBchT_fPg=5w4TVKBw8f=RgjFmwU+1HsOo=f5yU8HVM1A@mail.gmail.com>
+
+Dear Professor Wolfgang,
+
+Thank you for your response.
+
+My question is if I should use any value of correlation to determine the
+variance-covariance matrix in this type of data? I am not sure if I could
+use a correlation value, because the variances of log-transformed standard
+deviations (lnSD) are based only on sample size.
+
+Below an example of my data.
+
+    study    yi     vi exercise stage1      A 2.351 0.0250      row
+ 32      A 2.351 0.0250      row     43      A 2.261 0.0250      row
+  54      A 1.922 0.0250      row     75      A 1.887 0.0250      row
+  106      B 1.884 0.0313    cycle     37      B 1.851 0.0313    cycle
+    48      B 1.774 0.0313    cycle     79      B 1.740 0.0313
+cycle    1010     C 1.831 0.0278    cycle     311     D 1.732 0.0294
+   run     5
+
+
+Em qui, 18 de jul de 2019 ?s 07:26, Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> escreveu:
+
+> Dear Fernando,
+>
+> I am not sure I fully understand your question. My interpretation of your
+> question/problem is as follows. You have studies that measure some property
+> of interest in a group of a subjects at multiple timepoints. And for each
+> timepoint, you compute ln(SD) with sampling variance 1/(2*(n-1)). But since
+> multiple ln(SD) values are based on the same sample of subjects, you want
+> to compute the covariance between those ln(SD) values and you are not sure
+> how to do that. Is this the essence of your question?
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Fernando Klitzke
+> Borszcz
+> Sent: Thursday, 11 July, 2019 15:42
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Help with meta-analisys of variation
+>
+> Hi all,
+>
+> I am conducting a meta-analysis about standard deviations of change between
+> 2 conditions in the metafor package. I am using effect sizes (lnSD) and
+> their sampling variance, based on Nakagawa et al. (
+>
+> https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12309
+> ).
+> However, many studies included in my analysis, the same subject produces
+> multiple results (multiple time points). Thus, I should determine the
+> variance-covariance matrix of the effects. However, I am not sure if it is
+> appropriate to determine the variance-covariance matrix using any
+> correlation value for this type of effect, because effects variances are
+> based only on the sample size (1/2[n-1]). Is there any alternative to
+> determine the variance-covariance matrix for this type of data, or I should
+> just include the study as a random effect?
+>
+> Best wishes!
+>
+> Att.
+> Fernando Borszcz
+>
+
+
+-- 
+Att.
+Fernando Klitzke Borszcz
+Doutorando em Educa??o F?sica
+Laborat?rio de Esfor?o F?sico - LAEF
+Centro de Desportos - CDS
+Universidade Federal de Santa Catarina- UFSC
+(48) 998261406
+http://lattes.cnpq.br/4442928023267586
+[image: ORCID iD icon]orcid.org/0000-0002-3773-6906
+<https://orcid.org/0000-0002-3773-6906>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul 18 14:40:06 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 18 Jul 2019 12:40:06 +0000
+Subject: [R-meta] 
+ Random vs. Fixed Effects model in metafor with multiple
+ effect sizes per study
+In-Reply-To: <F29AEA03-4FE2-4931-9C3B-4AACD58A067F@gmail.com>
+References: <F29AEA03-4FE2-4931-9C3B-4AACD58A067F@gmail.com>
+Message-ID: <94bcb798fa024306bc80689f898eb292@UM-MAIL3214.unimaas.nl>
+
+Hi Mia,
+
+1) I cannot answer that question in general, except to say: It depends. Without more information, I would recommend to use an appropriate random-effects model for your data.
+
+2) While conceptually one could argue that, in the absence of heterogeneity, it doesn't make sense to run a moderator analysis, I would still do so (at least as long as the moderator analysis is pre-planned). The test for heterogeneity may not be significant due to low power, but when testing a specific moderator, one might still find that it is relevant. Consider this example:
+
+set.seed(1236)
+
+k <- 15
+vi <- runif(k, .001, .50)
+xi <- sample(0:5, k, replace=TRUE)
+yi <- rnorm(k, 0.1 * xi, sqrt(vi)) # xi is a true moderator
+
+rma(yi, vi) # test for heterogeneity is not significant (p = 0.25)
+rma(yi, vi, mods = ~ xi) # test of moderator is significant (p = .005)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Mia Daucourt
+Sent: Tuesday, 25 June, 2019 18:32
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Random vs. Fixed Effects model in metafor with multiple effect sizes per study
+
+Good afternoon,
+
+I?d like to run a fisher?s z meta-analysis with multiple effect sizes per study. As such, I have it set up in a multilevel framework. I have two questions:
+
+1.Do I have to run it as a random effects model or can I run it as a fixed effects multilevel model?
+
+2. If not, then I should run random effects model. However, when I run it as a random effects multilevel model I get non-significant heterogeneity. Is it still proper to run a moderator analysis when you do not find significant heterogeneity?
+
+Please let me know if you have any insight on the best course of action to take!
+
+My best,
+
+Mia Daucourt
+
+Florida State University
+Developmental Psychology PhD student
+IDCD Hart lab
+daucourt at psy.fsu.edu
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jul 18 14:50:00 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 18 Jul 2019 12:50:00 +0000
+Subject: [R-meta] Help with meta-analisys of variation
+In-Reply-To: <CAGwdHmBchT_fPg=5w4TVKBw8f=RgjFmwU+1HsOo=f5yU8HVM1A@mail.gmail.com>
+References: <CAGwdHmBjhV87p-AFnUgfj=-9V-igtpA8KwpXnUcAVxe4YjOXuw@mail.gmail.com>
+ <d415a7cd54ef4c479abc5f4974b0ee8f@UM-MAIL3214.unimaas.nl>
+ <CAGwdHmBchT_fPg=5w4TVKBw8f=RgjFmwU+1HsOo=f5yU8HVM1A@mail.gmail.com>
+Message-ID: <73d55e1576114934b40d275b1563f62c@UM-MAIL3214.unimaas.nl>
+
+The covariance between two lnSD values depends on the correlation between the two variables (for which you computed the lnSD values) and can be estimated with:
+
+r^2 / (2*(n-1))
+
+where r is the correlation between the two variables. So, you need to know the correlation between the measurements at different stages in order to compute the covariances.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Fernando Klitzke Borszcz [mailto:fernandoborszcz at gmail.com] 
+Sent: Thursday, 18 July, 2019 14:35
+To: Viechtbauer, Wolfgang (SP)
+Cc: r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Help with meta-analisys of variation
+
+Dear Professor Wolfgang,?
+
+Thank you for your response.
+
+My question is if I should use any value of correlation to determine the variance-covariance matrix in this type of data? I am not sure if I could use a correlation value, because the variances of log-transformed standard deviations (lnSD) are based only on sample size.?
+
+Below an example of my data.
+
+    study    yi     vi exercise stage
+1      A 2.351 0.0250      row     3
+2      A 2.351 0.0250      row     4
+3      A 2.261 0.0250      row     5
+4      A 1.922 0.0250      row     7
+5      A 1.887 0.0250      row    10
+6      B 1.884 0.0313    cycle     3
+7      B 1.851 0.0313    cycle     4
+8      B 1.774 0.0313    cycle     7
+9      B 1.740 0.0313    cycle    10
+10     C 1.831 0.0278    cycle     3
+11     D 1.732 0.0294      run     5
+
+Em qui, 18 de jul de 2019 ?s 07:26, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> escreveu:
+Dear Fernando,
+
+I am not sure I fully understand your question. My interpretation of your question/problem is as follows. You have studies that measure some property of interest in a group of a subjects at multiple timepoints. And for each timepoint, you compute ln(SD) with sampling variance 1/(2*(n-1)). But since multiple ln(SD) values are based on the same sample of subjects, you want to compute the covariance between those ln(SD) values and you are not sure how to do that. Is this the essence of your question?
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Fernando Klitzke Borszcz
+Sent: Thursday, 11 July, 2019 15:42
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Help with meta-analisys of variation
+
+Hi all,
+
+I am conducting a meta-analysis about standard deviations of change between
+2 conditions in the metafor package. I am using effect sizes (lnSD) and
+their sampling variance, based on Nakagawa et al. (
+https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12309).
+However, many studies included in my analysis, the same subject produces
+multiple results (multiple time points). Thus, I should determine the
+variance-covariance matrix of the effects. However, I am not sure if it is
+appropriate to determine the variance-covariance matrix using any
+correlation value for this type of effect, because effects variances are
+based only on the sample size (1/2[n-1]). Is there any alternative to
+determine the variance-covariance matrix for this type of data, or I should
+just include the study as a random effect?
+
+Best wishes!
+
+Att.
+Fernando Borszcz
+
+-- 
+Att.
+Fernando Klitzke Borszcz
+Doutorando em Educa??o F?sica
+Laborat?rio de Esfor?o F?sico - LAEF
+Centro de Desportos - CDS
+Universidade Federal de Santa Catarina- UFSC
+(48) 998261406
+http://lattes.cnpq.br/4442928023267586
+orcid.org/0000-0002-3773-6906
+
+From ycd|ng @end|ng |rom coh@org  Thu Jul 18 17:07:01 2019
+From: ycd|ng @end|ng |rom coh@org (Yuan Chun Ding)
+Date: Thu, 18 Jul 2019 15:07:01 +0000
+Subject: [R-meta] do I need to do meta analysis and how to perform meta
+ analysis for observational studies
+In-Reply-To: <c98237f5c96e43f2a945637c76f4c71f@UM-MAIL3214.unimaas.nl>
+References: <A86C6438FB909A409DDEF926277952B611356C17@PPWEXCH2KX13.coh.org>,
+ <c98237f5c96e43f2a945637c76f4c71f@UM-MAIL3214.unimaas.nl>
+Message-ID: <A86C6438FB909A409DDEF926277952B611374989@PPWEXCH2KX13.coh.org>
+
+Hi Wolfgang,
+
+Thank you so much for your help!!! I  got it.
+
+Yuan Ding
+________________________________________
+From: Viechtbauer, Wolfgang (SP) [wolfgang.viechtbauer at maastrichtuniversity.nl]
+Sent: Thursday, July 18, 2019 4:46 AM
+To: Yuan Chun Ding; r-sig-meta-analysis at r-project.org
+Subject: RE: do I need to do meta analysis and how to perform meta analysis for observational studies
+
+[Attention: This email came from an external source. Do not open attachments or click on links from unknown senders or unexpected emails.]
+
+
+
+
+
+Hi Yuan Ding,
+
+If you have the raw data from each study, I would analyze those directly. This is usually called an "individual patient data meta-analysis" (IPDMA). For certain types of models, an IPDMA and a meta-analysis based on effect sizes will yield identical results, but if you have the raw data, I would go with an IPDMA.
+
+And yes, you should include 'study ID' in your model, either as a random effect or as a fixed effects (the merits of those two approaches can be debated).
+
+If you want to go with a more traditional meta-analysis, then you would first want to fit logistic regression models to each dataset, including the covariates you want to adjust for. You can then extract the log odds ratio from each model with its corresponding standard error. You can then meta-analyze those values with:
+
+rma(log_odds_ratio, sei=standard_error)
+
+or
+
+rma(log_odds_ratio, standard_error^2)
+
+(the second argument of rma() is for the variances, so standard_error^2 will work, or if you want to pass the SEs to the function, then you can do that via the 'sei' argument).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Yuan Chun Ding
+Sent: Monday, 24 June, 2019 18:33
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] do I need to do meta analysis and how to perform meta analysis for observational studies
+
+Dear meta-analysis users,
+
+I have collected raw data from five observational studies, so a total of 1300 observations or patients, then for each patients there are 17,000 variables, since all five studies used the same method to measure gene expression values for over 16900 genes (plus some phenotypic variables, 17000 variables in total). Then I normalized gene expression data for all 16900 genes, and then calculated an immune score for each patient based on gene expression values for those  16900 genes.   I need to run a multivariable logistic regression to test association between the estimated immune score and a cancer development phenotype by adjusting for  covariates such as age, race etc.
+
+My first question is :   do I really need to use the meta analysis approach?  I originally just ran multivariable logistic regression by considering all 1300 patients are from one combined study (patient phenotype (yes or no) = immune score + 6 covariates, so estimating adjusted OR).  Then I thought about including study ID as a  random factor in the model or calculate OR for each of five study, then pool the five OR to get an overall OR.  What do you think?
+
+The second question:  from reading meta analysis paper,  the following R code to run meta analysis was design to run  clinical trials (randomized design) with confounding variables controlled in each study, so only univariate logistic regression analysis required, no need to adjust covariate; so how to calculate overall adjusted OR by meta analysis?  if I calculate adjusted OR for each study, I will get " Estimate" (for OR) and  "Std. Error" in each study. if using metafor, I guess I need to convert OR to logOR (Y in the example code below), then standard error to variance (V), is that right?  also how to convert from standard error in each study to variance?
+
+Y <- with(dat.bcg, log(tpos * cneg/(tneg * cpos)))
+V <- with(dat.bcg, 1/tpos + 1/cneg + 1/tneg + 1/cpos)
+cbind(Y, V)
+
+result.or.FE <- rma(yi = Y, vi = V, method = "FE") # Log Odds Ratio
+result.or.FE
+
+result.or.DL <- rma(yi = Y, vi = V, method = "DL")
+result.or.DL
+
+Thank you very much in advance,
+
+Yuan Ding from City of Hope National Medical center
+
+------------------------------------------------------------
+-SECURITY/CONFIDENTIALITY WARNING-  
+
+This message and any attachments are intended solely for the individual or entity to which they are addressed. This communication may contain information that is privileged, confidential, or exempt from disclosure under applicable law (e.g., personal health information, research data, financial information). Because this e-mail has been sent without encryption, individuals other than the intended recipient may be able to view the information, forward it to others or tamper with the information without the knowledge or consent of the sender. If you are not the intended recipient, or the employee or person responsible for delivering the message to the intended recipient, any dissemination, distribution or copying of the communication is strictly prohibited. If you received the communication in error, please notify the sender immediately by replying to this message and deleting the message and any accompanying files from your system. If, due to the security risks, you do not wish to receive further communications via e-mail, please reply to this message and inform the sender that you do not wish to receive further e-mail from the sender. (LCP301)
+
+
+From m|obo4370 @end|ng |rom hotm@||@com  Fri Jul 19 03:16:54 2019
+From: m|obo4370 @end|ng |rom hotm@||@com (Martin Lobo)
+Date: Fri, 19 Jul 2019 01:16:54 +0000
+Subject: [R-meta] how do i get the ri for a meta analysis pre post test
+In-Reply-To: <mailman.1627.2371.1563448670.8808.r-sig-meta-analysis@r-project.org>
+References: <mailman.1627.2371.1563448670.8808.r-sig-meta-analysis@r-project.org>
+Message-ID: <MN2PR20MB28146C59F8BF42BF73883212ACCB0@MN2PR20MB2814.namprd20.prod.outlook.com>
+
+Effect Size Measures for Pretest Posttest Control Group Designs
+
+datT <- escalc(measure="SMCR", m1i=m_post, m2i=m_pre, sd1i=sd_pre, ni=ni, ri=ri, data=datT)
+datC <- escalc(measure="SMCR", m1i=m_post, m2i=m_pre, sd1i=sd_pre, ni=ni, ri=ri, data=datC)
+
+Hello, I need to do this type of analysis, I have all the data but I do not know how to calculate the ri. Is there any way to do it without this?
+
+thank's
+
+
+
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Miembro del Area de Investigaci?n de la SAC
+Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+
+Instructor de ACLS de la American Heart Association
+
+
+
+	[[alternative HTML version deleted]]
+
+
+From |ern@ndobor@zcz @end|ng |rom gm@||@com  Mon Jul 22 19:22:20 2019
+From: |ern@ndobor@zcz @end|ng |rom gm@||@com (Fernando Klitzke Borszcz)
+Date: Mon, 22 Jul 2019 14:22:20 -0300
+Subject: [R-meta] Help with meta-analisys of variation
+In-Reply-To: <73d55e1576114934b40d275b1563f62c@UM-MAIL3214.unimaas.nl>
+References: <CAGwdHmBjhV87p-AFnUgfj=-9V-igtpA8KwpXnUcAVxe4YjOXuw@mail.gmail.com>
+ <d415a7cd54ef4c479abc5f4974b0ee8f@UM-MAIL3214.unimaas.nl>
+ <CAGwdHmBchT_fPg=5w4TVKBw8f=RgjFmwU+1HsOo=f5yU8HVM1A@mail.gmail.com>
+ <73d55e1576114934b40d275b1563f62c@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAGwdHmDMiSx694_=kFRbvWf4gyCQhU1KesonTa8uX4QZG8YiWg@mail.gmail.com>
+
+Dear Professor Wolfgang,
+
+Thank you for your help.
+
+Best wishes
+
+Em qui, 18 de jul de 2019 ?s 09:50, Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> escreveu:
+
+> The covariance between two lnSD values depends on the correlation between
+> the two variables (for which you computed the lnSD values) and can be
+> estimated with:
+>
+> r^2 / (2*(n-1))
+>
+> where r is the correlation between the two variables. So, you need to know
+> the correlation between the measurements at different stages in order to
+> compute the covariances.
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Fernando Klitzke Borszcz [mailto:fernandoborszcz at gmail.com]
+> Sent: Thursday, 18 July, 2019 14:35
+> To: Viechtbauer, Wolfgang (SP)
+> Cc: r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] Help with meta-analisys of variation
+>
+> Dear Professor Wolfgang,
+>
+> Thank you for your response.
+>
+> My question is if I should use any value of correlation to determine the
+> variance-covariance matrix in this type of data? I am not sure if I could
+> use a correlation value, because the variances of log-transformed standard
+> deviations (lnSD) are based only on sample size.
+>
+> Below an example of my data.
+>
+>     study    yi     vi exercise stage
+> 1      A 2.351 0.0250      row     3
+> 2      A 2.351 0.0250      row     4
+> 3      A 2.261 0.0250      row     5
+> 4      A 1.922 0.0250      row     7
+> 5      A 1.887 0.0250      row    10
+> 6      B 1.884 0.0313    cycle     3
+> 7      B 1.851 0.0313    cycle     4
+> 8      B 1.774 0.0313    cycle     7
+> 9      B 1.740 0.0313    cycle    10
+> 10     C 1.831 0.0278    cycle     3
+> 11     D 1.732 0.0294      run     5
+>
+> Em qui, 18 de jul de 2019 ?s 07:26, Viechtbauer, Wolfgang (SP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> escreveu:
+> Dear Fernando,
+>
+> I am not sure I fully understand your question. My interpretation of your
+> question/problem is as follows. You have studies that measure some property
+> of interest in a group of a subjects at multiple timepoints. And for each
+> timepoint, you compute ln(SD) with sampling variance 1/(2*(n-1)). But since
+> multiple ln(SD) values are based on the same sample of subjects, you want
+> to compute the covariance between those ln(SD) values and you are not sure
+> how to do that. Is this the essence of your question?
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Fernando Klitzke
+> Borszcz
+> Sent: Thursday, 11 July, 2019 15:42
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Help with meta-analisys of variation
+>
+> Hi all,
+>
+> I am conducting a meta-analysis about standard deviations of change between
+> 2 conditions in the metafor package. I am using effect sizes (lnSD) and
+> their sampling variance, based on Nakagawa et al. (
+>
+> https://besjournals.onlinelibrary.wiley.com/doi/full/10.1111/2041-210X.12309
+> ).
+> However, many studies included in my analysis, the same subject produces
+> multiple results (multiple time points). Thus, I should determine the
+> variance-covariance matrix of the effects. However, I am not sure if it is
+> appropriate to determine the variance-covariance matrix using any
+> correlation value for this type of effect, because effects variances are
+> based only on the sample size (1/2[n-1]). Is there any alternative to
+> determine the variance-covariance matrix for this type of data, or I should
+> just include the study as a random effect?
+>
+> Best wishes!
+>
+> Att.
+> Fernando Borszcz
+>
+> --
+> Att.
+> Fernando Klitzke Borszcz
+> Doutorando em Educa??o F?sica
+> Laborat?rio de Esfor?o F?sico - LAEF
+> Centro de Desportos - CDS
+> Universidade Federal de Santa Catarina- UFSC
+> (48) 998261406
+> http://lattes.cnpq.br/4442928023267586
+> orcid.org/0000-0002-3773-6906
+>
+
+
+-- 
+Att.
+
+Fernando Klitzke Borszcz
+Doutorando em Educa??o F?sica
+Laborat?rio de Esfor?o F?sico - LAEF
+Centro de Desportos - CDS
+Universidade Federal de Santa Catarina- UFSC
+(48) 998261406
+http://lattes.cnpq.br/4442928023267586
+[image: ORCID iD icon]orcid.org/0000-0002-3773-6906
+<https://orcid.org/0000-0002-3773-6906>
+
+	[[alternative HTML version deleted]]
+
+
+From ocord@ @end|ng |rom @|umn|@@t@n|ord@edu  Fri Jul 26 21:27:09 2019
+From: ocord@ @end|ng |rom @|umn|@@t@n|ord@edu (Olivia Cords)
+Date: Fri, 26 Jul 2019 12:27:09 -0700
+Subject: [R-meta] metafor package in R - Risk ratios using rma.mv()
+Message-ID: <CAAkeBhmrQGOiW9FJr+9P9nPePcAk3YPUDU5NDFxEr0jcmuJdOA@mail.gmail.com>
+
+Hello!
+My name is Olivia and I'm a researcher at Stanford University. Our group is
+trying to calculate relative risk ratios for the a meta-analysis
+extracting  incidence rates of tuberculosis disease using the metafor
+package.
+
+*Study Design: *
+Incidence rates were extracted for each study identified by a systematic
+review, with some studies reporting multiple rates for different years or
+locations. In this case, multiple rates were treated as different study
+cohorts, meaning that the data is clustered ('cohort_id' nested within
+'study_id').
+
+*Model:*
+We used the rma.mv() function, inputting the calculated incidence rate as
+the outcome variable ('pdc$yi), the variance ('pdc$vi'), WHO region
+('who_region') and whether the study was conducted through passive or
+active screening (passive_active') as moderators, and a random effects
+argument for the study level ('study_id'). We are unclear how to go from
+the output to Risk Ratios.
+
+*Data:*
+study_id cohort_id n_diagnosed person_years    who_region passive_active
+131 34 77 14298    1Americas 1Passive
+93 120 5 27750    1Americas 1Passive
+93 121 14 277150    1Americas 1Passive
+93 122 15 2000    1Americas 1Passive
+136 383 2 2000    Africa 2Active
+136 383 7 100000    Africa 2Active
+187 16 16 100000    Africa 3Not Specified
+187 517 2 100000    S.E. Asia 3Not Specified
+
+
+*Code:*
+
+library(xlsx)
+library(metafor)
+
+
+data <- read.xlsx('702_tb_incidence.xlsx', 1)
+print(data)
+
+#calculating the incidence rate and the variance
+pd_ec <- escalc(
+   measure = 'IR',
+   xi = data$n_diagnosed,
+   ti = data$person_years,
+   data = data
+)
+pd_ec
+
+#specifying mixed effects model
+#first level cohort incidence rate and variation
+#second level study_id
+#who_region and passive_active as moderators
+m0 <- rma.mv(pd_ec$yi, pd_ec$vi, method='REML', mods = ~ who_region +
+passive_active,
+        random= ~ 1 | study_id,
+        tdist=TRUE,
+        data=pd_ec)
+
+summary(m0)
+
+*Output:*
+
+Multivariate Meta-Analysis Model (k = 8; method: REML)
+
+  logLik  Deviance       AIC       BIC      AICc
+ 15.4961  -30.9922  -20.9922  -24.0607   39.0078
+
+Variance Components:
+
+            estim    sqrt  nlvls  fixed    factor
+sigma^2    0.0000  0.0037      4     no  study_id
+
+Test for Residual Heterogeneity:
+QE(df = 4) = 94.4465, p-val < .0001
+
+Test of Moderators (coefficients 2:4):
+F(df1 = 3, df2 = 4) = 3.7931, p-val = 0.1152
+
+Model Results:
+
+                       estimate      se     tval    pval    ci.lb   ci.ub
+intrcpt                  0.0027  0.0027   1.0073  0.3708  -0.0047  0.0101
+who_regionAfrica        -0.0025  0.0046  -0.5493  0.6120  -0.0153  0.0102
+who_regionS.E. Asia     -0.0027  0.0046  -0.5797  0.5932  -0.0154  0.0101
+passive_active2Active   -0.0001  0.0053  -0.0167  0.9874  -0.0148  0.0146
+
+
+Any advice/insight in much appreciated!
+
+
+Best wishes,
+
+Olivia
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190726/710e6691/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: 702_metafor_tb_incidence (4).r
+Type: application/octet-stream
+Size: 377 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190726/710e6691/attachment-0001.obj>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: 702_tb_incidence.xlsx
+Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+Size: 9048 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190726/710e6691/attachment-0001.xlsx>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: metafor_output_0724 (1).png
+Type: image/png
+Size: 138716 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190726/710e6691/attachment-0001.png>
+
+From Ruecker @end|ng |rom |mb|@un|-|re|burg@de  Fri Jul 26 22:32:46 2019
+From: Ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Fri, 26 Jul 2019 22:32:46 +0200
+Subject: [R-meta] metafor package in R - Risk ratios using rma.mv()
+In-Reply-To: <CAAkeBhmrQGOiW9FJr+9P9nPePcAk3YPUDU5NDFxEr0jcmuJdOA@mail.gmail.com>
+References: <CAAkeBhmrQGOiW9FJr+9P9nPePcAk3YPUDU5NDFxEr0jcmuJdOA@mail.gmail.com>
+Message-ID: <20190726223246.EGroupware.sPBlahJ1DnJ4JWQprQrGm_0@egroupware.imbi.uni-freiburg.de>
+
+Dear Olivia,
+
+Do you mean risk ratios or incidence rate ratios?
+
+Incidence rate ratios (IRR) can also be meta-analyzed using the R package meta, function metainc(). For an example, look into the help file of metainc() or try the code
+install.packages("meta")
+library(meta)
+data(smoking)
+m1 
+Best,
+Gerta
+
+----------------urspr?ngliche Nachricht-----------------
+Von: Olivia Cords [ocords at alumni.stanford.edu ]
+An: r-sig-meta-analysis at r-project.org 
+Datum: Fri, 26 Jul 2019 12:27:09 -0700
+----------------------------------------------------------
+> 
+>
+>Hello!
+>My name is Olivia and I'm a researcher at Stanford University. Our group is trying to 
+>calculate relative risk ratios for the a meta-analysis extracting incidence rates of 
+>tuberculosis disease using the metafor package.
+>
+>Study Design: 
+>Incidence rates were extracted for each study identified by a systematic review, with 
+>some studies reporting multiple rates for different years or locations. In this case, 
+>multiple rates were treated as different study cohorts, meaning that the data is clustered 
+>('cohort_id' nested within 'study_id').
+>
+>Model:
+>We used the [ http://rma.mv/ -> rma.mv ]() function, inputting the calculated 
+>incidence rate as the outcome variable ('pdc$yi), the variance ('pdc$vi'), WHO region 
+>('who_region') and whether the study was conducted through passive or active screening 
+>(passive_active') as moderators, and a random effects argument for the study level ('study_id'). We are 
+>unclear how to go from the output to Risk Ratios.
+>
+>Data:
+>
+>			study_id - cohort_id - n_diagnosed - person_years - who_region - 
+>passive_active				
+>			131 - 34 - 77 - 14298 - 1Americas - 1Passive				
+>			93 - 120 - 5 - 27750 - 1Americas - 1Passive				
+>			93 - 121 - 14 - 277150 - 1Americas - 1Passive				
+>			93 - 122 - 15 - 2000 - 1Americas - 1Passive				
+>			136 - 383 - 2 - 2000 - Africa - 2Active				
+>			136 - 383 - 7 - 100000 - Africa - 2Active				
+>			187 - 16 - 16 - 100000 - Africa - 3Not Specified				
+>			187 - 517 - 2 - 100000 - S.E. Asia - 3Not Specified			
+>
+>Code:
+>
+>library(xlsx)
+>library(metafor)
+>
+>data 
+>#calculating the incidence rate and the variance
+>pd_ec 
+>#first level cohort incidence rate and variation
+>#second level study_id
+>#who_region and passive_active as moderators
+>m0 rma.mv ](pd_ec$yi, pd_ec$vi, method='REML', mods = ~ who_region + 
+>passive_active,
+> random= ~ 1 | study_id,
+> tdist=TRUE,
+> data=pd_ec)
+>
+>summary(m0)
+>
+>Output:
+>Multivariate Meta-Analysis Model (k = 8; method: REML)
+
+ logLik Deviance AIC BIC AICc 
+>
+ 15.4961 -30.9922 -20.9922 -24.0607 39.0078 
+
+Variance Components:
+
+ estim sqrt 
+>nlvls fixed factor 
+sigma^2 0.0000 0.0037 4 no study_id 
+
+Test for Residual 
+>Heterogeneity:
+QE(df = 4) = 94.4465, p-val ci.lb ] ci.ub 
+intrcpt 0.0027 0.0027 1.0073 0.3708 -0.0047 0.0101 
+>
+who_regionAfrica -0.0025 0.0046 -0.5493 0.6120 -0.0153 0.0102 
+who_regionS.E. Asia -0.0027 0.0046 
+>-0.5797 0.5932 -0.0154 0.0101 
+passive_active2Active -0.0001 0.0053 -0.0167 0.9874 
+>-0.0148 0.0146
+>
+>Any advice/insight in much appreciated!
+>
+>Best wishes,
+>Olivia
+>
+> 
+ 
+__________________________________________________
+Gerta Ruecker
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+Postal Address: Stefan-Meier-Str. 26, 79104 Freiburg
+Phone: +49/761/ 203-6673
+Mail: Ruecker at imbi.uni-freiburg.de 
+Homepage: http://www.imbi.uni-freiburg.de
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Jul 26 22:44:02 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Fri, 26 Jul 2019 20:44:02 +0000
+Subject: [R-meta] metafor package in R - Risk ratios using rma.mv()
+In-Reply-To: <CAAkeBhmrQGOiW9FJr+9P9nPePcAk3YPUDU5NDFxEr0jcmuJdOA@mail.gmail.com>
+References: <CAAkeBhmrQGOiW9FJr+9P9nPePcAk3YPUDU5NDFxEr0jcmuJdOA@mail.gmail.com>
+Message-ID: <f737ae70ee254206a55c3982b2bd8513@UM-MAIL3214.unimaas.nl>
+
+Hi Olivia,
+
+A couple comments before I get to your actual question:
+
+1) You might want to divide the person-years by some factor. For example:
+
+ti = data$person_years / 1000
+
+The incidence rates then reflect the number of cases per 1000 person years. That way, the rates aren't so small and the same goes for the model coefficients (e.g., the 0.0027 will turn into 2.7, which is a bit easier to communicate).
+
+2) You don't need to write pd_ec$yi and pd_ec$vi when you use data=pd_ec. So, rma.mv(yi, vi, ..., data=pd_ec) is sufficient.
+
+3) You should include random effects for studies (as you have done) and also random effects for estimates within studies. So:
+
+pd_ec$id <- 1:nrow(pd_ec)
+
+random = ~ 1 | study_id / id
+
+In fact, I see that you may have multiple estimates for the same cohort, so one could even use an additional level, that is:
+
+random = ~ 1 | study_id / cohort_id / id
+
+But if you only have 8 rows of data, then I wouldn't do that (so then I would use random = ~ 1 | study_id / id).
+
+4) Now for your actual question: You are analyzing incidence rates, so the coefficients of your model reflect how the (average) rate changes as a function of those moderators (e.g., while the rate is 0.0027 for "1Americas", the rate is 0.0027-0.0025=0.0002 for "Africa"). In other words, the coefficients represent incidence rate differences. If you want ratios, you should analyze log incidence rates (measure="IRLN"). Then the coefficients reflect differences between log incidence rates, so if you exponentiate the coefficients of your model, you get incidence rate ratios.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Olivia Cords
+Sent: Friday, 26 July, 2019 21:27
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] metafor package in R - Risk ratios using rma.mv()
+
+ATTACHMENT(S) REMOVED: metafor_output_0724 (1).png | 702_tb_incidence.xlsx | 702_metafor_tb_incidence (4).r 
+
+Hello!
+My name is Olivia and I'm a researcher at Stanford University. Our group is trying to calculate relative risk ratios for the a meta-analysis extracting? incidence rates of tuberculosis disease using the metafor package.
+
+Study Design:
+Incidence rates were extracted for each study identified by a systematic review, with some studies reporting multiple rates for different years or locations. In this case, multiple rates were treated as different study cohorts, meaning that the data is clustered ('cohort_id' nested within 'study_id').
+
+Model:
+We used the rma.mv() function, inputting the calculated incidence rate as the outcome variable ('pdc$yi), the variance ('pdc$vi'), WHO region ('who_region') and whether the study was conducted through passive or active screening (passive_active') as moderators, and a random effects argument for the study level ('study_id'). We are unclear how to go from the output to Risk Ratios.
+
+Data:
+study_id??? cohort_id?? n_diagnosed person_years?? who_region? passive_active
+131???????? 34????????? 77????????? 14298????????? 1Americas?? 1Passive
+93????????? 120???????? 5?????????? 27750????????? 1Americas?? 1Passive
+93????????? 121???????? 14????????? 277150???????? 1Americas?? 1Passive
+93????????? 122???????? 15????????? 2000?????????? 1Americas?? 1Passive
+136???????? 383???????? 2?????????? 2000?????????? Africa????? 2Active
+136???????? 383???????? 7?????????? 100000???????? Africa????? 2Active
+187???????? 16????????? 16????????? 100000???????? Africa????? 3Not Specified
+187???????? 517???????? 2?????????? 100000???????? S.E. Asia?? 3Not Specified
+
+Code:
+
+library(xlsx)
+library(metafor)
+
+data <- read.xlsx('702_tb_incidence.xlsx', 1)
+print(data)
+#calculating the incidence rate and the variance
+pd_ec <- escalc(
+?? measure = 'IR',
+?? xi = data$n_diagnosed,
+?? ti = data$person_years,
+?? data = data
+)
+pd_ec
+
+#specifying mixed effects model
+#first level cohort incidence rate and variation
+#second level study_id
+#who_region and passive_active as moderators
+m0 <- rma.mv(pd_ec$yi, pd_ec$vi, method='REML', mods = ~ who_region + passive_active,
+??????? random= ~ 1 | study_id,
+??????? tdist=TRUE,
+??????? data=pd_ec)
+
+summary(m0)
+
+Output:
+Multivariate Meta-Analysis Model (k = 8; method: REML)
+
+? logLik? Deviance?????? AIC?????? BIC????? AICc
+?15.4961? -30.9922? -20.9922? -24.0607?? 39.0078??
+
+Variance Components:
+
+??????????? estim??? sqrt? nlvls? fixed??? factor
+sigma^2??? 0.0000? 0.0037????? 4???? no? study_id
+
+Test for Residual Heterogeneity:
+QE(df = 4) = 94.4465, p-val < .0001
+
+Test of Moderators (coefficients 2:4):
+F(df1 = 3, df2 = 4) = 3.7931, p-val = 0.1152
+
+Model Results:
+
+?????????????????????? estimate????? se???? tval??? pval??? ci.lb?? ci.ub
+intrcpt????????????????? 0.0027? 0.0027?? 1.0073? 0.3708? -0.0047? 0.0101???
+who_regionAfrica??????? -0.0025? 0.0046? -0.5493? 0.6120? -0.0153? 0.0102???
+who_regionS.E. Asia???? -0.0027? 0.0046? -0.5797? 0.5932? -0.0154? 0.0101???
+passive_active2Active?? -0.0001? 0.0053? -0.0167? 0.9874? -0.0148? 0.0146?
+
+Any advice/insight in much appreciated!
+
+Best wishes,
+Olivia
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Jul 26 22:45:16 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Fri, 26 Jul 2019 20:45:16 +0000
+Subject: [R-meta] how do i get the ri for a meta analysis pre post test
+In-Reply-To: <MN2PR20MB28146C59F8BF42BF73883212ACCB0@MN2PR20MB2814.namprd20.prod.outlook.com>
+References: <mailman.1627.2371.1563448670.8808.r-sig-meta-analysis@r-project.org>
+ <MN2PR20MB28146C59F8BF42BF73883212ACCB0@MN2PR20MB2814.namprd20.prod.outlook.com>
+Message-ID: <5cb19f33b13e49d98d5541a30d758b9d@UM-MAIL3214.unimaas.nl>
+
+Hi Lorenzo,
+
+You have to extract ri from the articles - it is not something you calculate. If you don't know the pre- to post-test correlation, then you could try to make an educate guess and then do a sensitivity analysis (i.e., vary your guess a bit and check how this affects your results/conclusions).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Martin Lobo
+Sent: Friday, 19 July, 2019 3:17
+To: r-sig-meta-analysis at r-project.org; r-sig-meta-analysis-bounces at r-project.org; Martin Lobo
+Subject: [R-meta] how do i get the ri for a meta analysis pre post test
+
+Effect Size Measures for Pretest Posttest Control Group Designs
+
+datT <- escalc(measure="SMCR", m1i=m_post, m2i=m_pre, sd1i=sd_pre, ni=ni, ri=ri, data=datT)
+datC <- escalc(measure="SMCR", m1i=m_post, m2i=m_pre, sd1i=sd_pre, ni=ni, ri=ri, data=datC)
+
+Hello, I need to do this type of analysis, I have all the data but I do not know how to calculate the ri. Is there any way to do it without this?
+
+thank's
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Miembro del Area de Investigaci?n de la SAC
+Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Instructor de ACLS de la American Heart Association
+
+From @dher024 @end|ng |rom uott@w@@c@  Mon Jul 29 19:10:35 2019
+From: @dher024 @end|ng |rom uott@w@@c@ (Aman Dheri)
+Date: Mon, 29 Jul 2019 13:10:35 -0400
+Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+Message-ID: <9F3B347A-37C0-4FCE-9148-EFFE08618194@uottawa.ca>
+
+Hello,
+
+I am doing a fixed effects meta-analysis in Metafor and I see that it returns a non-zero I^2 value when tau^2 is always zero. According to Metafor documentation the fixed effects model in rma.uni should be 0 because of its calculation from the tau^2. Does any one know why this is happening, and if it is changing the weighting during the meta-analysis vs if the I^2 was 0?
+
+I assumed my code wasn?t needed for the answer to this but please let me know if I?m wrong!
+
+Thank you!
+Arthur
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Jul 29 19:56:50 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 29 Jul 2019 17:56:50 +0000
+Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+In-Reply-To: <9F3B347A-37C0-4FCE-9148-EFFE08618194@uottawa.ca>
+References: <9F3B347A-37C0-4FCE-9148-EFFE08618194@uottawa.ca>
+Message-ID: <f6d1477a34ec43838c25e517223da8b1@UM-MAIL3214.unimaas.nl>
+
+Hi Arthur,
+
+Indeed, for random/mixed-effects models, I^2 is computed with tau^2 / (tau^2 + v), where tau^2 is the estimate of (residual) heterogeneity and v is the 'typical' sampling variance. So, if tau^2 = 0, then I^2 = 0.
+
+Since I^2 is a useful statistic also for fixed-effects models, I^2 is also computed then, but using (Q - (df)) / Q, where Q is the test statistic for (residual) heterogeneity and df = degrees of freedom of the test (k-1 for a model without moderators). But this has no effect on the rest of the computations (such as the weights).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Aman Dheri
+Sent: Monday, 29 July, 2019 19:11
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+
+Hello,
+
+I am doing a fixed effects meta-analysis in Metafor and I see that it returns a non-zero I^2 value when tau^2 is always zero. According to Metafor documentation the fixed effects model in rma.uni should be 0 because of its calculation from the tau^2. Does any one know why this is happening, and if it is changing the weighting during the meta-analysis vs if the I^2 was 0?
+
+I assumed my code wasn?t needed for the answer to this but please let me know if I?m wrong!
+
+Thank you!
+Arthur
+
+From c@thk|d@|over @end|ng |rom gm@||@com  Tue Jul 30 05:21:24 2019
+From: c@thk|d@|over @end|ng |rom gm@||@com (Cath Kids)
+Date: Tue, 30 Jul 2019 11:21:24 +0800
+Subject: [R-meta] [R=meta] Question about removal of outliers and power
+ calculation
+Message-ID: <CAMzfLd0qRjQX4z6zZW=WZ+WGwPmC4bMyPXsZma68dKpZDnyVnQ@mail.gmail.com>
+
+Hello everyone,
+
+I am new to meta-analysis and I would like to clarify some conceptual
+matter:
+
+1. Should I remove outliers before doing subgroup analysis/ meta
+regression? In my study, heterogeneity became insignificant after removal
+outliers. I read meta-analyses which did both practice and I wonder which
+is the correct way.
+
+2. I wonder whether any one of you are familiar with any tools to calculate
+power for meta-analysis of correlation coefficients?
+
+Thank you very much!
+
+Regards,
+Joanne
+
+	[[alternative HTML version deleted]]
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Tue Jul 30 10:37:22 2019
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Tue, 30 Jul 2019 10:37:22 +0200
+Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+In-Reply-To: <f6d1477a34ec43838c25e517223da8b1@UM-MAIL3214.unimaas.nl>
+References: <9F3B347A-37C0-4FCE-9148-EFFE08618194@uottawa.ca>
+ <f6d1477a34ec43838c25e517223da8b1@UM-MAIL3214.unimaas.nl>
+Message-ID: <59ae6a1a-f910-906d-3ff6-25cf0770d0a9@imbi.uni-freiburg.de>
+
+Hi all,
+
+The question whether it is possible in the fixed effect model that tau^2 
+= 0 though I^2 > 0 was not answered in Wolfgang's reply. Following his 
+response, in this case metafor calculates
+
+I^2 = (Q - (df)) / Q,
+
+which probably means
+
+I^2 = max(0, (Q - (df)) / Q).
+
+Now it depends on the way tau^2 is calculated. For the DerSimonian-Laird 
+estimate, \hat tau^2 has the same numerator as I^2, that is, if \hat 
+tau^2 = 0, then I^2 = 0.
+
+Thus the case Arthur describes can only, if at all, occur for other 
+tau^2 estimates. Thus, I repeat his question: Is it possible and under 
+which circumstances?
+
+Best,
+
+Gerta
+
+Am 29.07.2019 um 19:56 schrieb Viechtbauer, Wolfgang (SP):
+> Hi Arthur,
+>
+> Indeed, for random/mixed-effects models, I^2 is computed with tau^2 / (tau^2 + v), where tau^2 is the estimate of (residual) heterogeneity and v is the 'typical' sampling variance. So, if tau^2 = 0, then I^2 = 0.
+>
+> Since I^2 is a useful statistic also for fixed-effects models, I^2 is also computed then, but using (Q - (df)) / Q, where Q is the test statistic for (residual) heterogeneity and df = degrees of freedom of the test (k-1 for a model without moderators). But this has no effect on the rest of the computations (such as the weights).
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Aman Dheri
+> Sent: Monday, 29 July, 2019 19:11
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+>
+> Hello,
+>
+> I am doing a fixed effects meta-analysis in Metafor and I see that it returns a non-zero I^2 value when tau^2 is always zero. According to Metafor documentation the fixed effects model in rma.uni should be 0 because of its calculation from the tau^2. Does any one know why this is happening, and if it is changing the weighting during the meta-analysis vs if the I^2 was 0?
+>
+> I assumed my code wasn?t needed for the answer to this but please let me know if I?m wrong!
+>
+> Thank you!
+> Arthur
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Tue Jul 30 12:46:41 2019
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 30 Jul 2019 11:46:41 +0100
+Subject: [R-meta] [R=meta] Question about removal of outliers and power
+ calculation
+In-Reply-To: <CAMzfLd0qRjQX4z6zZW=WZ+WGwPmC4bMyPXsZma68dKpZDnyVnQ@mail.gmail.com>
+References: <CAMzfLd0qRjQX4z6zZW=WZ+WGwPmC4bMyPXsZma68dKpZDnyVnQ@mail.gmail.com>
+Message-ID: <c33a0e3e-4c9f-2d51-9d77-33ad1759ce5b@dewey.myzen.co.uk>
+
+Dear Joanne
+
+In line comments
+
+On 30/07/2019 04:21, Cath Kids wrote:
+> Hello everyone,
+> 
+> I am new to meta-analysis and I would like to clarify some conceptual
+> matter:
+> 
+> 1. Should I remove outliers before doing subgroup analysis/ meta
+> regression? In my study, heterogeneity became insignificant after removal
+> outliers. I read meta-analyses which did both practice and I wonder which
+> is the correct way.
+
+This raises a number of issues. If heterogeneity exists why do you want 
+to reduce or eliminate it? Would it not be better to try to describe and 
+explain it? In general removing outliers leads to a model which is data 
+dependent rather than the scientific model you started with. The only 
+time I would contemplate removing observations would be if there was 
+reason to suspect that they are fraudulent, recorded erroneously, did 
+not really meet the inclusion criteria after all, or some other 
+principled explanation which i cannot think of just now.
+
+> 2. I wonder whether any one of you are familiar with any tools to calculate
+> power for meta-analysis of correlation coefficients?
+> 
+
+If you are planning a study why do you need power? The number of primary 
+studies you find in your literature search is not within your powers to 
+choose. You can only analyse what you find, not what you would like to 
+find. If you have already done the study then all the required 
+information about precision is contained within the confidence estimates 
+about your estimate(s).
+
+
+> Thank you very much!
+> 
+> Regards,
+> Joanne
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> ---
+> This email has been checked for viruses by AVG.
+> https://www.avg.com
+> 
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From c@thk|d@|over @end|ng |rom gm@||@com  Tue Jul 30 13:38:44 2019
+From: c@thk|d@|over @end|ng |rom gm@||@com (Cath Kids)
+Date: Tue, 30 Jul 2019 19:38:44 +0800
+Subject: [R-meta] [R=meta] Question about removal of outliers and power
+ calculation
+In-Reply-To: <c33a0e3e-4c9f-2d51-9d77-33ad1759ce5b@dewey.myzen.co.uk>
+References: <CAMzfLd0qRjQX4z6zZW=WZ+WGwPmC4bMyPXsZma68dKpZDnyVnQ@mail.gmail.com>
+ <c33a0e3e-4c9f-2d51-9d77-33ad1759ce5b@dewey.myzen.co.uk>
+Message-ID: <CAMzfLd3QDjP0DeD=Nmq0KfO0r4CQw7gV9koFK_D_+JOyMiKxnA@mail.gmail.com>
+
+Dear Michael,
+
+Thank you for your reply! Please see more response in blue.
+
+On Tue, Jul 30, 2019 at 6:46 PM Michael Dewey <lists at dewey.myzen.co.uk>
+wrote:
+
+> Dear Joanne
+>
+> In line comments
+>
+> On 30/07/2019 04:21, Cath Kids wrote:
+> > Hello everyone,
+> >
+> > I am new to meta-analysis and I would like to clarify some conceptual
+> > matter:
+> >
+> > 1. Should I remove outliers before doing subgroup analysis/ meta
+> > regression? In my study, heterogeneity became insignificant after removal
+> > outliers. I read meta-analyses which did both practice and I wonder which
+> > is the correct way.
+>
+> This raises a number of issues. If heterogeneity exists why do you want
+> to reduce or eliminate it? Would it not be better to try to describe and
+> explain it? In general removing outliers leads to a model which is data
+> dependent rather than the scientific model you started with. The only
+> time I would contemplate removing observations would be if there was
+> reason to suspect that they are fraudulent, recorded erroneously, did
+> not really meet the inclusion criteria after all, or some other
+> principled explanation which i cannot think of just now.
+>
+
+I see. So I should use all observations for the subgroup analysis/
+meta-regression. But then given the heterogeneity of the results, I can
+remove the outliers and check whether there is any change in the overall
+effect size as a sensitivity analysis. is that right?
+
+>
+> > 2. I wonder whether any one of you are familiar with any tools to
+> calculate
+> > power for meta-analysis of correlation coefficients?
+> >
+>
+> If you are planning a study why do you need power? The number of primary
+> studies you find in your literature search is not within your powers to
+> choose. You can only analyse what you find, not what you would like to
+> find. If you have already done the study then all the required
+> information about precision is contained within the confidence estimates
+> about your estimate(s).
+>
+> I refer to this guideline online
+https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/power-analysis.html
+.
+However, it does not mention meta-analysis of correlation. So I'm not sure
+how to do it.
+
+>
+> > Thank you very much!
+> >
+> > Regards,
+> > Joanne
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list
+> > R-sig-meta-analysis at r-project.org
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+> > ---
+> > This email has been checked for viruses by AVG.
+> > https://www.avg.com
+> >
+> >
+>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Tue Jul 30 14:15:24 2019
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Tue, 30 Jul 2019 14:15:24 +0200
+Subject: [R-meta] [R=meta] Question about removal of outliers and power
+ calculation
+In-Reply-To: <CAMzfLd3QDjP0DeD=Nmq0KfO0r4CQw7gV9koFK_D_+JOyMiKxnA@mail.gmail.com>
+References: <CAMzfLd0qRjQX4z6zZW=WZ+WGwPmC4bMyPXsZma68dKpZDnyVnQ@mail.gmail.com>
+ <c33a0e3e-4c9f-2d51-9d77-33ad1759ce5b@dewey.myzen.co.uk>
+ <CAMzfLd3QDjP0DeD=Nmq0KfO0r4CQw7gV9koFK_D_+JOyMiKxnA@mail.gmail.com>
+Message-ID: <98bb1f9a-71f2-7341-e08a-9108a0b26d71@imbi.uni-freiburg.de>
+
+Dear Joanne,
+
+I agree with Michael in all points. I had a look at the page you 
+referred to and it did not became clear to me why they want to calculate 
+power. At least the last caveat on that page is true: "Please note that 
+power analyses should always be conducted a priori, meaning before you 
+perform the meta-analysis." In my view, it all comes down to the same 
+thing (whether you calculate numbers before or afterwards) because, as 
+Michael said, you cannot plan the size of a meta-analysis like you can 
+plan the size of a study.
+
+Note that the reference you gave is not a guideline, but simply a book, 
+a practical guide.
+
+Best,
+
+Gerta
+
+Am 30.07.2019 um 13:38 schrieb Cath Kids:
+> Dear Michael,
+>
+> Thank you for your reply! Please see more response in blue.
+>
+> On Tue, Jul 30, 2019 at 6:46 PM Michael Dewey <lists at dewey.myzen.co.uk>
+> wrote:
+>
+>> Dear Joanne
+>>
+>> In line comments
+>>
+>> On 30/07/2019 04:21, Cath Kids wrote:
+>>> Hello everyone,
+>>>
+>>> I am new to meta-analysis and I would like to clarify some conceptual
+>>> matter:
+>>>
+>>> 1. Should I remove outliers before doing subgroup analysis/ meta
+>>> regression? In my study, heterogeneity became insignificant after removal
+>>> outliers. I read meta-analyses which did both practice and I wonder which
+>>> is the correct way.
+>> This raises a number of issues. If heterogeneity exists why do you want
+>> to reduce or eliminate it? Would it not be better to try to describe and
+>> explain it? In general removing outliers leads to a model which is data
+>> dependent rather than the scientific model you started with. The only
+>> time I would contemplate removing observations would be if there was
+>> reason to suspect that they are fraudulent, recorded erroneously, did
+>> not really meet the inclusion criteria after all, or some other
+>> principled explanation which i cannot think of just now.
+>>
+> I see. So I should use all observations for the subgroup analysis/
+> meta-regression. But then given the heterogeneity of the results, I can
+> remove the outliers and check whether there is any change in the overall
+> effect size as a sensitivity analysis. is that right?
+>
+>>> 2. I wonder whether any one of you are familiar with any tools to
+>> calculate
+>>> power for meta-analysis of correlation coefficients?
+>>>
+>> If you are planning a study why do you need power? The number of primary
+>> studies you find in your literature search is not within your powers to
+>> choose. You can only analyse what you find, not what you would like to
+>> find. If you have already done the study then all the required
+>> information about precision is contained within the confidence estimates
+>> about your estimate(s).
+>>
+>> I refer to this guideline online
+> https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/power-analysis.html
+> .
+> However, it does not mention meta-analysis of correlation. So I'm not sure
+> how to do it.
+>
+>>> Thank you very much!
+>>>
+>>> Regards,
+>>> Joanne
+>>>
+>>>        [[alternative HTML version deleted]]
+>>>
+>>> _______________________________________________
+>>> R-sig-meta-analysis mailing list
+>>> R-sig-meta-analysis at r-project.org
+>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>
+>>> ---
+>>> This email has been checked for viruses by AVG.
+>>> https://www.avg.com
+>>>
+>>>
+>> --
+>> Michael
+>> http://www.dewey.myzen.co.uk/home.html
+>>
+> 	[[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Jul 30 15:28:20 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 30 Jul 2019 13:28:20 +0000
+Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+In-Reply-To: <59ae6a1a-f910-906d-3ff6-25cf0770d0a9@imbi.uni-freiburg.de>
+References: <9F3B347A-37C0-4FCE-9148-EFFE08618194@uottawa.ca>
+ <f6d1477a34ec43838c25e517223da8b1@UM-MAIL3214.unimaas.nl>
+ <59ae6a1a-f910-906d-3ff6-25cf0770d0a9@imbi.uni-freiburg.de>
+Message-ID: <444ab9f0eea04204b5d8c2439bc63ccb@UM-MAIL3214.unimaas.nl>
+
+My understanding of Arthur's question was that he is wondering why the following code yields a value of I^2 = 40% given that this fits a fixed-effects model where tau^2 = 0 by definition.
+
+library(metafor)
+
+yi <- c(.2, .3, .4, .5)
+vi <- rep(.01, 4)
+
+res <- rma(yi, vi, method="FE")
+res$I2
+
+(and in the 'devel' version, the value of I^2 is shown explicitly in the output also for a FE model).
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Gerta Ruecker [mailto:ruecker at imbi.uni-freiburg.de] 
+Sent: Tuesday, 30 July, 2019 10:37
+To: Viechtbauer, Wolfgang (SP); Aman Dheri; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Metafor Fixed Effects giving I2- why?
+
+Hi all,
+
+The question whether it is possible in the fixed effect model that tau^2 
+= 0 though I^2 > 0 was not answered in Wolfgang's reply. Following his 
+response, in this case metafor calculates
+
+I^2 = (Q - (df)) / Q,
+
+which probably means
+
+I^2 = max(0, (Q - (df)) / Q).
+
+Now it depends on the way tau^2 is calculated. For the DerSimonian-Laird 
+estimate, \hat tau^2 has the same numerator as I^2, that is, if \hat 
+tau^2 = 0, then I^2 = 0.
+
+Thus the case Arthur describes can only, if at all, occur for other 
+tau^2 estimates. Thus, I repeat his question: Is it possible and under 
+which circumstances?
+
+Best,
+
+Gerta
+
+Am 29.07.2019 um 19:56 schrieb Viechtbauer, Wolfgang (SP):
+> Hi Arthur,
+>
+> Indeed, for random/mixed-effects models, I^2 is computed with tau^2 / (tau^2 + v), where tau^2 is the estimate of (residual) heterogeneity and v is the 'typical' sampling variance. So, if tau^2 = 0, then I^2 = 0.
+>
+> Since I^2 is a useful statistic also for fixed-effects models, I^2 is also computed then, but using (Q - (df)) / Q, where Q is the test statistic for (residual) heterogeneity and df = degrees of freedom of the test (k-1 for a model without moderators). But this has no effect on the rest of the computations (such as the weights).
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Aman Dheri
+> Sent: Monday, 29 July, 2019 19:11
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+>
+> Hello,
+>
+> I am doing a fixed effects meta-analysis in Metafor and I see that it returns a non-zero I^2 value when tau^2 is always zero. According to Metafor documentation the fixed effects model in rma.uni should be 0 because of its calculation from the tau^2. Does any one know why this is happening, and if it is changing the weighting during the meta-analysis vs if the I^2 was 0?
+>
+> I assumed my code wasn?t needed for the answer to this but please let me know if I?m wrong!
+>
+> Thank you!
+> Arthur
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Tue Jul 30 16:15:42 2019
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Tue, 30 Jul 2019 16:15:42 +0200
+Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+In-Reply-To: <444ab9f0eea04204b5d8c2439bc63ccb@UM-MAIL3214.unimaas.nl>
+References: <9F3B347A-37C0-4FCE-9148-EFFE08618194@uottawa.ca>
+ <f6d1477a34ec43838c25e517223da8b1@UM-MAIL3214.unimaas.nl>
+ <59ae6a1a-f910-906d-3ff6-25cf0770d0a9@imbi.uni-freiburg.de>
+ <444ab9f0eea04204b5d8c2439bc63ccb@UM-MAIL3214.unimaas.nl>
+Message-ID: <42b0bf5b-de02-60d9-947b-1af85c1eaee6@imbi.uni-freiburg.de>
+
+Thank you, Wolfgang!
+
+The difference is between the *parameter* tau^2, which is zero if we 
+believe the fixed effect model, and the estimate \hat tau^2, which in 
+your example is likewise positive (all methods), though (of course) small.
+
+Best,
+
+Gerta
+
+Am 30.07.2019 um 15:28 schrieb Viechtbauer, Wolfgang (SP):
+> My understanding of Arthur's question was that he is wondering why the following code yields a value of I^2 = 40% given that this fits a fixed-effects model where tau^2 = 0 by definition.
+>
+> library(metafor)
+>
+> yi <- c(.2, .3, .4, .5)
+> vi <- rep(.01, 4)
+>
+> res <- rma(yi, vi, method="FE")
+> res$I2
+>
+> (and in the 'devel' version, the value of I^2 is shown explicitly in the output also for a FE model).
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Gerta Ruecker [mailto:ruecker at imbi.uni-freiburg.de]
+> Sent: Tuesday, 30 July, 2019 10:37
+> To: Viechtbauer, Wolfgang (SP); Aman Dheri; r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] Metafor Fixed Effects giving I2- why?
+>
+> Hi all,
+>
+> The question whether it is possible in the fixed effect model that tau^2
+> = 0 though I^2 > 0 was not answered in Wolfgang's reply. Following his
+> response, in this case metafor calculates
+>
+> I^2 = (Q - (df)) / Q,
+>
+> which probably means
+>
+> I^2 = max(0, (Q - (df)) / Q).
+>
+> Now it depends on the way tau^2 is calculated. For the DerSimonian-Laird
+> estimate, \hat tau^2 has the same numerator as I^2, that is, if \hat
+> tau^2 = 0, then I^2 = 0.
+>
+> Thus the case Arthur describes can only, if at all, occur for other
+> tau^2 estimates. Thus, I repeat his question: Is it possible and under
+> which circumstances?
+>
+> Best,
+>
+> Gerta
+>
+> Am 29.07.2019 um 19:56 schrieb Viechtbauer, Wolfgang (SP):
+>> Hi Arthur,
+>>
+>> Indeed, for random/mixed-effects models, I^2 is computed with tau^2 / (tau^2 + v), where tau^2 is the estimate of (residual) heterogeneity and v is the 'typical' sampling variance. So, if tau^2 = 0, then I^2 = 0.
+>>
+>> Since I^2 is a useful statistic also for fixed-effects models, I^2 is also computed then, but using (Q - (df)) / Q, where Q is the test statistic for (residual) heterogeneity and df = degrees of freedom of the test (k-1 for a model without moderators). But this has no effect on the rest of the computations (such as the weights).
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Aman Dheri
+>> Sent: Monday, 29 July, 2019 19:11
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+>>
+>> Hello,
+>>
+>> I am doing a fixed effects meta-analysis in Metafor and I see that it returns a non-zero I^2 value when tau^2 is always zero. According to Metafor documentation the fixed effects model in rma.uni should be 0 because of its calculation from the tau^2. Does any one know why this is happening, and if it is changing the weighting during the meta-analysis vs if the I^2 was 0?
+>>
+>> I assumed my code wasn?t needed for the answer to this but please let me know if I?m wrong!
+>>
+>> Thank you!
+>> Arthur
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Jul 30 16:31:30 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 30 Jul 2019 14:31:30 +0000
+Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+In-Reply-To: <42b0bf5b-de02-60d9-947b-1af85c1eaee6@imbi.uni-freiburg.de>
+References: <9F3B347A-37C0-4FCE-9148-EFFE08618194@uottawa.ca>
+ <f6d1477a34ec43838c25e517223da8b1@UM-MAIL3214.unimaas.nl>
+ <59ae6a1a-f910-906d-3ff6-25cf0770d0a9@imbi.uni-freiburg.de>
+ <444ab9f0eea04204b5d8c2439bc63ccb@UM-MAIL3214.unimaas.nl>
+ <42b0bf5b-de02-60d9-947b-1af85c1eaee6@imbi.uni-freiburg.de>
+Message-ID: <2ce010fa767c488c973b4d400f4b352a@UM-MAIL3214.unimaas.nl>
+
+And yes, one can construct examples where the estimate of tau^2 = 0, while I^2 > 0 (when I^2 is computed with max(0, (Q - (df)) / Q)). As you pointed out, this can't happen when estimating tau^2 wit the DL estimator, but it can happen when using other estimators. For example:
+
+yi <- c(.2, .3, .4, .5)
+vi <- rep(.0125, 4)
+
+res <- rma(yi, vi, method="FE")
+res$I2
+
+rma(yi, vi, method="ML")$tau2 # this is essentially 0
+var(yi)*3/4 - .0125 # for this case, ML reduces to this
+
+(same goes for the HS estimator, which is identical to ML when the sampling variances are homoscedastic; all other estimators should give an estimate > 0)
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Gerta Ruecker [mailto:ruecker at imbi.uni-freiburg.de] 
+Sent: Tuesday, 30 July, 2019 16:16
+To: Viechtbauer, Wolfgang (SP); Aman Dheri; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] Metafor Fixed Effects giving I2- why?
+
+Thank you, Wolfgang!
+
+The difference is between the *parameter* tau^2, which is zero if we 
+believe the fixed effect model, and the estimate \hat tau^2, which in 
+your example is likewise positive (all methods), though (of course) small.
+
+Best,
+
+Gerta
+
+Am 30.07.2019 um 15:28 schrieb Viechtbauer, Wolfgang (SP):
+> My understanding of Arthur's question was that he is wondering why the following code yields a value of I^2 = 40% given that this fits a fixed-effects model where tau^2 = 0 by definition.
+>
+> library(metafor)
+>
+> yi <- c(.2, .3, .4, .5)
+> vi <- rep(.01, 4)
+>
+> res <- rma(yi, vi, method="FE")
+> res$I2
+>
+> (and in the 'devel' version, the value of I^2 is shown explicitly in the output also for a FE model).
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Gerta Ruecker [mailto:ruecker at imbi.uni-freiburg.de]
+> Sent: Tuesday, 30 July, 2019 10:37
+> To: Viechtbauer, Wolfgang (SP); Aman Dheri; r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] Metafor Fixed Effects giving I2- why?
+>
+> Hi all,
+>
+> The question whether it is possible in the fixed effect model that tau^2
+> = 0 though I^2 > 0 was not answered in Wolfgang's reply. Following his
+> response, in this case metafor calculates
+>
+> I^2 = (Q - (df)) / Q,
+>
+> which probably means
+>
+> I^2 = max(0, (Q - (df)) / Q).
+>
+> Now it depends on the way tau^2 is calculated. For the DerSimonian-Laird
+> estimate, \hat tau^2 has the same numerator as I^2, that is, if \hat
+> tau^2 = 0, then I^2 = 0.
+>
+> Thus the case Arthur describes can only, if at all, occur for other
+> tau^2 estimates. Thus, I repeat his question: Is it possible and under
+> which circumstances?
+>
+> Best,
+>
+> Gerta
+>
+> Am 29.07.2019 um 19:56 schrieb Viechtbauer, Wolfgang (SP):
+>> Hi Arthur,
+>>
+>> Indeed, for random/mixed-effects models, I^2 is computed with tau^2 / (tau^2 + v), where tau^2 is the estimate of (residual) heterogeneity and v is the 'typical' sampling variance. So, if tau^2 = 0, then I^2 = 0.
+>>
+>> Since I^2 is a useful statistic also for fixed-effects models, I^2 is also computed then, but using (Q - (df)) / Q, where Q is the test statistic for (residual) heterogeneity and df = degrees of freedom of the test (k-1 for a model without moderators). But this has no effect on the rest of the computations (such as the weights).
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Aman Dheri
+>> Sent: Monday, 29 July, 2019 19:11
+>> To: r-sig-meta-analysis at r-project.org
+>> Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+>>
+>> Hello,
+>>
+>> I am doing a fixed effects meta-analysis in Metafor and I see that it returns a non-zero I^2 value when tau^2 is always zero. According to Metafor documentation the fixed effects model in rma.uni should be 0 because of its calculation from the tau^2. Does any one know why this is happening, and if it is changing the weighting during the meta-analysis vs if the I^2 was 0?
+>>
+>> I assumed my code wasn?t needed for the answer to this but please let me know if I?m wrong!
+>>
+>> Thank you!
+>> Arthur
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+
+From ruecker @end|ng |rom |mb|@un|-|re|burg@de  Tue Jul 30 16:39:35 2019
+From: ruecker @end|ng |rom |mb|@un|-|re|burg@de (Gerta Ruecker)
+Date: Tue, 30 Jul 2019 16:39:35 +0200
+Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+In-Reply-To: <2ce010fa767c488c973b4d400f4b352a@UM-MAIL3214.unimaas.nl>
+References: <9F3B347A-37C0-4FCE-9148-EFFE08618194@uottawa.ca>
+ <f6d1477a34ec43838c25e517223da8b1@UM-MAIL3214.unimaas.nl>
+ <59ae6a1a-f910-906d-3ff6-25cf0770d0a9@imbi.uni-freiburg.de>
+ <444ab9f0eea04204b5d8c2439bc63ccb@UM-MAIL3214.unimaas.nl>
+ <42b0bf5b-de02-60d9-947b-1af85c1eaee6@imbi.uni-freiburg.de>
+ <2ce010fa767c488c973b4d400f4b352a@UM-MAIL3214.unimaas.nl>
+Message-ID: <0474bfd5-2f8c-2e25-7fc8-15940353b585@imbi.uni-freiburg.de>
+
+Thanks again - this is exactly what I wanted to know (and thought the 
+original post referred to).
+
+Gerta
+
+Am 30.07.2019 um 16:31 schrieb Viechtbauer, Wolfgang (SP):
+> And yes, one can construct examples where the estimate of tau^2 = 0, while I^2 > 0 (when I^2 is computed with max(0, (Q - (df)) / Q)). As you pointed out, this can't happen when estimating tau^2 wit the DL estimator, but it can happen when using other estimators. For example:
+>
+> yi <- c(.2, .3, .4, .5)
+> vi <- rep(.0125, 4)
+>
+> res <- rma(yi, vi, method="FE")
+> res$I2
+>
+> rma(yi, vi, method="ML")$tau2 # this is essentially 0
+> var(yi)*3/4 - .0125 # for this case, ML reduces to this
+>
+> (same goes for the HS estimator, which is identical to ML when the sampling variances are homoscedastic; all other estimators should give an estimate > 0)
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: Gerta Ruecker [mailto:ruecker at imbi.uni-freiburg.de]
+> Sent: Tuesday, 30 July, 2019 16:16
+> To: Viechtbauer, Wolfgang (SP); Aman Dheri; r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] Metafor Fixed Effects giving I2- why?
+>
+> Thank you, Wolfgang!
+>
+> The difference is between the *parameter* tau^2, which is zero if we
+> believe the fixed effect model, and the estimate \hat tau^2, which in
+> your example is likewise positive (all methods), though (of course) small.
+>
+> Best,
+>
+> Gerta
+>
+> Am 30.07.2019 um 15:28 schrieb Viechtbauer, Wolfgang (SP):
+>> My understanding of Arthur's question was that he is wondering why the following code yields a value of I^2 = 40% given that this fits a fixed-effects model where tau^2 = 0 by definition.
+>>
+>> library(metafor)
+>>
+>> yi <- c(.2, .3, .4, .5)
+>> vi <- rep(.01, 4)
+>>
+>> res <- rma(yi, vi, method="FE")
+>> res$I2
+>>
+>> (and in the 'devel' version, the value of I^2 is shown explicitly in the output also for a FE model).
+>>
+>> Best,
+>> Wolfgang
+>>
+>> -----Original Message-----
+>> From: Gerta Ruecker [mailto:ruecker at imbi.uni-freiburg.de]
+>> Sent: Tuesday, 30 July, 2019 10:37
+>> To: Viechtbauer, Wolfgang (SP); Aman Dheri; r-sig-meta-analysis at r-project.org
+>> Subject: Re: [R-meta] Metafor Fixed Effects giving I2- why?
+>>
+>> Hi all,
+>>
+>> The question whether it is possible in the fixed effect model that tau^2
+>> = 0 though I^2 > 0 was not answered in Wolfgang's reply. Following his
+>> response, in this case metafor calculates
+>>
+>> I^2 = (Q - (df)) / Q,
+>>
+>> which probably means
+>>
+>> I^2 = max(0, (Q - (df)) / Q).
+>>
+>> Now it depends on the way tau^2 is calculated. For the DerSimonian-Laird
+>> estimate, \hat tau^2 has the same numerator as I^2, that is, if \hat
+>> tau^2 = 0, then I^2 = 0.
+>>
+>> Thus the case Arthur describes can only, if at all, occur for other
+>> tau^2 estimates. Thus, I repeat his question: Is it possible and under
+>> which circumstances?
+>>
+>> Best,
+>>
+>> Gerta
+>>
+>> Am 29.07.2019 um 19:56 schrieb Viechtbauer, Wolfgang (SP):
+>>> Hi Arthur,
+>>>
+>>> Indeed, for random/mixed-effects models, I^2 is computed with tau^2 / (tau^2 + v), where tau^2 is the estimate of (residual) heterogeneity and v is the 'typical' sampling variance. So, if tau^2 = 0, then I^2 = 0.
+>>>
+>>> Since I^2 is a useful statistic also for fixed-effects models, I^2 is also computed then, but using (Q - (df)) / Q, where Q is the test statistic for (residual) heterogeneity and df = degrees of freedom of the test (k-1 for a model without moderators). But this has no effect on the rest of the computations (such as the weights).
+>>>
+>>> Best,
+>>> Wolfgang
+>>>
+>>> -----Original Message-----
+>>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Aman Dheri
+>>> Sent: Monday, 29 July, 2019 19:11
+>>> To: r-sig-meta-analysis at r-project.org
+>>> Subject: [R-meta] Metafor Fixed Effects giving I2- why?
+>>>
+>>> Hello,
+>>>
+>>> I am doing a fixed effects meta-analysis in Metafor and I see that it returns a non-zero I^2 value when tau^2 is always zero. According to Metafor documentation the fixed effects model in rma.uni should be 0 because of its calculation from the tau^2. Does any one know why this is happening, and if it is changing the weighting during the meta-analysis vs if the I^2 was 0?
+>>>
+>>> I assumed my code wasn?t needed for the answer to this but please let me know if I?m wrong!
+>>>
+>>> Thank you!
+>>> Arthur
+
+-- 
+
+Dr. rer. nat. Gerta R?cker, Dipl.-Math.
+
+Institute of Medical Biometry and Statistics,
+Faculty of Medicine and Medical Center - University of Freiburg
+
+Stefan-Meier-Str. 26, D-79104 Freiburg, Germany
+
+Phone:    +49/761/203-6673
+Fax:      +49/761/203-6680
+Mail:     ruecker at imbi.uni-freiburg.de
+Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view
+
+

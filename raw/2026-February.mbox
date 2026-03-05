@@ -1,0 +1,106 @@
+From @@r@m@j@n@@en @end|ng |rom uv@@n|  Tue Feb 10 14:19:13 2026
+From: @@r@m@j@n@@en @end|ng |rom uv@@n| (Arne Janssen)
+Date: Tue, 10 Feb 2026 13:19:13 +0000
+Subject: [R-meta] combining different effect sizes
+Message-ID: <AM9PR10MB4498F83B12503D4909C6D4E98A62A@AM9PR10MB4498.EURPRD10.PROD.OUTLOOK.COM>
+
+L.S.,
+
+I have a very simple (perhaps even silly) question: I am interested in doing a meta-analysis using datasets that report means, standard deviations and sample sizes, whereas others report 2x2 tables or proportions  and sample sizes. After having calculated effect sizes with the appropriate escalc measure (SMD, RR, etc. respectively), does it make sense at all to combine all these effect sizes into one analysis with rma? My gut feeling is not, but I would like to be sure.
+
+Thanks very much in advance,
+Arne Janssen
+University of Amsterdam
+The Netherlands
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Tue Feb 10 22:20:41 2026
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Tue, 10 Feb 2026 15:20:41 -0600
+Subject: [R-meta] combining different effect sizes
+In-Reply-To: <AM9PR10MB4498F83B12503D4909C6D4E98A62A@AM9PR10MB4498.EURPRD10.PROD.OUTLOOK.COM>
+References: <AM9PR10MB4498F83B12503D4909C6D4E98A62A@AM9PR10MB4498.EURPRD10.PROD.OUTLOOK.COM>
+Message-ID: <CAFUVuJymK3Oyoug0VU3N0DG-fMCr2aXqGgGg1mt8vvqb3SQOeg@mail.gmail.com>
+
+Hi Arne,
+
+I assume you are talking about converting from metrics for binary outcomes
+(odds ratios or risk ratios) into metrics for continuous outcomes. There
+are methods for doing such conversions---one that comes up routinely is
+converting from odds ratios into standardized mean differences. There are
+several different formulas for doing so. Here are some relevant references:
+
+Chinn, S. (2000). A simple method for converting an odds ratio to effect
+size for use in meta?analysis. Statistics in Medicine, 19(22), 3127-3131.
+doi:10.1002/1097-0258(20001130)19:22<3127::AID-SIM784>3.3.CO;2-D
+Borenstein, M., Hedges, L. V., Higgins, J. P. T. and Rothstein, H. R.
+(2009) Converting Among Effect Sizes, in Introduction to Meta-Analysis (pp.
+45-49). Chichester, England: John Wiley & Sons, Ltd.
+doi:10.1002/9780470743386.ch7
+Fleiss, J.L. & Berlin, J.A. (2009). Effect sizes for dichotomous data. In
+Cooper, H., Hedges, L.V., & Valentine, Jeffrey C. (Eds.), The Handbook of
+Research Synthesis and Meta-Analysis (2nd Ed) (pp. 237-254). New York, NY:
+Russell Sage Foundation.
+Haddock, C. K., Rindskopf, D., & Shadish, W. R. (1998). Using odds ratios
+as effect sizes for meta-analysis of dichotomous data: A primer on methods
+and issues. Psychological Methods, 3, 339?353.
+Holling, H., B?hning, D., & B?hning, W. (2007). Meta-analysis of binary
+data based upon dichotomized criteria. Zeitschrift f?r Psychologie/Journal
+of Psychology, 215(2), 122-131. doi:10.1027/0044-3409.215.2.122
+S?nchez-Meca, J., Mar?n-Mart?nez, F., & Chac?n-Moscoso, S. (2003).
+Effect-size indices for dichotomized outcomes in meta-analysis.
+Psychological methods, 8(4), 448. doi:10.1037/1082-989x.8.4.448
+
+Whether using such conversions makes sense depends on whether the modeling
+assumptions behind them are reasonable in application. The motivating model
+behind the conversions is that the binary outcome arises from dichotomizing
+an underlying continuous variable. Under some distributional assumptions,
+you can use the information in the binary variable to estimate the
+standardized mean difference on the latent continuous variable. This tends
+to be more reasonable when the binary variable really is a dichotomization
+of a continuous variable that the other studies report. For example, if
+most studies report academic performance on standardized tests, but one or
+two studies report rates of proficiency (i.e., scoring above a benchmark
+level) on similar tests, then it seems reasonable to try and recover the
+SMD on the test. If you can't identify any coherent latent construct that
+is dichotomized into the binary variable, then trying to convert seems less
+reasonable.
+
+If you do end up using a conversion, it seems nonetheless useful and
+prudent to consider whether the type of outcome (binary vs. continous)
+moderates the magnitude of effects.
+
+James
+
+
+On Tue, Feb 10, 2026 at 7:19?AM Arne Janssen via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> L.S.,
+>
+> I have a very simple (perhaps even silly) question: I am interested in
+> doing a meta-analysis using datasets that report means, standard deviations
+> and sample sizes, whereas others report 2x2 tables or proportions  and
+> sample sizes. After having calculated effect sizes with the appropriate
+> escalc measure (SMD, RR, etc. respectively), does it make sense at all to
+> combine all these effect sizes into one analysis with rma? My gut feeling
+> is not, but I would like to be sure.
+>
+> Thanks very much in advance,
+> Arne Janssen
+> University of Amsterdam
+> The Netherlands
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+

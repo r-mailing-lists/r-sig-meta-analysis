@@ -1,0 +1,3723 @@
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Mon Jun  3 04:07:16 2024
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Mon, 3 Jun 2024 02:07:16 +0000
+Subject: [R-meta] shrinkage in location-scale RE model
+Message-ID: <MEAPR01MB5415367E64750C44F2AEBC749DFF2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear community,
+
+I am investigating the study-specific effect in the context of a location-scale random-effects model. I'll explain my question briefly.
+
+We start from a normal random-effects model. To get the study-specific effect (theta, hereafter) in a normal random-effects model, we first need to get the shrinkage factor (lambda) for each study:
+lambda_i = tau^2 / (tau^2 + v_i^2), where tau^2 is the estimated heterogeneity in a RE model, and v_i is the sampling variance of the effect size estimates  y_i
+
+then, theta is actually a weighted mean:
+theta_i = lambda_i  * y_i +  (1 - lambda_i) * mu, where mu is the intercept from the RE model.
+
+I manually checked the above formula is correct, using rma() in metafor package:
+dat <- dat.bangertdrowns2004
+# fit a RE
+res <- rma(yi, vi, data=dat)
+# get shrinkage
+dat$lamda <- res$tau2 / (res$tau2 + res$vi)
+# get study-specific effect
+dat$theta <- dat$lamda * res$yi + (1 - dat$lamda) * res$beta[1]
+# use blup() to get theta
+theta <- blup(res)
+# manual check
+dat$theta == theta$pred
+
+Now, if we fit a location-scale RE model, which relaxes the assumption of a common tau^2:
+res.ls <- rma(yi, vi, scale = ~ 1, data=dat)
+
+I thought we would get different tau^2 for each effect size included in the data, so that the lambda is becoming:
+lambda_i = tau_i^2 / (tau^2 + v_i^2), where tau_i^2 is the heterogeneity corresponding to each y_i.
+
+But this was not the case in rma().
+
+So, my questions are:
+
+
+  1.
+Is my formula wrong when computing theta or lambda for the location-scale model
+  2.
+If my formula is correct, how to get the estimate of tau_i^2; the variance for each effect size, so that we can get lambda_i which is dependent on both  tau_i^2 and v_i
+
+
+Best wishes,
+Yefeng
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Jun  3 09:18:38 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 3 Jun 2024 07:18:38 +0000
+Subject: [R-meta] shrinkage in location-scale RE model
+In-Reply-To: <MEAPR01MB5415367E64750C44F2AEBC749DFF2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB5415367E64750C44F2AEBC749DFF2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <AS8PR08MB919327982A016DDC42300C888BFF2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Yefeng,
+
+The formula still holds, but the location-scale model you are fitting just has a single intercept, so it is identical to the standard random-effects model. If you want to fit a model with a different tau^2 for each study, then you would have to use:
+
+res <- rma(yi, vi, data=dat, scale = ~ 0 + factor(id))
+
+However, it is going to be difficult to get this model to converge. While in principle it is possible to fit such a model, there is little information available to estimate the tau^2_i values. Also, the number of parameters is growing linearly with the number of studies, which raises concerns about the consistency of the estimates (the so-called Neyman-Scott problem).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Yefeng Yang via R-sig-meta-analysis
+> Sent: Monday, June 3, 2024 04:07
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> Subject: [R-meta] shrinkage in location-scale RE model
+>
+> Dear community,
+>
+> I am investigating the study-specific effect in the context of a location-scale
+> random-effects model. I'll explain my question briefly.
+>
+> We start from a normal random-effects model. To get the study-specific effect
+> (theta, hereafter) in a normal random-effects model, we first need to get the
+> shrinkage factor (lambda) for each study:
+> lambda_i = tau^2 / (tau^2 + v_i^2), where tau^2 is the estimated heterogeneity
+> in a RE model, and v_i is the sampling variance of the effect size estimates
+> y_i
+>
+> then, theta is actually a weighted mean:
+> theta_i = lambda_i  * y_i +  (1 - lambda_i) * mu, where mu is the intercept from
+> the RE model.
+>
+> I manually checked the above formula is correct, using rma() in metafor package:
+> dat <- dat.bangertdrowns2004
+> # fit a RE
+> res <- rma(yi, vi, data=dat)
+> # get shrinkage
+> dat$lamda <- res$tau2 / (res$tau2 + res$vi)
+> # get study-specific effect
+> dat$theta <- dat$lamda * res$yi + (1 - dat$lamda) * res$beta[1]
+> # use blup() to get theta
+> theta <- blup(res)
+> # manual check
+> dat$theta == theta$pred
+>
+> Now, if we fit a location-scale RE model, which relaxes the assumption of a
+> common tau^2:
+> res.ls <- rma(yi, vi, scale = ~ 1, data=dat)
+>
+> I thought we would get different tau^2 for each effect size included in the
+> data, so that the lambda is becoming:
+> lambda_i = tau_i^2 / (tau^2 + v_i^2), where tau_i^2 is the heterogeneity
+> corresponding to each y_i.
+>
+> But this was not the case in rma().
+>
+> So, my questions are:
+>
+>   1.
+> Is my formula wrong when computing theta or lambda for the location-scale model
+>   2.
+> If my formula is correct, how to get the estimate of tau_i^2; the variance for
+> each effect size, so that we can get lambda_i which is dependent on both
+> tau_i^2 and v_i
+>
+> Best wishes,
+> Yefeng
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Jun  3 09:29:46 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 3 Jun 2024 07:29:46 +0000
+Subject: [R-meta] Inverse weighting after estimation of VCOV
+In-Reply-To: <CAFUVuJx=MJRvE31in_AM4wEH7HoiRWwCo1M49XOjWRzmP=O1qw@mail.gmail.com>
+References: <b75395f4-72af-4672-84ad-047fae65b91d@staff.uni-marburg.de>
+ <CAFUVuJx2oUeaquSeqsRHvyuyOvPyX9KRDt3Y3OC12iRWVS5NbA@mail.gmail.com>
+ <da66f29d-32df-4cff-a1f6-cc893b3e978f@staff.uni-marburg.de>
+ <CAFUVuJx=MJRvE31in_AM4wEH7HoiRWwCo1M49XOjWRzmP=O1qw@mail.gmail.com>
+Message-ID: <AS8PR08MB9193A5A76CFE6E7893E6F1CD8BFF2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+One additional point (leaving aside the issue what the appropriate model for these data is):
+
+rma.mv(yi, vi, V=V_mat, ...)
+
+doesn't make sense. The second unnamed argument ('vi') will be matched to the third argument of rma.mv(), which is argument 'W' for the weights. So you are setting the weights equal to 'vi', which indeed will give more weight to the less precise estimates. Generally, you don't want to manually specify weights (especially in more complex models where there can be an entire weight matrix) unless you really know what you are doing.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of James Pustejovsky via R-sig-meta-analysis
+> Sent: Friday, May 31, 2024 15:22
+> To: pedrosac at staff.uni-marburg.de; R Special Interest Group for Meta-Analysis
+> <r-sig-meta-analysis at r-project.org>
+> Cc: James Pustejovsky <jepusto at gmail.com>
+> Subject: Re: [R-meta] Inverse weighting after estimation of VCOV
+>
+> Hi David,
+>
+> Thanks for clarifying your data structure. Based on what you've described,
+> I don't think it makes sense to use vcalc(). The point of vcalc() is to
+> build in covariance between the sampling errors of the effect size
+> estimates. For your one publication that reports 8 studies, each effect
+> size estimate is based on a separate sample of participants (because each
+> estimate comes from a different country). So there's no reason to expect
+> that there would be covariance in the sampling errors.
+>
+> Instead, one might suspect that there would be covariance between the
+> country-specific effect size parameters (i.e., the "true" effect sizes)
+> from this publication. This would be plausible if the same operational
+> procedures (e.g., same recruitment approach, same measurement
+> instrumentation, same follow-up window) were used across the samples in
+> this publication. The conventional way to model this would be to 1) specify
+> effect size estimates as independent but 2) include publication-level
+> random effects in the model to capture shared operational variance within
+> publications. The syntax would be something like:
+> res_metaRE <- rma(
+>   yi, V = vi,
+>   random = ~ 1 | publicationID / number,
+>   mods = ~ hospitalbeds + ltcbeds,
+>   verbose=TRUE,
+>   data=df_complete, sparse = TRUE
+> )
+> You'll need to create a publicationID variable if you don't already have
+> that on the data.
+>
+> The difficulty with this approach in your case is that there's only one
+> publication that has multiple samples nested within it, so there's not a
+> lot of information available to parse out the variance at the publication
+> level from the variance at the sample level (across countries). You could
+> try using the model fit statistics to compare the model above versus a
+> model that only has random effects at the sample level.
+>
+> James
+>
+> On Mon, May 27, 2024 at 8:54?AM David Pedrosa via R-sig-meta-analysis <
+> r-sig-meta-analysis at r-project.org> wrote:
+>
+> > Hi James,
+> >
+> > apologies, my question was not  seasoned enough.
+> >
+> > I have a dataframe with 16 studies, all of which provide some odds
+> > ratios for hospitalisation. 8 studies are from the same publication but
+> > on different countries. To me there is still reason to believe they
+> > ?share more variance? than the rest. Besides, I want to weigh the total
+> > number  of subjects from each of the studies. To make it a bit more
+> > complex, we have digged out the miner of hospital beds and long term
+> > beds for every country, both of which we consider potential moderators.
+> > I ran the random effects model
+> >
+> > res_metaRE <- rma(yi, vi,
+> >   random = ~ 1 | number, mods = ~ hospitalbeds +
+> > ltcbeds, verbose=TRUE, data=df_complete)
+> >
+> > to which weights(res_metaRE) provides accurate results. If I try to
+> > estimate the VCOV matrix, the results show correct diagonal values, that
+> > is identical to df_conplete$vi. But sticking the resulting V_mat
+> >
+> > V_mat <- vcalc(vi=vi, cluster=shared_variance, data=df_complete, rho=.7)
+> >
+> > to rma.mv provides results that are too high but especially the studies
+> > with lower number of subjects are higher weighted. I am assuming that
+> > it?s just somehow inverted but I cannot understand if I?m missing
+> > something or if there is some other mistake in the way I?m estimating
+> > the VCOV. Number is just the study id.
+> >
+> > I?m not entirely sure I understand your point with the subsection of the
+> > matrix.
+> >
+> > Thanks for your help!
+> > Best,
+> > David
+> >
+> > P.S.: Here are the relevant parts of df_complete
+> >
+> > structure(list(number = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+> > 12, 13, 14, 15), author = c("Aamodt", "Ceylan", "Krause", "Kumar",
+> > "Moens, Belgium", "Moens, France"Moens, Italy", "Moens, Canada",
+> > "Moens, Mexiko", "Moens, New Zeeland", "Moens, Spain", "Moens, South
+> > Corea",
+> > "Moens, Czech Rep.", "Moens, Hungary", "Moens, USA"), year = c(2023,
+> > 2022, 2021, 2021, 2015, 2015, 2015, 2015, 2015, 2015, 2015, 2015,
+> > 2015, 2015, 2015), n_ges = c(53279, 27, 40, 346141, 837, 4599,
+> > 4034, 1381, 1062, 202, 352, 1565, 92, 241, 20065), OR = c(1.06,
+> > 1.43, 8.25, 1.454, 2.3, 1.5, 1.4, 1.7, 0.95, 1.97, 1.09, 0.95,
+> > 0.97, 1.44, 1.4), hospitalbeds = c(2.77, 3.02, 7.76, 2.77, 5.47,
+> > 5.65, 3.12, 2.58, 1, 2.57, 2.96, 12.77, 6.66, 6.79, 2.77), ltcbeds =
+> > c(32.3,
+> > 9.5, 54.2, 53.9, 66.8, 47.4, 21.3, 46.7, 0, 50.4, 43.4, 25, 34.9,
+> > 42.6, 28.9), p_values = c(0.106809128205467, 0.706331045003814,
+> > 0.0281267337718951, 0, 2.43772276381116e-05, 2.76746355676653e-22,
+> > 1.01260208850919e-05, 1.19251123951374e-10, 0.772759462747246,
+> > 0.0741077696800058, 0.74088983860122, 0.68164335922065, 1,
+> > 0.183303852299051,
+> > 3.20176730771634e-26), shared_variance = c(0, 0, 0, 0, 1, 1,
+> > 1, 1, 1, 1, 1, 1, 1, 1, 1), yi = structure(c(0.0582689081239758,
+> > 0.357674444271816, 2.11021320034659, 0.374318379111328, 0.832909122935104,
+> > 0.405465108108164, 0.336472236621213, 0.53062825106217,
+> > -0.0512932943875506,
+> > 0.678033542749897, 0.0861776962410524, -0.0512932943875506,
+> > -0.0304592074847086,
+> > 0.364643113587909, 0.336472236621213), ni = c(53279, 27, 40,
+> > 346141, 837, 4599, 4034, 1381, 1062, 202, 352, 1565, 92, 241,
+> > 20065), measure = "GEN"), vi = c(0.000835840725678602, 0.638632983584221,
+> > 0.604067037193667, 0.000435509388232691, 0.0467214213223696,
+> > 0.00468347897652763, 0.00538603813506437, 0.0132951153208062,
+> > 0.0214123920152818, 0.142112789690683, 0.0489441998392354,
+> > 0.0138688993962097,
+> > 0.186242249276727, 0.0702159732616764, 0.00133268716433697)), row.names
+> > = c(NA,
+> > -15L), class = c("escalc", "data.frame"), yi.names = "yi", vi.names =
+> > "vi", digits = c(est = 4,
+> > se = 4, test = 4, pval = 4, ci = 4, var = 4, sevar = 4, fit = 4,
+> > het = 4))
+> >
+> > Am 24.05.2024 um 19:06 schrieb James Pustejovsky:
+> > > Hi David,
+> > >
+> > > I don't entirely understand the models that you're looking at, so
+> > > clarifying the following would help in getting good feedback:
+> > > * What is the variable `shared_variance` used in the vcalc call?
+> > > * What is the variable `number` used in the random effects argument of
+> > > rma.mv?
+> > > * How are these variables related?
+> > >
+> > > Additionally, it would be good to check that the vcov matrix created
+> > > by vcalc() is as you intend it to be. Could you pull out the blocks of
+> > > this matrix for a few studies and just verify that they give you
+> > > covariance matrices with a correlation of 0.7? I mean something like:
+> > > vcov_study_k <- V_mat[i:j, i:j]
+> > > cov2cor(vcov_study_k)
+> > > where the indices i:j are the rows in your data corresponding to a
+> > > given study k.
+> > >
+> > > James
+> > >
+> > > On Fri, May 24, 2024 at 10:00?AM David Pedrosa via R-sig-meta-analysis
+> > > <r-sig-meta-analysis at r-project.org> wrote:
+> > >
+> > >     Dear all,
+> > >
+> > >     I have a basic question about the output of my (gu)estimation of the
+> > >     variance-covariance matrix. I have extracted results from very
+> > >     heterogeneous studies with OR as effect size (sample sizes between 20
+> > >     and 300,000). Since some of the results come from the same study, I
+> > >     decided to try to use the VCOV as an input and estimated values
+> > >     according to the following formula
+> > >
+> > >     V_mat  <- vcalc(vi=vi, cluster=shared_variance, data=df_complete,
+> > >     rho=.7)
+> > >     res_meta     <- rma.mv(yi, vi, V=V_mat,
+> > >                              random = ~ 1 | number, mods = ~
+> > >     hospitalbeds +
+> > >     ltcbeds, verbose=TRUE, data=df_complete)
+> > >
+> > >
+> > >     Interestingly, in this case the weighting is reversed, so that
+> > >     most of
+> > >     the weight is given to studies with the smallest sample size;
+> > >     something
+> > >     that does not happen when using this formula:
+> > >
+> > >     res_meta     <- rma(yi, vi,
+> > >                              random = ~ 1 | number, mods = ~
+> > >     hospitalbeds +
+> > >     ltcbeds, verbose=TRUE, data=df_complete)
+> > >
+> > >     I have tried to understand what is going on, but I am at kind of
+> > >     lost.
+> > >     Could someone please give me some advice?
+> > >
+> > >     Thanks in advance,
+> > >
+> > >     David
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Jun  3 09:33:48 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 3 Jun 2024 07:33:48 +0000
+Subject: [R-meta] pooled vs separate QB statistics
+In-Reply-To: <CAKWaqjad3iiRuP5zz03z1LP09vu=AEA+qRuHLc_P_nzQLHb6eA@mail.gmail.com>
+References: <CAKWaqja5hhacGWMTe5KwAjKZy=U4EVvuPEJ+aM-2SgK3ZV5a8A@mail.gmail.com>
+ <d474261e-5152-fb47-01b5-025be3b938b1@dewey.myzen.co.uk>
+ <CAKWaqjad3iiRuP5zz03z1LP09vu=AEA+qRuHLc_P_nzQLHb6eA@mail.gmail.com>
+Message-ID: <AS8PR08MB91932DCA873D0B41415C67698BFF2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi Filippo,
+
+That is correct.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Filippo Gambarota via R-sig-meta-analysis
+> Sent: Tuesday, May 28, 2024 12:39
+> To: Michael Dewey <lists at dewey.myzen.co.uk>
+> Cc: Filippo Gambarota <filippo.gambarota at gmail.com>; R Special Interest Group
+> for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> Subject: Re: [R-meta] pooled vs separate QB statistics
+>
+> Dear Michael,
+> Thank you. So basically when different tau2 are estimated (either
+> using a multivariate model or scale location model) the Q test for the
+> moderators is the non-pooled test? When a single tau2 is estimated the
+> Q test is the pooled version?
+> Filippo
+>
+> On Tue, 28 May 2024 at 12:31, Michael Dewey <lists at dewey.myzen.co.uk> wrote:
+> >
+> > Dear Filippo
+> >
+> > Does
+> > https://www.metafor-project.org/doku.php/tips:different_tau2_across_subgroups
+> > help?
+> >
+> > Michael
+> >
+> > On 28/05/2024 11:09, Filippo Gambarota via R-sig-meta-analysis wrote:
+> > > Hi,
+> > > I was reading the two papers (at the end) about categorical moderators
+> > > and the omnibus test and despite the conclusion is that the Q (or F)
+> > > test based on the pooled tau2 estimation works better in most cases,
+> > > when k in each moderator level is large and tau2 is expected to differ
+> > > across levels, it is better to use the non-pooled method.
+> > >
+> > > Reading the metafor documentation it is not clear to me how to
+> > > implement the non-pooled method. Maybe I am missing something but I
+> > > can change the type of test (z vs t vs knha that takes into account
+> > > tau2 uncertainty) but I see no option to choose the pooled vs non
+> > > pooled tau2 method.
+> > >
+> > > Thanks
+> > > Filippo
+> > >
+> > > Rubio-Aparicio, M., L?pez-L?pez, J. A., Viechtbauer, W.,
+> > > Mar?n-Mart?nez, F., Botella, J., & S?nchez-Meca, J. (2020). Testing
+> > > Categorical Moderators in Mixed-Effects Meta-analysis in the Presence
+> > > of Heteroscedasticity. Journal of Experimental Education, 88(2),
+> > > 288?310. https://doi.org/10.1080/00220973.2018.1561404
+> > >
+> > > Rubio-Aparicio, M., S?nchez-Meca, J., L?pez-L?pez, J. A., Botella, J.,
+> > > & Mar?n-Mart?nez, F. (2017). Analysis of categorical moderators in
+> > > mixed-effects meta-analysis: Consequences of using pooled versus
+> > > separate estimates of the residual between-studies variances. The
+> > > British Journal of Mathematical and Statistical Psychology, 70(3),
+> > > 439?456. https://doi.org/10.1111/bmsp.12092
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Jun  3 09:42:08 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 3 Jun 2024 07:42:08 +0000
+Subject: [R-meta] Hypothesis Testing of R2 in metafor
+In-Reply-To: <94ed3040-dfce-4b89-b066-c99e2bb83edf@Spark>
+References: <c81e2835-f936-4c4a-ae64-edd4e7da31d4@Spark>
+ <de58f25b-77f3-49ae-afdb-9d27a180fafd@Spark>
+ <75ccb351-265d-3c59-b738-32709655bbf7@dewey.myzen.co.uk>
+ <94ed3040-dfce-4b89-b066-c99e2bb83edf@Spark>
+Message-ID: <AS8PR08MB91939219755F4D2969A4EAF68BFF2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Zhouhan,
+
+Yes, one could interpret the omnibus test of all coefficients as a test of R^2 = 0. They do not match up as nicely though as in regular regression, where there is a direct relationship between the F-statistic and R^2, namely:
+
+R^2 = F / (F + (n-p)/(p-1))
+
+where n is the sample size and p is the number of coefficients. This formula doesn't apply to mixed-effects meta-regression models and, for example, cases can arise where R^2 = 0 while the omnibus test statistic is greater than 0. But yes, in principle, if one cannot reject the null hypothesis that all coefficients (except for the intercept) are equal to 0, then this would imply that one cannot reject R^2 = 0.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Zhouhan Jin via R-sig-meta-analysis
+> Sent: Tuesday, May 28, 2024 18:28
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>; Michael Dewey <lists at dewey.myzen.co.uk>
+> Cc: Zhouhan Jin <zjin65 at uwo.ca>
+> Subject: Re: [R-meta] Hypothesis Testing of R2 in metafor
+>
+> Thanks for the link regarding the CIs for R^2.
+>
+> But my question was: can one, in principle, take the p-value used to test the
+> null that all model coefs are zero to also serve as a null hypothesis test of
+> R^2 being zero or there is a separate hypothesis test for R^2 (again in
+> principle)?
+>
+> In fact, is such a principle used in meta-analysis as I (think) it is used in
+> regular regression (below)?
+>
+> summary(lm(mpg ~ cyl, data= mtcars))$fstatistic
+>
+> Best wishes,
+>
+> Zhouhan
+> On May 28, 2024 at 06:32 -0400, Michael Dewey <lists at dewey.myzen.co.uk>, wrote:
+>
+> Dear Zhouhan
+>
+> Does https://www.metafor-project.org/doku.php/tips:ci_for_r2 help?
+>
+> Michael
+>
+> On 28/05/2024 04:34, Zhouhan Jin via R-sig-meta-analysis wrote:
+> Hello Colleagues,
+>
+> My understanding is that it is common to report the p-value for the omnibus null
+> hypothesis that all the coefficients in a model are zero, next to an R^2 value
+> for an rma.mv()/rma() model.
+>
+> If the above assumption is correct, then, should one also take that p-value to
+> be a null hypothesis test of R^2 being zero or there is a separate test for R^2?
+>
+> Thanks in advance.
+>
+> Best wishes,
+>
+> Zhouhan
+
+From pedros@c m@iii@g oii st@ii@u@i-m@rburg@de  Mon Jun  3 23:49:50 2024
+From: pedros@c m@iii@g oii st@ii@u@i-m@rburg@de (pedros@c m@iii@g oii st@ii@u@i-m@rburg@de)
+Date: Mon, 3 Jun 2024 23:49:50 +0200
+Subject: [R-meta] Inverse weighting after estimation of VCOV
+In-Reply-To: <AS8PR08MB9193A5A76CFE6E7893E6F1CD8BFF2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <b75395f4-72af-4672-84ad-047fae65b91d@staff.uni-marburg.de>
+ <CAFUVuJx2oUeaquSeqsRHvyuyOvPyX9KRDt3Y3OC12iRWVS5NbA@mail.gmail.com>
+ <da66f29d-32df-4cff-a1f6-cc893b3e978f@staff.uni-marburg.de>
+ <CAFUVuJx=MJRvE31in_AM4wEH7HoiRWwCo1M49XOjWRzmP=O1qw@mail.gmail.com>
+ <AS8PR08MB9193A5A76CFE6E7893E6F1CD8BFF2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <5a7c922e-437e-41dc-a9c8-0468293f38fd@staff.uni-marburg.de>
+
+Dear James and Wolfgang,
+
+I think I now understand the reason why it was weighting my data so 
+strangely. And your explanations, James, are enough food for though for 
+some days. Thank you very much!
+
+Best,
+
+David
+
+
+Am 03.06.2024 um 09:29 schrieb Viechtbauer, Wolfgang (NP):
+> One additional point (leaving aside the issue what the appropriate model for these data is):
+>
+> rma.mv(yi, vi, V=V_mat, ...)
+>
+> doesn't make sense. The second unnamed argument ('vi') will be matched to the third argument of rma.mv(), which is argument 'W' for the weights. So you are setting the weights equal to 'vi', which indeed will give more weight to the less precise estimates. Generally, you don't want to manually specify weights (especially in more complex models where there can be an entire weight matrix) unless you really know what you are doing.
+>
+> Best,
+> Wolfgang
+>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis<r-sig-meta-analysis-bounces at r-project.org>  On Behalf
+>> Of James Pustejovsky via R-sig-meta-analysis
+>> Sent: Friday, May 31, 2024 15:22
+>> To:pedrosac at staff.uni-marburg.de; R Special Interest Group for Meta-Analysis
+>> <r-sig-meta-analysis at r-project.org>
+>> Cc: James Pustejovsky<jepusto at gmail.com>
+>> Subject: Re: [R-meta] Inverse weighting after estimation of VCOV
+>>
+>> Hi David,
+>>
+>> Thanks for clarifying your data structure. Based on what you've described,
+>> I don't think it makes sense to use vcalc(). The point of vcalc() is to
+>> build in covariance between the sampling errors of the effect size
+>> estimates. For your one publication that reports 8 studies, each effect
+>> size estimate is based on a separate sample of participants (because each
+>> estimate comes from a different country). So there's no reason to expect
+>> that there would be covariance in the sampling errors.
+>>
+>> Instead, one might suspect that there would be covariance between the
+>> country-specific effect size parameters (i.e., the "true" effect sizes)
+>> from this publication. This would be plausible if the same operational
+>> procedures (e.g., same recruitment approach, same measurement
+>> instrumentation, same follow-up window) were used across the samples in
+>> this publication. The conventional way to model this would be to 1) specify
+>> effect size estimates as independent but 2) include publication-level
+>> random effects in the model to capture shared operational variance within
+>> publications. The syntax would be something like:
+>> res_metaRE <- rma(
+>>    yi, V = vi,
+>>    random = ~ 1 | publicationID / number,
+>>    mods = ~ hospitalbeds + ltcbeds,
+>>    verbose=TRUE,
+>>    data=df_complete, sparse = TRUE
+>> )
+>> You'll need to create a publicationID variable if you don't already have
+>> that on the data.
+>>
+>> The difficulty with this approach in your case is that there's only one
+>> publication that has multiple samples nested within it, so there's not a
+>> lot of information available to parse out the variance at the publication
+>> level from the variance at the sample level (across countries). You could
+>> try using the model fit statistics to compare the model above versus a
+>> model that only has random effects at the sample level.
+>>
+>> James
+>>
+>> On Mon, May 27, 2024 at 8:54?AM David Pedrosa via R-sig-meta-analysis <
+>> r-sig-meta-analysis at r-project.org> wrote:
+>>
+>>> Hi James,
+>>>
+>>> apologies, my question was not  seasoned enough.
+>>>
+>>> I have a dataframe with 16 studies, all of which provide some odds
+>>> ratios for hospitalisation. 8 studies are from the same publication but
+>>> on different countries. To me there is still reason to believe they
+>>> ?share more variance? than the rest. Besides, I want to weigh the total
+>>> number  of subjects from each of the studies. To make it a bit more
+>>> complex, we have digged out the miner of hospital beds and long term
+>>> beds for every country, both of which we consider potential moderators.
+>>> I ran the random effects model
+>>>
+>>> res_metaRE <- rma(yi, vi,
+>>>    random = ~ 1 | number, mods = ~ hospitalbeds +
+>>> ltcbeds, verbose=TRUE, data=df_complete)
+>>>
+>>> to which weights(res_metaRE) provides accurate results. If I try to
+>>> estimate the VCOV matrix, the results show correct diagonal values, that
+>>> is identical to df_conplete$vi. But sticking the resulting V_mat
+>>>
+>>> V_mat <- vcalc(vi=vi, cluster=shared_variance, data=df_complete, rho=.7)
+>>>
+>>> to rma.mv provides results that are too high but especially the studies
+>>> with lower number of subjects are higher weighted. I am assuming that
+>>> it?s just somehow inverted but I cannot understand if I?m missing
+>>> something or if there is some other mistake in the way I?m estimating
+>>> the VCOV. Number is just the study id.
+>>>
+>>> I?m not entirely sure I understand your point with the subsection of the
+>>> matrix.
+>>>
+>>> Thanks for your help!
+>>> Best,
+>>> David
+>>>
+>>> P.S.: Here are the relevant parts of df_complete
+>>>
+>>> structure(list(number = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+>>> 12, 13, 14, 15), author = c("Aamodt", "Ceylan", "Krause", "Kumar",
+>>> "Moens, Belgium", "Moens, France"Moens, Italy", "Moens, Canada",
+>>> "Moens, Mexiko", "Moens, New Zeeland", "Moens, Spain", "Moens, South
+>>> Corea",
+>>> "Moens, Czech Rep.", "Moens, Hungary", "Moens, USA"), year = c(2023,
+>>> 2022, 2021, 2021, 2015, 2015, 2015, 2015, 2015, 2015, 2015, 2015,
+>>> 2015, 2015, 2015), n_ges = c(53279, 27, 40, 346141, 837, 4599,
+>>> 4034, 1381, 1062, 202, 352, 1565, 92, 241, 20065), OR = c(1.06,
+>>> 1.43, 8.25, 1.454, 2.3, 1.5, 1.4, 1.7, 0.95, 1.97, 1.09, 0.95,
+>>> 0.97, 1.44, 1.4), hospitalbeds = c(2.77, 3.02, 7.76, 2.77, 5.47,
+>>> 5.65, 3.12, 2.58, 1, 2.57, 2.96, 12.77, 6.66, 6.79, 2.77), ltcbeds =
+>>> c(32.3,
+>>> 9.5, 54.2, 53.9, 66.8, 47.4, 21.3, 46.7, 0, 50.4, 43.4, 25, 34.9,
+>>> 42.6, 28.9), p_values = c(0.106809128205467, 0.706331045003814,
+>>> 0.0281267337718951, 0, 2.43772276381116e-05, 2.76746355676653e-22,
+>>> 1.01260208850919e-05, 1.19251123951374e-10, 0.772759462747246,
+>>> 0.0741077696800058, 0.74088983860122, 0.68164335922065, 1,
+>>> 0.183303852299051,
+>>> 3.20176730771634e-26), shared_variance = c(0, 0, 0, 0, 1, 1,
+>>> 1, 1, 1, 1, 1, 1, 1, 1, 1), yi = structure(c(0.0582689081239758,
+>>> 0.357674444271816, 2.11021320034659, 0.374318379111328, 0.832909122935104,
+>>> 0.405465108108164, 0.336472236621213, 0.53062825106217,
+>>> -0.0512932943875506,
+>>> 0.678033542749897, 0.0861776962410524, -0.0512932943875506,
+>>> -0.0304592074847086,
+>>> 0.364643113587909, 0.336472236621213), ni = c(53279, 27, 40,
+>>> 346141, 837, 4599, 4034, 1381, 1062, 202, 352, 1565, 92, 241,
+>>> 20065), measure = "GEN"), vi = c(0.000835840725678602, 0.638632983584221,
+>>> 0.604067037193667, 0.000435509388232691, 0.0467214213223696,
+>>> 0.00468347897652763, 0.00538603813506437, 0.0132951153208062,
+>>> 0.0214123920152818, 0.142112789690683, 0.0489441998392354,
+>>> 0.0138688993962097,
+>>> 0.186242249276727, 0.0702159732616764, 0.00133268716433697)), row.names
+>>> = c(NA,
+>>> -15L), class = c("escalc", "data.frame"), yi.names = "yi", vi.names =
+>>> "vi", digits = c(est = 4,
+>>> se = 4, test = 4, pval = 4, ci = 4, var = 4, sevar = 4, fit = 4,
+>>> het = 4))
+>>>
+>>> Am 24.05.2024 um 19:06 schrieb James Pustejovsky:
+>>>> Hi David,
+>>>>
+>>>> I don't entirely understand the models that you're looking at, so
+>>>> clarifying the following would help in getting good feedback:
+>>>> * What is the variable `shared_variance` used in the vcalc call?
+>>>> * What is the variable `number` used in the random effects argument of
+>>>> rma.mv?
+>>>> * How are these variables related?
+>>>>
+>>>> Additionally, it would be good to check that the vcov matrix created
+>>>> by vcalc() is as you intend it to be. Could you pull out the blocks of
+>>>> this matrix for a few studies and just verify that they give you
+>>>> covariance matrices with a correlation of 0.7? I mean something like:
+>>>> vcov_study_k <- V_mat[i:j, i:j]
+>>>> cov2cor(vcov_study_k)
+>>>> where the indices i:j are the rows in your data corresponding to a
+>>>> given study k.
+>>>>
+>>>> James
+>>>>
+>>>> On Fri, May 24, 2024 at 10:00?AM David Pedrosa via R-sig-meta-analysis
+>>>> <r-sig-meta-analysis at r-project.org>  wrote:
+>>>>
+>>>>      Dear all,
+>>>>
+>>>>      I have a basic question about the output of my (gu)estimation of the
+>>>>      variance-covariance matrix. I have extracted results from very
+>>>>      heterogeneous studies with OR as effect size (sample sizes between 20
+>>>>      and 300,000). Since some of the results come from the same study, I
+>>>>      decided to try to use the VCOV as an input and estimated values
+>>>>      according to the following formula
+>>>>
+>>>>      V_mat  <- vcalc(vi=vi, cluster=shared_variance, data=df_complete,
+>>>>      rho=.7)
+>>>>      res_meta     <- rma.mv(yi, vi, V=V_mat,
+>>>>                               random = ~ 1 | number, mods = ~
+>>>>      hospitalbeds +
+>>>>      ltcbeds, verbose=TRUE, data=df_complete)
+>>>>
+>>>>
+>>>>      Interestingly, in this case the weighting is reversed, so that
+>>>>      most of
+>>>>      the weight is given to studies with the smallest sample size;
+>>>>      something
+>>>>      that does not happen when using this formula:
+>>>>
+>>>>      res_meta     <- rma(yi, vi,
+>>>>                               random = ~ 1 | number, mods = ~
+>>>>      hospitalbeds +
+>>>>      ltcbeds, verbose=TRUE, data=df_complete)
+>>>>
+>>>>      I have tried to understand what is going on, but I am at kind of
+>>>>      lost.
+>>>>      Could someone please give me some advice?
+>>>>
+>>>>      Thanks in advance,
+>>>>
+>>>>      David
+-- 
+Uni Marburg Siegel 
+<https://www.uni-marburg.de/de/fb20/bereiche/kopfz/neurologie/forschung/agbun> 
+	
+	
+	
+	
+Prof. Dr. David Pedrosa
+Leitender Oberarzt der Klinik f?r Neurologie,
+Leiter der Sektion Bewegungsst?rungen und Neuromodulation, 
+Universit?tsklinikum Gie?en und Marburg
+Tel. (+49) 6421-58 65299 Fax. (+49) 6421-58 67055
+Address. Baldingerstr., 35043 Marburg
+Web. https://www.ukgm.de/ugm_2/deu/umr_neu/index.html
+Web. 
+https://www.uni-marburg.de/de/fb20/bereiche/kopfz/neurologie/forschung/agbun 
+
+
+
+	[[alternative HTML version deleted]]
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Wed Jun  5 08:14:04 2024
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Wed, 5 Jun 2024 06:14:04 +0000
+Subject: [R-meta] forest plot and study-specific effect
+Message-ID: <MEAPR01MB54153827D76318844FE596BB9DF92@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear community,
+
+I have a small question about the forest plot used in the meta-analysis.
+
+The forest plots and their varieties are often used in meta-analysis papers to show the overall/grand mean, individual effect size estimates, and other relevant info depending on the software making them. We know the effect size estimates from individual studies are usually noisy or not very precise. But, why do meta-analysts prefer to report individual effect size estimates rather than the study-specific effects (which benefit from the shrinkage or borrowing of strength). Or, put differently, the developers of software that can make forest plots do not seem to provide the option of showing study-specific effects (I did not check carefully; some software or packages might provide this functionality). Is there any specific reason? Or, it is just a convention.
+
+Best,
+Yefeng
+
+	[[alternative HTML version deleted]]
+
+
+From NIE22@QS @end|ng |rom e@ntu@edu@@g  Wed Jun  5 09:31:21 2024
+From: NIE22@QS @end|ng |rom e@ntu@edu@@g (#QIAO SHUYI#)
+Date: Wed, 5 Jun 2024 07:31:21 +0000
+Subject: [R-meta] =?utf-8?b?5Zue5aSNOiBSLXNpZy1tZXRhLWFuYWx5c2lzIERpZ2Vz?=
+ =?utf-8?q?t=2C_Vol_85=2C_Issue_4?=
+In-Reply-To: <mailman.5303.7.1717495201.51394.r-sig-meta-analysis@r-project.org>
+References: <mailman.5303.7.1717495201.51394.r-sig-meta-analysis@r-project.org>
+Message-ID: <JH0PR01MB6275ACED11EE30CBBE265F51F0F92@JH0PR01MB6275.apcprd01.prod.exchangelabs.com>
+
+Dear All,
+
+Thank you for your attention. I am wondering if metafor can also support a meta-analysis of the arithmetic mean (larger than 1) and what the aggregation/ moderation code would be to weight the arithmetic mean by inverse variance under random effect modeling. Thank you.
+
+Best wishes
+Shuyi Qiao
+________________________________
+???: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> ?? r-sig-meta-analysis-request at r-project.org <r-sig-meta-analysis-request at r-project.org>
+????: 2024?6?4? 18:00
+???: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+??: R-sig-meta-analysis Digest, Vol 85, Issue 4
+
+Send R-sig-meta-analysis mailing list submissions to
+        r-sig-meta-analysis at r-project.org
+
+To subscribe or unsubscribe via the World Wide Web, visit
+        https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+or, via email, send a message with subject or body 'help' to
+        r-sig-meta-analysis-request at r-project.org
+
+You can reach the person managing the list at
+        r-sig-meta-analysis-owner at r-project.org
+
+When replying, please edit your Subject line so it is more specific
+than "Re: Contents of R-sig-meta-analysis digest..."
+
+
+Today's Topics:
+
+   1. Re: Inverse weighting after estimation of VCOV
+      (pedrosac at staff.uni-marburg.de)
+
+----------------------------------------------------------------------
+
+Message: 1
+Date: Mon, 3 Jun 2024 23:49:50 +0200
+From: pedrosac at staff.uni-marburg.de
+To: "Viechtbauer, Wolfgang (NP)"
+        <wolfgang.viechtbauer at maastrichtuniversity.nl>, R Special Interest
+        Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>,
+        "pedrosac at staff.uni-marburg.de" <pedrosac at staff.uni-marburg.de>
+Subject: Re: [R-meta] Inverse weighting after estimation of VCOV
+Message-ID:
+        <5a7c922e-437e-41dc-a9c8-0468293f38fd at staff.uni-marburg.de>
+Content-Type: text/plain; charset="utf-8"
+
+Dear James and Wolfgang,
+
+I think I now understand the reason why it was weighting my data so
+strangely. And your explanations, James, are enough food for though for
+some days. Thank you very much!
+
+Best,
+
+David
+
+
+Am 03.06.2024 um 09:29 schrieb Viechtbauer, Wolfgang (NP):
+> One additional point (leaving aside the issue what the appropriate model for these data is):
+>
+> rma.mv(yi, vi, V=V_mat, ...)
+>
+> doesn't make sense. The second unnamed argument ('vi') will be matched to the third argument of rma.mv(), which is argument 'W' for the weights. So you are setting the weights equal to 'vi', which indeed will give more weight to the less precise estimates. Generally, you don't want to manually specify weights (especially in more complex models where there can be an entire weight matrix) unless you really know what you are doing.
+>
+> Best,
+> Wolfgang
+>
+>> -----Original Message-----
+>> From: R-sig-meta-analysis<r-sig-meta-analysis-bounces at r-project.org>  On Behalf
+>> Of James Pustejovsky via R-sig-meta-analysis
+>> Sent: Friday, May 31, 2024 15:22
+>> To:pedrosac at staff.uni-marburg.de; R Special Interest Group for Meta-Analysis
+>> <r-sig-meta-analysis at r-project.org>
+>> Cc: James Pustejovsky<jepusto at gmail.com>
+>> Subject: Re: [R-meta] Inverse weighting after estimation of VCOV
+>>
+>> Hi David,
+>>
+>> Thanks for clarifying your data structure. Based on what you've described,
+>> I don't think it makes sense to use vcalc(). The point of vcalc() is to
+>> build in covariance between the sampling errors of the effect size
+>> estimates. For your one publication that reports 8 studies, each effect
+>> size estimate is based on a separate sample of participants (because each
+>> estimate comes from a different country). So there's no reason to expect
+>> that there would be covariance in the sampling errors.
+>>
+>> Instead, one might suspect that there would be covariance between the
+>> country-specific effect size parameters (i.e., the "true" effect sizes)
+>> from this publication. This would be plausible if the same operational
+>> procedures (e.g., same recruitment approach, same measurement
+>> instrumentation, same follow-up window) were used across the samples in
+>> this publication. The conventional way to model this would be to 1) specify
+>> effect size estimates as independent but 2) include publication-level
+>> random effects in the model to capture shared operational variance within
+>> publications. The syntax would be something like:
+>> res_metaRE <- rma(
+>>    yi, V = vi,
+>>    random = ~ 1 | publicationID / number,
+>>    mods = ~ hospitalbeds + ltcbeds,
+>>    verbose=TRUE,
+>>    data=df_complete, sparse = TRUE
+>> )
+>> You'll need to create a publicationID variable if you don't already have
+>> that on the data.
+>>
+>> The difficulty with this approach in your case is that there's only one
+>> publication that has multiple samples nested within it, so there's not a
+>> lot of information available to parse out the variance at the publication
+>> level from the variance at the sample level (across countries). You could
+>> try using the model fit statistics to compare the model above versus a
+>> model that only has random effects at the sample level.
+>>
+>> James
+>>
+>> On Mon, May 27, 2024 at 8:54?AM David Pedrosa via R-sig-meta-analysis <
+>> r-sig-meta-analysis at r-project.org> wrote:
+>>
+>>> Hi James,
+>>>
+>>> apologies, my question was not  seasoned enough.
+>>>
+>>> I have a dataframe with 16 studies, all of which provide some odds
+>>> ratios for hospitalisation. 8 studies are from the same publication but
+>>> on different countries. To me there is still reason to believe they
+>>> ?share more variance? than the rest. Besides, I want to weigh the total
+>>> number  of subjects from each of the studies. To make it a bit more
+>>> complex, we have digged out the miner of hospital beds and long term
+>>> beds for every country, both of which we consider potential moderators.
+>>> I ran the random effects model
+>>>
+>>> res_metaRE <- rma(yi, vi,
+>>>    random = ~ 1 | number, mods = ~ hospitalbeds +
+>>> ltcbeds, verbose=TRUE, data=df_complete)
+>>>
+>>> to which weights(res_metaRE) provides accurate results. If I try to
+>>> estimate the VCOV matrix, the results show correct diagonal values, that
+>>> is identical to df_conplete$vi. But sticking the resulting V_mat
+>>>
+>>> V_mat <- vcalc(vi=vi, cluster=shared_variance, data=df_complete, rho=.7)
+>>>
+>>> to rma.mv provides results that are too high but especially the studies
+>>> with lower number of subjects are higher weighted. I am assuming that
+>>> it?s just somehow inverted but I cannot understand if I?m missing
+>>> something or if there is some other mistake in the way I?m estimating
+>>> the VCOV. Number is just the study id.
+>>>
+>>> I?m not entirely sure I understand your point with the subsection of the
+>>> matrix.
+>>>
+>>> Thanks for your help!
+>>> Best,
+>>> David
+>>>
+>>> P.S.: Here are the relevant parts of df_complete
+>>>
+>>> structure(list(number = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+>>> 12, 13, 14, 15), author = c("Aamodt", "Ceylan", "Krause", "Kumar",
+>>> "Moens, Belgium", "Moens, France"Moens, Italy", "Moens, Canada",
+>>> "Moens, Mexiko", "Moens, New Zeeland", "Moens, Spain", "Moens, South
+>>> Corea",
+>>> "Moens, Czech Rep.", "Moens, Hungary", "Moens, USA"), year = c(2023,
+>>> 2022, 2021, 2021, 2015, 2015, 2015, 2015, 2015, 2015, 2015, 2015,
+>>> 2015, 2015, 2015), n_ges = c(53279, 27, 40, 346141, 837, 4599,
+>>> 4034, 1381, 1062, 202, 352, 1565, 92, 241, 20065), OR = c(1.06,
+>>> 1.43, 8.25, 1.454, 2.3, 1.5, 1.4, 1.7, 0.95, 1.97, 1.09, 0.95,
+>>> 0.97, 1.44, 1.4), hospitalbeds = c(2.77, 3.02, 7.76, 2.77, 5.47,
+>>> 5.65, 3.12, 2.58, 1, 2.57, 2.96, 12.77, 6.66, 6.79, 2.77), ltcbeds =
+>>> c(32.3,
+>>> 9.5, 54.2, 53.9, 66.8, 47.4, 21.3, 46.7, 0, 50.4, 43.4, 25, 34.9,
+>>> 42.6, 28.9), p_values = c(0.106809128205467, 0.706331045003814,
+>>> 0.0281267337718951, 0, 2.43772276381116e-05, 2.76746355676653e-22,
+>>> 1.01260208850919e-05, 1.19251123951374e-10, 0.772759462747246,
+>>> 0.0741077696800058, 0.74088983860122, 0.68164335922065, 1,
+>>> 0.183303852299051,
+>>> 3.20176730771634e-26), shared_variance = c(0, 0, 0, 0, 1, 1,
+>>> 1, 1, 1, 1, 1, 1, 1, 1, 1), yi = structure(c(0.0582689081239758,
+>>> 0.357674444271816, 2.11021320034659, 0.374318379111328, 0.832909122935104,
+>>> 0.405465108108164, 0.336472236621213, 0.53062825106217,
+>>> -0.0512932943875506,
+>>> 0.678033542749897, 0.0861776962410524, -0.0512932943875506,
+>>> -0.0304592074847086,
+>>> 0.364643113587909, 0.336472236621213), ni = c(53279, 27, 40,
+>>> 346141, 837, 4599, 4034, 1381, 1062, 202, 352, 1565, 92, 241,
+>>> 20065), measure = "GEN"), vi = c(0.000835840725678602, 0.638632983584221,
+>>> 0.604067037193667, 0.000435509388232691, 0.0467214213223696,
+>>> 0.00468347897652763, 0.00538603813506437, 0.0132951153208062,
+>>> 0.0214123920152818, 0.142112789690683, 0.0489441998392354,
+>>> 0.0138688993962097,
+>>> 0.186242249276727, 0.0702159732616764, 0.00133268716433697)), row.names
+>>> = c(NA,
+>>> -15L), class = c("escalc", "data.frame"), yi.names = "yi", vi.names =
+>>> "vi", digits = c(est = 4,
+>>> se = 4, test = 4, pval = 4, ci = 4, var = 4, sevar = 4, fit = 4,
+>>> het = 4))
+>>>
+>>> Am 24.05.2024 um 19:06 schrieb James Pustejovsky:
+>>>> Hi David,
+>>>>
+>>>> I don't entirely understand the models that you're looking at, so
+>>>> clarifying the following would help in getting good feedback:
+>>>> * What is the variable `shared_variance` used in the vcalc call?
+>>>> * What is the variable `number` used in the random effects argument of
+>>>> rma.mv?
+>>>> * How are these variables related?
+>>>>
+>>>> Additionally, it would be good to check that the vcov matrix created
+>>>> by vcalc() is as you intend it to be. Could you pull out the blocks of
+>>>> this matrix for a few studies and just verify that they give you
+>>>> covariance matrices with a correlation of 0.7? I mean something like:
+>>>> vcov_study_k <- V_mat[i:j, i:j]
+>>>> cov2cor(vcov_study_k)
+>>>> where the indices i:j are the rows in your data corresponding to a
+>>>> given study k.
+>>>>
+>>>> James
+>>>>
+>>>> On Fri, May 24, 2024 at 10:00?AM David Pedrosa via R-sig-meta-analysis
+>>>> <r-sig-meta-analysis at r-project.org>  wrote:
+>>>>
+>>>>      Dear all,
+>>>>
+>>>>      I have a basic question about the output of my (gu)estimation of the
+>>>>      variance-covariance matrix. I have extracted results from very
+>>>>      heterogeneous studies with OR as effect size (sample sizes between 20
+>>>>      and 300,000). Since some of the results come from the same study, I
+>>>>      decided to try to use the VCOV as an input and estimated values
+>>>>      according to the following formula
+>>>>
+>>>>      V_mat  <- vcalc(vi=vi, cluster=shared_variance, data=df_complete,
+>>>>      rho=.7)
+>>>>      res_meta     <- rma.mv(yi, vi, V=V_mat,
+>>>>                               random = ~ 1 | number, mods = ~
+>>>>      hospitalbeds +
+>>>>      ltcbeds, verbose=TRUE, data=df_complete)
+>>>>
+>>>>
+>>>>      Interestingly, in this case the weighting is reversed, so that
+>>>>      most of
+>>>>      the weight is given to studies with the smallest sample size;
+>>>>      something
+>>>>      that does not happen when using this formula:
+>>>>
+>>>>      res_meta     <- rma(yi, vi,
+>>>>                               random = ~ 1 | number, mods = ~
+>>>>      hospitalbeds +
+>>>>      ltcbeds, verbose=TRUE, data=df_complete)
+>>>>
+>>>>      I have tried to understand what is going on, but I am at kind of
+>>>>      lost.
+>>>>      Could someone please give me some advice?
+>>>>
+>>>>      Thanks in advance,
+>>>>
+>>>>      David
+--
+Uni Marburg Siegel
+<https://www.uni-marburg.de/de/fb20/bereiche/kopfz/neurologie/forschung/agbun>
+
+
+
+
+Prof. Dr. David Pedrosa
+Leitender Oberarzt der Klinik f?r Neurologie,
+Leiter der Sektion Bewegungsst?rungen und Neuromodulation,
+Universit?tsklinikum Gie?en und Marburg
+Tel. (+49) 6421-58 65299 Fax. (+49) 6421-58 67055
+Address. Baldingerstr., 35043 Marburg
+Web. https://www.ukgm.de/ugm_2/deu/umr_neu/index.html
+Web.
+https://www.uni-marburg.de/de/fb20/bereiche/kopfz/neurologie/forschung/agbun
+
+
+
+        [[alternative HTML version deleted]]
+
+
+
+
+------------------------------
+
+Subject: Digest Footer
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+------------------------------
+
+End of R-sig-meta-analysis Digest, Vol 85, Issue 4
+**************************************************
+
+	[[alternative HTML version deleted]]
+
+
+From ||||ppo@g@mb@rot@ @end|ng |rom gm@||@com  Wed Jun  5 11:55:40 2024
+From: ||||ppo@g@mb@rot@ @end|ng |rom gm@||@com (Filippo Gambarota)
+Date: Wed, 5 Jun 2024 11:55:40 +0200
+Subject: [R-meta] pooled vs separate QB statistics
+In-Reply-To: <AS8PR08MB91932DCA873D0B41415C67698BFF2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CAKWaqja5hhacGWMTe5KwAjKZy=U4EVvuPEJ+aM-2SgK3ZV5a8A@mail.gmail.com>
+ <d474261e-5152-fb47-01b5-025be3b938b1@dewey.myzen.co.uk>
+ <CAKWaqjad3iiRuP5zz03z1LP09vu=AEA+qRuHLc_P_nzQLHb6eA@mail.gmail.com>
+ <AS8PR08MB91932DCA873D0B41415C67698BFF2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <CAKWaqjYq=EQWET_rzVkjt11352W0wzwKWXpm8DXcYCHkBj5jxQ@mail.gmail.com>
+
+Thanks!
+
+On Mon, 3 Jun 2024 at 09:33, Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Hi Filippo,
+>
+> That is correct.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Filippo Gambarota via R-sig-meta-analysis
+> > Sent: Tuesday, May 28, 2024 12:39
+> > To: Michael Dewey <lists at dewey.myzen.co.uk>
+> > Cc: Filippo Gambarota <filippo.gambarota at gmail.com>; R Special Interest
+> Group
+> > for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> > Subject: Re: [R-meta] pooled vs separate QB statistics
+> >
+> > Dear Michael,
+> > Thank you. So basically when different tau2 are estimated (either
+> > using a multivariate model or scale location model) the Q test for the
+> > moderators is the non-pooled test? When a single tau2 is estimated the
+> > Q test is the pooled version?
+> > Filippo
+> >
+> > On Tue, 28 May 2024 at 12:31, Michael Dewey <lists at dewey.myzen.co.uk>
+> wrote:
+> > >
+> > > Dear Filippo
+> > >
+> > > Does
+> > >
+> https://www.metafor-project.org/doku.php/tips:different_tau2_across_subgroups
+> > > help?
+> > >
+> > > Michael
+> > >
+> > > On 28/05/2024 11:09, Filippo Gambarota via R-sig-meta-analysis wrote:
+> > > > Hi,
+> > > > I was reading the two papers (at the end) about categorical
+> moderators
+> > > > and the omnibus test and despite the conclusion is that the Q (or F)
+> > > > test based on the pooled tau2 estimation works better in most cases,
+> > > > when k in each moderator level is large and tau2 is expected to
+> differ
+> > > > across levels, it is better to use the non-pooled method.
+> > > >
+> > > > Reading the metafor documentation it is not clear to me how to
+> > > > implement the non-pooled method. Maybe I am missing something but I
+> > > > can change the type of test (z vs t vs knha that takes into account
+> > > > tau2 uncertainty) but I see no option to choose the pooled vs non
+> > > > pooled tau2 method.
+> > > >
+> > > > Thanks
+> > > > Filippo
+> > > >
+> > > > Rubio-Aparicio, M., L?pez-L?pez, J. A., Viechtbauer, W.,
+> > > > Mar?n-Mart?nez, F., Botella, J., & S?nchez-Meca, J. (2020). Testing
+> > > > Categorical Moderators in Mixed-Effects Meta-analysis in the Presence
+> > > > of Heteroscedasticity. Journal of Experimental Education, 88(2),
+> > > > 288?310. https://doi.org/10.1080/00220973.2018.1561404
+> > > >
+> > > > Rubio-Aparicio, M., S?nchez-Meca, J., L?pez-L?pez, J. A., Botella,
+> J.,
+> > > > & Mar?n-Mart?nez, F. (2017). Analysis of categorical moderators in
+> > > > mixed-effects meta-analysis: Consequences of using pooled versus
+> > > > separate estimates of the residual between-studies variances. The
+> > > > British Journal of Mathematical and Statistical Psychology, 70(3),
+> > > > 439?456. https://doi.org/10.1111/bmsp.12092
+>
+
+
+-- 
+*Filippo Gambarota, PhD*
+Postdoctoral Researcher - University of Padova
+Department of Developmental and Social Psychology
+Website: filippogambarota.xyz
+Research Groups: Colab <http://colab.psy.unipd.it/>   Psicostat
+<https://psicostat.dpss.psy.unipd.it/>
+
+	[[alternative HTML version deleted]]
+
+
+From i@io m@iii@g oii phys@ii@-courses@org  Wed Jun  5 11:59:52 2024
+From: i@io m@iii@g oii phys@ii@-courses@org (i@io m@iii@g oii phys@ii@-courses@org)
+Date: Wed, 5 Jun 2024 11:59:52 +0200 (CEST)
+Subject: [R-meta] Online course: GLLVMs: Advanced Multivariate Analysis of
+ Ecological Communities in R
+Message-ID: <1717581592.730727227@webmail.jimdo.com>
+
+
+ 
+Dear all,
+ 
+ there are only 3 seats left for our upcoming online course on "GLLVMs: Advanced Multivariate Analysis of Ecological Communities in R" scheduled for June 10-13.
+ 
+ 
+ 
+This online course will explore Generalized Linear Latent Variable Models (GLLVMs) as a powerful framework for analyzing multivariate ecological data. The course will cover topics such as fitting GLLVMs with the gllvm R-package, formulating appropriate models, model checking and selection, and effective visualization and interpretation of results.
+ 
+ 
+ 
+With only 3 seats remaining, this is your last chance to secure your spot! Whether you're a PhD candidate, postdoctoral researcher, or seasoned professional, this course offers invaluable insights and tools for advancing your research in ecological analysis.
+ 
+ 
+ 
+Here are the key details:
+ 
+Dates: June 10-13, 2024
+Time: Classes from 2-8 PM Berlin time each day
+Course website: [ https://www.physalia-courses.org/courses-workshops/gllvm/ ]( https://www.physalia-courses.org/courses-workshops/gllvm/ )
+ 
+ 
+ 
+If you have any questions or need further assistance, feel free to reach out to us.
+ 
+Best regards,
+ 
+Carlo
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+--------------------
+
+Carlo Pecoraro, Ph.D
+
+
+Physalia-courses DIRECTOR
+
+info at physalia-courses.org
+
+mobile: +49 17645230846
+ 
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Jun  5 12:04:48 2024
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 5 Jun 2024 11:04:48 +0100
+Subject: [R-meta] =?utf-8?q?Meta-analysis_of_mean=2C_was_Re=3A__=E5=9B=9E?=
+ =?utf-8?q?=E5=A4=8D=3A_R-sig-meta-analysis_Digest=2C_Vol_85=2C_Issue_4?=
+In-Reply-To: <JH0PR01MB6275ACED11EE30CBBE265F51F0F92@JH0PR01MB6275.apcprd01.prod.exchangelabs.com>
+References: <mailman.5303.7.1717495201.51394.r-sig-meta-analysis@r-project.org>
+ <JH0PR01MB6275ACED11EE30CBBE265F51F0F92@JH0PR01MB6275.apcprd01.prod.exchangelabs.com>
+Message-ID: <70773e0b-d57d-50f3-b871-32b40a8ddc9d@dewey.myzen.co.uk>
+
+
+If I understand you correctly then load metafor and do ?escalc
+
+Then search in the help for
+(3a) Measures for Quantitative Variables
+
+and read the explanation.
+
+If you have further questions then just ask again.
+
+Michael
+
+On 05/06/2024 08:31, #QIAO SHUYI# via R-sig-meta-analysis wrote:
+> Dear All,
+> 
+> Thank you for your attention. I am wondering if metafor can also support a meta-analysis of the arithmetic mean (larger than 1) and what the aggregation/ moderation code would be to weight the arithmetic mean by inverse variance under random effect modeling. Thank you.
+> 
+> Best wishes
+> Shuyi Qiao
+> ________________________________
+> ???: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> ?? r-sig-meta-analysis-request at r-project.org <r-sig-meta-analysis-request at r-project.org>
+> ????: 2024?6?4? 18:00
+> ???: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+> ??: R-sig-meta-analysis Digest, Vol 85, Issue 4
+> 
+> Send R-sig-meta-analysis mailing list submissions to
+>          r-sig-meta-analysis at r-project.org
+> 
+> To subscribe or unsubscribe via the World Wide Web, visit
+>          https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> or, via email, send a message with subject or body 'help' to
+>          r-sig-meta-analysis-request at r-project.org
+> 
+> You can reach the person managing the list at
+>          r-sig-meta-analysis-owner at r-project.org
+> 
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of R-sig-meta-analysis digest..."
+> 
+> 
+> Today's Topics:
+> 
+>     1. Re: Inverse weighting after estimation of VCOV
+>        (pedrosac at staff.uni-marburg.de)
+> 
+> ----------------------------------------------------------------------
+> 
+> Message: 1
+> Date: Mon, 3 Jun 2024 23:49:50 +0200
+> From: pedrosac at staff.uni-marburg.de
+> To: "Viechtbauer, Wolfgang (NP)"
+>          <wolfgang.viechtbauer at maastrichtuniversity.nl>, R Special Interest
+>          Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>,
+>          "pedrosac at staff.uni-marburg.de" <pedrosac at staff.uni-marburg.de>
+> Subject: Re: [R-meta] Inverse weighting after estimation of VCOV
+> Message-ID:
+>          <5a7c922e-437e-41dc-a9c8-0468293f38fd at staff.uni-marburg.de>
+> Content-Type: text/plain; charset="utf-8"
+> 
+> Dear James and Wolfgang,
+> 
+> I think I now understand the reason why it was weighting my data so
+> strangely. And your explanations, James, are enough food for though for
+> some days. Thank you very much!
+> 
+> Best,
+> 
+> David
+> 
+> 
+> Am 03.06.2024 um 09:29 schrieb Viechtbauer, Wolfgang (NP):
+>> One additional point (leaving aside the issue what the appropriate model for these data is):
+>>
+>> rma.mv(yi, vi, V=V_mat, ...)
+>>
+>> doesn't make sense. The second unnamed argument ('vi') will be matched to the third argument of rma.mv(), which is argument 'W' for the weights. So you are setting the weights equal to 'vi', which indeed will give more weight to the less precise estimates. Generally, you don't want to manually specify weights (especially in more complex models where there can be an entire weight matrix) unless you really know what you are doing.
+>>
+>> Best,
+>> Wolfgang
+>>
+>>> -----Original Message-----
+>>> From: R-sig-meta-analysis<r-sig-meta-analysis-bounces at r-project.org>  On Behalf
+>>> Of James Pustejovsky via R-sig-meta-analysis
+>>> Sent: Friday, May 31, 2024 15:22
+>>> To:pedrosac at staff.uni-marburg.de; R Special Interest Group for Meta-Analysis
+>>> <r-sig-meta-analysis at r-project.org>
+>>> Cc: James Pustejovsky<jepusto at gmail.com>
+>>> Subject: Re: [R-meta] Inverse weighting after estimation of VCOV
+>>>
+>>> Hi David,
+>>>
+>>> Thanks for clarifying your data structure. Based on what you've described,
+>>> I don't think it makes sense to use vcalc(). The point of vcalc() is to
+>>> build in covariance between the sampling errors of the effect size
+>>> estimates. For your one publication that reports 8 studies, each effect
+>>> size estimate is based on a separate sample of participants (because each
+>>> estimate comes from a different country). So there's no reason to expect
+>>> that there would be covariance in the sampling errors.
+>>>
+>>> Instead, one might suspect that there would be covariance between the
+>>> country-specific effect size parameters (i.e., the "true" effect sizes)
+>>> from this publication. This would be plausible if the same operational
+>>> procedures (e.g., same recruitment approach, same measurement
+>>> instrumentation, same follow-up window) were used across the samples in
+>>> this publication. The conventional way to model this would be to 1) specify
+>>> effect size estimates as independent but 2) include publication-level
+>>> random effects in the model to capture shared operational variance within
+>>> publications. The syntax would be something like:
+>>> res_metaRE <- rma(
+>>>     yi, V = vi,
+>>>     random = ~ 1 | publicationID / number,
+>>>     mods = ~ hospitalbeds + ltcbeds,
+>>>     verbose=TRUE,
+>>>     data=df_complete, sparse = TRUE
+>>> )
+>>> You'll need to create a publicationID variable if you don't already have
+>>> that on the data.
+>>>
+>>> The difficulty with this approach in your case is that there's only one
+>>> publication that has multiple samples nested within it, so there's not a
+>>> lot of information available to parse out the variance at the publication
+>>> level from the variance at the sample level (across countries). You could
+>>> try using the model fit statistics to compare the model above versus a
+>>> model that only has random effects at the sample level.
+>>>
+>>> James
+>>>
+>>> On Mon, May 27, 2024 at 8:54?AM David Pedrosa via R-sig-meta-analysis <
+>>> r-sig-meta-analysis at r-project.org> wrote:
+>>>
+>>>> Hi James,
+>>>>
+>>>> apologies, my question was not  seasoned enough.
+>>>>
+>>>> I have a dataframe with 16 studies, all of which provide some odds
+>>>> ratios for hospitalisation. 8 studies are from the same publication but
+>>>> on different countries. To me there is still reason to believe they
+>>>> ?share more variance? than the rest. Besides, I want to weigh the total
+>>>> number  of subjects from each of the studies. To make it a bit more
+>>>> complex, we have digged out the miner of hospital beds and long term
+>>>> beds for every country, both of which we consider potential moderators.
+>>>> I ran the random effects model
+>>>>
+>>>> res_metaRE <- rma(yi, vi,
+>>>>     random = ~ 1 | number, mods = ~ hospitalbeds +
+>>>> ltcbeds, verbose=TRUE, data=df_complete)
+>>>>
+>>>> to which weights(res_metaRE) provides accurate results. If I try to
+>>>> estimate the VCOV matrix, the results show correct diagonal values, that
+>>>> is identical to df_conplete$vi. But sticking the resulting V_mat
+>>>>
+>>>> V_mat <- vcalc(vi=vi, cluster=shared_variance, data=df_complete, rho=.7)
+>>>>
+>>>> to rma.mv provides results that are too high but especially the studies
+>>>> with lower number of subjects are higher weighted. I am assuming that
+>>>> it?s just somehow inverted but I cannot understand if I?m missing
+>>>> something or if there is some other mistake in the way I?m estimating
+>>>> the VCOV. Number is just the study id.
+>>>>
+>>>> I?m not entirely sure I understand your point with the subsection of the
+>>>> matrix.
+>>>>
+>>>> Thanks for your help!
+>>>> Best,
+>>>> David
+>>>>
+>>>> P.S.: Here are the relevant parts of df_complete
+>>>>
+>>>> structure(list(number = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+>>>> 12, 13, 14, 15), author = c("Aamodt", "Ceylan", "Krause", "Kumar",
+>>>> "Moens, Belgium", "Moens, France"Moens, Italy", "Moens, Canada",
+>>>> "Moens, Mexiko", "Moens, New Zeeland", "Moens, Spain", "Moens, South
+>>>> Corea",
+>>>> "Moens, Czech Rep.", "Moens, Hungary", "Moens, USA"), year = c(2023,
+>>>> 2022, 2021, 2021, 2015, 2015, 2015, 2015, 2015, 2015, 2015, 2015,
+>>>> 2015, 2015, 2015), n_ges = c(53279, 27, 40, 346141, 837, 4599,
+>>>> 4034, 1381, 1062, 202, 352, 1565, 92, 241, 20065), OR = c(1.06,
+>>>> 1.43, 8.25, 1.454, 2.3, 1.5, 1.4, 1.7, 0.95, 1.97, 1.09, 0.95,
+>>>> 0.97, 1.44, 1.4), hospitalbeds = c(2.77, 3.02, 7.76, 2.77, 5.47,
+>>>> 5.65, 3.12, 2.58, 1, 2.57, 2.96, 12.77, 6.66, 6.79, 2.77), ltcbeds =
+>>>> c(32.3,
+>>>> 9.5, 54.2, 53.9, 66.8, 47.4, 21.3, 46.7, 0, 50.4, 43.4, 25, 34.9,
+>>>> 42.6, 28.9), p_values = c(0.106809128205467, 0.706331045003814,
+>>>> 0.0281267337718951, 0, 2.43772276381116e-05, 2.76746355676653e-22,
+>>>> 1.01260208850919e-05, 1.19251123951374e-10, 0.772759462747246,
+>>>> 0.0741077696800058, 0.74088983860122, 0.68164335922065, 1,
+>>>> 0.183303852299051,
+>>>> 3.20176730771634e-26), shared_variance = c(0, 0, 0, 0, 1, 1,
+>>>> 1, 1, 1, 1, 1, 1, 1, 1, 1), yi = structure(c(0.0582689081239758,
+>>>> 0.357674444271816, 2.11021320034659, 0.374318379111328, 0.832909122935104,
+>>>> 0.405465108108164, 0.336472236621213, 0.53062825106217,
+>>>> -0.0512932943875506,
+>>>> 0.678033542749897, 0.0861776962410524, -0.0512932943875506,
+>>>> -0.0304592074847086,
+>>>> 0.364643113587909, 0.336472236621213), ni = c(53279, 27, 40,
+>>>> 346141, 837, 4599, 4034, 1381, 1062, 202, 352, 1565, 92, 241,
+>>>> 20065), measure = "GEN"), vi = c(0.000835840725678602, 0.638632983584221,
+>>>> 0.604067037193667, 0.000435509388232691, 0.0467214213223696,
+>>>> 0.00468347897652763, 0.00538603813506437, 0.0132951153208062,
+>>>> 0.0214123920152818, 0.142112789690683, 0.0489441998392354,
+>>>> 0.0138688993962097,
+>>>> 0.186242249276727, 0.0702159732616764, 0.00133268716433697)), row.names
+>>>> = c(NA,
+>>>> -15L), class = c("escalc", "data.frame"), yi.names = "yi", vi.names =
+>>>> "vi", digits = c(est = 4,
+>>>> se = 4, test = 4, pval = 4, ci = 4, var = 4, sevar = 4, fit = 4,
+>>>> het = 4))
+>>>>
+>>>> Am 24.05.2024 um 19:06 schrieb James Pustejovsky:
+>>>>> Hi David,
+>>>>>
+>>>>> I don't entirely understand the models that you're looking at, so
+>>>>> clarifying the following would help in getting good feedback:
+>>>>> * What is the variable `shared_variance` used in the vcalc call?
+>>>>> * What is the variable `number` used in the random effects argument of
+>>>>> rma.mv?
+>>>>> * How are these variables related?
+>>>>>
+>>>>> Additionally, it would be good to check that the vcov matrix created
+>>>>> by vcalc() is as you intend it to be. Could you pull out the blocks of
+>>>>> this matrix for a few studies and just verify that they give you
+>>>>> covariance matrices with a correlation of 0.7? I mean something like:
+>>>>> vcov_study_k <- V_mat[i:j, i:j]
+>>>>> cov2cor(vcov_study_k)
+>>>>> where the indices i:j are the rows in your data corresponding to a
+>>>>> given study k.
+>>>>>
+>>>>> James
+>>>>>
+>>>>> On Fri, May 24, 2024 at 10:00?AM David Pedrosa via R-sig-meta-analysis
+>>>>> <r-sig-meta-analysis at r-project.org>  wrote:
+>>>>>
+>>>>>       Dear all,
+>>>>>
+>>>>>       I have a basic question about the output of my (gu)estimation of the
+>>>>>       variance-covariance matrix. I have extracted results from very
+>>>>>       heterogeneous studies with OR as effect size (sample sizes between 20
+>>>>>       and 300,000). Since some of the results come from the same study, I
+>>>>>       decided to try to use the VCOV as an input and estimated values
+>>>>>       according to the following formula
+>>>>>
+>>>>>       V_mat  <- vcalc(vi=vi, cluster=shared_variance, data=df_complete,
+>>>>>       rho=.7)
+>>>>>       res_meta     <- rma.mv(yi, vi, V=V_mat,
+>>>>>                                random = ~ 1 | number, mods = ~
+>>>>>       hospitalbeds +
+>>>>>       ltcbeds, verbose=TRUE, data=df_complete)
+>>>>>
+>>>>>
+>>>>>       Interestingly, in this case the weighting is reversed, so that
+>>>>>       most of
+>>>>>       the weight is given to studies with the smallest sample size;
+>>>>>       something
+>>>>>       that does not happen when using this formula:
+>>>>>
+>>>>>       res_meta     <- rma(yi, vi,
+>>>>>                                random = ~ 1 | number, mods = ~
+>>>>>       hospitalbeds +
+>>>>>       ltcbeds, verbose=TRUE, data=df_complete)
+>>>>>
+>>>>>       I have tried to understand what is going on, but I am at kind of
+>>>>>       lost.
+>>>>>       Could someone please give me some advice?
+>>>>>
+>>>>>       Thanks in advance,
+>>>>>
+>>>>>       David
+> --
+> Uni Marburg Siegel
+> <https://www.uni-marburg.de/de/fb20/bereiche/kopfz/neurologie/forschung/agbun>
+> 
+> 
+> 
+> 
+> Prof. Dr. David Pedrosa
+> Leitender Oberarzt der Klinik f?r Neurologie,
+> Leiter der Sektion Bewegungsst?rungen und Neuromodulation,
+> Universit?tsklinikum Gie?en und Marburg
+> Tel. (+49) 6421-58 65299 Fax. (+49) 6421-58 67055
+> Address. Baldingerstr., 35043 Marburg
+> Web. https://www.ukgm.de/ugm_2/deu/umr_neu/index.html
+> Web.
+> https://www.uni-marburg.de/de/fb20/bereiche/kopfz/neurologie/forschung/agbun
+> 
+> 
+> 
+>          [[alternative HTML version deleted]]
+> 
+> 
+> 
+> 
+> ------------------------------
+> 
+> Subject: Digest Footer
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> 
+> ------------------------------
+> 
+> End of R-sig-meta-analysis Digest, Vol 85, Issue 4
+> **************************************************
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> 
+
+-- 
+Michael
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Jun  5 14:19:04 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 5 Jun 2024 12:19:04 +0000
+Subject: [R-meta] forest plot and study-specific effect
+In-Reply-To: <MEAPR01MB54153827D76318844FE596BB9DF92@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB54153827D76318844FE596BB9DF92@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <AS8PR08MB919344F2EEFDDD6AF02216AC8BF92@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Yefeng,
+
+Plotting the BLUPs has been done before. See Figure 3 in:
+
+van Houwelingen, H. C., Arends, L. R., & Stijnen, T. (2002). Advanced methods in meta-analysis: Multivariate approach and meta-regression. Statistics in Medicine, 21(4), 589-624.
+
+Actually, the forest plot shows the individual estimates, plus the BLUPs.
+
+You can find a recreation of this here:
+
+https://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+
+I think there are various reasons why the default is not to show the BLUPs. For example, the estimates are simply what was found in each of the invididual studies, while the BLUPs depend on what other studies are included in the analysis and the values also depend on the specifics of the modeling approach used. But showing both (as above) is definitely interesting.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Yefeng Yang via R-sig-meta-analysis
+> Sent: Wednesday, June 5, 2024 08:14
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> Subject: [R-meta] forest plot and study-specific effect
+>
+> Dear community,
+>
+> I have a small question about the forest plot used in the meta-analysis.
+>
+> The forest plots and their varieties are often used in meta-analysis papers to
+> show the overall/grand mean, individual effect size estimates, and other
+> relevant info depending on the software making them. We know the effect size
+> estimates from individual studies are usually noisy or not very precise. But,
+> why do meta-analysts prefer to report individual effect size estimates rather
+> than the study-specific effects (which benefit from the shrinkage or borrowing
+> of strength). Or, put differently, the developers of software that can make
+> forest plots do not seem to provide the option of showing study-specific effects
+> (I did not check carefully; some software or packages might provide this
+> functionality). Is there any specific reason? Or, it is just a convention.
+>
+> Best,
+> Yefeng
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Wed Jun  5 18:54:42 2024
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?iso-8859-1?Q?Dr=2E_Gerta_R=FCcker?=)
+Date: Wed, 5 Jun 2024 16:54:42 +0000
+Subject: [R-meta] forest plot and study-specific effect
+In-Reply-To: <AS8PR08MB919344F2EEFDDD6AF02216AC8BF92@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <MEAPR01MB54153827D76318844FE596BB9DF92@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <AS8PR08MB919344F2EEFDDD6AF02216AC8BF92@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <e5270e9637384d609acd49837aefa988@uniklinik-freiburg.de>
+
+Dear Yefeng,
+
+You may like to have a look at the supplement " traceplot-R-code.R" to the paper https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1693 (R?ver, Rindskopf, Friede) that shows how to obtain a joint forest plot with study-specific estimates and BLUPs with R package bayesmeta.
+
+Best,
+Gerta
+
+
+
+UNIVERSIT?TSKLINIKUM FREIBURG
+Institute for Medical Biometry and Statistics
+
+Dr. Gerta R?cker
+Guest Scientist
+
+Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+gerta.ruecker at uniklinik-freiburg.de
+
+https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+-----Urspr?ngliche Nachricht-----
+Von: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> Im Auftrag von Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis
+Gesendet: Mittwoch, 5. Juni 2024 14:19
+An: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Betreff: Re: [R-meta] forest plot and study-specific effect
+
+Dear Yefeng,
+
+Plotting the BLUPs has been done before. See Figure 3 in:
+
+van Houwelingen, H. C., Arends, L. R., & Stijnen, T. (2002). Advanced methods in meta-analysis: Multivariate approach and meta-regression. Statistics in Medicine, 21(4), 589-624.
+
+Actually, the forest plot shows the individual estimates, plus the BLUPs.
+
+You can find a recreation of this here:
+
+https://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+
+I think there are various reasons why the default is not to show the BLUPs. For example, the estimates are simply what was found in each of the invididual studies, while the BLUPs depend on what other studies are included in the analysis and the values also depend on the specifics of the modeling approach used. But showing both (as above) is definitely interesting.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Yefeng Yang via R-sig-meta-analysis
+> Sent: Wednesday, June 5, 2024 08:14
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> Subject: [R-meta] forest plot and study-specific effect
+>
+> Dear community,
+>
+> I have a small question about the forest plot used in the meta-analysis.
+>
+> The forest plots and their varieties are often used in meta-analysis papers to
+> show the overall/grand mean, individual effect size estimates, and other
+> relevant info depending on the software making them. We know the effect size
+> estimates from individual studies are usually noisy or not very precise. But,
+> why do meta-analysts prefer to report individual effect size estimates rather
+> than the study-specific effects (which benefit from the shrinkage or borrowing
+> of strength). Or, put differently, the developers of software that can make
+> forest plots do not seem to provide the option of showing study-specific effects
+> (I did not check carefully; some software or packages might provide this
+> functionality). Is there any specific reason? Or, it is just a convention.
+>
+> Best,
+> Yefeng
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From chr|@t|@n@roever @end|ng |rom med@un|-goett|ngen@de  Thu Jun  6 08:25:21 2024
+From: chr|@t|@n@roever @end|ng |rom med@un|-goett|ngen@de (=?utf-8?B?UsO2dmVyLCBDaHJpc3RpYW4=?=)
+Date: Thu, 6 Jun 2024 06:25:21 +0000
+Subject: [R-meta] 
+ [+externe Mail+] Re: forest plot and study-specific effect
+In-Reply-To: <e5270e9637384d609acd49837aefa988@uniklinik-freiburg.de>
+References: <MEAPR01MB54153827D76318844FE596BB9DF92@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <AS8PR08MB919344F2EEFDDD6AF02216AC8BF92@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <e5270e9637384d609acd49837aefa988@uniklinik-freiburg.de>
+Message-ID: <624d153420ebcc44b7a44f0498f7d9f23bfa6163.camel@med.uni-goettingen.de>
+
+Dear Yefeng,
+
+the forest plots in the "bayesmeta" package by default show the
+shrinkage estimates / BLUPs along with the plain data; see e.g. here:
+  https://cran.r-project.org/package=bayesmeta
+  https://doi.org/10.18637/jss.v093.i06  (Fig.2)
+(bayesmeta's forest plots are based on the "forestplot" package).
+
+I often find this helpful to illustrate the amount of borrowing-of-
+information / mutual support between studies, depending on the amount
+of heterogeneity. It may in particular also be an interesting option in
+cases where the "plain data estimates" may not be readily available,
+e.g., when you are looking at a binomial likelihood and some studies
+have zero event counts.
+
+Cheers,
+
+Christian
+
+
+On Wed, 2024-06-05 at 16:54 +0000, Dr. Gerta R?cker via R-sig-meta-
+analysis wrote:
+> Dear Yefeng,
+> 
+> You may like to have a look at the supplement " traceplot-R-code.R"
+> to the paper 
+> https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1693 (R?ver,
+> Rindskopf, Friede) that shows how to obtain a joint forest plot with
+> study-specific estimates and BLUPs with R package bayesmeta.
+> 
+> Best,
+> Gerta
+> 
+> 
+> 
+> UNIVERSIT?TSKLINIKUM FREIBURG
+> Institute for Medical Biometry and Statistics
+> 
+> Dr. Gerta R?cker
+> Guest Scientist
+> 
+> Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+> gerta.ruecker at uniklinik-freiburg.de
+> 
+> https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+> 
+> -----Urspr?ngliche Nachricht-----
+> Von: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> Im Auftrag von Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis
+> Gesendet: Mittwoch, 5. Juni 2024 14:19
+> An: R Special Interest Group for Meta-Analysis <
+> r-sig-meta-analysis at r-project.org>
+> Cc: Viechtbauer, Wolfgang (NP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Betreff: Re: [R-meta] forest plot and study-specific effect
+> 
+> Dear Yefeng,
+> 
+> Plotting the BLUPs has been done before. See Figure 3 in:
+> 
+> van Houwelingen, H. C., Arends, L. R., & Stijnen, T. (2002). Advanced
+> methods in meta-analysis: Multivariate approach and meta-regression.
+> Statistics in Medicine, 21(4), 589-624.
+> 
+> Actually, the forest plot shows the individual estimates, plus the
+> BLUPs.
+> 
+> You can find a recreation of this here:
+> 
+> https://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+> 
+> I think there are various reasons why the default is not to show the
+> BLUPs. For example, the estimates are simply what was found in each
+> of the invididual studies, while the BLUPs depend on what other
+> studies are included in the analysis and the values also depend on
+> the specifics of the modeling approach used. But showing both (as
+> above) is definitely interesting.
+> 
+> Best,
+> Wolfgang
+> 
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <
+> > r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> > Of Yefeng Yang via R-sig-meta-analysis
+> > Sent: Wednesday, June 5, 2024 08:14
+> > To: r-sig-meta-analysis at r-project.org
+> > Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> > Subject: [R-meta] forest plot and study-specific effect
+> > 
+> > Dear community,
+> > 
+> > I have a small question about the forest plot used in the meta-
+> > analysis.
+> > 
+> > The forest plots and their varieties are often used in meta-
+> > analysis papers to
+> > show the overall/grand mean, individual effect size estimates, and
+> > other
+> > relevant info depending on the software making them. We know the
+> > effect size
+> > estimates from individual studies are usually noisy or not very
+> > precise. But,
+> > why do meta-analysts prefer to report individual effect size
+> > estimates rather
+> > than the study-specific effects (which benefit from the shrinkage
+> > or borrowing
+> > of strength). Or, put differently, the developers of software that
+> > can make
+> > forest plots do not seem to provide the option of showing study-
+> > specific effects
+> > (I did not check carefully; some software or packages might provide
+> > this
+> > functionality). Is there any specific reason? Or, it is just a
+> > convention.
+> > 
+> > Best,
+> > Yefeng
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Thu Jun  6 09:48:41 2024
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Thu, 6 Jun 2024 07:48:41 +0000
+Subject: [R-meta] 
+ [+externe Mail+] Re: forest plot and study-specific effect
+In-Reply-To: <624d153420ebcc44b7a44f0498f7d9f23bfa6163.camel@med.uni-goettingen.de>
+References: <MEAPR01MB54153827D76318844FE596BB9DF92@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <AS8PR08MB919344F2EEFDDD6AF02216AC8BF92@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <e5270e9637384d609acd49837aefa988@uniklinik-freiburg.de>
+ <624d153420ebcc44b7a44f0498f7d9f23bfa6163.camel@med.uni-goettingen.de>
+Message-ID: <MEAPR01MB5415BCAE153AD2CFE1113B909DFA2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear Wolfgang, Gerta, and Christian,
+
+Thank you very much for your thoughts.
+The recommended sources (metafor example, papers, and bayesmeta package) are quite useful.
+
+All the best,
+Yefeng
+________________________________
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of R?ver, Christian via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Sent: 06 June 2024 16:25
+To: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Cc: R?ver, Christian <christian.roever at med.uni-goettingen.de>
+Subject: Re: [R-meta] [+externe Mail+] Re: forest plot and study-specific effect
+
+Dear Yefeng,
+
+the forest plots in the "bayesmeta" package by default show the
+shrinkage estimates / BLUPs along with the plain data; see e.g. here:
+  https://cran.r-project.org/package=bayesmeta
+  https://doi.org/10.18637/jss.v093.i06  (Fig.2)
+(bayesmeta's forest plots are based on the "forestplot" package).
+
+I often find this helpful to illustrate the amount of borrowing-of-
+information / mutual support between studies, depending on the amount
+of heterogeneity. It may in particular also be an interesting option in
+cases where the "plain data estimates" may not be readily available,
+e.g., when you are looking at a binomial likelihood and some studies
+have zero event counts.
+
+Cheers,
+
+Christian
+
+
+On Wed, 2024-06-05 at 16:54 +0000, Dr. Gerta R?cker via R-sig-meta-
+analysis wrote:
+> Dear Yefeng,
+>
+> You may like to have a look at the supplement " traceplot-R-code.R"
+> to the paper
+> https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1693 (R?ver,
+> Rindskopf, Friede) that shows how to obtain a joint forest plot with
+> study-specific estimates and BLUPs with R package bayesmeta.
+>
+> Best,
+> Gerta
+>
+>
+>
+> UNIVERSIT?TSKLINIKUM FREIBURG
+> Institute for Medical Biometry and Statistics
+>
+> Dr. Gerta R?cker
+> Guest Scientist
+>
+> Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+> gerta.ruecker at uniklinik-freiburg.de
+>
+> https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+>
+> -----Urspr?ngliche Nachricht-----
+> Von: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> Im Auftrag von Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis
+> Gesendet: Mittwoch, 5. Juni 2024 14:19
+> An: R Special Interest Group for Meta-Analysis <
+> r-sig-meta-analysis at r-project.org>
+> Cc: Viechtbauer, Wolfgang (NP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Betreff: Re: [R-meta] forest plot and study-specific effect
+>
+> Dear Yefeng,
+>
+> Plotting the BLUPs has been done before. See Figure 3 in:
+>
+> van Houwelingen, H. C., Arends, L. R., & Stijnen, T. (2002). Advanced
+> methods in meta-analysis: Multivariate approach and meta-regression.
+> Statistics in Medicine, 21(4), 589-624.
+>
+> Actually, the forest plot shows the individual estimates, plus the
+> BLUPs.
+>
+> You can find a recreation of this here:
+>
+> https://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+>
+> I think there are various reasons why the default is not to show the
+> BLUPs. For example, the estimates are simply what was found in each
+> of the invididual studies, while the BLUPs depend on what other
+> studies are included in the analysis and the values also depend on
+> the specifics of the modeling approach used. But showing both (as
+> above) is definitely interesting.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <
+> > r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> > Of Yefeng Yang via R-sig-meta-analysis
+> > Sent: Wednesday, June 5, 2024 08:14
+> > To: r-sig-meta-analysis at r-project.org
+> > Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> > Subject: [R-meta] forest plot and study-specific effect
+> >
+> > Dear community,
+> >
+> > I have a small question about the forest plot used in the meta-
+> > analysis.
+> >
+> > The forest plots and their varieties are often used in meta-
+> > analysis papers to
+> > show the overall/grand mean, individual effect size estimates, and
+> > other
+> > relevant info depending on the software making them. We know the
+> > effect size
+> > estimates from individual studies are usually noisy or not very
+> > precise. But,
+> > why do meta-analysts prefer to report individual effect size
+> > estimates rather
+> > than the study-specific effects (which benefit from the shrinkage
+> > or borrowing
+> > of strength). Or, put differently, the developers of software that
+> > can make
+> > forest plots do not seem to provide the option of showing study-
+> > specific effects
+> > (I did not check carefully; some software or packages might provide
+> > this
+> > functionality). Is there any specific reason? Or, it is just a
+> > convention.
+> >
+> > Best,
+> > Yefeng
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Thu Jun  6 10:14:49 2024
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Thu, 6 Jun 2024 08:14:49 +0000
+Subject: [R-meta] 
+ [+externe Mail+] Re: forest plot and study-specific effect
+In-Reply-To: <624d153420ebcc44b7a44f0498f7d9f23bfa6163.camel@med.uni-goettingen.de>
+References: <MEAPR01MB54153827D76318844FE596BB9DF92@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <AS8PR08MB919344F2EEFDDD6AF02216AC8BF92@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <e5270e9637384d609acd49837aefa988@uniklinik-freiburg.de>
+ <624d153420ebcc44b7a44f0498f7d9f23bfa6163.camel@med.uni-goettingen.de>
+Message-ID: <MEAPR01MB541563AE457FC3B995F724E49DFA2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+
+Dear Christian,
+
+I had a read of your introductive paper about bayesmeta.
+
+A quick question to ask. Under the subsection 2.8. Shrinkage estimates of study-specific means, the formula for computing study-specific effects is presented. I am wondering whether it makes sense to plug-in tau^2_i (tau^2 for each study) rather than the mean/median/mode to the formula, given that each study might not have the same heterogeneity.
+
+
+All the best,
+Yefeng
+________________________________
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of R?ver, Christian via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Sent: 06 June 2024 16:25
+To: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Cc: R?ver, Christian <christian.roever at med.uni-goettingen.de>
+Subject: Re: [R-meta] [+externe Mail+] Re: forest plot and study-specific effect
+
+Dear Yefeng,
+
+the forest plots in the "bayesmeta" package by default show the
+shrinkage estimates / BLUPs along with the plain data; see e.g. here:
+  https://cran.r-project.org/package=bayesmeta
+  https://doi.org/10.18637/jss.v093.i06  (Fig.2)
+(bayesmeta's forest plots are based on the "forestplot" package).
+
+I often find this helpful to illustrate the amount of borrowing-of-
+information / mutual support between studies, depending on the amount
+of heterogeneity. It may in particular also be an interesting option in
+cases where the "plain data estimates" may not be readily available,
+e.g., when you are looking at a binomial likelihood and some studies
+have zero event counts.
+
+Cheers,
+
+Christian
+
+
+On Wed, 2024-06-05 at 16:54 +0000, Dr. Gerta R?cker via R-sig-meta-
+analysis wrote:
+> Dear Yefeng,
+>
+> You may like to have a look at the supplement " traceplot-R-code.R"
+> to the paper
+> https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1693 (R?ver,
+> Rindskopf, Friede) that shows how to obtain a joint forest plot with
+> study-specific estimates and BLUPs with R package bayesmeta.
+>
+> Best,
+> Gerta
+>
+>
+>
+> UNIVERSIT?TSKLINIKUM FREIBURG
+> Institute for Medical Biometry and Statistics
+>
+> Dr. Gerta R?cker
+> Guest Scientist
+>
+> Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+> gerta.ruecker at uniklinik-freiburg.de
+>
+> https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+>
+> -----Urspr?ngliche Nachricht-----
+> Von: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> Im Auftrag von Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis
+> Gesendet: Mittwoch, 5. Juni 2024 14:19
+> An: R Special Interest Group for Meta-Analysis <
+> r-sig-meta-analysis at r-project.org>
+> Cc: Viechtbauer, Wolfgang (NP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Betreff: Re: [R-meta] forest plot and study-specific effect
+>
+> Dear Yefeng,
+>
+> Plotting the BLUPs has been done before. See Figure 3 in:
+>
+> van Houwelingen, H. C., Arends, L. R., & Stijnen, T. (2002). Advanced
+> methods in meta-analysis: Multivariate approach and meta-regression.
+> Statistics in Medicine, 21(4), 589-624.
+>
+> Actually, the forest plot shows the individual estimates, plus the
+> BLUPs.
+>
+> You can find a recreation of this here:
+>
+> https://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+>
+> I think there are various reasons why the default is not to show the
+> BLUPs. For example, the estimates are simply what was found in each
+> of the invididual studies, while the BLUPs depend on what other
+> studies are included in the analysis and the values also depend on
+> the specifics of the modeling approach used. But showing both (as
+> above) is definitely interesting.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <
+> > r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> > Of Yefeng Yang via R-sig-meta-analysis
+> > Sent: Wednesday, June 5, 2024 08:14
+> > To: r-sig-meta-analysis at r-project.org
+> > Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> > Subject: [R-meta] forest plot and study-specific effect
+> >
+> > Dear community,
+> >
+> > I have a small question about the forest plot used in the meta-
+> > analysis.
+> >
+> > The forest plots and their varieties are often used in meta-
+> > analysis papers to
+> > show the overall/grand mean, individual effect size estimates, and
+> > other
+> > relevant info depending on the software making them. We know the
+> > effect size
+> > estimates from individual studies are usually noisy or not very
+> > precise. But,
+> > why do meta-analysts prefer to report individual effect size
+> > estimates rather
+> > than the study-specific effects (which benefit from the shrinkage
+> > or borrowing
+> > of strength). Or, put differently, the developers of software that
+> > can make
+> > forest plots do not seem to provide the option of showing study-
+> > specific effects
+> > (I did not check carefully; some software or packages might provide
+> > this
+> > functionality). Is there any specific reason? Or, it is just a
+> > convention.
+> >
+> > Best,
+> > Yefeng
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From r@h@||5 @end|ng |rom |@nc@@ter@@c@uk  Tue Jun 11 17:56:50 2024
+From: r@h@||5 @end|ng |rom |@nc@@ter@@c@uk (Hall, Rebecca)
+Date: Tue, 11 Jun 2024 15:56:50 +0000
+Subject: [R-meta] Effect Sizes and Beta Coefficients
+Message-ID: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+
+Dear all,
+
+I have a question regarding the use of a beta coefficient as a substitute for effect size where a paper lacks statistical data for Pearson's r to otherwise be calculated.
+
+Peterson & Brown (2005) support the use of standardised beta coefficients and relative SE in the place of correlations, but Roth et al. (2018) criticise this. I'm therefore wondering whether there is a general consensus regarding the use of beta coefficients, and should Peterson & Brown's approach no longer be appropriate then I would be gladly advised on the alternative method that should be utilised.
+
+Many thanks,
+Rebecca
+
+
+Dr Rebecca Hall | Research Associate
+Department of Psychology | Lancaster University
+[cid:8e93845c-4859-40e6-a9ef-401fa7129900]   [cid:7e44341b-7489-4093-9d94-19b0af1f5f03]
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240611/3087219b/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Outlook-ciyeerlm.png
+Type: image/png
+Size: 14445 bytes
+Desc: Outlook-ciyeerlm.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240611/3087219b/attachment-0002.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Outlook-ffgzkeol.png
+Type: image/png
+Size: 11783 bytes
+Desc: Outlook-ffgzkeol.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240611/3087219b/attachment-0003.png>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Jun 11 18:21:39 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 11 Jun 2024 16:21:39 +0000
+Subject: [R-meta] Effect Sizes and Beta Coefficients
+In-Reply-To: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+References: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+Message-ID: <AS8PR08MB919328CD162F9AB729B2C4F78BC72@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Rebecca,
+
+This is my personal opinion: I would consider this approach outdated.
+
+Typically, in a situation like this, one also knows the t-statistic for the coefficient of interest (or its p-value from which one can back-calculate the t-statistic). In that case, one can compute the (semi)partial correlation coefficient for the coefficient.
+
+However, whether one should combine such 'partial' effect sizes with bivariate correlations is debatable in the first place. A relevant article that essentially argues against this is:
+
+Aloe, A. M. (2015). Inaccuracy of regression results in replacing bivariate correlations. Research Synthesis Methods, 6(1), 21-27. https://doi.org/10.1002/jrsm.1126
+
+At least, one could try to capture some of the heterogeneity introduced by this by including a moderator in the model that indicates the type of correlation coefficient. With enough studies, one could even go a step further and include moderators that indicate which covariates were included in the original regression models from which the (semi)partial correlations were obtained (as a bunch of dummy variables).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Hall, Rebecca via R-sig-meta-analysis
+> Sent: Tuesday, June 11, 2024 17:57
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Subject: [R-meta] Effect Sizes and Beta Coefficients
+>
+> Dear all,
+>
+> I have a question regarding the use of a beta coefficient as a substitute for
+> effect size where a paper lacks statistical data for Pearson's r to otherwise be
+> calculated.
+>
+> Peterson & Brown (2005) support the use of standardised beta coefficients and
+> relative SE in the place of correlations, but Roth et al. (2018) criticise this.
+> I'm therefore wondering whether there is a general consensus regarding the use
+> of beta coefficients, and should Peterson & Brown's approach no longer be
+> appropriate then I would be gladly advised on the alternative method that should
+> be utilised.
+>
+> Many thanks,
+> Rebecca
+>
+> Dr Rebecca Hall | Research Associate
+> Department of Psychology | Lancaster University
+
+
+From r@h@||5 @end|ng |rom |@nc@@ter@@c@uk  Wed Jun 12 17:55:51 2024
+From: r@h@||5 @end|ng |rom |@nc@@ter@@c@uk (Hall, Rebecca)
+Date: Wed, 12 Jun 2024 15:55:51 +0000
+Subject: [R-meta] [External] RE:  Effect Sizes and Beta Coefficients
+In-Reply-To: <AS8PR08MB919328CD162F9AB729B2C4F78BC72@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB919328CD162F9AB729B2C4F78BC72@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <LO0P265MB7364B75C488F5DA4ACE615B3F7C02@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+
+Dear Wolfgang,
+
+Many thanks for your response. Am I correct in thinking that I can convert a p-value in R using qt(1- p-value, n-1)?
+
+Further to this, please could you advise how I might then calculate the partial correlation from a one-sample t-test?
+
+Best,
+Rebecca
+
+Dr Rebecca Hall | Research Associate
+Department of Psychology | Lancaster University
+[cid:e278ead7-3a22-4727-8d85-17c7a87a554a]   [cid:349cef11-e009-4261-9b73-e71cd423e99d]
+________________________________
+From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: 11 June 2024 17:21
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+Subject: [External] RE: [R-meta] Effect Sizes and Beta Coefficients
+
+This email originated outside the University. Check before clicking links or attachments.
+
+Dear Rebecca,
+
+This is my personal opinion: I would consider this approach outdated.
+
+Typically, in a situation like this, one also knows the t-statistic for the coefficient of interest (or its p-value from which one can back-calculate the t-statistic). In that case, one can compute the (semi)partial correlation coefficient for the coefficient.
+
+However, whether one should combine such 'partial' effect sizes with bivariate correlations is debatable in the first place. A relevant article that essentially argues against this is:
+
+Aloe, A. M. (2015). Inaccuracy of regression results in replacing bivariate correlations. Research Synthesis Methods, 6(1), 21-27. https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdoi.org%2F10.1002%2Fjrsm.1126&data=05%7C02%7Challr4%40live.lancs.ac.uk%7C13428b25f15c401569f808dc8a32a626%7C9c9bcd11977a4e9ca9a0bc734090164a%7C0%7C0%7C638537197297828712%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=wEj7B9IYjGpNKGcC%2Ffvo2etZSAzfaqjHAnZa%2FMr%2Fy9Y%3D&reserved=0<https://doi.org/10.1002/jrsm.1126>
+
+At least, one could try to capture some of the heterogeneity introduced by this by including a moderator in the model that indicates the type of correlation coefficient. With enough studies, one could even go a step further and include moderators that indicate which covariates were included in the original regression models from which the (semi)partial correlations were obtained (as a bunch of dummy variables).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Hall, Rebecca via R-sig-meta-analysis
+> Sent: Tuesday, June 11, 2024 17:57
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Subject: [R-meta] Effect Sizes and Beta Coefficients
+>
+> Dear all,
+>
+> I have a question regarding the use of a beta coefficient as a substitute for
+> effect size where a paper lacks statistical data for Pearson's r to otherwise be
+> calculated.
+>
+> Peterson & Brown (2005) support the use of standardised beta coefficients and
+> relative SE in the place of correlations, but Roth et al. (2018) criticise this.
+> I'm therefore wondering whether there is a general consensus regarding the use
+> of beta coefficients, and should Peterson & Brown's approach no longer be
+> appropriate then I would be gladly advised on the alternative method that should
+> be utilised.
+>
+> Many thanks,
+> Rebecca
+>
+> Dr Rebecca Hall | Research Associate
+> Department of Psychology | Lancaster University
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240612/5b5f7372/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Outlook-5q1ougpn.png
+Type: image/png
+Size: 14445 bytes
+Desc: Outlook-5q1ougpn.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240612/5b5f7372/attachment-0002.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Outlook-ol5tsbc2.png
+Type: image/png
+Size: 11783 bytes
+Desc: Outlook-ol5tsbc2.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240612/5b5f7372/attachment-0003.png>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Jun 13 14:43:06 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 13 Jun 2024 12:43:06 +0000
+Subject: [R-meta] [External] RE:  Effect Sizes and Beta Coefficients
+In-Reply-To: <LO0P265MB7364B75C488F5DA4ACE615B3F7C02@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+References: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB919328CD162F9AB729B2C4F78BC72@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB7364B75C488F5DA4ACE615B3F7C02@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+Message-ID: <AS8PR08MB9193EEB5AC2A7A602FD0000C8BC12@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Rebecca,
+
+Please see below for my answer.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Sent: Wednesday, June 12, 2024 17:56
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>; R
+> Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> Subject: Re: [External] RE: [R-meta] Effect Sizes and Beta Coefficients
+>
+> Dear Wolfgang,
+>
+> Many thanks for your response. Am I correct in thinking that I can convert a p-
+> value in R using qt(1- p-value, n-1)?
+
+I assume you are asking about a p-value from a regression model. First of all, this is typically a two-sided p-value, so the given p-value must first be divided by 2. Also, the degrees of freedom are n-p-1 for a regression model with p regression coefficients. So it would be:
+
+qt(1-pval/2, df=n-p-1)
+
+Note that the (two-sided) p-value does not tell you anything about the sign of the regression coefficient (which in turn corresponds to the sign of the test statistic and hence the sign of the (semi)partial correlation), so additional information reported needs to be used to determine the correct sign.
+
+> Further to this, please could you advise how I might then calculate the partial
+> correlation from a one-sample t-test?
+
+You can't. A one-sample t-test is used to test if the mean of a single variable differs significantly from some value. It is not possible to compute the partial correlation for a single variable.
+
+> Best,
+> Rebecca
+>
+> Dr Rebecca Hall | Research Associate
+> Department of Psychology | Lancaster University
+>
+> ________________________________________
+> From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Sent: 11 June 2024 17:21
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Subject: [External] RE: [R-meta] Effect Sizes and Beta Coefficients
+>
+> This email originated outside the University. Check before clicking links or
+> attachments.
+>
+> Dear Rebecca,
+>
+> This is my personal opinion: I would consider this approach outdated.
+>
+> Typically, in a situation like this, one also knows the t-statistic for the
+> coefficient of interest (or its p-value from which one can back-calculate the t-
+> statistic). In that case, one can compute the (semi)partial correlation
+> coefficient for the coefficient.
+>
+> However, whether one should combine such 'partial' effect sizes with bivariate
+> correlations is debatable in the first place. A relevant article that
+> essentially argues against this is:
+>
+> Aloe, A. M. (2015). Inaccuracy of regression results in replacing bivariate
+> correlations. Research Synthesis Methods, 6(1), 21-27.
+> https://doi.org/10.1002/jrsm.1126
+>
+> At least, one could try to capture some of the heterogeneity introduced by this
+> by including a moderator in the model that indicates the type of correlation
+> coefficient. With enough studies, one could even go a step further and include
+> moderators that indicate which covariates were included in the original
+> regression models from which the (semi)partial correlations were obtained (as a
+> bunch of dummy variables).
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On
+> Behalf
+> > Of Hall, Rebecca via R-sig-meta-analysis
+> > Sent: Tuesday, June 11, 2024 17:57
+> > To: r-sig-meta-analysis at r-project.org
+> > Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> > Subject: [R-meta] Effect Sizes and Beta Coefficients
+> >
+> > Dear all,
+> >
+> > I have a question regarding the use of a beta coefficient as a substitute for
+> > effect size where a paper lacks statistical data for Pearson's r to otherwise
+> be
+> > calculated.
+> >
+> > Peterson & Brown (2005) support the use of standardised beta coefficients and
+> > relative SE in the place of correlations, but Roth et al. (2018) criticise
+> this.
+> > I'm therefore wondering whether there is a general consensus regarding the use
+> > of beta coefficients, and should Peterson & Brown's approach no longer be
+> > appropriate then I would be gladly advised on the alternative method that
+> should
+> > be utilised.
+> >
+> > Many thanks,
+> > Rebecca
+> >
+> > Dr Rebecca Hall | Research Associate
+> > Department of Psychology | Lancaster University
+
+
+From r@h@||5 @end|ng |rom |@nc@@ter@@c@uk  Mon Jun 17 16:27:11 2024
+From: r@h@||5 @end|ng |rom |@nc@@ter@@c@uk (Hall, Rebecca)
+Date: Mon, 17 Jun 2024 14:27:11 +0000
+Subject: [R-meta] [External] RE:  Effect Sizes and Beta Coefficients
+In-Reply-To: <AS8PR08MB9193EEB5AC2A7A602FD0000C8BC12@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB919328CD162F9AB729B2C4F78BC72@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB7364B75C488F5DA4ACE615B3F7C02@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB9193EEB5AC2A7A602FD0000C8BC12@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <LO0P265MB736415E009D92507B33815D9F7CD2@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+
+Dear Wolfgang,
+
+Many thanks for your assistance so far. We are still looking at papers using various statistical analyses, and have come across one which utilises a one-way MANCOVA. Please could you advise on the validity of calculating an effect size from this type of analysis, as the reported F and p values are altered by controlling for covariates, whereas this has not been the case in other studies.
+
+Similarly, we have a paper reporting odds ratios which, if we are correct, we can directly convert to an effect size (pearson's r). However, the odds ratios in question are presented as two models, one with more covariates than the other. Is there a particular model you would suggest including (see below)?
+
+[cid:b83e5b01-73a0-4682-87bf-9d6482f24a44]
+
+Best,
+Rebecca
+
+Dr Rebecca Hall | Research Associate
+Department of Psychology | Lancaster University
+[cid:e30394e5-20ff-40d4-8c5e-a52658e54d4c]   [cid:24b9e1f2-c402-4ef3-8abd-35627f2c4cbf]
+________________________________
+From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: 13 June 2024 13:43
+To: Hall, Rebecca <r.hall5 at lancaster.ac.uk>; R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Subject: RE: [External] RE: [R-meta] Effect Sizes and Beta Coefficients
+
+Dear Rebecca,
+
+Please see below for my answer.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Sent: Wednesday, June 12, 2024 17:56
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>; R
+> Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> Subject: Re: [External] RE: [R-meta] Effect Sizes and Beta Coefficients
+>
+> Dear Wolfgang,
+>
+> Many thanks for your response. Am I correct in thinking that I can convert a p-
+> value in R using qt(1- p-value, n-1)?
+
+I assume you are asking about a p-value from a regression model. First of all, this is typically a two-sided p-value, so the given p-value must first be divided by 2. Also, the degrees of freedom are n-p-1 for a regression model with p regression coefficients. So it would be:
+
+qt(1-pval/2, df=n-p-1)
+
+Note that the (two-sided) p-value does not tell you anything about the sign of the regression coefficient (which in turn corresponds to the sign of the test statistic and hence the sign of the (semi)partial correlation), so additional information reported needs to be used to determine the correct sign.
+
+> Further to this, please could you advise how I might then calculate the partial
+> correlation from a one-sample t-test?
+
+You can't. A one-sample t-test is used to test if the mean of a single variable differs significantly from some value. It is not possible to compute the partial correlation for a single variable.
+
+> Best,
+> Rebecca
+>
+> Dr Rebecca Hall | Research Associate
+> Department of Psychology | Lancaster University
+>
+> ________________________________________
+> From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Sent: 11 June 2024 17:21
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Subject: [External] RE: [R-meta] Effect Sizes and Beta Coefficients
+>
+> This email originated outside the University. Check before clicking links or
+> attachments.
+>
+> Dear Rebecca,
+>
+> This is my personal opinion: I would consider this approach outdated.
+>
+> Typically, in a situation like this, one also knows the t-statistic for the
+> coefficient of interest (or its p-value from which one can back-calculate the t-
+> statistic). In that case, one can compute the (semi)partial correlation
+> coefficient for the coefficient.
+>
+> However, whether one should combine such 'partial' effect sizes with bivariate
+> correlations is debatable in the first place. A relevant article that
+> essentially argues against this is:
+>
+> Aloe, A. M. (2015). Inaccuracy of regression results in replacing bivariate
+> correlations. Research Synthesis Methods, 6(1), 21-27.
+> https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdoi.org%2F10.1002%2Fjrsm.1126&data=05%7C02%7Challr4%40live.lancs.ac.uk%7C2ce13474f1ec470a8a9c08dc8ba66749%7C9c9bcd11977a4e9ca9a0bc734090164a%7C0%7C0%7C638538794019673955%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=OUXIjY07mR54gO5eHMgodzvyAuc3uB4CnWfESXhYNJA%3D&reserved=0<https://doi.org/10.1002/jrsm.1126>
+>
+> At least, one could try to capture some of the heterogeneity introduced by this
+> by including a moderator in the model that indicates the type of correlation
+> coefficient. With enough studies, one could even go a step further and include
+> moderators that indicate which covariates were included in the original
+> regression models from which the (semi)partial correlations were obtained (as a
+> bunch of dummy variables).
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On
+> Behalf
+> > Of Hall, Rebecca via R-sig-meta-analysis
+> > Sent: Tuesday, June 11, 2024 17:57
+> > To: r-sig-meta-analysis at r-project.org
+> > Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> > Subject: [R-meta] Effect Sizes and Beta Coefficients
+> >
+> > Dear all,
+> >
+> > I have a question regarding the use of a beta coefficient as a substitute for
+> > effect size where a paper lacks statistical data for Pearson's r to otherwise
+> be
+> > calculated.
+> >
+> > Peterson & Brown (2005) support the use of standardised beta coefficients and
+> > relative SE in the place of correlations, but Roth et al. (2018) criticise
+> this.
+> > I'm therefore wondering whether there is a general consensus regarding the use
+> > of beta coefficients, and should Peterson & Brown's approach no longer be
+> > appropriate then I would be gladly advised on the alternative method that
+> should
+> > be utilised.
+> >
+> > Many thanks,
+> > Rebecca
+> >
+> > Dr Rebecca Hall | Research Associate
+> > Department of Psychology | Lancaster University
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240617/d1da18d2/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image.png
+Type: image/png
+Size: 231540 bytes
+Desc: image.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240617/d1da18d2/attachment-0003.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Outlook-vohmdobc.png
+Type: image/png
+Size: 14445 bytes
+Desc: Outlook-vohmdobc.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240617/d1da18d2/attachment-0004.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Outlook-zheuyefz.png
+Type: image/png
+Size: 11783 bytes
+Desc: Outlook-zheuyefz.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240617/d1da18d2/attachment-0005.png>
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Mon Jun 17 17:12:46 2024
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Mon, 17 Jun 2024 16:12:46 +0100
+Subject: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+In-Reply-To: <LO0P265MB736415E009D92507B33815D9F7CD2@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+References: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB919328CD162F9AB729B2C4F78BC72@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB7364B75C488F5DA4ACE615B3F7C02@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB9193EEB5AC2A7A602FD0000C8BC12@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB736415E009D92507B33815D9F7CD2@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+Message-ID: <dbce933f-6d5a-aba8-cf38-9c3a5e8052c6@dewey.myzen.co.uk>
+
+Dear Rebecca
+
+In general estimates adjusted for different sets of covariates are not 
+directly comparable. If the sets are almost the same then you may be 
+able to argue for including them. It might also depend on strategic 
+questions like how many studies you already have and whether adding one 
+more is worth the hassle of explaining why you included it.
+
+In short as so often the answer is, how brave do you feel?
+
+Michael
+
+On 17/06/2024 15:27, Hall, Rebecca via R-sig-meta-analysis wrote:
+> Dear Wolfgang,
+> 
+> Many thanks for your assistance so far. We are still looking at papers 
+> using various statistical analyses, and have come across one which 
+> utilises a one-way MANCOVA. Please could you advise on the validity of 
+> calculating an effect size from this type of analysis, as the reported F 
+> and p values are altered by controlling for covariates, whereas this has 
+> not been the case in other studies.
+> 
+> Similarly, we have a paper reporting odds ratios which, if we are 
+> correct, we can directly convert to an effect size (pearson's r). 
+> However, the odds ratios in question are presented as two models, one 
+> with more covariates than the other. Is there a particular model you 
+> would suggest including (see below)?
+> 
+> 
+> Best,
+> Rebecca
+> 
+> *Dr Rebecca Hall | Research Associate
+> *
+> Department of Psychology | Lancaster University
+> 
+> ------------------------------------------------------------------------
+> *From:* Viechtbauer, Wolfgang (NP) 
+> <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> *Sent:* 13 June 2024 13:43
+> *To:* Hall, Rebecca <r.hall5 at lancaster.ac.uk>; R Special Interest Group 
+> for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+> *Subject:* RE: [External] RE: [R-meta] Effect Sizes and Beta Coefficients
+> Dear Rebecca,
+> 
+> Please see below for my answer.
+> 
+> Best,
+> Wolfgang
+> 
+>> -----Original Message-----
+>> From: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+>> Sent: Wednesday, June 12, 2024 17:56
+>> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>; R
+>> Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+>> Subject: Re: [External] RE: [R-meta] Effect Sizes and Beta Coefficients
+>>
+>> Dear Wolfgang,
+>>
+>> Many thanks for your response. Am I correct in thinking that I can convert a p-
+>> value in R using qt(1- p-value, n-1)?
+> 
+> I assume you are asking about a p-value from a regression model. First 
+> of all, this is typically a two-sided p-value, so the given p-value must 
+> first be divided by 2. Also, the degrees of freedom are n-p-1 for a 
+> regression model with p regression coefficients. So it would be:
+> 
+> qt(1-pval/2, df=n-p-1)
+> 
+> Note that the (two-sided) p-value does not tell you anything about the 
+> sign of the regression coefficient (which in turn corresponds to the 
+> sign of the test statistic and hence the sign of the (semi)partial 
+> correlation), so additional information reported needs to be used to 
+> determine the correct sign.
+> 
+>> Further to this, please could you advise how I might then calculate the partial
+>> correlation from a one-sample t-test?
+> 
+> You can't. A one-sample t-test is used to test if the mean of a single 
+> variable differs significantly from some value. It is not possible to 
+> compute the partial correlation for a single variable.
+> 
+>> Best,
+>> Rebecca
+>>
+>> Dr Rebecca Hall | Research Associate
+>> Department of Psychology | Lancaster University
+>>
+>> ________________________________________
+>> From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+>> Sent: 11 June 2024 17:21
+>> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+>> project.org>
+>> Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+>> Subject: [External] RE: [R-meta] Effect Sizes and Beta Coefficients
+>>
+>> This email originated outside the University. Check before clicking links or
+>> attachments.
+>>
+>> Dear Rebecca,
+>>
+>> This is my personal opinion: I would consider this approach outdated.
+>>
+>> Typically, in a situation like this, one also knows the t-statistic for the
+>> coefficient of interest (or its p-value from which one can back-calculate the t-
+>> statistic). In that case, one can compute the (semi)partial correlation
+>> coefficient for the coefficient.
+>>
+>> However, whether one should combine such 'partial' effect sizes with bivariate
+>> correlations is debatable in the first place. A relevant article that
+>> essentially argues against this is:
+>>
+>> Aloe, A. M. (2015). Inaccuracy of regression results in replacing bivariate
+>> correlations. Research Synthesis Methods, 6(1), 21-27.
+>> https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fdoi.org%2F10.1002%2Fjrsm.1126&data=05%7C02%7Challr4%40live.lancs.ac.uk%7C2ce13474f1ec470a8a9c08dc8ba66749%7C9c9bcd11977a4e9ca9a0bc734090164a%7C0%7C0%7C638538794019673955%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=OUXIjY07mR54gO5eHMgodzvyAuc3uB4CnWfESXhYNJA%3D&reserved=0 <https://doi.org/10.1002/jrsm.1126>
+>>
+>> At least, one could try to capture some of the heterogeneity introduced by this
+>> by including a moderator in the model that indicates the type of correlation
+>> coefficient. With enough studies, one could even go a step further and include
+>> moderators that indicate which covariates were included in the original
+>> regression models from which the (semi)partial correlations were obtained (as a
+>> bunch of dummy variables).
+>>
+>> Best,
+>> Wolfgang
+>>
+>> > -----Original Message-----
+>> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On
+>> Behalf
+>> > Of Hall, Rebecca via R-sig-meta-analysis
+>> > Sent: Tuesday, June 11, 2024 17:57
+>> > To: r-sig-meta-analysis at r-project.org
+>> > Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+>> > Subject: [R-meta] Effect Sizes and Beta Coefficients
+>> >
+>> > Dear all,
+>> >
+>> > I have a question regarding the use of a beta coefficient as a substitute for
+>> > effect size where a paper lacks statistical data for Pearson's r to otherwise
+>> be
+>> > calculated.
+>> >
+>> > Peterson & Brown (2005) support the use of standardised beta coefficients and
+>> > relative SE in the place of correlations, but Roth et al. (2018) criticise
+>> this.
+>> > I'm therefore wondering whether there is a general consensus regarding the use
+>> > of beta coefficients, and should Peterson & Brown's approach no longer be
+>> > appropriate then I would be gladly advised on the alternative method that
+>> should
+>> > be utilised.
+>> >
+>> > Many thanks,
+>> > Rebecca
+>> >
+>> > Dr Rebecca Hall | Research Associate
+>> > Department of Psychology | Lancaster University
+> 
+> <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>	Virus-free.www.avg.com <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>
+> 
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+Michael
+
+
+From chr|@t|@n@roever @end|ng |rom med@un|-goett|ngen@de  Tue Jun 18 09:01:49 2024
+From: chr|@t|@n@roever @end|ng |rom med@un|-goett|ngen@de (=?utf-8?B?UsO2dmVyLCBDaHJpc3RpYW4=?=)
+Date: Tue, 18 Jun 2024 07:01:49 +0000
+Subject: [R-meta] 
+ [+externe Mail+] Re: forest plot and study-specific effect
+In-Reply-To: <MEAPR01MB541563AE457FC3B995F724E49DFA2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+References: <MEAPR01MB54153827D76318844FE596BB9DF92@MEAPR01MB5415.ausprd01.prod.outlook.com>
+ <AS8PR08MB919344F2EEFDDD6AF02216AC8BF92@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <e5270e9637384d609acd49837aefa988@uniklinik-freiburg.de>
+ <624d153420ebcc44b7a44f0498f7d9f23bfa6163.camel@med.uni-goettingen.de>
+ <MEAPR01MB541563AE457FC3B995F724E49DFA2@MEAPR01MB5415.ausprd01.prod.outlook.com>
+Message-ID: <8a9906ab8314a8786b3d3aa9a868c518e72c70a5.camel@med.uni-goettingen.de>
+
+Hi Yefeng,
+
+note that the formulas in Sec. 2.8 relate to the *conditional*
+distribution of the theta_j parameters (conditional on tau), which is a
+normal distribution, characterized by mean and variance. In order to
+arrive at the eventual marginal posterior, one still needs to integrate
+over the heterogeneity (tau) posterior, yielding a non-normal posterior
+distribution. In particular, there is no mean/median/mode plugged in.
+If you did that, it may in some cases still be a reasonable
+approximation; this is commonly done in an "empirical Bayes" type
+analysis. (The "bayesmeta()" function will return the "proper" marginal
+posterior for you.)
+
+But your actual point relates to the original model specification (the
+normal-normal hierarchical model) from Sec. 2.1 -- of course, one can
+think of alternatives here, with more than a single heterogeneity
+parameter. The simplest extension may e.g. be a model where you have
+two groups of studies estimating the same parameter. Suppose that one
+group reports unadjusted estimates, while the other group has adjusted
+for some covariable. Then you might expect different amounts of
+heterogeneity for the two groups. This could be implemented as special
+case of a "location-scale model" as described by Viechtbauer and
+Lopesz-Lopez (2022) here: https://doi.org/10.1002/jrsm.1562
+
+This kind of model of course is only really helpful as long as you have
+several studies in each group; with few studies per subgroup (or even
+single studies in a group, or a separate heterogeneity parameter for
+certain individual studies) it gets hard to estimate the heterogeneity,
+as you are effectively trying to estimate a variance based on a single
+(or few) observation(s).
+
+If you still think the assumption of a single common normal variance
+parameter is too restrictive, you may also consider using as model as
+implemented in the "metaplus" package (
+https://doi.org/10.32614/CRAN.package.metaplus), where the random
+effect follows a non-normal distribution. For example, if you think
+there are two groups of studies, one more and one less heterogeneous
+(but you don't know which study belongs to which group), then using a
+two-component normal mixture may do the trick. Or if you think the
+(normal) heterogeneity variance may not be identical for all studies,
+but may itself be somewhat heterogeneous, this may marginally lead to a
+Student-t distributed random effect, where the degrees-of-freedom
+parameter regulates the variability of the heterogeneity parameters. I
+would however expect that you need quite a lot of data (i.e., studies)
+to estimate these more complex models with reasonable precision.
+However, if you think these models describe reality more accurately
+this may be the way to go; and a Bayesian approach with informative
+priors might help in case of fewer studies.
+
+Cheers,
+
+Christian
+
+
+
+On Thu, 2024-06-06 at 08:14 +0000, Yefeng Yang wrote:
+> Dear Christian,
+> 
+> I had a read of your introductive paper about bayesmeta.
+> 
+> A quick question to ask. Under the subsection 2.8. Shrinkage
+> estimates of study-specific means, the formula for computing study-
+> specific effects is presented. I am wondering whether it makes sense
+> to plug-in tau^2_i (tau^2 for each study) rather than the
+> mean/median/mode to the formula, given that each study might not have
+> the same heterogeneity.
+> 
+> 
+> All the best,
+> Yefeng
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> on behalf of R?ver, Christian via R-sig-meta-analysis <
+> r-sig-meta-analysis at r-project.org>
+> Sent: 06 June 2024 16:25
+> To: r-sig-meta-analysis at r-project.org <
+> r-sig-meta-analysis at r-project.org>
+> Cc: R?ver, Christian <christian.roever at med.uni-goettingen.de>
+> Subject: Re: [R-meta] [+externe Mail+] Re: forest plot and study-
+> specific effect
+>  
+> Dear Yefeng,
+> 
+> the forest plots in the "bayesmeta" package by default show the
+> shrinkage estimates / BLUPs along with the plain data; see e.g. here:
+>   https://cran.r-project.org/package=bayesmeta
+>   https://doi.org/10.18637/jss.v093.i06  (Fig.2)
+> (bayesmeta's forest plots are based on the "forestplot" package).
+> 
+> I often find this helpful to illustrate the amount of borrowing-of-
+> information / mutual support between studies, depending on the amount
+> of heterogeneity. It may in particular also be an interesting option
+> in
+> cases where the "plain data estimates" may not be readily available,
+> e.g., when you are looking at a binomial likelihood and some studies
+> have zero event counts.
+> 
+> Cheers,
+> 
+> Christian
+> 
+> 
+> On Wed, 2024-06-05 at 16:54 +0000, Dr. Gerta R?cker via R-sig-meta-
+> analysis wrote:
+> > Dear Yefeng,
+> > 
+> > You may like to have a look at the supplement " traceplot-R-code.R"
+> > to the paper 
+> > https://onlinelibrary.wiley.com/doi/full/10.1002/jrsm.1693 (R?ver,
+> > Rindskopf, Friede) that shows how to obtain a joint forest plot
+> with
+> > study-specific estimates and BLUPs with R package bayesmeta.
+> > 
+> > Best,
+> > Gerta
+> > 
+> > 
+> > 
+> > UNIVERSIT?TSKLINIKUM FREIBURG
+> > Institute for Medical Biometry and Statistics
+> > 
+> > Dr. Gerta R?cker
+> > Guest Scientist
+> > 
+> > Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+> > gerta.ruecker at uniklinik-freiburg.de
+> > 
+> > 
+> https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+> > 
+> > -----Urspr?ngliche Nachricht-----
+> > Von: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org
+> >
+> > Im Auftrag von Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis
+> > Gesendet: Mittwoch, 5. Juni 2024 14:19
+> > An: R Special Interest Group for Meta-Analysis <
+> > r-sig-meta-analysis at r-project.org>
+> > Cc: Viechtbauer, Wolfgang (NP) <
+> > wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Betreff: Re: [R-meta] forest plot and study-specific effect
+> > 
+> > Dear Yefeng,
+> > 
+> > Plotting the BLUPs has been done before. See Figure 3 in:
+> > 
+> > van Houwelingen, H. C., Arends, L. R., & Stijnen, T. (2002).
+> Advanced
+> > methods in meta-analysis: Multivariate approach and meta-
+> regression.
+> > Statistics in Medicine, 21(4), 589-624.
+> > 
+> > Actually, the forest plot shows the individual estimates, plus the
+> > BLUPs.
+> > 
+> > You can find a recreation of this here:
+> > 
+> > 
+> https://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002
+> > 
+> > I think there are various reasons why the default is not to show
+> the
+> > BLUPs. For example, the estimates are simply what was found in each
+> > of the invididual studies, while the BLUPs depend on what other
+> > studies are included in the analysis and the values also depend on
+> > the specifics of the modeling approach used. But showing both (as
+> > above) is definitely interesting.
+> > 
+> > Best,
+> > Wolfgang
+> > 
+> > > -----Original Message-----
+> > > From: R-sig-meta-analysis <
+> > > r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> > > Of Yefeng Yang via R-sig-meta-analysis
+> > > Sent: Wednesday, June 5, 2024 08:14
+> > > To: r-sig-meta-analysis at r-project.org
+> > > Cc: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> > > Subject: [R-meta] forest plot and study-specific effect
+> > > 
+> > > Dear community,
+> > > 
+> > > I have a small question about the forest plot used in the meta-
+> > > analysis.
+> > > 
+> > > The forest plots and their varieties are often used in meta-
+> > > analysis papers to
+> > > show the overall/grand mean, individual effect size estimates,
+> and
+> > > other
+> > > relevant info depending on the software making them. We know the
+> > > effect size
+> > > estimates from individual studies are usually noisy or not very
+> > > precise. But,
+> > > why do meta-analysts prefer to report individual effect size
+> > > estimates rather
+> > > than the study-specific effects (which benefit from the shrinkage
+> > > or borrowing
+> > > of strength). Or, put differently, the developers of software
+> that
+> > > can make
+> > > forest plots do not seem to provide the option of showing study-
+> > > specific effects
+> > > (I did not check carefully; some software or packages might
+> provide
+> > > this
+> > > functionality). Is there any specific reason? Or, it is just a
+> > > convention.
+> > > 
+> > > Best,
+> > > Yefeng
+> > 
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ 
+> R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> > 
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ 
+> R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Jun 18 09:46:20 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 18 Jun 2024 07:46:20 +0000
+Subject: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+In-Reply-To: <dbce933f-6d5a-aba8-cf38-9c3a5e8052c6@dewey.myzen.co.uk>
+References: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB919328CD162F9AB729B2C4F78BC72@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB7364B75C488F5DA4ACE615B3F7C02@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB9193EEB5AC2A7A602FD0000C8BC12@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB736415E009D92507B33815D9F7CD2@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <dbce933f-6d5a-aba8-cf38-9c3a5e8052c6@dewey.myzen.co.uk>
+Message-ID: <AS8PR08MB919307ADB6F3745E210698798BCE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Adding a bit to this:
+
+With respect to the MANCOVA: What kind of 'effect size' are you trying to compute for this? This thread revolved around ((semi)partial) correlation coefficients, so I assume this is what you are trying to compute here. I am not sure what information you have from the MANCOVA, but generally I would say that it will be next to impossible to compute a correlation coefficient from such an analysis. Test statistics from a MANCOVA will not tell you about directionality and are a complex amalgamation of the group differences for multiple variables (adjusted for covariates). Things already get tricky if we take away the 'multivariate' part and take away the 'covariate' part, in which case we are left with an independent samples t-test. Translating the results from such a test into a type of correlation coefficient that can meaningfully be combined with the results from studies that measured both variables of interest on a continuous scale (and then report of regular Pearson product-moment correlation coefficient) requires assuming that the dichotomous variable that defines the two groups for the t-test is a dichotomized version of a continuous variable in which case one can compute a biserial correlation coefficient. Trying to do something like this based on an MANCOVA seems dubious at best.
+
+As for your second question: As far as I can tell, the table you show does not appear to provide odds ratios, but the results from linear regression models (leaving aside that the table appears to be messed up, at least with respect to the last three columns). The values shown are beta coefficients (since outcome and predictors were z-scored -- which makes the B and beta columns redundant). If you want a partial correlation coefficient here, you can just compute B/SE to get the test statistic. Together with the number of predictors and the total sample size, one can then compute the partial correlation coefficient from this information. But I cannot tell you which of the models you should use for this (this is a substantive question).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Michael Dewey <lists at dewey.myzen.co.uk>
+> Sent: Monday, June 17, 2024 17:13
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>; Viechtbauer, Wolfgang (NP)
+> <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Subject: Re: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+>
+> Dear Rebecca
+>
+> In general estimates adjusted for different sets of covariates are not
+> directly comparable. If the sets are almost the same then you may be
+> able to argue for including them. It might also depend on strategic
+> questions like how many studies you already have and whether adding one
+> more is worth the hassle of explaining why you included it.
+>
+> In short as so often the answer is, how brave do you feel?
+>
+> Michael
+>
+> On 17/06/2024 15:27, Hall, Rebecca via R-sig-meta-analysis wrote:
+> > Dear Wolfgang,
+> >
+> > Many thanks for your assistance so far. We are still looking at papers
+> > using various statistical analyses, and have come across one which
+> > utilises a one-way MANCOVA. Please could you advise on the validity of
+> > calculating an effect size from this type of analysis, as the reported F
+> > and p values are altered by controlling for covariates, whereas this has
+> > not been the case in other studies.
+> >
+> > Similarly, we have a paper reporting odds ratios which, if we are
+> > correct, we can directly convert to an effect size (pearson's r).
+> > However, the odds ratios in question are presented as two models, one
+> > with more covariates than the other. Is there a particular model you
+> > would suggest including (see below)?
+> >
+> > Best,
+> > Rebecca
+> >
+> > *Dr Rebecca Hall | Research Associate*
+> > Department of Psychology | Lancaster University
+
+From r@h@||5 @end|ng |rom |@nc@@ter@@c@uk  Tue Jun 18 16:25:33 2024
+From: r@h@||5 @end|ng |rom |@nc@@ter@@c@uk (Hall, Rebecca)
+Date: Tue, 18 Jun 2024 14:25:33 +0000
+Subject: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+In-Reply-To: <AS8PR08MB919307ADB6F3745E210698798BCE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB919328CD162F9AB729B2C4F78BC72@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB7364B75C488F5DA4ACE615B3F7C02@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB9193EEB5AC2A7A602FD0000C8BC12@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB736415E009D92507B33815D9F7CD2@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <dbce933f-6d5a-aba8-cf38-9c3a5e8052c6@dewey.myzen.co.uk>
+ <AS8PR08MB919307ADB6F3745E210698798BCE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <LO0P265MB7364AABA7377605AAE6CC08BF7CE2@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+
+Many thanks to you both for your input.
+
+Wolfgang, please could you expand on how we compute B/SE to get the test statistic, and then how we add the number of predictors and the total sample size to compute the partial correlation coefficient? Is this through cholesky factorisation?
+
+Best,
+Rebecca
+
+
+Dr Rebecca Hall | Research Associate
+Department of Psychology | Lancaster University
+[cid:4d0073e3-02a1-4826-8717-2f615a418df3]   [cid:23f8bfe7-ad5a-4ab9-8ea1-ba635830123c]
+________________________________
+From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: 18 June 2024 08:46
+To: Michael Dewey <lists at dewey.myzen.co.uk>; R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+Subject: RE: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+
+Adding a bit to this:
+
+With respect to the MANCOVA: What kind of 'effect size' are you trying to compute for this? This thread revolved around ((semi)partial) correlation coefficients, so I assume this is what you are trying to compute here. I am not sure what information you have from the MANCOVA, but generally I would say that it will be next to impossible to compute a correlation coefficient from such an analysis. Test statistics from a MANCOVA will not tell you about directionality and are a complex amalgamation of the group differences for multiple variables (adjusted for covariates). Things already get tricky if we take away the 'multivariate' part and take away the 'covariate' part, in which case we are left with an independent samples t-test. Translating the results from such a test into a type of correlation coefficient that can meaningfully be combined with the results from studies that measured both variables of interest on a continuous scale (and then report of regular Pearson product-moment correlation coefficient) requires assuming that the dichotomous variable that defines the two groups for the t-test is a dichotomized version of a continuous variable in which case one can compute a biserial correlation coefficient. Trying to do something like this based on an MANCOVA seems dubious at best.
+
+As for your second question: As far as I can tell, the table you show does not appear to provide odds ratios, but the results from linear regression models (leaving aside that the table appears to be messed up, at least with respect to the last three columns). The values shown are beta coefficients (since outcome and predictors were z-scored -- which makes the B and beta columns redundant). If you want a partial correlation coefficient here, you can just compute B/SE to get the test statistic. Together with the number of predictors and the total sample size, one can then compute the partial correlation coefficient from this information. But I cannot tell you which of the models you should use for this (this is a substantive question).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Michael Dewey <lists at dewey.myzen.co.uk>
+> Sent: Monday, June 17, 2024 17:13
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>; Viechtbauer, Wolfgang (NP)
+> <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Subject: Re: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+>
+> Dear Rebecca
+>
+> In general estimates adjusted for different sets of covariates are not
+> directly comparable. If the sets are almost the same then you may be
+> able to argue for including them. It might also depend on strategic
+> questions like how many studies you already have and whether adding one
+> more is worth the hassle of explaining why you included it.
+>
+> In short as so often the answer is, how brave do you feel?
+>
+> Michael
+>
+> On 17/06/2024 15:27, Hall, Rebecca via R-sig-meta-analysis wrote:
+> > Dear Wolfgang,
+> >
+> > Many thanks for your assistance so far. We are still looking at papers
+> > using various statistical analyses, and have come across one which
+> > utilises a one-way MANCOVA. Please could you advise on the validity of
+> > calculating an effect size from this type of analysis, as the reported F
+> > and p values are altered by controlling for covariates, whereas this has
+> > not been the case in other studies.
+> >
+> > Similarly, we have a paper reporting odds ratios which, if we are
+> > correct, we can directly convert to an effect size (pearson's r).
+> > However, the odds ratios in question are presented as two models, one
+> > with more covariates than the other. Is there a particular model you
+> > would suggest including (see below)?
+> >
+> > Best,
+> > Rebecca
+> >
+> > *Dr Rebecca Hall | Research Associate*
+> > Department of Psychology | Lancaster University
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240618/1a7bfe34/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Outlook-wa50glnv.png
+Type: image/png
+Size: 14445 bytes
+Desc: Outlook-wa50glnv.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240618/1a7bfe34/attachment-0002.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Outlook-r5450wlk.png
+Type: image/png
+Size: 11783 bytes
+Desc: Outlook-r5450wlk.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240618/1a7bfe34/attachment-0003.png>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Jun 18 17:58:20 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 18 Jun 2024 15:58:20 +0000
+Subject: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+In-Reply-To: <LO0P265MB7364AABA7377605AAE6CC08BF7CE2@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+References: <LO0P265MB736425221A4B64D55E7E5C99F7C72@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB919328CD162F9AB729B2C4F78BC72@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB7364B75C488F5DA4ACE615B3F7C02@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <AS8PR08MB9193EEB5AC2A7A602FD0000C8BC12@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB736415E009D92507B33815D9F7CD2@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+ <dbce933f-6d5a-aba8-cf38-9c3a5e8052c6@dewey.myzen.co.uk>
+ <AS8PR08MB919307ADB6F3745E210698798BCE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <LO0P265MB7364AABA7377605AAE6CC08BF7CE2@LO0P265MB7364.GBRP265.PROD.OUTLOOK.COM>
+Message-ID: <AS8PR08MB919342BFB72A569E721E7B578BCE2@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+B/SE gives you the test statistic. If you want to use escalc(measure="PCOR", ...), then you need to supply this via the 'ti' argument, the number of predictors via the 'mi' argument, and the sample size via the 'ni' argument. See:
+
+https://wviechtb.github.io/metafor/reference/escalc.html#partial-and-semi-partial-correlations
+
+> -----Original Message-----
+> From: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Sent: Tuesday, June 18, 2024 16:26
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>;
+> Michael Dewey <lists at dewey.myzen.co.uk>; R Special Interest Group for Meta-
+> Analysis <r-sig-meta-analysis at r-project.org>
+> Subject: Re: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+>
+> Many thanks to you both for your input.
+>
+> Wolfgang, please could you expand on how we compute B/SE to get the test
+> statistic, and then how we add the number of predictors and the total sample
+> size to compute the partial correlation coefficient? Is this through cholesky
+> factorisation?
+>
+> Best,
+> Rebecca
+>
+> Dr Rebecca Hall | Research Associate
+> Department of Psychology | Lancaster University
+>
+> ________________________________________
+> From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Sent: 18 June 2024 08:46
+> To: Michael Dewey <lists at dewey.myzen.co.uk>; R Special Interest Group for Meta-
+> Analysis <r-sig-meta-analysis at r-project.org>
+> Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> Subject: RE: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+>
+> Adding a bit to this:
+>
+> With respect to the MANCOVA: What kind of 'effect size' are you trying to
+> compute for this? This thread revolved around ((semi)partial) correlation
+> coefficients, so I assume this is what you are trying to compute here. I am not
+> sure what information you have from the MANCOVA, but generally I would say that
+> it will be next to impossible to compute a correlation coefficient from such an
+> analysis. Test statistics from a MANCOVA will not tell you about directionality
+> and are a complex amalgamation of the group differences for multiple variables
+> (adjusted for covariates). Things already get tricky if we take away the
+> 'multivariate' part and take away the 'covariate' part, in which case we are
+> left with an independent samples t-test. Translating the results from such a
+> test into a type of correlation coefficient that can meaningfully be combined
+> with the results from studies that measured both variables of interest on a
+> continuous scale (and then report of regular Pearson product-moment correlation
+> coefficient) requires assuming that the dichotomous variable that defines the
+> two groups for the t-test is a dichotomized version of a continuous variable in
+> which case one can compute a biserial correlation coefficient. Trying to do
+> something like this based on an MANCOVA seems dubious at best.
+>
+> As for your second question: As far as I can tell, the table you show does not
+> appear to provide odds ratios, but the results from linear regression models
+> (leaving aside that the table appears to be messed up, at least with respect to
+> the last three columns). The values shown are beta coefficients (since outcome
+> and predictors were z-scored -- which makes the B and beta columns redundant).
+> If you want a partial correlation coefficient here, you can just compute B/SE to
+> get the test statistic. Together with the number of predictors and the total
+> sample size, one can then compute the partial correlation coefficient from this
+> information. But I cannot tell you which of the models you should use for this
+> (this is a substantive question).
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: Michael Dewey <lists at dewey.myzen.co.uk>
+> > Sent: Monday, June 17, 2024 17:13
+> > To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> > project.org>; Viechtbauer, Wolfgang (NP)
+> > <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> > Cc: Hall, Rebecca <r.hall5 at lancaster.ac.uk>
+> > Subject: Re: [R-meta] [External] RE: Effect Sizes and Beta Coefficients
+> >
+> > Dear Rebecca
+> >
+> > In general estimates adjusted for different sets of covariates are not
+> > directly comparable. If the sets are almost the same then you may be
+> > able to argue for including them. It might also depend on strategic
+> > questions like how many studies you already have and whether adding one
+> > more is worth the hassle of explaining why you included it.
+> >
+> > In short as so often the answer is, how brave do you feel?
+> >
+> > Michael
+> >
+> > On 17/06/2024 15:27, Hall, Rebecca via R-sig-meta-analysis wrote:
+> > > Dear Wolfgang,
+> > >
+> > > Many thanks for your assistance so far. We are still looking at papers
+> > > using various statistical analyses, and have come across one which
+> > > utilises a one-way MANCOVA. Please could you advise on the validity of
+> > > calculating an effect size from this type of analysis, as the reported F
+> > > and p values are altered by controlling for covariates, whereas this has
+> > > not been the case in other studies.
+> > >
+> > > Similarly, we have a paper reporting odds ratios which, if we are
+> > > correct, we can directly convert to an effect size (pearson's r).
+> > > However, the odds ratios in question are presented as two models, one
+> > > with more covariates than the other. Is there a particular model you
+> > > would suggest including (see below)?
+> > >
+> > > Best,
+> > > Rebecca
+> > >
+> > > *Dr Rebecca Hall | Research Associate*
+> > > Department of Psychology | Lancaster University
+
+
+From Y|ng@Cheng @end|ng |rom c@u@b@edu  Mon Jun 24 20:10:21 2024
+From: Y|ng@Cheng @end|ng |rom c@u@b@edu (Ying Cheng)
+Date: Mon, 24 Jun 2024 18:10:21 +0000
+Subject: [R-meta] Meta Analysis of Interaction Effects
+Message-ID: <SJ2PR08MB8449A4E0C93585E504E2EA9884D42@SJ2PR08MB8449.namprd08.prod.outlook.com>
+
+Dear Meta Community,
+
+I hope everyone has enjoyed the summer so far! 
+
+When conducting a meta-analysis, I am wondering about the appropriate way to extract the effect size for an interaction term (e.g., continuous variable x continuous variable or continuous variable x categorical variable) stemming from regressions.? Many studies reported unstandardized coefficients of the interaction terms. However, given they are using different scales, I assume standardized coefficients will be more appropriate (?). If so, is there any way to transform an unstandardized coefficient of an interaction term from regression to a standardized coefficient? Additionally, some studies also reported simple slopes for the independent variable above and below 1 SD of the mean. Would this information be helpful to calculate the effect size for the interaction?
+
+Another related question would be the way to obtain the sampling variance of such an interaction effect. 
+
+Any information or recommended reading will be greatly valued!
+
+P.S. I appreciate a previous post discussing the effect size for an interaction term stemming from 2*2 ANOVA (https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-February/000655.html).
+
+Best,
+Ying
+
+Ying Cheng, PhD
+Associate Professor
+Department of Management
+California State University, San Bernardino
+
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Jun 25 10:57:43 2024
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 25 Jun 2024 08:57:43 +0000
+Subject: [R-meta] Meta Analysis of Interaction Effects
+In-Reply-To: <SJ2PR08MB8449A4E0C93585E504E2EA9884D42@SJ2PR08MB8449.namprd08.prod.outlook.com>
+References: <SJ2PR08MB8449A4E0C93585E504E2EA9884D42@SJ2PR08MB8449.namprd08.prod.outlook.com>
+Message-ID: <AS8PR08MB91931C2EAEA9D79E979A31E88BD52@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Ying,
+
+If the studies use different scales, then you cannot directly compare / aggregate unstandardized regression coefficients, so yes, you will have to consider some kind of standardized measure. For regular regression coefficients (not reflecting an interaction), I am quite partial (pun intended) to using partial correlation coefficients (or their r-to-z transformed version). The nice thing about these is that they can be easily computed if all that you know if the test statistic (t-statistic) for the regression coefficient, the number of predictors in the model, and the total sample size. See:
+
+https://wviechtb.github.io/metafor/reference/escalc.html#partial-and-semi-partial-correlations
+
+This information is typically available when study authors are reporting the results from a linear regression model, making this measure a practicable choice. In principle, one could also compute a partial correlation coefficient for an interaction term, although I have never seen anybody do this.
+
+Mixing together continuous-continuous and continuous-categorical interaction coefficients (of whatever type) raises other issues. Doing so could make sense if the categorical variable is a categorized version of what the corresponding continuous from continuous-continuous interactions reflects. However, then one has to 'undo' this kind of categorization, which is analogous to what happens when we do a meta-analysis of correlation coefficients, but some studies only provide point-biserial correlations. See:
+
+Jacobs, P., & Viechtbauer, W. (2017). Estimation of the biserial correlation and its sampling variance for use in meta-analysis. Research Synthesis Methods, 8(2), 161-180. https://doi.org/10.1002/jrsm.1218
+
+I am not familiar with some analogous procedures for turning a 'point-biserial partial correlation coefficient' into a 'biserial partial correlation coefficient'. I certainly would not simply use equation (8) from the article above on a 'point-biserial partial correlation coefficient' unless there is some evidence (empirical or analytical) that this makes sense. Even then, that still leaves the issue of how to compute the sampling variance of the resulting value.
+
+Finally, for the case where two simple slopes are reported: That seems also very tricky to me how to turn this into something that would be meaningfully comparable to a partial correlation coefficient. This vaguely relates to methods discussed in this article:
+
+Pustejovsky, J. E. (2014). Converting from d to r to z when the design uses extreme groups, dichotomization, or experimental control. Psychological Methods, 19(1), 92-112. https://doi.org/10.1037/a0033788
+
+But this is not about partial correlations and interaction terms, so while a connection is there, it is not immediate.
+
+In essence, I think it will be very difficult to compute some commensurable measure from all these different cases.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Ying Cheng via R-sig-meta-analysis
+> Sent: Monday, June 24, 2024 20:10
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Ying Cheng <Ying.Cheng at csusb.edu>
+> Subject: [R-meta] Meta Analysis of Interaction Effects
+>
+> Dear Meta Community,
+>
+> I hope everyone has enjoyed the summer so far!
+>
+> When conducting a meta-analysis, I am wondering about the appropriate way to
+> extract the effect size for an interaction term (e.g., continuous variable x
+> continuous variable or continuous variable x categorical variable) stemming from
+> regressions.  Many studies reported unstandardized coefficients of the
+> interaction terms. However, given they are using different scales, I assume
+> standardized coefficients will be more appropriate (?). If so, is there any way
+> to transform an unstandardized coefficient of an interaction term from
+> regression to a standardized coefficient? Additionally, some studies also
+> reported simple slopes for the independent variable above and below 1 SD of the
+> mean. Would this information be helpful to calculate the effect size for the
+> interaction?
+>
+> Another related question would be the way to obtain the sampling variance of
+> such an interaction effect.
+>
+> Any information or recommended reading will be greatly valued!
+>
+> P.S. I appreciate a previous post discussing the effect size for an interaction
+> term stemming from 2*2 ANOVA (https://stat.ethz.ch/pipermail/r-sig-meta-
+> analysis/2018-February/000655.html).
+>
+> Best,
+> Ying
+>
+> Ying Cheng, PhD
+> Associate Professor
+> Department of Management
+> California State University, San Bernardino
+
+
+From @m @end|ng |rom mcm@@ter@c@  Tue Jun 25 15:48:40 2024
+From: @m @end|ng |rom mcm@@ter@c@ (Marimuthu S)
+Date: Tue, 25 Jun 2024 13:48:40 +0000
+Subject: [R-meta] Error in the Network plot
+Message-ID: <YT3PR01MB5891684F6F86B38BC11CC175DAD52@YT3PR01MB5891.CANPRD01.PROD.OUTLOOK.COM>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240625/ed6df47c/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Outlook-l5t5h5qp.png
+Type: image/png
+Size: 30067 bytes
+Desc: Outlook-l5t5h5qp.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240625/ed6df47c/attachment-0001.png>
+
+From wojc|ech@r@czyn@k|94 @end|ng |rom gm@||@com  Wed Jun 26 10:38:04 2024
+From: wojc|ech@r@czyn@k|94 @end|ng |rom gm@||@com (=?UTF-8?Q?Wojciech_Raczy=C5=84ski?=)
+Date: Wed, 26 Jun 2024 10:38:04 +0200
+Subject: [R-meta] Meta-analysis of two multi-level studies
+Message-ID: <CACL36UqpWFnuA3WDRB8Guzc9BudT3L1ozU1AQ0-+6=3DaY6wJQ@mail.gmail.com>
+
+Dear Group,
+
+I am new to the Metafor package but eager to learn how to use it properly.
+Saying that, please excuse my (probably silly) questions, but I'd be really
+grateful if you could provide some suggestions on how to run my very first
+meta-analysis across two studies I conducted.
+
+I have conducted two studies: Study 1 and Study 2. Study 2 is a replication
+of Study 1.
+I want to run a meta-analysis to estimate the true effects of the links
+between my three DVs and each of the IVs. I am now wondering how to
+approach it best. Allow me to say a few words about Study 1:
+There were ~3000 students (level 1) from 30 schools (level 2). DV:
+self-concept scale consisting of three subscales: Family, Friends, and
+School. All three subscales are highly related to each other (r = ~0.8).
+For theoretical reasons, I run three separate multi-level models, with each
+of the subscales as DV. I regressed these three DVs on 8 IVs, which I
+believe are linked to the DV (multi-level design). Of important note - two
+of those IVs are in squared form, that is, IV and IV^2 (as I observed
+U-shaped relationships). Thus, I ended up with 10 standardized coefficients
+plus an intercept.
+I replicated Study 1 (Study 2) on a set of 25 different schools and
+different 2500 students, keeping all others the same (IVs and DVs).
+
+initially, I thought about converting my standardized coefficients into r,
+but I searched through the Archives and found this response (
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2019-December/001887.html).
+So, I figured I'd simply use the standardized coefficient in my
+meta-analysis (yi). I computed variance by squaring SE (vi). But now I'm
+puzzled what to do next.
+
+Possible scenarios I figured would be to:
+1) Run 10 x 3 = 30 separate meta-analyses for 10 predictors for 3 subscales
+separately
+res_DVsubscale1_IV1 <- rma(yi, vi, data = dat_DVsubscale1_IV1)
+res_DVsubscale1_IV1
+(repeat 30 times)
+
+2) Run a multi-level meta-analysis and cluster the data in IVs and Subscales
+res <- rma.mv(yi, vi, mods = ~ IV, random = ~ 1 | IV/DV_Subscale, data=dat)
+res
+
+But then I'd get general estimates of IVs across three subscales, and I
+want separate ones for each of the Subscales... So maybe an interaction:
+res_interaction <- rma.mv(yi, vi, mods = ~ IV * DV_Subscale, random = ~ 1 |
+IV/DV_Subscale, data=dat)
+res_interaction
+
+But then I'd get estimates for IVs for Subscale 2 and Subscale 3 but not
+Subscale 1. Plus, it would compare the effects of IVs for DV2 and DV3 to
+those of DV1, which is not what I want...
+
+3) Run three multi-level meta-analyses (for each of the three subscales)
+and cluster the data in IVs
+res_DVsubscale1 <- rma.mv(yi, vi, mods = ~ IV, random = ~ 1 | IV,
+data=dat_DVsubscale1)
+res_DVsubscale1
+
+And although I was leaning towards this option, I saw weird results
+regarding my squared terms. Although in two multi-level models in Study 1
+and Study 2 they are both significantly related to DV (i.e., IV p < .001,
+and IV^2 p < .001), when running the above, they are grossly not
+significant (i.e., p = .9). and with completely different estimates (IV ? =
+-.2, IV^2 ? = .2 in Study 1 and IV ? = -.4, IV^2 ? = .4 in Study 2). What's
+going on?
+Extra questions:
+a) Should I include the original intercept from my multi-level models from
+Study 1 and Study 2? And exclude the intercept from the rma/rma.mv ("-1")?
+Or maybe manually set the rma/rma.mv intercept to ... like a mean of the
+two original intercepts?
+
+b) Regardless of how to approach it, I would love to do a Foster Plot
+showing all IVs divided by Subscale. I searched through the website, and
+the closest forest plot example I could find was
+https://www.metafor-project.org/doku.php/tips:forest_plot_with_aggregated_values.
+Still, it's not what I was looking for - I'd want on the left to be IV (in
+the example provided "Study", and next to it, my three DVs (In the example
+provided "Estimates"). I also found in Archive the suggestion to use
+forest() from meta package, but maybe anyone of you has manager to plot it
+with metafor package?
+
+Kind regards,
+Wojciech Raczy?ski
+
+	[[alternative HTML version deleted]]
+
+
+From @ndre@@@vo|d@t@d @end|ng |rom ke||ogg@ox@@c@uk  Sun Jun 30 15:37:13 2024
+From: @ndre@@@vo|d@t@d @end|ng |rom ke||ogg@ox@@c@uk (Andreas Voldstad)
+Date: Sun, 30 Jun 2024 13:37:13 +0000
+Subject: [R-meta] Non-positive definite covariance matrix for rma.mv
+Message-ID: <LO4P265MB35011DDB3A5E33536E6C939FEDD22@LO4P265MB3501.GBRP265.PROD.OUTLOOK.COM>
+
+Dear everyone,
+
+I have one study in my meta-analysis with a covariance matrix that is non-positive definite.
+
+I am wondering what consequences this might have for my meta-analysis with rma.mv, and whether you have any suggestions of how to deal with the issue.
+
+The study had four arms and effect sizes are additionally correlated over time and within dyads.
+
+The correlations over time and dyad members used for creating the covariance matrix was based on the corresponding correlations between participants' scores, estimated from the study dataset.
+
+Because of the four arms, some effect sizes have no overlap, leading to blocks of zeros in the covariance matrix.
+
+The covariance matrix is reproduced below:
+
+study_escalc <- data.frame(  StudyID = c("StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA"),  Role = c("Husband", "Husband", "Wife", "Wife", "Husband", "Husband", "Wife", "Wife", "Husband", "Husband", "Wife", "Wife", "Husband", "Husband", "Wife", "Wife"),  Timenum = c(2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3),  Tx = c("Tx1", "Tx1", "Tx1", "Tx1", "Tx2", "Tx2", "Tx2", "Tx2", "Tx1", "Tx1", "Tx1", "Tx1", "Tx2", "Tx2", "Tx2", "Tx2"),  Control = c("Passive", "Passive", "Passive", "Passive", "Passive", "Passive", "Passive", "Passive", "Active", "Active", "Active", "Active", "Active", "Active", "Active", "Active"),  Contrast = c("Tx1 vs Passive", "Tx1 vs Passive", "Tx1 vs Passive", "Tx1 vs Passive", "Tx2 vs Passive", "Tx2 vs Passive", "Tx2 vs Passive", "Tx2 vs Passive", "Tx1 vs Active", "Tx1 vs Active", "Tx1 vs Active", "Tx1 vs Active", "Tx2 vs Active", "Tx2 vs Active", "Tx2 vs Active", "Tx2 vs Active"),  delta = c(0.467304, 0.429311, 0.145277, 0.248136, 0.684523, 0.537425, 0.380137, 0.335112, 0.432723, 0.480095, 0.145031, 0.252715, 0.628890, 0.572478, 0.373187, 0.338829),  v = c(0.053375, 0.053154, 0.051417, 0.051710, 0.056543, 0.056865, 0.052208, 0.052756, 0.053863, 0.053454, 0.050774, 0.053052, 0.056766, 0.057132, 0.051522, 0.054108),  N_tx = c(38, 39, 39, 38, 36, 35, 39, 37, 38, 39, 39, 38, 36, 35, 39, 37),  N_Control = c(39, 38, 39, 40, 39, 38, 39, 40, 38, 38, 40, 38, 38, 38, 40, 38),  Category = c("Husband_2", "Husband_3", "Wife_2", "Wife_3", "Husband_2", "Husband_3", "Wife_2", "Wife_3", "Husband_2", "Husband_3", "Wife_2", "Wife_3", "Husband_2", "Husband_3", "Wife_2", "Wife_3"),  Effect = c("Tx1 vs Passive_Husband_2", "Tx1 vs Passive_Husband_3", "Tx1 vs Passive_Wife_2", "Tx1 vs Passive_Wife_3", "Tx2 vs Passive_Husband_2", "Tx2 vs Passive_Husband_3", "Tx2 vs Passive_Wife_2", "Tx2 vs Passive_Wife_3", "Tx1 vs Active_Husband_2", "Tx1 vs Active_Husband_3", "Tx1 vs Active_Wife_2", "Tx1 vs Active_Wife_3", "Tx2 vs Active_Husband_2", "Tx2 vs Active_Husband_3", "Tx2 vs Active_Wife_2", "Tx2 vs Active_Wife_3"))
+
+study_cormat <- matrix(c(  1.000000, 0.781447, 0.689538, 0.639455,  0.781447, 1.000000, 0.565192, 0.653545,  0.689538, 0.565192, 1.000000, 0.820650,  0.639455, 0.653545, 0.820650, 1.000000),  nrow=4, byrow=TRUE, dimnames = list(    c("Husband_2", "Husband_3", "Wife_2", "Wife_3"),    c("Husband_2", "Husband_3", "Wife_2", "Wife_3")))
+
+Study_Vmat <-   vcalc(vi = v,        cluster = StudyID,        obs = Category,                 grp1 = Tx,         grp2 = Control,                 w1 = N_tx,        w2 = N_Control,                rho = study_cormat,        data = study_escalc)
+
+# Warning message: The var-cov matrix appears to be not positive definite in cluster StudyA. cov2cor(Study_Vmat)
+
+
+
+Warm wishes,
+
+Andreas Voldstad (he/him)
+PhD student in Psychiatry
+University of Oxford
+Please don?t feel obliged to read or respond to my email outside your own working hours.
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Sun Jun 30 18:13:32 2024
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Sun, 30 Jun 2024 11:13:32 -0500
+Subject: [R-meta] Non-positive definite covariance matrix for rma.mv
+In-Reply-To: <LO4P265MB35011DDB3A5E33536E6C939FEDD22@LO4P265MB3501.GBRP265.PROD.OUTLOOK.COM>
+References: <LO4P265MB35011DDB3A5E33536E6C939FEDD22@LO4P265MB3501.GBRP265.PROD.OUTLOOK.COM>
+Message-ID: <5D714D39-72F9-4F05-B50F-AC6CB5B1A1AA@gmail.com>
+
+Hi Andreas,
+
+I think the NPD issue arises from having treatment contrasts that are perfectly collinear. Consider that if you know the contrasts Tx1 vs Passive, Tx2 vs Passive, and Tx1 vs Active, then you can infer the Tx2 vs Active contrast: 
+(Tx2 vs Passive) - (Tx1 vs Passive) + (Tx1 vs Active) = (Tx2 - Tx1)  + (Tx1 vs Active) = (Tx2 vs Active)
+
+As far as I can see, the only way to avoid this is to calculate all effect size contrasts relative to a common comparison condition. 
+
+Depending on the meta-analytic model in which you use this covariance matrix, the NPD issue might or might not be important?it really depends on the structure of the model. For example, if you are going to run separate models with the active control contrasts and passive control contrasts, then the fact that the whole covariance matrix is NPD is NBD?not a big deal. But if you?re fitting some sort of multilevel meta-analysis model across all the contrasts, then metafor will yell at you if you use an NBD matrix in the V argument.
+
+James
+
+> On Jun 30, 2024, at 8:37?AM, Andreas Voldstad via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+> 
+> ?Dear everyone,
+> 
+> I have one study in my meta-analysis with a covariance matrix that is non-positive definite.
+> 
+> I am wondering what consequences this might have for my meta-analysis with rma.mv, and whether you have any suggestions of how to deal with the issue.
+> 
+> The study had four arms and effect sizes are additionally correlated over time and within dyads.
+> 
+> The correlations over time and dyad members used for creating the covariance matrix was based on the corresponding correlations between participants' scores, estimated from the study dataset.
+> 
+> Because of the four arms, some effect sizes have no overlap, leading to blocks of zeros in the covariance matrix.
+> 
+> The covariance matrix is reproduced below:
+> 
+> study_escalc <- data.frame(  StudyID = c("StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA", "StudyA"),  Role = c("Husband", "Husband", "Wife", "Wife", "Husband", "Husband", "Wife", "Wife", "Husband", "Husband", "Wife", "Wife", "Husband", "Husband", "Wife", "Wife"),  Timenum = c(2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3),  Tx = c("Tx1", "Tx1", "Tx1", "Tx1", "Tx2", "Tx2", "Tx2", "Tx2", "Tx1", "Tx1", "Tx1", "Tx1", "Tx2", "Tx2", "Tx2", "Tx2"),  Control = c("Passive", "Passive", "Passive", "Passive", "Passive", "Passive", "Passive", "Passive", "Active", "Active", "Active", "Active", "Active", "Active", "Active", "Active"),  Contrast = c("Tx1 vs Passive", "Tx1 vs Passive", "Tx1 vs Passive", "Tx1 vs Passive", "Tx2 vs Passive", "Tx2 vs Passive", "Tx2 vs Passive", "Tx2 vs Passive", "Tx1 vs Active", "Tx1 vs Active", "Tx1 vs Active", "Tx1 vs Active", "Tx2 vs Active", "Tx2 vs Active", "Tx2 vs Active", "Tx2 vs Active"),  delta = c(0.467304, 0.429311, 0.145277, 0.248136, 0.684523, 0.537425, 0.380137, 0.335112, 0.432723, 0.480095, 0.145031, 0.252715, 0.628890, 0.572478, 0.373187, 0.338829),  v = c(0.053375, 0.053154, 0.051417, 0.051710, 0.056543, 0.056865, 0.052208, 0.052756, 0.053863, 0.053454, 0.050774, 0.053052, 0.056766, 0.057132, 0.051522, 0.054108),  N_tx = c(38, 39, 39, 38, 36, 35, 39, 37, 38, 39, 39, 38, 36, 35, 39, 37),  N_Control = c(39, 38, 39, 40, 39, 38, 39, 40, 38, 38, 40, 38, 38, 38, 40, 38),  Category = c("Husband_2", "Husband_3", "Wife_2", "Wife_3", "Husband_2", "Husband_3", "Wife_2", "Wife_3", "Husband_2", "Husband_3", "Wife_2", "Wife_3", "Husband_2", "Husband_3", "Wife_2", "Wife_3"),  Effect = c("Tx1 vs Passive_Husband_2", "Tx1 vs Passive_Husband_3", "Tx1 vs Passive_Wife_2", "Tx1 vs Passive_Wife_3", "Tx2 vs Passive_Husband_2", "Tx2 vs Passive_Husband_3", "Tx2 vs Passive_Wife_2", "Tx2 vs Passive_Wife_3", "Tx1 vs Active_Husband_2", "Tx1 vs Active_Husband_3", "Tx1 vs Active_Wife_2", "Tx1 vs Active_Wife_3", "Tx2 vs Active_Husband_2", "Tx2 vs Active_Husband_3", "Tx2 vs Active_Wife_2", "Tx2 vs Active_Wife_3"))
+> 
+> study_cormat <- matrix(c(  1.000000, 0.781447, 0.689538, 0.639455,  0.781447, 1.000000, 0.565192, 0.653545,  0.689538, 0.565192, 1.000000, 0.820650,  0.639455, 0.653545, 0.820650, 1.000000),  nrow=4, byrow=TRUE, dimnames = list(    c("Husband_2", "Husband_3", "Wife_2", "Wife_3"),    c("Husband_2", "Husband_3", "Wife_2", "Wife_3")))
+> 
+> Study_Vmat <-   vcalc(vi = v,        cluster = StudyID,        obs = Category,                 grp1 = Tx,         grp2 = Control,                 w1 = N_tx,        w2 = N_Control,                rho = study_cormat,        data = study_escalc)
+> 
+> # Warning message: The var-cov matrix appears to be not positive definite in cluster StudyA. cov2cor(Study_Vmat)
+> 
+> 
+> 
+> Warm wishes,
+> 
+> Andreas Voldstad (he/him)
+> PhD student in Psychiatry
+> University of Oxford
+> Please don?t feel obliged to read or respond to my email outside your own working hours.
+> 
+>    [[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Sun Jun 30 19:36:08 2024
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?iso-8859-1?Q?Dr=2E_Gerta_R=FCcker?=)
+Date: Sun, 30 Jun 2024 17:36:08 +0000
+Subject: [R-meta] Error in the Network plot
+In-Reply-To: <YT3PR01MB5891684F6F86B38BC11CC175DAD52@YT3PR01MB5891.CANPRD01.PROD.OUTLOOK.COM>
+References: <YT3PR01MB5891684F6F86B38BC11CC175DAD52@YT3PR01MB5891.CANPRD01.PROD.OUTLOOK.COM>
+Message-ID: <6930d37de8e5431692a33d63329c97c6@uniklinik-freiburg.de>
+
+Hi Marimuthu,
+
+It seems you had not yet an answer to this. The problem you encountered comes from mixing code from R packages netmeta and metafor. If you want to use netmeta, particularly function netconnection(), you have to use pairwise() instead of to.wide() (which is a metafor function).
+
+Attached you find your code adapted for R package netmeta which works fine.
+
+Best,
+Gerta
+
+
+
+UNIVERSIT?TSKLINIKUM FREIBURG
+Institute for Medical Biometry and Statistics
+
+Dr. Gerta R?cker
+Guest Scientist
+
+Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+gerta.ruecker at uniklinik-freiburg.de
+
+https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+Von: Marimuthu S via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Gesendet: Dienstag, 25. Juni 2024 15:49
+An: Marimuthu S via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Cc: Marimuthu S <sm at mcmaster.ca>
+Betreff: [R-meta] Error in the Network plot
+
+Good Morning everyone,
+
+I am trying to plot a network graph using 'netconnection' R function. I got the below error message.
+
+R code and Error:
+
+library(netmeta)
+dat <- dat.hasselblad1998
+dat
+table(dat$study)
+
+# restructure to a wide format
+dat.wide <- to.wide(dat, study="study", grp="trt", ref="no_contact", grpvars=6:7)
+dat.wide
+
+nc1 <- netconnection(trt.1,  trt.2, study, data = dat.wide)
+
+Error in netconnection.default(trt.1, trt.2, study, data = dat.wide) :
+  The following studies have a wrong number of comparisons: '2', '9'
+  Please provide data for all treatment comparisons (two-arm: 1; three-arm: 3; four-arm: 6, ...).
+
+I would appreciate it if someone could clarify this and let me know how to sort it out. Please note that studies 2 and 9 have 3 arms.
+
+
+Marimuthu
+
+
+
+
+
+
+
+Warm Regards,
+
+Marimuthu S,
+Ph.D. Student (Biostatistics)
+
+[cid:image002.png at 01DACB22.760CD510]
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240630/6d24fce5/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image002.png
+Type: image/png
+Size: 26099 bytes
+Desc: image002.png
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240630/6d24fce5/attachment-0001.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Hasselblad.R
+Type: application/octet-stream
+Size: 575 bytes
+Desc: Hasselblad.R
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20240630/6d24fce5/attachment-0001.obj>
+

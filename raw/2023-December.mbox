@@ -1,0 +1,3702 @@
+From @o||@c@p @end|ng |rom gm@||@com  Fri Dec  1 12:44:29 2023
+From: @o||@c@p @end|ng |rom gm@||@com (Zoukal Sofia)
+Date: Fri, 1 Dec 2023 12:44:29 +0100
+Subject: [R-meta] R-meta] add comma to numbers in forest plot from metaprop
+ objet
+Message-ID: <CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>
+
+*Hi,
+**I need to modify the numbers in the columns of a forest plot made
+from a metaprop object.*
+
+*Please how can **I** add commas for numbers w**ith 5 or more digits
+in **column** of event and total to appear in the forest plot?*
+
+*#there is my data:*
+
+events <- c(12000, 5000, 800, 30000)  # Example event counts
+
+n <- c(50000, 10000, 5000, 40000)  # Example total sample sizes
+data <- data.frame( events = events, n = n)
+
+# Format event counts with commas for numbers with 5 or more digits
+formatted_events <- ifelse(events >= 10000, format(events,
+big.mark=","), as.character(events))
+data$events_formatted <- formatIfNeeded(data$events)
+print(data)
+
+# Run meta-analysis with the modified dataset
+meta_result <- metaprop(event = formatted_events, n = n)
+
+# Plot the forest plot for the meta-analysis with formatted data
+
+forest(meta_result)
+
+
+Unfortunatlly, it does not work: "Error: Non-numeric value for argument 'event'"
+
+help me please!
+
+Best
+
+?
+
+	[[alternative HTML version deleted]]
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Fri Dec  1 17:43:52 2023
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?utf-8?B?RHIuIEdlcnRhIFLDvGNrZXI=?=)
+Date: Fri, 1 Dec 2023 16:43:52 +0000
+Subject: [R-meta] 
+ R-meta] add comma to numbers in forest plot from metaprop objet
+In-Reply-To: <CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>
+References: <CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>
+Message-ID: <514e932528d547f88884185dfd2e2c22@uniklinik-freiburg.de>
+
+Dear Sofia,
+
+Try this code:
+
+library(meta)
+events <- c(12000, 5000, 800, 30000)  # Example event counts
+n <- c(50000, 10000, 5000, 40000)  # Example total sample sizes
+
+formatted_events <- format(events, big.mark=",")
+formatted_n <- format(n, big.mark=",")
+
+meta_result <- metaprop(event = events, n = n)
+meta_result$formatted_events <- formatted_events
+meta_result$formatted_n <- formatted_n
+
+forest(meta_result, 
+       leftcols = c("studlab", "formatted_events", "formatted_n"),
+       leftlabs = c("Study", "Events","Total"))
+
+Remarks: 
+- The formatted numbers should be list elements of the metaprop object, not of the data. 
+- It makes sense to format also the sample sizes (n) in the same way.
+- It also makes sense to format *all* numbers equally, also those that are smaller than 10000.
+- It does not make sense to format the numbers as characters (as you did), because then don't become right-justified.
+
+Best,
+Gerta
+
+
+UNIVERSIT?TSKLINIKUM FREIBURG
+Institute for Medical Biometry and Statistics
+
+Dr. Gerta R?cker
+Guest Scientist
+
+Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+gerta.ruecker at uniklinik-freiburg.de
+
+https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+-----Urspr?ngliche Nachricht-----
+Von: Zoukal Sofia via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> 
+Gesendet: Freitag, 1. Dezember 2023 12:44
+An: r-sig-meta-analysis at r-project.org
+Cc: Zoukal Sofia <sofi.cap at gmail.com>
+Betreff: [R-meta] R-meta] add comma to numbers in forest plot from metaprop objet
+
+*Hi,
+**I need to modify the numbers in the columns of a forest plot made
+from a metaprop object.*
+
+*Please how can **I** add commas for numbers w**ith 5 or more digits
+in **column** of event and total to appear in the forest plot?*
+
+*#there is my data:*
+
+events <- c(12000, 5000, 800, 30000)  # Example event counts
+
+n <- c(50000, 10000, 5000, 40000)  # Example total sample sizes
+data <- data.frame( events = events, n = n)
+
+# Format event counts with commas for numbers with 5 or more digits
+formatted_events <- ifelse(events >= 10000, format(events,
+big.mark=","), as.character(events))
+data$events_formatted <- formatIfNeeded(data$events)
+print(data)
+
+# Run meta-analysis with the modified dataset
+meta_result <- metaprop(event = formatted_events, n = n)
+
+# Plot the forest plot for the meta-analysis with formatted data
+
+forest(meta_result)
+
+
+Unfortunatlly, it does not work: "Error: Non-numeric value for argument 'event'"
+
+help me please!
+
+Best
+
+?
+
+	[[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+From d@n|e|@|o@ter @end|ng |rom utoronto@c@  Sat Dec  2 23:05:30 2023
+From: d@n|e|@|o@ter @end|ng |rom utoronto@c@ (Daniel Foster)
+Date: Sat, 2 Dec 2023 22:05:30 +0000
+Subject: [R-meta] metafor inquiry: weighted moderators
+Message-ID: <QB1PR01MB400320A6FB19754C88891224EC80A@QB1PR01MB4003.CANPRD01.PROD.OUTLOOK.COM>
+
+Hello Wolfgang, I hope all is well. My name is Daniel, I am carrying out a multi-level meta-analysis using the metafor package, and I was hoping you could answer a quick question for me.
+
+I am trying to assess publication bias using the PET method. To do this you include the inverse of the SE as a predictor in your model. In the code below, mods = ~ SE calls on the unweighted SE data from my dataframe. What I am unsure of is if the rma.mv function automatically weights "~SE" as 1/SE (as is needed for the PET method).
+
+So do I need to calculate the weighted SE before including it in the model below, or does metafor do this for me?
+
+ overalleffectPET <- rma.mv(Tstat, Variance,
+??????+ mods = ~ SE,
+??????+ random = list(~ 1 | EffectSize_ID, ~ 1 | Study_ID),
+??????+ tdist= TRUE, data=EmployBinaryITT)
+
+Thank you in advance for both you time and help!
+
+Daniel
+
+
+
+----------------------------
+
+Daniel Foster, M.Ed.
+
+PhD Candidate | Department of Applied Psychology and Human Development | University of Toronto
+
+Research Associate | Atkinson Centre for Society and Child Development
+
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sun Dec  3 13:47:11 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Sun, 3 Dec 2023 12:47:11 +0000
+Subject: [R-meta] metafor inquiry: weighted moderators
+In-Reply-To: <QB1PR01MB400320A6FB19754C88891224EC80A@QB1PR01MB4003.CANPRD01.PROD.OUTLOOK.COM>
+References: <QB1PR01MB400320A6FB19754C88891224EC80A@QB1PR01MB4003.CANPRD01.PROD.OUTLOOK.COM>
+Message-ID: <AS8PR08MB9193D8A08530C1AFD6E103468B87A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi Daniel,
+
+In the original formulation of the regression test by Egger (which uses standard regression models), there are two numerically equivalent formulations, one using the standard errors as predictor of the effect size estimates and one using the precisions (1 / standard errors) as predictor of the z-scores (effect size estimates / standard errors). In the first formulation, we use WLS, in the second formualation OLS. To demonstrate:
+
+library(metafor)
+
+### calculate log risk ratios and corresponding sampling variances
+dat <- escalc(measure="RR", ai=ai, n1i=n1i,
+                            ci=ci, n2i=n2i, data=dat.graves2010)
+dat
+
+### regression test using lm(); two formulations
+summary(lm(yi ~ sqrt(vi), weights=1/vi, data=dat))
+summary(lm(yi/sqrt(vi) ~ I(1/sqrt(vi)), data=dat))
+
+Note that in the first formulation, we look at the slope of sqrt(vi), in the second formulation things are flipped around and we look at the intercept.
+
+For fixed-effects meta-regression models, these two formulations are also equivalent:
+
+### regression test using a fixed-effects meta-regression model
+rma(yi, vi, mods = ~ sqrt(vi), data=dat, method="FE")
+rma(yi/sqrt(vi), 1, mods = ~ I(1/sqrt(vi)), data=dat, method="FE")
+
+Note that while the coefficients are the same as when using lm(), the SEs of the coefficients are different because a fixed-effects meta-regression model does not include the multiplicative dispersion term that lm() includes.
+
+However, once we move to random/mixed-effects models, there is really only one formulation, where we use sqrt(vi) as predictor, that is:
+
+### regression test using a mixed-effects meta-regression model
+rma(yi, vi, mods = ~ sqrt(vi), data=dat)
+
+The same applies to multilevel models like you are fitting. So, you really need to use the effect size estimates as outcome (not 'Tstat'). The rest is fine.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Daniel Foster via R-sig-meta-analysis
+> Sent: Saturday, December 2, 2023 23:06
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Daniel Foster <daniel.foster at utoronto.ca>
+> Subject: [R-meta] metafor inquiry: weighted moderators
+>
+> Hello Wolfgang, I hope all is well. My name is Daniel, I am carrying out a
+> multi-level meta-analysis using the metafor package, and I was hoping you could
+> answer a quick question for me.
+>
+> I am trying to assess publication bias using the PET method. To do this you
+> include the inverse of the SE as a predictor in your model. In the code below,
+> mods = ~ SE calls on the unweighted SE data from my dataframe. What I am unsure
+> of is if the rma.mv function automatically weights "~SE" as 1/SE (as is needed
+> for the PET method).
+>
+> So do I need to calculate the weighted SE before including it in the model
+> below, or does metafor do this for me?
+>
+>  overalleffectPET <- rma.mv(Tstat, Variance,
+> ??????+ mods = ~ SE,
+> ??????+ random = list(~ 1 | EffectSize_ID, ~ 1 | Study_ID),
+> ??????+ tdist= TRUE, data=EmployBinaryITT)
+>
+> Thank you in advance for both you time and help!
+>
+> Daniel
+>
+> ----------------------------
+>
+> Daniel Foster, M.Ed.
+> PhD Candidate | Department of Applied Psychology and Human Development |
+> University of Toronto
+> Research Associate | Atkinson Centre for Society and Child Development
+
+From d@n|e|@|o@ter @end|ng |rom utoronto@c@  Sun Dec  3 14:52:40 2023
+From: d@n|e|@|o@ter @end|ng |rom utoronto@c@ (Daniel Foster)
+Date: Sun, 3 Dec 2023 13:52:40 +0000
+Subject: [R-meta] metafor inquiry: weighted moderators
+In-Reply-To: <AS8PR08MB9193D8A08530C1AFD6E103468B87A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <QB1PR01MB400320A6FB19754C88891224EC80A@QB1PR01MB4003.CANPRD01.PROD.OUTLOOK.COM>
+ <AS8PR08MB9193D8A08530C1AFD6E103468B87A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <YT1PR01MB4012F5566941A1A9E852E016EC87A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+
+Thank you! This resolves my issue.
+
+
+
+
+
+________________________________
+From: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: Sunday, December 3, 2023 7:47 AM
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Daniel Foster <daniel.foster at utoronto.ca>
+Subject: RE: [R-meta] metafor inquiry: weighted moderators
+
+[You don't often get email from wolfgang.viechtbauer at maastrichtuniversity.nl. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+
+Hi Daniel,
+
+In the original formulation of the regression test by Egger (which uses standard regression models), there are two numerically equivalent formulations, one using the standard errors as predictor of the effect size estimates and one using the precisions (1 / standard errors) as predictor of the z-scores (effect size estimates / standard errors). In the first formulation, we use WLS, in the second formualation OLS. To demonstrate:
+
+library(metafor)
+
+### calculate log risk ratios and corresponding sampling variances
+dat <- escalc(measure="RR", ai=ai, n1i=n1i,
+                            ci=ci, n2i=n2i, data=dat.graves2010)
+dat
+
+### regression test using lm(); two formulations
+summary(lm(yi ~ sqrt(vi), weights=1/vi, data=dat))
+summary(lm(yi/sqrt(vi) ~ I(1/sqrt(vi)), data=dat))
+
+Note that in the first formulation, we look at the slope of sqrt(vi), in the second formulation things are flipped around and we look at the intercept.
+
+For fixed-effects meta-regression models, these two formulations are also equivalent:
+
+### regression test using a fixed-effects meta-regression model
+rma(yi, vi, mods = ~ sqrt(vi), data=dat, method="FE")
+rma(yi/sqrt(vi), 1, mods = ~ I(1/sqrt(vi)), data=dat, method="FE")
+
+Note that while the coefficients are the same as when using lm(), the SEs of the coefficients are different because a fixed-effects meta-regression model does not include the multiplicative dispersion term that lm() includes.
+
+However, once we move to random/mixed-effects models, there is really only one formulation, where we use sqrt(vi) as predictor, that is:
+
+### regression test using a mixed-effects meta-regression model
+rma(yi, vi, mods = ~ sqrt(vi), data=dat)
+
+The same applies to multilevel models like you are fitting. So, you really need to use the effect size estimates as outcome (not 'Tstat'). The rest is fine.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Daniel Foster via R-sig-meta-analysis
+> Sent: Saturday, December 2, 2023 23:06
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Daniel Foster <daniel.foster at utoronto.ca>
+> Subject: [R-meta] metafor inquiry: weighted moderators
+>
+> Hello Wolfgang, I hope all is well. My name is Daniel, I am carrying out a
+> multi-level meta-analysis using the metafor package, and I was hoping you could
+> answer a quick question for me.
+>
+> I am trying to assess publication bias using the PET method. To do this you
+> include the inverse of the SE as a predictor in your model. In the code below,
+> mods = ~ SE calls on the unweighted SE data from my dataframe. What I am unsure
+> of is if the rma.mv function automatically weights "~SE" as 1/SE (as is needed
+> for the PET method).
+>
+> So do I need to calculate the weighted SE before including it in the model
+> below, or does metafor do this for me?
+>
+>  overalleffectPET <- rma.mv(Tstat, Variance,
+> ??????+ mods = ~ SE,
+> ??????+ random = list(~ 1 | EffectSize_ID, ~ 1 | Study_ID),
+> ??????+ tdist= TRUE, data=EmployBinaryITT)
+>
+> Thank you in advance for both you time and help!
+>
+> Daniel
+>
+> ----------------------------
+>
+> Daniel Foster, M.Ed.
+> PhD Candidate | Department of Applied Psychology and Human Development |
+> University of Toronto
+> Research Associate | Atkinson Centre for Society and Child Development
+
+	[[alternative HTML version deleted]]
+
+
+From gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de  Mon Dec  4 13:24:13 2023
+From: gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de (Dr. Guido Schwarzer)
+Date: Mon, 4 Dec 2023 12:24:13 +0000
+Subject: [R-meta] 
+ R-meta] add comma to numbers in forest plot from metaprop objet
+In-Reply-To: <CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>
+References: <CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>
+Message-ID: <686802B7-FA87-478A-B4AE-317ADE011322@uniklinik-freiburg.de>
+
+Sofia,
+
+You can set argument 'big.mark' in settings.meta() which is considered in printouts and forest plots.
+
+events <- c(12000, 5000, 800, 30000)
+n <- c(50000, 10000, 5000, 40000)
+
+library("meta")
+settings.meta(big.mark = ",")
+m <- metaprop(events, n)
+forest(m)
+
+Best,
+Guido
+
+
+From d@n|e|@|o@ter567 @end|ng |rom gm@||@com  Tue Dec  5 20:09:00 2023
+From: d@n|e|@|o@ter567 @end|ng |rom gm@||@com (Daniel Foster)
+Date: Tue, 5 Dec 2023 14:09:00 -0500
+Subject: [R-meta] Multivariate multi-level meta-analysis: adjusting control
+ variables when modeling publication bias?
+Message-ID: <CANPVL-UKkfUXHZhhv5FUj=2m=Qx8SP10QLf-QoFu=4khg9P3hQ@mail.gmail.com>
+
+Hello Wolfgang and all,
+
+I am carrying out multivariate multilevel meta-analysis using the
+rma.mv function in the metafor package, and I have come across an
+issue that has been giving me a lot of trouble. At this point I am at
+a stand still and any insight would be greatly appreciated!!
+
+When testing for publication bias using the PET approach, Doucouliagos
+& Stanley (2009), suggest using the following model in a weighted
+least squares formula:
+
+ES= B1(1/SE) + SIGMA ak(Zj/SEi )+ e
+
+Where SE is the standard error of the effect estimate,  Z is a vector
+of meta-independent variables reflecting differences across studies
+for the jth study in literature, ak is the meta-regression coefficient
+which reflects the effect of particular study characteristics.
+
+My confusion lies in the fact that they are suggesting that the
+control variables (Z) included need to be divided by the standard
+error of the effect estimate. My questions are this:
+
+Should I be dividing my control variables by the standard error of
+the effect estimate when using the rma.mv function?  I have found some
+multivariate multilevel meta-analyses that follow this method
+(Klomp, 2009), but then others that don't (at least explicitly;
+Akgunduz, 2018)
+
+If I do need to do this, it is not clear to me how a binary control
+variable can be incorporated in my mra.mv model (i.e., 1, 0). To my
+mind, it seems strange to divide a dichotomous variable by a
+continuous variable. What steps do I need to execute to include these
+variables in my mra.mv model?
+
+Thank you so much in advance for your insights!
+
+Daniel
+
+Akgunduz, Y. E., & Plantenga, J. (2018). doi: 10.1111/joes.12192
+Doucouliagos, H., & Stanley, T. D. (2009). doi: 10.1111/j.1467-8543.2009.00723.x
+Klomp, J., & De Haan, J. (2010). doi: 10.1111/j.1467-6419.2009.00597.x
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Dec  5 20:46:38 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 5 Dec 2023 19:46:38 +0000
+Subject: [R-meta] 
+ Multivariate multi-level meta-analysis: adjusting control
+ variables when modeling publication bias?
+In-Reply-To: <CANPVL-UKkfUXHZhhv5FUj=2m=Qx8SP10QLf-QoFu=4khg9P3hQ@mail.gmail.com>
+References: <CANPVL-UKkfUXHZhhv5FUj=2m=Qx8SP10QLf-QoFu=4khg9P3hQ@mail.gmail.com>
+Message-ID: <AS8PR08MB919347D8859889EEC49F7D718B85A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi Daniel,
+
+Didn't you ask the same question here?
+
+https://stats.stackexchange.com/q/633046/1934
+
+Please see my answer there.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Daniel Foster via R-sig-meta-analysis
+> Sent: Tuesday, December 5, 2023 20:09
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Daniel Foster <daniel.foster567 at gmail.com>
+> Subject: [R-meta] Multivariate multi-level meta-analysis: adjusting control
+> variables when modeling publication bias?
+>
+> Hello Wolfgang and all,
+>
+> I am carrying out multivariate multilevel meta-analysis using the
+> rma.mv function in the metafor package, and I have come across an
+> issue that has been giving me a lot of trouble. At this point I am at
+> a stand still and any insight would be greatly appreciated!!
+>
+> When testing for publication bias using the PET approach, Doucouliagos
+> & Stanley (2009), suggest using the following model in a weighted
+> least squares formula:
+>
+> ES= B1(1/SE) + SIGMA ak(Zj/SEi )+ e
+>
+> Where SE is the standard error of the effect estimate,  Z is a vector
+> of meta-independent variables reflecting differences across studies
+> for the jth study in literature, ak is the meta-regression coefficient
+> which reflects the effect of particular study characteristics.
+>
+> My confusion lies in the fact that they are suggesting that the
+> control variables (Z) included need to be divided by the standard
+> error of the effect estimate. My questions are this:
+>
+> Should I be dividing my control variables by the standard error of
+> the effect estimate when using the rma.mv function?  I have found some
+> multivariate multilevel meta-analyses that follow this method
+> (Klomp, 2009), but then others that don't (at least explicitly;
+> Akgunduz, 2018)
+>
+> If I do need to do this, it is not clear to me how a binary control
+> variable can be incorporated in my mra.mv model (i.e., 1, 0). To my
+> mind, it seems strange to divide a dichotomous variable by a
+> continuous variable. What steps do I need to execute to include these
+> variables in my mra.mv model?
+>
+> Thank you so much in advance for your insights!
+>
+> Daniel
+>
+> Akgunduz, Y. E., & Plantenga, J. (2018). doi: 10.1111/joes.12192
+> Doucouliagos, H., & Stanley, T. D. (2009). doi: 10.1111/j.1467-8543.2009.00723.x
+> Klomp, J., & De Haan, J. (2010). doi: 10.1111/j.1467-6419.2009.00597.x
+
+
+From d@n|e|@|o@ter @end|ng |rom utoronto@c@  Tue Dec  5 21:46:25 2023
+From: d@n|e|@|o@ter @end|ng |rom utoronto@c@ (Daniel Foster)
+Date: Tue, 5 Dec 2023 20:46:25 +0000
+Subject: [R-meta] 
+ Multivariate multi-level meta-analysis: adjusting control
+ variables when modeling publication bias?
+In-Reply-To: <AS8PR08MB919347D8859889EEC49F7D718B85A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CANPVL-UKkfUXHZhhv5FUj=2m=Qx8SP10QLf-QoFu=4khg9P3hQ@mail.gmail.com>
+ <AS8PR08MB919347D8859889EEC49F7D718B85A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <YT1PR01MB4012EC9BCCE6D4061E026038EC85A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+
+Hi Wolfgang,
+
+Thank you! Sorry, I am new to Stack Exchange and did not realize that you had already provided a response. I deeply appreciate your insights.
+
+I do have a follow up question, if that's okay. I am also carrying two other multilevel analyses - one uses the t-statistic as a dependent outcome, and another uses the partial correlation coefficient (the computation of which is derived from the t-statistic) as the dependent variable.
+
+You mention that the authors divide everything because they are working with test statistics, which makes me wonder whether the analyses I just mentioned require the same adjustment? However, you go on to say that random-effects models and models with a multilevel structure do not require this adjustment. Do you mind clarifying?
+
+Thank you again for your time! The mailing list archives are an incredible resource!!
+
+I will also post this response on stack exchange, so that it is available to others.
+
+Best,
+Daniel
+
+
+
+________________________________
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Sent: Tuesday, December 5, 2023 2:46 PM
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Subject: Re: [R-meta] Multivariate multi-level meta-analysis: adjusting control variables when modeling publication bias?
+
+[You don't often get email from r-sig-meta-analysis at r-project.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+
+Hi Daniel,
+
+Didn't you ask the same question here?
+
+https://can01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstats.stackexchange.com%2Fq%2F633046%2F1934&data=05%7C01%7Cdaniel.foster%40utoronto.ca%7C2e5052078db84090f23c08dbf5cb060f%7C78aac2262f034b4d9037b46d56c55210%7C0%7C0%7C638374024577218808%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=IcOgv30X42Ns1dIFMUHBay1I%2BudhJw8Ofc5yh%2FmmtYM%3D&reserved=0<https://stats.stackexchange.com/q/633046/1934>
+
+Please see my answer there.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Daniel Foster via R-sig-meta-analysis
+> Sent: Tuesday, December 5, 2023 20:09
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Daniel Foster <daniel.foster567 at gmail.com>
+> Subject: [R-meta] Multivariate multi-level meta-analysis: adjusting control
+> variables when modeling publication bias?
+>
+> Hello Wolfgang and all,
+>
+> I am carrying out multivariate multilevel meta-analysis using the
+> rma.mv function in the metafor package, and I have come across an
+> issue that has been giving me a lot of trouble. At this point I am at
+> a stand still and any insight would be greatly appreciated!!
+>
+> When testing for publication bias using the PET approach, Doucouliagos
+> & Stanley (2009), suggest using the following model in a weighted
+> least squares formula:
+>
+> ES= B1(1/SE) + SIGMA ak(Zj/SEi )+ e
+>
+> Where SE is the standard error of the effect estimate,  Z is a vector
+> of meta-independent variables reflecting differences across studies
+> for the jth study in literature, ak is the meta-regression coefficient
+> which reflects the effect of particular study characteristics.
+>
+> My confusion lies in the fact that they are suggesting that the
+> control variables (Z) included need to be divided by the standard
+> error of the effect estimate. My questions are this:
+>
+> Should I be dividing my control variables by the standard error of
+> the effect estimate when using the rma.mv function?  I have found some
+> multivariate multilevel meta-analyses that follow this method
+> (Klomp, 2009), but then others that don't (at least explicitly;
+> Akgunduz, 2018)
+>
+> If I do need to do this, it is not clear to me how a binary control
+> variable can be incorporated in my mra.mv model (i.e., 1, 0). To my
+> mind, it seems strange to divide a dichotomous variable by a
+> continuous variable. What steps do I need to execute to include these
+> variables in my mra.mv model?
+>
+> Thank you so much in advance for your insights!
+>
+> Daniel
+>
+> Akgunduz, Y. E., & Plantenga, J. (2018). doi: 10.1111/joes.12192
+> Doucouliagos, H., & Stanley, T. D. (2009). doi: 10.1111/j.1467-8543.2009.00723.x
+> Klomp, J., & De Haan, J. (2010). doi: 10.1111/j.1467-6419.2009.00597.x
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://can01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&data=05%7C01%7Cdaniel.foster%40utoronto.ca%7C2e5052078db84090f23c08dbf5cb060f%7C78aac2262f034b4d9037b46d56c55210%7C0%7C0%7C638374024577218808%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=%2FQ%2BCa44M16CwWVmRCbTF1AOfTUpiHxH6%2FlklRYdkfbc%3D&reserved=0<https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>
+
+	[[alternative HTML version deleted]]
+
+
+From Tor|@Pen@ @end|ng |rom @tonybrook@edu  Tue Dec  5 23:59:31 2023
+From: Tor|@Pen@ @end|ng |rom @tonybrook@edu (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+Date: Tue, 5 Dec 2023 17:59:31 -0500
+Subject: [R-meta] PET-PEESE Question
+Message-ID: <CAEmuQj8Waiq4Eho6bGbuUuvh81Ls2c0kYKGYvBPjcjw7OQVTcg@mail.gmail.com>
+
+Hello,
+
+Thank you again for all your guidance.
+
+I have been trying to conduct PET-PEESE analyses on several rma.mv objects
+by adding variance as a moderator.  The following code works well:
+
+#pet-peese test
+m_1_pet <- rma.mv(yi = yi,
+                     V = vi,
+                     mods = ~ vi,
+                     slab = STUDY.ID,
+                     data = Relationship_TE_Occurrence,
+                     random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,
+                     test = "t",
+                     method = "REML")
+
+summary(m_1_pet, digits=3)
+
+However, when I try to conduct the PEESE part I receive this error message:
+"Model matrix not of full rank. Cannot fit model" for the following code:
+
+Relationship$SE_Mod <- Relationship$vi^2
+
+m_1_peese <- rma.mv(yi = yi,
+                     V = vi,
+                     mods = ~ SE_Mod,
+                     slab = STUDY.ID,
+                     data = Relationship_TE_Occurrence,
+                     random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,
+                     test = "t",
+                     method = "REML")
+
+summary(m_1_peese, digits=3)
+
+Does anyone have any insight into why the model would fit for the PET part
+but not the PEESE? I'm not sure how to fix this issue.
+
+Thanks,
+Tori
+
+-- 
+*Tori Pe?a, Ph.D. *(she/her/ella)
+Cognitive Psychology
+Dept. of Psychology
+Stony Brook University
+Stony Brook, NY 11790-2500
+[image: Stony Brook University logo]
+
+	[[alternative HTML version deleted]]
+
+
+From @o||@c@p @end|ng |rom gm@||@com  Tue Dec  5 15:07:03 2023
+From: @o||@c@p @end|ng |rom gm@||@com (Zoukal Sofia)
+Date: Tue, 5 Dec 2023 15:07:03 +0100
+Subject: [R-meta] 
+ R-meta] add comma to numbers in forest plot from metaprop objet
+In-Reply-To: <686802B7-FA87-478A-B4AE-317ADE011322@uniklinik-freiburg.de>
+References: <CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>
+ <686802B7-FA87-478A-B4AE-317ADE011322@uniklinik-freiburg.de>
+Message-ID: <CAHTW072FiYVTOBc0pPRbB6pawkM73jfhjrs4eFEpYO_mVtOiGQ-5117@mail.gmail.com>
+
+Hi,
+
+Thank you so much for your help!
+
+Best
+?
+
+Le lun. 4 d?c. 2023 ? 13:24, Dr. Guido Schwarzer <
+guido.schwarzer at uniklinik-freiburg.de> a ?crit :
+
+> Sofia,
+>
+> You can set argument 'big.mark' in settings.meta() which is considered in
+> printouts and forest plots.
+>
+> events <- c(12000, 5000, 800, 30000)
+> n <- c(50000, 10000, 5000, 40000)
+>
+> library("meta")
+> settings.meta(big.mark = ",")
+> m <- metaprop(events, n)
+> forest(m)
+>
+> Best,
+> Guido
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From @o||@c@p @end|ng |rom gm@||@com  Tue Dec  5 15:07:03 2023
+From: @o||@c@p @end|ng |rom gm@||@com (Zoukal Sofia)
+Date: Tue, 5 Dec 2023 15:07:03 +0100
+Subject: [R-meta] 
+ R-meta] add comma to numbers in forest plot from metaprop objet
+In-Reply-To: <686802B7-FA87-478A-B4AE-317ADE011322@uniklinik-freiburg.de>
+References: <CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>
+ <686802B7-FA87-478A-B4AE-317ADE011322@uniklinik-freiburg.de>
+Message-ID: <CAHTW072FiYVTOBc0pPRbB6pawkM73jfhjrs4eFEpYO_mVtOiGQ-6429@mail.gmail.com>
+
+Hi,
+
+Thank you so much for your help!
+
+Best
+?
+
+Le lun. 4 d?c. 2023 ? 13:24, Dr. Guido Schwarzer <
+guido.schwarzer at uniklinik-freiburg.de> a ?crit :
+
+> Sofia,
+>
+> You can set argument 'big.mark' in settings.meta() which is considered in
+> printouts and forest plots.
+>
+> events <- c(12000, 5000, 800, 30000)
+> n <- c(50000, 10000, 5000, 40000)
+>
+> library("meta")
+> settings.meta(big.mark = ",")
+> m <- metaprop(events, n)
+> forest(m)
+>
+> Best,
+> Guido
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From 64zone @end|ng |rom gm@||@com  Wed Dec  6 01:59:51 2023
+From: 64zone @end|ng |rom gm@||@com (Sicong Liu)
+Date: Wed, 6 Dec 2023 00:59:51 +0000
+Subject: [R-meta] resources re. synthesis of cov/corr matrices
+Message-ID: <IA1PR12MB604348A0B8429D17D3F8F04BAA84A@IA1PR12MB6043.namprd12.prod.outlook.com>
+
+Hello All,
+
+Hope everyone is enjoying the holiday vibes!
+
+Most of the books or papers I have read so far deal with attempted causal relationships, such as those involving experiment/clinical trials. However, I would like to get recommendations regarding the synthesis of covariance/correlation matrices when the focused relationship of meta-analysis is correlational and multivariate, such as those requiring structural equation modeling. I wonder if anyone could point me to some reviews/books or relevant sources?
+
+Thank you very much all!
+
+Cheers,
+Sicong (Zone) Liu
+-------------
+
+
+	[[alternative HTML version deleted]]
+
+
+From m|kew|cheung @end|ng |rom gm@||@com  Wed Dec  6 04:45:12 2023
+From: m|kew|cheung @end|ng |rom gm@||@com (Mike Cheung)
+Date: Wed, 6 Dec 2023 11:45:12 +0800
+Subject: [R-meta] resources re. synthesis of cov/corr matrices
+In-Reply-To: <IA1PR12MB604348A0B8429D17D3F8F04BAA84A@IA1PR12MB6043.namprd12.prod.outlook.com>
+References: <IA1PR12MB604348A0B8429D17D3F8F04BAA84A@IA1PR12MB6043.namprd12.prod.outlook.com>
+Message-ID: <CADF7-FO2Vf1JzURWWU-kmz86EBoA8Aquz82EsqGOfRRyfsxkJg@mail.gmail.com>
+
+Dear Zone,
+
+One starting point is to search the topic "meta-analytic structural
+equation model (MASEM)." Here is an article summarizing it.
+https://osf.io/preprints/psyarxiv/epsqt
+The metaSEM package provides a unified framework to do it.
+https://github.com/mikewlcheung/metasem
+
+Best,
+Mike
+
+On Wed, Dec 6, 2023 at 9:00?AM Sicong Liu via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> Hello All,
+>
+> Hope everyone is enjoying the holiday vibes!
+>
+> Most of the books or papers I have read so far deal with attempted causal
+> relationships, such as those involving experiment/clinical trials. However,
+> I would like to get recommendations regarding the synthesis of
+> covariance/correlation matrices when the focused relationship of
+> meta-analysis is correlational and multivariate, such as those requiring
+> structural equation modeling. I wonder if anyone could point me to some
+> reviews/books or relevant sources?
+>
+> Thank you very much all!
+>
+> Cheers,
+> Sicong (Zone) Liu
+> -------------
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From 64zone @end|ng |rom gm@||@com  Wed Dec  6 06:24:35 2023
+From: 64zone @end|ng |rom gm@||@com (Sicong Liu)
+Date: Wed, 6 Dec 2023 05:24:35 +0000
+Subject: [R-meta] resources re. synthesis of cov/corr matrices
+In-Reply-To: <CADF7-FO2Vf1JzURWWU-kmz86EBoA8Aquz82EsqGOfRRyfsxkJg@mail.gmail.com>
+References: <IA1PR12MB604348A0B8429D17D3F8F04BAA84A@IA1PR12MB6043.namprd12.prod.outlook.com>
+ <CADF7-FO2Vf1JzURWWU-kmz86EBoA8Aquz82EsqGOfRRyfsxkJg@mail.gmail.com>
+Message-ID: <IA1PR12MB6043E0D6C52E09DB97D52E63AA84A@IA1PR12MB6043.namprd12.prod.outlook.com>
+
+Dear Mike,
+
+Thank you very much for sharing! ?
+
+Cheers,
+Zone
+-------------
+
+
+From: Mike Cheung <mikewlcheung at gmail.com>
+Date: Wednesday, December 6, 2023 at 11:45 AM
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Sicong Liu <64zone at gmail.com>
+Subject: Re: [R-meta] resources re. synthesis of cov/corr matrices
+Dear Zone,
+
+One starting point is to search the topic "meta-analytic structural equation model (MASEM)." Here is an article summarizing it. https://osf.io/preprints/psyarxiv/epsqt
+The metaSEM package provides a unified framework to do it. https://github.com/mikewlcheung/metasem
+
+Best,
+Mike
+
+On Wed, Dec 6, 2023 at 9:00?AM Sicong Liu via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>> wrote:
+Hello All,
+
+Hope everyone is enjoying the holiday vibes!
+
+Most of the books or papers I have read so far deal with attempted causal relationships, such as those involving experiment/clinical trials. However, I would like to get recommendations regarding the synthesis of covariance/correlation matrices when the focused relationship of meta-analysis is correlational and multivariate, such as those requiring structural equation modeling. I wonder if anyone could point me to some reviews/books or relevant sources?
+
+Thank you very much all!
+
+Cheers,
+Sicong (Zone) Liu
+-------------
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de  Wed Dec  6 08:53:22 2023
+From: |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de (Lukasz Stasielowicz)
+Date: Wed, 6 Dec 2023 08:53:22 +0100
+Subject: [R-meta] PET-PEESE Question
+In-Reply-To: <mailman.5008.8751.1701834336.1361.r-sig-meta-analysis@r-project.org>
+References: <mailman.5008.8751.1701834336.1361.r-sig-meta-analysis@r-project.org>
+Message-ID: <d6ed1565-c73c-47de-947f-07c2f1bc9f9f@uni-osnabrueck.de>
+
+Dear Tori,
+
+vi refers to sampling variance in your code, right?
+
+In that case, slight code adjustments seem necessary:
+PET: mods = ~sqrt(vi) #standard error as a moderator
+PEESE: PET: mods = ~vi #variance as a moderator
+
+
+Further reading: 
+https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/pub-bias.html#pet-peese
+
+
+Best,
+Lukasz
+-- 
+Lukasz Stasielowicz
+Osnabr?ck University
+Institute for Psychology
+Research methods, psychological assessment, and evaluation
+Lise-Meitner-Stra?e 3
+49076 Osnabr?ck (Germany)
+Twitter: https://twitter.com/l_stasielowicz
+Tel.: +49 541 969-7735
+
+On 06.12.2023 04:45, r-sig-meta-analysis-request at r-project.org wrote:
+> Send R-sig-meta-analysis mailing list submissions to
+> 	r-sig-meta-analysis at r-project.org
+> 
+> To subscribe or unsubscribe via the World Wide Web, visit
+> 	https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> or, via email, send a message with subject or body 'help' to
+> 	r-sig-meta-analysis-request at r-project.org
+> 
+> You can reach the person managing the list at
+> 	r-sig-meta-analysis-owner at r-project.org
+> 
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of R-sig-meta-analysis digest..."
+> 
+> 
+> Today's Topics:
+> 
+>     1. PET-PEESE Question (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+>     2. Re:  R-meta] add comma to numbers in forest plot from
+>        metaprop objet (Zoukal Sofia)
+>     3. Re:  R-meta] add comma to numbers in forest plot from
+>        metaprop objet (Zoukal Sofia)
+>     4. resources re. synthesis of cov/corr matrices (Sicong Liu)
+>     5. Re: resources re. synthesis of cov/corr matrices (Mike Cheung)
+> 
+> ----------------------------------------------------------------------
+> 
+> Message: 1
+> Date: Tue, 5 Dec 2023 17:59:31 -0500
+> From: =?UTF-8?Q?Tori_Pe=C3=B1a?= <Tori.Pena at stonybrook.edu>
+> To: R Special Interest Group for Meta-Analysis
+> 	<r-sig-meta-analysis at r-project.org>
+> Subject: [R-meta] PET-PEESE Question
+> Message-ID:
+> 	<CAEmuQj8Waiq4Eho6bGbuUuvh81Ls2c0kYKGYvBPjcjw7OQVTcg at mail.gmail.com>
+> Content-Type: text/plain; charset="utf-8"
+> 
+> Hello,
+> 
+> Thank you again for all your guidance.
+> 
+> I have been trying to conduct PET-PEESE analyses on several rma.mv objects
+> by adding variance as a moderator.  The following code works well:
+> 
+> #pet-peese test
+> m_1_pet <- rma.mv(yi = yi,
+>                       V = vi,
+>                       mods = ~ vi,
+>                       slab = STUDY.ID,
+>                       data = Relationship_TE_Occurrence,
+>                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,
+>                       test = "t",
+>                       method = "REML")
+> 
+> summary(m_1_pet, digits=3)
+> 
+> However, when I try to conduct the PEESE part I receive this error message:
+> "Model matrix not of full rank. Cannot fit model" for the following code:
+> 
+> Relationship$SE_Mod <- Relationship$vi^2
+> 
+> m_1_peese <- rma.mv(yi = yi,
+>                       V = vi,
+>                       mods = ~ SE_Mod,
+>                       slab = STUDY.ID,
+>                       data = Relationship_TE_Occurrence,
+>                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,
+>                       test = "t",
+>                       method = "REML")
+> 
+> summary(m_1_peese, digits=3)
+> 
+> Does anyone have any insight into why the model would fit for the PET part
+> but not the PEESE? I'm not sure how to fix this issue.
+> 
+> Thanks,
+> Tori
+>
+
+
+From wow99308008 @end|ng |rom gm@||@com  Sun Dec 10 07:32:50 2023
+From: wow99308008 @end|ng |rom gm@||@com (Nick Chen)
+Date: Sun, 10 Dec 2023 14:32:50 +0800
+Subject: [R-meta] About whether to delete the outliers from the dataset
+Message-ID: <CAC_J9Nu8AyRfMvJsz3RPnEMxkAoz=wci3aPuvgUC4JWetHAY2A@mail.gmail.com>
+
+I have a question concerning whether to delete some of the data or not. I
+have a dataset of 56 studies with a pooled effect size of g=1.25. Yet,
+there are 4 data that reported an incredibly high effect size (8.15, 6.63,
+4.14, 4.10 respectively). Statistically, they should be considered as
+outliers and be removed from the dataset. But since these data went through
+the inclusion and exclusion criteria, they should be staying in the dataset
+since they met all the requirements of my selection. So if we excluded the
+4 data, wouldn't that be miss-reporting some data in the dataset? What
+should I do? Should I excluded the 4 seemingly influential cases or keep
+them for a complete list of research?
+*Name*: Nick Chen (Ping-Cheng, Chen)
+*School*:National Taiwan Normal University (NTNU) English Department
+(Master)
+*Email*: wow99308008 at gmail.com
+*Phone number*: +886 909 663 963
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Sun Dec 10 11:07:43 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Sun, 10 Dec 2023 10:07:43 +0000
+Subject: [R-meta] About whether to delete the outliers from the dataset
+In-Reply-To: <CAC_J9Nu8AyRfMvJsz3RPnEMxkAoz=wci3aPuvgUC4JWetHAY2A@mail.gmail.com>
+References: <CAC_J9Nu8AyRfMvJsz3RPnEMxkAoz=wci3aPuvgUC4JWetHAY2A@mail.gmail.com>
+Message-ID: <19e352ee-8a90-1602-b451-774d0fb61cfa@dewey.myzen.co.uk>
+
+Dear Nick
+
+Apart from the two options you outline (include all, exclude four) I 
+assume you have already investigated whether these four studies share 
+some common feature which might explain the differences.
+
+I would suggest presenting the full analysis as your main one and then 
+presenting the one excluding the four as a sensitivity analysis. If the 
+scientific conclusions are unaltered then your discussion is much 
+simpler but if excluding them leads to a different conclusion then your 
+discussion section needs to provide some suggestion about what is going on.
+
+I think presenting the analysis excluding the four as the main analysis 
+is less preferable and, of course, just reporting that analysis and 
+ignoring the four altogether is clearly wrong (I know you did not 
+suggests that).
+
+Michael
+
+On 10/12/2023 06:32, Nick Chen via R-sig-meta-analysis wrote:
+> I have a question concerning whether to delete some of the data or not. I
+> have a dataset of 56 studies with a pooled effect size of g=1.25. Yet,
+> there are 4 data that reported an incredibly high effect size (8.15, 6.63,
+> 4.14, 4.10 respectively). Statistically, they should be considered as
+> outliers and be removed from the dataset. But since these data went through
+> the inclusion and exclusion criteria, they should be staying in the dataset
+> since they met all the requirements of my selection. So if we excluded the
+> 4 data, wouldn't that be miss-reporting some data in the dataset? What
+> should I do? Should I excluded the 4 seemingly influential cases or keep
+> them for a complete list of research?
+> *Name*: Nick Chen (Ping-Cheng, Chen)
+> *School*:National Taiwan Normal University (NTNU) English Department
+> (Master)
+> *Email*: wow99308008 at gmail.com
+> *Phone number*: +886 909 663 963
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+
+From rnorouz|@n @end|ng |rom gm@||@com  Sun Dec 10 17:58:29 2023
+From: rnorouz|@n @end|ng |rom gm@||@com (Reza Norouzian)
+Date: Sun, 10 Dec 2023 10:58:29 -0600
+Subject: [R-meta] About whether to delete the outliers from the dataset
+In-Reply-To: <CAC_J9Nu8AyRfMvJsz3RPnEMxkAoz=wci3aPuvgUC4JWetHAY2A@mail.gmail.com>
+References: <CAC_J9Nu8AyRfMvJsz3RPnEMxkAoz=wci3aPuvgUC4JWetHAY2A@mail.gmail.com>
+Message-ID: <CAKt3tz=Uexv5oc+Vb0OqMFV6wGVo9QfQ32wxx5brzLdOyu0kww@mail.gmail.com>
+
+Dear Nick,
+
+It may be useful to add some additional context to your question for better
+assistance.
+
+For example, do you have a multilevel data structure where each study could
+have multiple rows or instead you have allowed only one row for each study
+in your dataset?
+
+Also, can you possibly describe your method of outlier detection? For
+instance, if you are using the metafor package, have you looked at the
+combination of cooks.distance(), hatvalues(), and rstudent() for those
+large effects in your meta-regression model?
+
+Additionally, I wonder what happens to your pooled effect's standard error
+(or the width of the pooled effect's confidence interval [CI]) with versus
+without those large effects? For example, does the width of the CI
+substantially (ex. by ~30%) decrease after removing those large effects,
+increase, or remain largely unchanged?
+
+Finally, depending on how much this matters to you in terms of your study
+objectives, does retaining versus removing those large effects in your
+meta-regression model change the statistical significance of your pooled
+effect at all (i.e., sig. to not sig., or vice versa)?
+
+Reza
+
+
+On Sun, Dec 10, 2023 at 12:33?AM Nick Chen via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> I have a question concerning whether to delete some of the data or not. I
+> have a dataset of 56 studies with a pooled effect size of g=1.25. Yet,
+> there are 4 data that reported an incredibly high effect size (8.15, 6.63,
+> 4.14, 4.10 respectively). Statistically, they should be considered as
+> outliers and be removed from the dataset. But since these data went through
+> the inclusion and exclusion criteria, they should be staying in the dataset
+> since they met all the requirements of my selection. So if we excluded the
+> 4 data, wouldn't that be miss-reporting some data in the dataset? What
+> should I do? Should I excluded the 4 seemingly influential cases or keep
+> them for a complete list of research?
+> *Name*: Nick Chen (Ping-Cheng, Chen)
+> *School*:National Taiwan Normal University (NTNU) English Department
+> (Master)
+> *Email*: wow99308008 at gmail.com
+> *Phone number*: +886 909 663 963
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From d@n|e|@|o@ter @end|ng |rom utoronto@c@  Sun Dec 10 18:43:55 2023
+From: d@n|e|@|o@ter @end|ng |rom utoronto@c@ (Daniel Foster)
+Date: Sun, 10 Dec 2023 17:43:55 +0000
+Subject: [R-meta] Multi-level meta: including a measure of precision in
+ subgroup analysis model
+Message-ID: <YT1PR01MB4012895FF81E70EB373498DDEC88A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+
+Hello all,
+
+I am carrying out a multi-level meta-analysis and I have a question regarding publication bias in the context of subgroup analysis.
+
+
+I have noticed that many meta-regression models include a precision measure (SE or SE^2) in their final model along with covariates. Is the same true for subgroup analysis in a multi-level analysis wherein moderators are tested individually?
+
+
+For example:
+
+moderertorX <- rma.mv(yi, vi, mods = ~ SE + moderertorX, random = list(~ 1 | EffectSize_ID, ~1 | Study_ID), tdist=TRUE, data=data)
+
+
+Thanks!
+
+Daniel
+
+
+	[[alternative HTML version deleted]]
+
+
+From d@n|e|@|o@ter @end|ng |rom utoronto@c@  Sun Dec 10 18:47:40 2023
+From: d@n|e|@|o@ter @end|ng |rom utoronto@c@ (Daniel Foster)
+Date: Sun, 10 Dec 2023 17:47:40 +0000
+Subject: [R-meta] Publication bias in the context of subgroup analysis
+Message-ID: <YT1PR01MB40126D728F940089E6D03D04EC88A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+
+Hello all,
+
+I am carrying out a multi-level meta-analysis and I have a question regarding publication bias in the context of subgroup analysis.
+
+I have noticed that many meta-regression models include a precision measure (SE or SE^2) in their final model along with covariates. Is the same true for subgroup analysis in a multi-level analysis wherein moderators are tested individually?
+
+For example:
+moderertorX <- rma.mv(yi, vi, mods = ~ SE + moderertorX, random = list(~ 1 | EffectSize_ID, ~1 | Study_ID), tdist=TRUE, data=data)
+
+Thanks!
+Daniel
+
+
+
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sun Dec 10 20:35:12 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Sun, 10 Dec 2023 19:35:12 +0000
+Subject: [R-meta] Publication bias in the context of subgroup analysis
+In-Reply-To: <YT1PR01MB40126D728F940089E6D03D04EC88A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+References: <YT1PR01MB40126D728F940089E6D03D04EC88A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+Message-ID: <AS8PR08MB9193147AEE33499AF0C2DF3D8B88A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi Daniel,
+
+I am not sure why you posted the same question twice -- I'll respond to this one.
+
+In what sense do you mean 'subgroup analysis'? To me, a subgroup analysis is one where studies are split into subgroups and one fits models within these subgroups. This is not what you are doing below, at least the code doesn't reflect this.
+
+If your question is about using something like SE (or SE^2) as a predictor in the context of a model that includes other moderators, then the answer is yes. A relevant article in this regard is:
+
+Coburn, K. M., & Vevea, J. L. (2015). Publication bias as a function of study characteristics. Psychological Methods, 20(3), 310-330. https://doi.org/10.1037/met0000046
+
+It doesn't discuss multilevel models, but the point is that sometimes there might be a relationship between the effect sizes and the standard errors because of some confounding with other variables. For example, suppose we have two sets of studies in our meta-analysis, the first consisting of RCTs, the other non-randomized studies. Furthermore, assume that there is no publication bias going on. But now suppose that RCTs (which tend to be smaller due to the additional complexities of running a trial) tend to yield smaller (or larger) effects than the non-randomized studies (maybe the non-randomized studies are yielding somewhat biased estimates). In this situation, the funnel plot may look asymmetric, not because of publication bias, but because of the confounding of the SEs with study type. When including study type as a moderators, then this confounding is controlled for and we find no association between the effect sizes and SEs (rightly so). This shows that it may actually be very important to account for relevant moderators before examining the data for a relationship between the SEs and the effect sizes.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Daniel Foster via R-sig-meta-analysis
+> Sent: Sunday, December 10, 2023 18:48
+> To: Daniel Foster via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+> Cc: Daniel Foster <daniel.foster at utoronto.ca>
+> Subject: [R-meta] Publication bias in the context of subgroup analysis
+>
+> Hello all,
+>
+> I am carrying out a multi-level meta-analysis and I have a question regarding
+> publication bias in the context of subgroup analysis.
+>
+> I have noticed that many meta-regression models include a precision measure (SE
+> or SE^2) in their final model along with covariates. Is the same true for
+> subgroup analysis in a multi-level analysis wherein moderators are tested
+> individually?
+>
+> For example:
+> moderertorX <- rma.mv(yi, vi, mods = ~ SE + moderertorX, random = list(~ 1 |
+> EffectSize_ID, ~1 | Study_ID), tdist=TRUE, data=data)
+>
+> Thanks!
+> Daniel
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sun Dec 10 20:36:19 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Sun, 10 Dec 2023 19:36:19 +0000
+Subject: [R-meta] PET-PEESE Question
+In-Reply-To: <d6ed1565-c73c-47de-947f-07c2f1bc9f9f@uni-osnabrueck.de>
+References: <mailman.5008.8751.1701834336.1361.r-sig-meta-analysis@r-project.org>
+ <d6ed1565-c73c-47de-947f-07c2f1bc9f9f@uni-osnabrueck.de>
+Message-ID: <AS8PR08MB9193AD53CF70B17D68CAA7098B88A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+There is another issue:
+
+Relationship$SE_Mod <- Relationship$vi^2
+
+but the dataset is called "Relationship_TE_Occurrence".
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Lukasz Stasielowicz via R-sig-meta-analysis
+> Sent: Wednesday, December 6, 2023 08:53
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Lukasz Stasielowicz <lukasz.stasielowicz at uni-osnabrueck.de>
+> Subject: Re: [R-meta] PET-PEESE Question
+>
+> Dear Tori,
+>
+> vi refers to sampling variance in your code, right?
+>
+> In that case, slight code adjustments seem necessary:
+> PET: mods = ~sqrt(vi) #standard error as a moderator
+> PEESE: PET: mods = ~vi #variance as a moderator
+>
+>
+> Further reading:
+> https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/pub-bias.html#pet-
+> peese
+>
+>
+> Best,
+> Lukasz
+> --
+> Lukasz Stasielowicz
+> Osnabr?ck University
+> Institute for Psychology
+> Research methods, psychological assessment, and evaluation
+> Lise-Meitner-Stra?e 3
+> 49076 Osnabr?ck (Germany)
+> Twitter: https://twitter.com/l_stasielowicz
+> Tel.: +49 541 969-7735
+>
+> > Hello,
+> >
+> > Thank you again for all your guidance.
+> >
+> > I have been trying to conduct PET-PEESE analyses on several rma.mv objects
+> > by adding variance as a moderator.  The following code works well:
+> >
+> > #pet-peese test
+> > m_1_pet <- rma.mv(yi = yi,
+> >                       V = vi,
+> >                       mods = ~ vi,
+> >                       slab = STUDY.ID,
+> >                       data = Relationship_TE_Occurrence,
+> >                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,
+> >                       test = "t",
+> >                       method = "REML")
+> >
+> > summary(m_1_pet, digits=3)
+> >
+> > However, when I try to conduct the PEESE part I receive this error message:
+> > "Model matrix not of full rank. Cannot fit model" for the following code:
+> >
+> > Relationship$SE_Mod <- Relationship$vi^2
+> >
+> > m_1_peese <- rma.mv(yi = yi,
+> >                       V = vi,
+> >                       mods = ~ SE_Mod,
+> >                       slab = STUDY.ID,
+> >                       data = Relationship_TE_Occurrence,
+> >                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,
+> >                       test = "t",
+> >                       method = "REML")
+> >
+> > summary(m_1_peese, digits=3)
+> >
+> > Does anyone have any insight into why the model would fit for the PET part
+> > but not the PEESE? I'm not sure how to fix this issue.
+> >
+> > Thanks,
+> > Tori
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sun Dec 10 20:42:25 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Sun, 10 Dec 2023 19:42:25 +0000
+Subject: [R-meta] 
+ Multivariate multi-level meta-analysis: adjusting control
+ variables when modeling publication bias?
+In-Reply-To: <YT1PR01MB4012EC9BCCE6D4061E026038EC85A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+References: <CANPVL-UKkfUXHZhhv5FUj=2m=Qx8SP10QLf-QoFu=4khg9P3hQ@mail.gmail.com>
+ <AS8PR08MB919347D8859889EEC49F7D718B85A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <YT1PR01MB4012EC9BCCE6D4061E026038EC85A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+Message-ID: <AS8PR08MB9193C358625777DAAF3C95F08B88A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi Daniel,
+
+I don't think you ever got a response to this.
+
+I don't have much to say about this anyway, except that *very rarely* does it ever make sense to run a meta-analysis on test statistics. In any case, the idea of formulating a model like in PET where we use the test statistics as the dependent variables just doesn't carry over to random-effects / multilevel models as I demonstrated in one of my previous posts. Instead, we should use the model formulation where the effect sizes estimates are the dependent variable.
+
+Note that partial correlations are not test statistics.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Daniel Foster <daniel.foster at utoronto.ca>
+> Sent: Tuesday, December 5, 2023 21:46
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Subject: Re: [R-meta] Multivariate multi-level meta-analysis: adjusting control
+> variables when modeling publication bias?
+>
+> Hi Wolfgang,
+>
+> Thank you! Sorry, I am new to Stack Exchange and did not realize that you had
+> already provided a response. I deeply appreciate your insights.
+>
+> I do have a follow up question, if that's okay. I am also carrying two other
+> multilevel analyses - one uses the t-statistic as a dependent outcome, and
+> another uses the partial correlation coefficient (the computation of which is
+> derived from the t-statistic) as the dependent variable.
+>
+> You mention that the authors divide everything because they are working with
+> test statistics, which makes me wonder whether the analyses I just mentioned
+> require the same adjustment? However, you go on to say that random-effects
+> models and models with a multilevel structure do not require this adjustment. Do
+> you mind clarifying?
+>
+> Thank you again for your time! The mailing list archives are an incredible
+> resource!!
+>
+> I will also post this response on stack exchange, so that it is available to
+> others.
+>
+> Best,
+> Daniel
+>
+> ________________________________________
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf
+> of Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis <r-sig-meta-analysis at r-
+> project.org>
+> Sent: Tuesday, December 5, 2023 2:46 PM
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Subject: Re: [R-meta] Multivariate multi-level meta-analysis: adjusting control
+> variables when modeling publication bias?
+>
+> Hi Daniel,
+>
+> Didn't you ask the same question here?
+>
+> https://stats.stackexchange.com/q/633046/1934
+>
+> Please see my answer there.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On
+> Behalf
+> > Of Daniel Foster via R-sig-meta-analysis
+> > Sent: Tuesday, December 5, 2023 20:09
+> > To: r-sig-meta-analysis at r-project.org
+> > Cc: Daniel Foster <daniel.foster567 at gmail.com>
+> > Subject: [R-meta] Multivariate multi-level meta-analysis: adjusting control
+> > variables when modeling publication bias?
+> >
+> > Hello Wolfgang and all,
+> >
+> > I am carrying out multivariate multilevel meta-analysis using the
+> > rma.mv function in the metafor package, and I have come across an
+> > issue that has been giving me a lot of trouble. At this point I am at
+> > a stand still and any insight would be greatly appreciated!!
+> >
+> > When testing for publication bias using the PET approach, Doucouliagos
+> > & Stanley (2009), suggest using the following model in a weighted
+> > least squares formula:
+> >
+> > ES= B1(1/SE) + SIGMA ak(Zj/SEi )+ e
+> >
+> > Where SE is the standard error of the effect estimate,  Z is a vector
+> > of meta-independent variables reflecting differences across studies
+> > for the jth study in literature, ak is the meta-regression coefficient
+> > which reflects the effect of particular study characteristics.
+> >
+> > My confusion lies in the fact that they are suggesting that the
+> > control variables (Z) included need to be divided by the standard
+> > error of the effect estimate. My questions are this:
+> >
+> > Should I be dividing my control variables by the standard error of
+> > the effect estimate when using the rma.mv function?  I have found some
+> > multivariate multilevel meta-analyses that follow this method
+> > (Klomp, 2009), but then others that don't (at least explicitly;
+> > Akgunduz, 2018)
+> >
+> > If I do need to do this, it is not clear to me how a binary control
+> > variable can be incorporated in my mra.mv model (i.e., 1, 0). To my
+> > mind, it seems strange to divide a dichotomous variable by a
+> > continuous variable. What steps do I need to execute to include these
+> > variables in my mra.mv model?
+> >
+> > Thank you so much in advance for your insights!
+> >
+> > Daniel
+> >
+> > Akgunduz, Y. E., & Plantenga, J. (2018). doi: 10.1111/joes.12192
+> > Doucouliagos, H., & Stanley, T. D. (2009). doi: 10.1111/j.1467-
+> 8543.2009.00723.x
+> > Klomp, J., & De Haan, J. (2010). doi: 10.1111/j.1467-6419.2009.00597.x
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Sun Dec 10 22:19:23 2023
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?iso-8859-1?Q?Dr=2E_Gerta_R=FCcker?=)
+Date: Sun, 10 Dec 2023 21:19:23 +0000
+Subject: [R-meta] Publication bias in the context of subgroup analysis
+In-Reply-To: <AS8PR08MB9193147AEE33499AF0C2DF3D8B88A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <YT1PR01MB40126D728F940089E6D03D04EC88A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>
+ <AS8PR08MB9193147AEE33499AF0C2DF3D8B88A@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <33650b6540e24079a8cf0306cb443699@uniklinik-freiburg.de>
+
+Hi all,
+
+Only to clarify notions: Cochrane uses the term "subgroup analysis" in both meanings, conducting separate meta-analyses within subgroups and meta-analysing all studies in one analysis, with "subgroup" as a covariate, i.e., meta-analysis with a categorial covariate. See https://training.cochrane.org/handbook/current/chapter-10#section-10-11-2 and https://training.cochrane.org/handbook/current/chapter-10#section-10-11-3-1 . R package meta also uses this terminology.
+
+Best,
+Gerta
+
+
+UNIVERSIT?TSKLINIKUM FREIBURG
+Institute for Medical Biometry and Statistics
+
+Dr. Gerta R?cker
+Guest Scientist
+
+Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+gerta.ruecker at uniklinik-freiburg.de
+
+https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+
+-----Urspr?ngliche Nachricht-----
+Von: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> Im Auftrag von Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis
+Gesendet: Sonntag, 10. Dezember 2023 20:35
+An: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Betreff: Re: [R-meta] Publication bias in the context of subgroup analysis
+
+Hi Daniel,
+
+I am not sure why you posted the same question twice -- I'll respond to this one.
+
+In what sense do you mean 'subgroup analysis'? To me, a subgroup analysis is one where studies are split into subgroups and one fits models within these subgroups. This is not what you are doing below, at least the code doesn't reflect this.
+
+If your question is about using something like SE (or SE^2) as a predictor in the context of a model that includes other moderators, then the answer is yes. A relevant article in this regard is:
+
+Coburn, K. M., & Vevea, J. L. (2015). Publication bias as a function of study characteristics. Psychological Methods, 20(3), 310-330. https://doi.org/10.1037/met0000046
+
+It doesn't discuss multilevel models, but the point is that sometimes there might be a relationship between the effect sizes and the standard errors because of some confounding with other variables. For example, suppose we have two sets of studies in our meta-analysis, the first consisting of RCTs, the other non-randomized studies. Furthermore, assume that there is no publication bias going on. But now suppose that RCTs (which tend to be smaller due to the additional complexities of running a trial) tend to yield smaller (or larger) effects than the non-randomized studies (maybe the non-randomized studies are yielding somewhat biased estimates). In this situation, the funnel plot may look asymmetric, not because of publication bias, but because of the confounding of the SEs with study type. When including study type as a moderators, then this confounding is controlled for and we find no association between the effect sizes and SEs (rightly so). This shows that it may actually be very important to account for relevant moderators before examining the data for a relationship between the SEs and the effect sizes.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Daniel Foster via R-sig-meta-analysis
+> Sent: Sunday, December 10, 2023 18:48
+> To: Daniel Foster via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+> Cc: Daniel Foster <daniel.foster at utoronto.ca>
+> Subject: [R-meta] Publication bias in the context of subgroup analysis
+>
+> Hello all,
+>
+> I am carrying out a multi-level meta-analysis and I have a question regarding
+> publication bias in the context of subgroup analysis.
+>
+> I have noticed that many meta-regression models include a precision measure (SE
+> or SE^2) in their final model along with covariates. Is the same true for
+> subgroup analysis in a multi-level analysis wherein moderators are tested
+> individually?
+>
+> For example:
+> moderertorX <- rma.mv(yi, vi, mods = ~ SE + moderertorX, random = list(~ 1 |
+> EffectSize_ID, ~1 | Study_ID), tdist=TRUE, data=data)
+>
+> Thanks!
+> Daniel
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From t571 @end|ng |rom w|g@h@tp@edu@tw  Mon Dec 11 08:37:46 2023
+From: t571 @end|ng |rom w|g@h@tp@edu@tw (=?UTF-8?B?6Iux5paH56eR6Zmz5ZOB6Kqg?=)
+Date: Mon, 11 Dec 2023 15:37:46 +0800
+Subject: [R-meta] About meta-regression analysis
+Message-ID: <CAPm5Ok2LzzG5RCYKJSBCXKegsiqymrc6uaQ_ztR596nrg435dw@mail.gmail.com>
+
+Hello all,
+     As I read through the "Doing meta in R" website and to the part of
+meta-regression, this is the example that the website provides in order to
+change the categorical moderators into numerical ones (since you need
+"numbers" to begin to test the interaction between moderators):
+--------------------------------------------------------------------
+# Add factor labels to 'continent'
+# 0 = Europe
+# 1 = North America
+levels(MVRegressionData$continent) = c("Europe", "North America")
+--------------------------------------------------------------------
+and I thought of my own data. I have a moderator in my data named "Duration
+of treatment," with "Short", "Medium", "Long" and "N/A"(some of the studies
+didn't provide the duration of treatment). In this case, how would I code
+in order to change this moderator into numerical order to begin the
+meta-regression analysis?
+Nick
+??? (Nick Chen)
+Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Dec 11 10:26:44 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Mon, 11 Dec 2023 09:26:44 +0000
+Subject: [R-meta] About meta-regression analysis
+In-Reply-To: <CAPm5Ok2LzzG5RCYKJSBCXKegsiqymrc6uaQ_ztR596nrg435dw@mail.gmail.com>
+References: <CAPm5Ok2LzzG5RCYKJSBCXKegsiqymrc6uaQ_ztR596nrg435dw@mail.gmail.com>
+Message-ID: <AS8PR08MB91931B3235EC6C2F75BA7EA18B8FA@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Nick,
+
+One does not have to manually change a categorical moderator into a numerical one to examine interactions. Of course, categorical moderators are represented in a model in terms of numerical variables (typically via a set of dummy variables), but R can handle all of this encoding for you automatically. Here is an example with two categorical variables, one consisting of two levels, the other with three levels:
+
+https://www.metafor-project.org/doku.php/tips:multiple_factors_interactions
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of ?????? via R-sig-meta-analysis
+> Sent: Monday, December 11, 2023 08:38
+> To: r-sig-meta-analysis at r-project.org
+> Cc: ?????? <t571 at wlgsh.tp.edu.tw>
+> Subject: [R-meta] About meta-regression analysis
+>
+> Hello all,
+>      As I read through the "Doing meta in R" website and to the part of
+> meta-regression, this is the example that the website provides in order to
+> change the categorical moderators into numerical ones (since you need
+> "numbers" to begin to test the interaction between moderators):
+> --------------------------------------------------------------------
+> # Add factor labels to 'continent'
+> # 0 = Europe
+> # 1 = North America
+> levels(MVRegressionData$continent) = c("Europe", "North America")
+> --------------------------------------------------------------------
+> and I thought of my own data. I have a moderator in my data named "Duration
+> of treatment," with "Short", "Medium", "Long" and "N/A"(some of the studies
+> didn't provide the duration of treatment). In this case, how would I code
+> in order to change this moderator into numerical order to begin the
+> meta-regression analysis?
+> Nick
+> ??? (Nick Chen)
+> Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+
+From t571 @end|ng |rom w|g@h@tp@edu@tw  Tue Dec 12 00:21:09 2023
+From: t571 @end|ng |rom w|g@h@tp@edu@tw (=?UTF-8?B?6Iux5paH56eR6Zmz5ZOB6Kqg?=)
+Date: Tue, 12 Dec 2023 07:21:09 +0800
+Subject: [R-meta] Follow-up the coding question for meta-regression
+Message-ID: <CAPm5Ok33gF4zM=_OUw3ASvvEZzX0eNZcB0F8BNmUTjDHRh_HRQ@mail.gmail.com>
+
+Dear Wolfgang,
+     Sorry for another interruption. I ran into two more questions. First,
+when I was trying to write the code like this:
+
+dat$duration <- cut(dat$duration, breaks=c(0,4,8,12),
+labels=c(?NA?,?S?,?M?,?L?), right =FALSE)
+
+   and the system told me that ?x has to be numbers?, what should I do then?
+    (p.s. I am pretty sure that the part ?breaks? is also wrong?)
+
+   **Name of the moderator: duration
+       The distinction between the moderators:
+        NA = not provided
+        S (short) = 0-4 weeks
+        M (medium) = 4-8 weeks
+        L (long) = 8 weeks or above
+
+    and my second question is that, here is one of the interaction I
+performed:
+    [here I was trying to find out the interaction between the moderator
+"instruction type" and "research design", and instruction type was coded
+"ins" and with two categorical value "D (definition)" and "C(context)";
+research design was coded "rede" and with two categorical value "D
+(traditional)" and "O (others)"]
+
+Model Results:
+            estimate      se     zval    pval    ci.lb   ci.ub
+intrcpt       0.9482  0.3581   2.6476  0.0081   0.2463  1.6501  **
+insD          0.5142  0.4281   1.2012  0.2297  -0.3248  1.3532
+redeO         0.4920  0.6163   0.7984  0.4246  -0.7158  1.6998
+insD:redeO   -1.2206  0.8256  -1.4784  0.1393  -2.8388  0.3976
+
+
+Does the last line "insD:redeO" already means the interaction was not
+significant with the p-value of 0.1393? Do I need to do the "anova(res.il,
+btt3:4)" as suggested in the website?
+
+Nick
+??? (Nick Chen)
+Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+
+	[[alternative HTML version deleted]]
+
+
+From @|bertom@r@o|o @end|ng |rom m@||@com  Tue Dec 12 13:18:52 2023
+From: @|bertom@r@o|o @end|ng |rom m@||@com (Alberto Enrico Maraolo)
+Date: Tue, 12 Dec 2023 13:18:52 +0100
+Subject: [R-meta] Clarifications about pooling of continous outcomes when
+ geometric means are present
+References: <trinity-f7714299-87af-4833-a5e9-3e997f9734fa-1699050519581@3c-app-mailcom-lxa06>
+Message-ID: <trinity-e4693358-0505-4b15-a82d-c811dcef9d70-1702383532183@3c-app-mailcom-lxa09>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231212/4aba1735/attachment.html>
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Tue Dec 12 14:26:22 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 12 Dec 2023 13:26:22 +0000
+Subject: [R-meta] Follow-up the coding question for meta-regression
+In-Reply-To: <CAPm5Ok33gF4zM=_OUw3ASvvEZzX0eNZcB0F8BNmUTjDHRh_HRQ@mail.gmail.com>
+References: <CAPm5Ok33gF4zM=_OUw3ASvvEZzX0eNZcB0F8BNmUTjDHRh_HRQ@mail.gmail.com>
+Message-ID: <964474a4-c451-8757-8609-2a0c1ecf7899@dewey.myzen.co.uk>
+
+Comments in-line
+
+On 11/12/2023 23:21, ?????? via R-sig-meta-analysis wrote:
+> Dear Wolfgang,
+>       Sorry for another interruption. I ran into two more questions. First,
+> when I was trying to write the code like this:
+> 
+> dat$duration <- cut(dat$duration, breaks=c(0,4,8,12),
+> labels=c(?NA?,?S?,?M?,?L?), right =FALSE)
+> 
+>     and the system told me that ?x has to be numbers?, what should I do then?
+>      (p.s. I am pretty sure that the part ?breaks? is also wrong?)
+> 
+>     **Name of the moderator: duration
+>         The distinction between the moderators:
+>          NA = not provided
+>          S (short) = 0-4 weeks
+>          M (medium) = 4-8 weeks
+>          L (long) = 8 weeks or above
+
+
+So R is correct, that variable is not numeric but either character or 
+factor. You would not need breaks either.
+
+> 
+>      and my second question is that, here is one of the interaction I
+> performed:
+>      [here I was trying to find out the interaction between the moderator
+> "instruction type" and "research design", and instruction type was coded
+> "ins" and with two categorical value "D (definition)" and "C(context)";
+> research design was coded "rede" and with two categorical value "D
+> (traditional)" and "O (others)"]
+> 
+> Model Results:
+>              estimate      se     zval    pval    ci.lb   ci.ub
+> intrcpt       0.9482  0.3581   2.6476  0.0081   0.2463  1.6501  **
+> insD          0.5142  0.4281   1.2012  0.2297  -0.3248  1.3532
+> redeO         0.4920  0.6163   0.7984  0.4246  -0.7158  1.6998
+> insD:redeO   -1.2206  0.8256  -1.4784  0.1393  -2.8388  0.3976
+> 
+> 
+> Does the last line "insD:redeO" already means the interaction was not
+> significant with the p-value of 0.1393? Do I need to do the "anova(res.il,
+> btt3:4)" as suggested in the website?
+
+Yes, that interaction is not adding anything important in your model.
+
+Michael
+
+> 
+> Nick
+> ??? (Nick Chen)
+> Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Dec 12 15:44:49 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 12 Dec 2023 14:44:49 +0000
+Subject: [R-meta] 
+ Clarifications about pooling of continous outcomes when
+ geometric means are present
+In-Reply-To: <trinity-e4693358-0505-4b15-a82d-c811dcef9d70-1702383532183@3c-app-mailcom-lxa09>
+References: <trinity-f7714299-87af-4833-a5e9-3e997f9734fa-1699050519581@3c-app-mailcom-lxa06>
+ <trinity-e4693358-0505-4b15-a82d-c811dcef9d70-1702383532183@3c-app-mailcom-lxa09>
+Message-ID: <AS8PR08MB919393A5CDB1EDD51C409ADC8B8EA@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Alberto,
+
+No, as far as I understand your question, CVLN and SDLN are not measures that are relevant for your meta-analysis. One would have to use the equations given in the article you referenced.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Alberto Enrico Maraolo via R-sig-meta-analysis
+> Sent: Tuesday, December 12, 2023 13:19
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Alberto Enrico Maraolo <albertomaraolo at mail.com>
+> Subject: [R-meta] Clarifications about pooling of continous outcomes when
+> geometric means are present
+>
+> Dear all,
+>
+> I would like to have a help if possible on the pooling of continuous data,
+> specifically Pk/Pd outcomes in the presence of means, medians, and geometric
+> means.
+> The goal is to have a (standardized) mean difference between patients with two
+> different conditions.
+> Medians under certain assumption can be converted to means and the conv.fivenum
+> functions serves the purpose.
+>
+> The problem is the pooling of means with geometric means, since the latter
+> cannot be re-converted to arithmetic means without raw data.
+>
+> So, as suggested by the Cochrane Handbook, ?a meta-analysis may be then
+> performed on the scale of the log-transformed data?; the Handbook describes how
+> to derive the natural logs from the geometric means and how to compute standard
+> deviations of the log-transformed data from confidence intervals.
+> Since ?log-transformed and untransformed data cannot be mixed in a meta-
+> analysis?, the issue is to go from raw to transformed data for standard means,
+> and the suggestion is to follow the formulas from the paper of Higgins 2008.
+>
+> My question is: can I follow the chunks suggested in this page:
+>
+> https://wviechtb.github.io/metafor/reference/escalc.html?
+>
+> I mean the section 3a (?Measures for Quantitative Variables?), by resorting to
+> "CVLN" for the log transformed coefficient of variation and to "SDLN" for the
+> log transformed standard deviation in each group, in order to have log-
+> transformed data to be pooled with the natural logs from the geometric means.
+>
+> If there is some line of code also for faster handling of geometric means in
+> order to derive natural logs it would be nice as well.
+>
+> Warm regards,
+> Alberto
+>
+> Alberto Enrico Maraolo, MD, MSc (Antimicrobial Stewardship, Evidence Synthesis),
+> FESCMID
+>
+> Infectious Diseases Specialist, Member of the Steering Committee of SIMIT (ID
+> Italian Society)
+>
+> Cotugno Hospital, AORN dei Colli, Naples, Italy
+> mail: mailto:albertomaraolo at mail.com
+>
+> Alberto Enrico Maraolo, MD, MSc (Antimicrobial Stewardship, Evidence Synthesis),
+> FESCMID
+>
+> Specialista in Malattie Infettive, Consigliere Nazionale Direttivo SIMIT
+> (Societ? Italiana di Malattie Infettive e Tropicali)
+>
+> Dirigente Medico, AORN dei Colli - Ospedale Cotugno, Napoli
+
+From yh342 @end|ng |rom n@u@edu  Wed Dec 13 06:21:19 2023
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Tue, 12 Dec 2023 22:21:19 -0700
+Subject: [R-meta] Coding multi-measure correlational studies for multilevel
+ meta-analysis
+Message-ID: <CA+dzWjouCzAoQhK1Lo_OGprdFuv6J=j-8nYHtuzqovpt3L34PA@mail.gmail.com>
+
+Hello Experts,
+
+I'm collecting the correlations between 8 variables from several studies.
+If a study has used a single measure for all these 8 variables, I will need
+28 rows (assuming no missing) to capture all those correlations i.e.,
+var1.var2 = combn(1:8, 2, FUN=\(i)paste(i,collapse = ".")):
+
+    study   ri   var1.var2
+1)  1        .1   1.2
+ ...
+28) 1       .2    7.8
+
+But if a study has used, say, two measures (e.g., 1, 2) for two of those 8
+variables (e.g., variables "1" and "2" in 'var1.var2'), then, I wonder how
+**best** to capture the additional 13 correlations arising due to the
+additional measure used for "1" and "2" in that study in my data for
+multilevel modeling purposes?
+
+One approach might be to add a single column called, say "measure" to add
+just those additional rows in that multi-measure study:
+
+    study   ri   var1.var2  measure
+1)   1       .1    1.2
+ ...
+6)   1       .6     1.7           1
+7)   1       .4     1.7           2
+...
+12)  1       .8     2.7          1
+13)  1       .7     2.7          2
+...
+
+But this looks messy. For instance, what should be the value of "measure"
+for the var1.var2 rows that have used a single measure (e.g., var1.var2 ==
+1.2)? And can "measure" coded this way be used in the random part of the
+model (metafor::rma.mv)?
+
+Thanks,
+Yuhang
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Dec 13 15:05:59 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 13 Dec 2023 14:05:59 +0000
+Subject: [R-meta] 
+ Coding multi-measure correlational studies for multilevel
+ meta-analysis
+In-Reply-To: <CA+dzWjouCzAoQhK1Lo_OGprdFuv6J=j-8nYHtuzqovpt3L34PA@mail.gmail.com>
+References: <CA+dzWjouCzAoQhK1Lo_OGprdFuv6J=j-8nYHtuzqovpt3L34PA@mail.gmail.com>
+Message-ID: <AS8PR08MB91935F19C2D46BEC1A1C65FA8B8DA@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Hi Yuhang,
+
+First of all, I would suggest to create two separate variables for the two variables, like this:
+
+    study    ri   ni  var1  var2
+1)  1        .1   85  1     2
+...
+28) 1        .2   85  7     8
+
+Then you can use rcalc() to create the var-cov matrix of the (raw or r-to-z transformed) correlation coefficients within studies (the 'V' matrix), that is, if your dataset is called 'dat', you can do:
+
+tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat)
+V <- tmp$V
+dat <- tmp$dat
+
+Sidenote: For 8 variables, there are 8*7/2 correlations (or generally, for p variables, p*(p-1)/2 -- this is one of those equations one eventually has memorized due to using it so often).
+
+For a study (say, study 2) that used multiple measures for one of the variables (say, variable 8), there are then actually 9 variables and hence 9*8/2 = 36 correlations. The structure then is:
+
+    study    ri   ni  var1  var2  measure1 measure2
+1)  2        .1   78  1     2     a        b
+...
+7)  2        .3   78  1     8     a        x
+8)  2        .2   78  1     8     a        y
+9)  2        .4   78  2     3     b        c
+...
+14) 2        .3   78  2     8     b        x
+15) 2        .2   78  2     8     b        y
+16) 2        .5   78  3     4     c        d
+...
+20) 2        .4   78  3     8     c        x
+21) 2        .5   78  3     8     c        y
+22) 2        .1   78  4     5     d        e
+...
+25) 2        .0   78  4     8     d        x
+26) 2        .1   78  4     8     d        y
+27) 2        .3   78  5     6     e        f
+...
+29) 2        .3   78  5     8     e        x
+30) 2        .2   78  5     8     e        y
+31) 2        .2   78  6     7     f        g
+32) 2        .3   78  6     8     f        x
+33) 2        .1   78  6     8     f        y
+34) 2        .1   78  7     8     g        x
+35) 2        .2   78  7     8     g        y
+36) 2        .3   78  8     8     x        y
+
+The actual values used for measure1 and measure2 are irrelevant, as long as you use them consistently within a study. For studies that only used a single measure for each variable, you can leave measure1 and measure2 blank. For studies that used multiple measures for more than one variable, you have to keep expanding this structure. It just becomes very tedious to construct.
+
+Then for rcalc(), you need to paste together var1 and measure1 and var2 and measure2:
+
+dat$v1m1 <- paste0(dat$var1, ".", dat$measure1)
+dat$v2m2 <- paste0(dat$var2, ".", dat$measure2)
+
+and use those in rcalc():
+
+tmp <- rcalc(ri ~ v1m1 + v2m2 | study, ni=ni, data=dat)
+V <- tmp$V
+dat <- tmp$dat
+
+For the actual model fitted with rma.mv(), you don't use the combination of v1m1 and v2m2, but the combination of var1 and var2 as the predictor:
+
+dat$var1var2 <- paste0(dat$var1, ".", dat$var2)
+
+since you *want* the model not to give you estimates of 'measure-specific' pooled correlations, but you want to average over multiple measures for the same variable. So the model could be:
+
+rma.mv(yi, V, mods = ~ 0 + var1var2, random = ~ var1var2 | study, struct="UN", data=dat)
+
+However, this model will need to estimate 28*27/2 = 378 correlations plus 28 variances (tau^2 values) for the random effects, so in total 406 (!!) parameters (the general equation is p*(p+1)/2), plus the 28 fixed effects. That's a lot of parameters in the unstructured var-cov matrix of the random effects, so unless you have a lot of studies (hundreds if not thousands), this is going to be difficult or essentially impossible. This aside, the model allows for no heterogeneity when there are multiple correlations for the same var1var2 pair. A simple way to allow for this is to add another estimate specific random effect to the model:
+
+dat$id <- 1:nrow(dat)
+rma.mv(yi, V, mods = ~ 0 + var1var2, random = list(~ var1var2 | study, ~ 1 | id), struct="UN", data=dat)
+
+This is simplistic, since it assumes that the heterogeneity in multiple correlations for the same pair is the same regardless of the pair. If you have a lot of data, one could try:
+
+rma.mv(yi, V, mods = ~ 0 + var1var2, random = list(~ var1var2 | study, ~ var1var2 | id), struct=c("UN","DIAG"), data=dat)
+
+which would use separate estimate-level random effects for each pair, but this adds another 28 parameters to the model. But who cares about another 28 if one already has 406 ...
+
+Realistically, one needs to simplify the random effects structure. On the opposite end, there is the minimalistic:
+
+res <- rma.mv(yi, V, mods = ~ 0 + var1var2, random = ~ 1 | study/id, data=dat)
+res
+
+which, due to its overly simplistic nature, really needs to be followed-up with:
+
+robust(res, cluster=study, clubSandwich=TRUE)
+
+(could do the same with the models above, but this is less likely to matter if one actually manages to fit these complex models).
+
+An interesting question is what kind of structures of intermediate complexity one could consider.
+
+But I'll stop here for now, since this is getting way too long anyway.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Yuhang Hu via R-sig-meta-analysis
+> Sent: Wednesday, December 13, 2023 06:21
+> To: R meta <r-sig-meta-analysis at r-project.org>
+> Cc: Yuhang Hu <yh342 at nau.edu>
+> Subject: [R-meta] Coding multi-measure correlational studies for multilevel
+> meta-analysis
+>
+> Hello Experts,
+>
+> I'm collecting the correlations between 8 variables from several studies.
+> If a study has used a single measure for all these 8 variables, I will need
+> 28 rows (assuming no missing) to capture all those correlations i.e.,
+> var1.var2 = combn(1:8, 2, FUN=\(i)paste(i,collapse = ".")):
+>
+>     study   ri   var1.var2
+> 1)  1        .1   1.2
+>  ...
+> 28) 1       .2    7.8
+>
+> But if a study has used, say, two measures (e.g., 1, 2) for two of those 8
+> variables (e.g., variables "1" and "2" in 'var1.var2'), then, I wonder how
+> **best** to capture the additional 13 correlations arising due to the
+> additional measure used for "1" and "2" in that study in my data for
+> multilevel modeling purposes?
+>
+> One approach might be to add a single column called, say "measure" to add
+> just those additional rows in that multi-measure study:
+>
+>     study   ri   var1.var2  measure
+> 1)   1       .1    1.2
+>  ...
+> 6)   1       .6     1.7           1
+> 7)   1       .4     1.7           2
+> ...
+> 12)  1       .8     2.7          1
+> 13)  1       .7     2.7          2
+> ...
+>
+> But this looks messy. For instance, what should be the value of "measure"
+> for the var1.var2 rows that have used a single measure (e.g., var1.var2 ==
+> 1.2)? And can "measure" coded this way be used in the random part of the
+> model (metafor::rma.mv)?
+>
+> Thanks,
+> Yuhang
+
+
+From th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com  Wed Dec 13 22:16:47 2023
+From: th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com (Tharaka S. Priyadarshana)
+Date: Thu, 14 Dec 2023 05:16:47 +0800
+Subject: [R-meta] ML or REML in rma.mv
+Message-ID: <CADWK9cfzoa9oB-GRR1VjJT0vb_huQ8LYZYvm6TGiAMmxHdP9UQ@mail.gmail.com>
+
+Hello everyone,
+
+I recently came across a paper that used "ML" estimation for a multi-level
+meta-analysis, i.e. using "ML" with "rma.mv" function.
+
+According to "metafor" description, it says that, "use of restricted
+maximum likelihood (REML) estimation is generally recommended";
+https://wviechtb.github.io/metafor/reference/misc-recs.html#:~:text=When%20fitting%20models%20with%20the,method%3D%22REML%22%20
+).
+
+Could someone please explain to me whether is it possible to get
+different results if someone uses "ML" estimation instead of "REML" with ""
+rma.mv" function? If yes/no, why is that?
+Then, what are the major issues if "ML" estimation is used instead of
+"REML" with ""rma.mv" function?
+Could you please also share if you have any references (or any other
+examples) that discuss these points? I mean the use of "ML" or "REML"
+estimation in multi-level meta-analytic models.
+
+Thank you very much.
+
+Best regards,
+Tharaka
+
+	[[alternative HTML version deleted]]
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Thu Dec 14 01:40:40 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Thu, 14 Dec 2023 00:40:40 +0000
+Subject: [R-meta] ML or REML in rma.mv
+In-Reply-To: <CADWK9cfzoa9oB-GRR1VjJT0vb_huQ8LYZYvm6TGiAMmxHdP9UQ@mail.gmail.com>
+References: <CADWK9cfzoa9oB-GRR1VjJT0vb_huQ8LYZYvm6TGiAMmxHdP9UQ@mail.gmail.com>
+Message-ID: <SYCPR01MB542305FA29C78D5F2A5D44A19D8CA@SYCPR01MB5423.ausprd01.prod.outlook.com>
+
+Hey Tharaka,
+
+Two points for your consideration:
+
+1. ?Some simulation papers show that ML underestimates variance components, while REML does not. When sample sizes are not small, they should converge very well. Also, they do not show substantial discrepancy in the fixed effects estimation.
+
+2. In the context of model selection, conventional wisdom thinks ML and REML matter a lot, because you can not directly compare likelihoods from REML models with different fixed effects. Interestingly, there is also simulation work indicating that using REML as an estimator for model selection is doable.
+
+There are quite a few papers on the heterogeneity estimator in the context of meta-analysis. For example,
+
+Viechtbauer W. Bias and efficiency of meta-analytic variance estimators in the random-effects model[J]. Journal of Educational and Behavioral Statistics, 2005, 30(3): 261-293.
+Veroniki A A, Jackson D, Viechtbauer W, et al. Methods to estimate the between?study variance and its uncertainty in meta?analysis[J]. Research synthesis methods, 2016, 7(1): 55-79.
+Petropoulou M, Mavridis D. A comparison of 20 heterogeneity variance estimators in statistical synthesis of results from studies: a simulation study[J]. Statistics in medicine, 2017, 36(27): 4266-4280.
+Langan D, Higgins J P T, Jackson D, et al. A comparison of heterogeneity variance estimators in simulated random?effects meta?analyses[J]. Research synthesis methods, 2019, 10(1): 83-98.
+
+Regards,
+Yefeng
+________________________________
+From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Tharaka S. Priyadarshana via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>
+Sent: 14 December 2023 8:16
+To: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Cc: Tharaka S. Priyadarshana <tharakas.priyadarshana at gmail.com>
+Subject: [R-meta] ML or REML in rma.mv
+
+Hello everyone,
+
+I recently came across a paper that used "ML" estimation for a multi-level
+meta-analysis, i.e. using "ML" with "rma.mv" function.
+
+According to "metafor" description, it says that, "use of restricted
+maximum likelihood (REML) estimation is generally recommended";
+https://wviechtb.github.io/metafor/reference/misc-recs.html#:~:text=When%20fitting%20models%20with%20the,method%3D%22REML%22%20
+).
+
+Could someone please explain to me whether is it possible to get
+different results if someone uses "ML" estimation instead of "REML" with ""
+rma.mv" function? If yes/no, why is that?
+Then, what are the major issues if "ML" estimation is used instead of
+"REML" with ""rma.mv" function?
+Could you please also share if you have any references (or any other
+examples) that discuss these points? I mean the use of "ML" or "REML"
+estimation in multi-level meta-analytic models.
+
+Thank you very much.
+
+Best regards,
+Tharaka
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From yh342 @end|ng |rom n@u@edu  Thu Dec 14 04:21:25 2023
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Wed, 13 Dec 2023 20:21:25 -0700
+Subject: [R-meta] 
+ Coding multi-measure correlational studies for multilevel
+ meta-analysis
+In-Reply-To: <AS8PR08MB91935F19C2D46BEC1A1C65FA8B8DA@AS8PR08MB9193.eurprd08.prod.outlook.com>
+References: <CA+dzWjouCzAoQhK1Lo_OGprdFuv6J=j-8nYHtuzqovpt3L34PA@mail.gmail.com>
+ <AS8PR08MB91935F19C2D46BEC1A1C65FA8B8DA@AS8PR08MB9193.eurprd08.prod.outlook.com>
+Message-ID: <CA+dzWjqjM6-WvmxjwQCx7RhMR-NECxQJk9nrdoaTr1K+LNBFPg@mail.gmail.com>
+
+Dear Wolfgang, thank you so much. A few observations.
+
+1- This is, as you said, "very tedious to construct". So, I really wonder
+if we "*want* the model not to give us estimates of 'measure-specific'
+pooled correlations", then, can't we just average (maybe using
+metafor::aggregate.escalc) across "ri" for different measures manually and
+this way, reduce the data rows for a multi-measure study to 28 rows just
+like a single-measure?
+
+2- The difficulty of coding these studies extends to other
+variable-specific moderators as well. For example, if I want to code for
+the reliability of the variables in each pair, there again, things get
+messy in multi-measure studies. So, here I should average over reliability
+values for each variable across different measures?
+
+3- What if the variable-specific moderators in a multi-measure study were
+categorical? Say, qualitative features of the measures used (e.g., standard
+vs. researcher-developed). Now, we can't average over this feature for each
+variable across different measures. So what can we do?
+
+4- Regarding rcalc(), I actually intentionally didn't use it, because, at
+times, studies used multiple samples and times of measurement.
+
+Thank you,
+Yuhang
+
+On Wed, Dec 13, 2023 at 7:06?AM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Hi Yuhang,
+>
+> First of all, I would suggest to create two separate variables for the two
+> variables, like this:
+>
+>     study    ri   ni  var1  var2
+> 1)  1        .1   85  1     2
+> ...
+> 28) 1        .2   85  7     8
+>
+> Then you can use rcalc() to create the var-cov matrix of the (raw or
+> r-to-z transformed) correlation coefficients within studies (the 'V'
+> matrix), that is, if your dataset is called 'dat', you can do:
+>
+> tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat)
+> V <- tmp$V
+> dat <- tmp$dat
+>
+> Sidenote: For 8 variables, there are 8*7/2 correlations (or generally, for
+> p variables, p*(p-1)/2 -- this is one of those equations one eventually has
+> memorized due to using it so often).
+>
+> For a study (say, study 2) that used multiple measures for one of the
+> variables (say, variable 8), there are then actually 9 variables and hence
+> 9*8/2 = 36 correlations. The structure then is:
+>
+>     study    ri   ni  var1  var2  measure1 measure2
+> 1)  2        .1   78  1     2     a        b
+> ...
+> 7)  2        .3   78  1     8     a        x
+> 8)  2        .2   78  1     8     a        y
+> 9)  2        .4   78  2     3     b        c
+> ...
+> 14) 2        .3   78  2     8     b        x
+> 15) 2        .2   78  2     8     b        y
+> 16) 2        .5   78  3     4     c        d
+> ...
+> 20) 2        .4   78  3     8     c        x
+> 21) 2        .5   78  3     8     c        y
+> 22) 2        .1   78  4     5     d        e
+> ...
+> 25) 2        .0   78  4     8     d        x
+> 26) 2        .1   78  4     8     d        y
+> 27) 2        .3   78  5     6     e        f
+> ...
+> 29) 2        .3   78  5     8     e        x
+> 30) 2        .2   78  5     8     e        y
+> 31) 2        .2   78  6     7     f        g
+> 32) 2        .3   78  6     8     f        x
+> 33) 2        .1   78  6     8     f        y
+> 34) 2        .1   78  7     8     g        x
+> 35) 2        .2   78  7     8     g        y
+> 36) 2        .3   78  8     8     x        y
+>
+> The actual values used for measure1 and measure2 are irrelevant, as long
+> as you use them consistently within a study. For studies that only used a
+> single measure for each variable, you can leave measure1 and measure2
+> blank. For studies that used multiple measures for more than one variable,
+> you have to keep expanding this structure. It just becomes very tedious to
+> construct.
+>
+> Then for rcalc(), you need to paste together var1 and measure1 and var2
+> and measure2:
+>
+> dat$v1m1 <- paste0(dat$var1, ".", dat$measure1)
+> dat$v2m2 <- paste0(dat$var2, ".", dat$measure2)
+>
+> and use those in rcalc():
+>
+> tmp <- rcalc(ri ~ v1m1 + v2m2 | study, ni=ni, data=dat)
+> V <- tmp$V
+> dat <- tmp$dat
+>
+> For the actual model fitted with rma.mv(), you don't use the combination
+> of v1m1 and v2m2, but the combination of var1 and var2 as the predictor:
+>
+> dat$var1var2 <- paste0(dat$var1, ".", dat$var2)
+>
+> since you *want* the model not to give you estimates of 'measure-specific'
+> pooled correlations, but you want to average over multiple measures for the
+> same variable. So the model could be:
+>
+> rma.mv(yi, V, mods = ~ 0 + var1var2, random = ~ var1var2 | study,
+> struct="UN", data=dat)
+>
+> However, this model will need to estimate 28*27/2 = 378 correlations plus
+> 28 variances (tau^2 values) for the random effects, so in total 406 (!!)
+> parameters (the general equation is p*(p+1)/2), plus the 28 fixed effects.
+> That's a lot of parameters in the unstructured var-cov matrix of the random
+> effects, so unless you have a lot of studies (hundreds if not thousands),
+> this is going to be difficult or essentially impossible. This aside, the
+> model allows for no heterogeneity when there are multiple correlations for
+> the same var1var2 pair. A simple way to allow for this is to add another
+> estimate specific random effect to the model:
+>
+> dat$id <- 1:nrow(dat)
+> rma.mv(yi, V, mods = ~ 0 + var1var2, random = list(~ var1var2 | study, ~
+> 1 | id), struct="UN", data=dat)
+>
+> This is simplistic, since it assumes that the heterogeneity in multiple
+> correlations for the same pair is the same regardless of the pair. If you
+> have a lot of data, one could try:
+>
+> rma.mv(yi, V, mods = ~ 0 + var1var2, random = list(~ var1var2 | study, ~
+> var1var2 | id), struct=c("UN","DIAG"), data=dat)
+>
+> which would use separate estimate-level random effects for each pair, but
+> this adds another 28 parameters to the model. But who cares about another
+> 28 if one already has 406 ...
+>
+> Realistically, one needs to simplify the random effects structure. On the
+> opposite end, there is the minimalistic:
+>
+> res <- rma.mv(yi, V, mods = ~ 0 + var1var2, random = ~ 1 | study/id,
+> data=dat)
+> res
+>
+> which, due to its overly simplistic nature, really needs to be followed-up
+> with:
+>
+> robust(res, cluster=study, clubSandwich=TRUE)
+>
+> (could do the same with the models above, but this is less likely to
+> matter if one actually manages to fit these complex models).
+>
+> An interesting question is what kind of structures of intermediate
+> complexity one could consider.
+>
+> But I'll stop here for now, since this is getting way too long anyway.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Yuhang Hu via R-sig-meta-analysis
+> > Sent: Wednesday, December 13, 2023 06:21
+> > To: R meta <r-sig-meta-analysis at r-project.org>
+> > Cc: Yuhang Hu <yh342 at nau.edu>
+> > Subject: [R-meta] Coding multi-measure correlational studies for
+> multilevel
+> > meta-analysis
+> >
+> > Hello Experts,
+> >
+> > I'm collecting the correlations between 8 variables from several studies.
+> > If a study has used a single measure for all these 8 variables, I will
+> need
+> > 28 rows (assuming no missing) to capture all those correlations i.e.,
+> > var1.var2 = combn(1:8, 2, FUN=\(i)paste(i,collapse = ".")):
+> >
+> >     study   ri   var1.var2
+> > 1)  1        .1   1.2
+> >  ...
+> > 28) 1       .2    7.8
+> >
+> > But if a study has used, say, two measures (e.g., 1, 2) for two of those
+> 8
+> > variables (e.g., variables "1" and "2" in 'var1.var2'), then, I wonder
+> how
+> > **best** to capture the additional 13 correlations arising due to the
+> > additional measure used for "1" and "2" in that study in my data for
+> > multilevel modeling purposes?
+> >
+> > One approach might be to add a single column called, say "measure" to add
+> > just those additional rows in that multi-measure study:
+> >
+> >     study   ri   var1.var2  measure
+> > 1)   1       .1    1.2
+> >  ...
+> > 6)   1       .6     1.7           1
+> > 7)   1       .4     1.7           2
+> > ...
+> > 12)  1       .8     2.7          1
+> > 13)  1       .7     2.7          2
+> > ...
+> >
+> > But this looks messy. For instance, what should be the value of "measure"
+> > for the var1.var2 rows that have used a single measure (e.g., var1.var2
+> ==
+> > 1.2)? And can "measure" coded this way be used in the random part of the
+> > model (metafor::rma.mv)?
+> >
+> > Thanks,
+> > Yuhang
+>
+
+	[[alternative HTML version deleted]]
+
+
+From t571 @end|ng |rom w|g@h@tp@edu@tw  Thu Dec 14 15:09:30 2023
+From: t571 @end|ng |rom w|g@h@tp@edu@tw (=?UTF-8?B?6Iux5paH56eR6Zmz5ZOB6Kqg?=)
+Date: Thu, 14 Dec 2023 22:09:30 +0800
+Subject: [R-meta] About choosing the reference
+Message-ID: <CAPm5Ok2S1sn9kuu+DaJJrA+RJJtX29J-w-4=Ec6V=AYwM5kNZQ@mail.gmail.com>
+
+Dear all,
+
+       When performing meta-regression analysis, I use this code to change
+turn a variable into a factor:
+
+dat$duration <- relevel
+<http://stat.ethz.ch/R-manual/R-devel/library/stats/html/relevel.html>(factor
+<http://stat.ethz.ch/R-manual/R-devel/library/base/html/factor.html>(dat$duration),
+ref="S")
+
+       In my data, the duration moderator has four values including S
+(short), M (medium), L (long), and NA (not provided). And I tried to figure
+out the interaction between this moderator and another moderator named
+"Posttest type" with two values of M (meaning) and U (use). The problem I
+face now is that with different ference I used,  the coefficiency will
+differ, for example,
+(a) I use M as reference for duration, and this is the result
+
+                          estimate       se        zval          pval
+     ci.lb           ci.ub
+
+durS:posU  2.3309  0.8690 2.6824 0.0073  0.6278  4.0341   **
+
+
+(b) I use N/A as reference for duration, and this is the result
+
+                                                        estimate
+ se             zval          pval           ci.lb            ci.ub
+
+durS:posU  1.7890  1.4294 1.2516 0.2107 -1.0126  4.5906
+
+
+(c) I use L as reference for duration, and this is the result
+
+
+                            estimate       se              zval
+ pval           ci.lb            ci.ub
+
+durS:posU  1.2827  0.9275  1.3829 0.1667 -0.5352 3.1005
+
+
+So, eventually, which one should I choose to be the final result? Is
+there any criteria to choose between the three?
+
+
+Nick
+
+
+??? (Nick Chen)
+Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Dec 14 17:03:32 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 14 Dec 2023 16:03:32 +0000
+Subject: [R-meta] 
+ Coding multi-measure correlational studies for multilevel
+ meta-analysis
+In-Reply-To: <CA+dzWjqjM6-WvmxjwQCx7RhMR-NECxQJk9nrdoaTr1K+LNBFPg@mail.gmail.com>
+References: <CA+dzWjouCzAoQhK1Lo_OGprdFuv6J=j-8nYHtuzqovpt3L34PA@mail.gmail.com>
+ <AS8PR08MB91935F19C2D46BEC1A1C65FA8B8DA@AS8PR08MB9193.eurprd08.prod.outlook.com>
+ <CA+dzWjqjM6-WvmxjwQCx7RhMR-NECxQJk9nrdoaTr1K+LNBFPg@mail.gmail.com>
+Message-ID: <AS8PR08MB919351B30C74CD5B084BEBCD8B8CA@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Please see my responses below.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Yuhang Hu <yh342 at nau.edu>
+> Sent: Thursday, December 14, 2023 04:21
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Subject: Re: [R-meta] Coding multi-measure correlational studies for multilevel
+> meta-analysis
+>
+> Dear Wolfgang, thank you so much. A few observations.
+>
+> 1- This is, as you said, "very tedious to construct". So, I really wonder if we
+> "*want* the model not to give us estimates of 'measure-specific' pooled
+> correlations", then, can't we just average (maybe using
+> metafor::aggregate.escalc) across "ri" for different measures manually and this
+> way, reduce the data rows for a multi-measure study to 28 rows just like a
+> single-measure?
+
+In order to do this correctly, one would have to compute the var-cov matrix of the correlations one wants to pool over anyway. Of course, nobody is going to stop you from just averaging them and pretending that it is just a single correlation coefficient. It's just objectively wrong.
+
+> 2- The difficulty of coding these studies extends to other variable-specific
+> moderators as well. For example, if I want to code for the reliability of the
+> variables in each pair, there again, things get messy in multi-measure studies.
+> So, here I should average over reliability values for each variable across
+> different measures?
+
+As above.
+
+> 3- What if the variable-specific moderators in a multi-measure study were
+> categorical? Say, qualitative features of the measures used (e.g., standard vs.
+> researcher-developed). Now, we can't average over this feature for each variable
+> across different measures. So what can we do?
+
+This would in fact be an argument for not averaging and include the various correlations corresponding to different measures (with a measure-specific moderator variable).
+
+> 4- Regarding rcalc(), I actually intentionally didn't use it, because, at times,
+> studies used multiple samples and times of measurement.
+
+But rcalc() can handle this. Multiple samples are independent, so those just need to be treated (for the purposes of rcalc()) as different studies. And there is, from a computational point, no difference between multiple measures and multiple time points. It just creates more variables. Of course this complicates the construction of the dataset used as input to rcalc(), but that's a practical issue.
+
+I totally get that constructing such a dataset is quite difficult and time-consuming, if not impossible. What I describe below is the ideal approach where one constructs the dataset for a study that includes every possible pair of variables, where variables can reflect different constructs, multiple measures of the same construct, and/or multiple timepoints. If this is not possible due to logistic/practical reasons, then one would have to consider alternative approaches. A rough var-cov matrix could still be constructed with the vcalc() function. One could even go as far as pretending V is diagonal. In any case, cluster-robust inference methods should then be used.
+
+> Thank you,
+> Yuhang
+>
+> On Wed, Dec 13, 2023 at 7:06?AM Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> Hi Yuhang,
+>
+> First of all, I would suggest to create two separate variables for the two
+> variables, like this:
+>
+>     study    ri   ni  var1  var2
+> 1)  1        .1   85  1     2
+> ...
+> 28) 1        .2   85  7     8
+>
+> Then you can use rcalc() to create the var-cov matrix of the (raw or r-to-z
+> transformed) correlation coefficients within studies (the 'V' matrix), that is,
+> if your dataset is called 'dat', you can do:
+>
+> tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat)
+> V <- tmp$V
+> dat <- tmp$dat
+>
+> Sidenote: For 8 variables, there are 8*7/2 correlations (or generally, for p
+> variables, p*(p-1)/2 -- this is one of those equations one eventually has
+> memorized due to using it so often).
+>
+> For a study (say, study 2) that used multiple measures for one of the variables
+> (say, variable 8), there are then actually 9 variables and hence 9*8/2 = 36
+> correlations. The structure then is:
+>
+>     study    ri   ni  var1  var2  measure1 measure2
+> 1)  2        .1   78  1     2     a        b
+> ...
+> 7)  2        .3   78  1     8     a        x
+> 8)  2        .2   78  1     8     a        y
+> 9)  2        .4   78  2     3     b        c
+> ...
+> 14) 2        .3   78  2     8     b        x
+> 15) 2        .2   78  2     8     b        y
+> 16) 2        .5   78  3     4     c        d
+> ...
+> 20) 2        .4   78  3     8     c        x
+> 21) 2        .5   78  3     8     c        y
+> 22) 2        .1   78  4     5     d        e
+> ...
+> 25) 2        .0   78  4     8     d        x
+> 26) 2        .1   78  4     8     d        y
+> 27) 2        .3   78  5     6     e        f
+> ...
+> 29) 2        .3   78  5     8     e        x
+> 30) 2        .2   78  5     8     e        y
+> 31) 2        .2   78  6     7     f        g
+> 32) 2        .3   78  6     8     f        x
+> 33) 2        .1   78  6     8     f        y
+> 34) 2        .1   78  7     8     g        x
+> 35) 2        .2   78  7     8     g        y
+> 36) 2        .3   78  8     8     x        y
+>
+> The actual values used for measure1 and measure2 are irrelevant, as long as you
+> use them consistently within a study. For studies that only used a single
+> measure for each variable, you can leave measure1 and measure2 blank. For
+> studies that used multiple measures for more than one variable, you have to keep
+> expanding this structure. It just becomes very tedious to construct.
+>
+> Then for rcalc(), you need to paste together var1 and measure1 and var2 and
+> measure2:
+>
+> dat$v1m1 <- paste0(dat$var1, ".", dat$measure1)
+> dat$v2m2 <- paste0(dat$var2, ".", dat$measure2)
+>
+> and use those in rcalc():
+>
+> tmp <- rcalc(ri ~ v1m1 + v2m2 | study, ni=ni, data=dat)
+> V <- tmp$V
+> dat <- tmp$dat
+>
+> For the actual model fitted with http://rma.mv(), you don't use the combination
+> of v1m1 and v2m2, but the combination of var1 and var2 as the predictor:
+>
+> dat$var1var2 <- paste0(dat$var1, ".", dat$var2)
+>
+> since you *want* the model not to give you estimates of 'measure-specific'
+> pooled correlations, but you want to average over multiple measures for the same
+> variable. So the model could be:
+>
+> http://rma.mv(yi, V, mods = ~ 0 + var1var2, random = ~ var1var2 | study,
+> struct="UN", data=dat)
+>
+> However, this model will need to estimate 28*27/2 = 378 correlations plus 28
+> variances (tau^2 values) for the random effects, so in total 406 (!!) parameters
+> (the general equation is p*(p+1)/2), plus the 28 fixed effects. That's a lot of
+> parameters in the unstructured var-cov matrix of the random effects, so unless
+> you have a lot of studies (hundreds if not thousands), this is going to be
+> difficult or essentially impossible. This aside, the model allows for no
+> heterogeneity when there are multiple correlations for the same var1var2 pair. A
+> simple way to allow for this is to add another estimate specific random effect
+> to the model:
+>
+> dat$id <- 1:nrow(dat)
+> http://rma.mv(yi, V, mods = ~ 0 + var1var2, random = list(~ var1var2 | study, ~
+> 1 | id), struct="UN", data=dat)
+>
+> This is simplistic, since it assumes that the heterogeneity in multiple
+> correlations for the same pair is the same regardless of the pair. If you have a
+> lot of data, one could try:
+>
+> http://rma.mv(yi, V, mods = ~ 0 + var1var2, random = list(~ var1var2 | study, ~
+> var1var2 | id), struct=c("UN","DIAG"), data=dat)
+>
+> which would use separate estimate-level random effects for each pair, but this
+> adds another 28 parameters to the model. But who cares about another 28 if one
+> already has 406 ...
+>
+> Realistically, one needs to simplify the random effects structure. On the
+> opposite end, there is the minimalistic:
+>
+> res <- http://rma.mv(yi, V, mods = ~ 0 + var1var2, random = ~ 1 | study/id,
+> data=dat)
+> res
+>
+> which, due to its overly simplistic nature, really needs to be followed-up with:
+>
+> robust(res, cluster=study, clubSandwich=TRUE)
+>
+> (could do the same with the models above, but this is less likely to matter if
+> one actually manages to fit these complex models).
+>
+> An interesting question is what kind of structures of intermediate complexity
+> one could consider.
+>
+> But I'll stop here for now, since this is getting way too long anyway.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Yuhang Hu via R-sig-meta-analysis
+> > Sent: Wednesday, December 13, 2023 06:21
+> > To: R meta <mailto:r-sig-meta-analysis at r-project.org>
+> > Cc: Yuhang Hu <mailto:yh342 at nau.edu>
+> > Subject: [R-meta] Coding multi-measure correlational studies for multilevel
+> > meta-analysis
+> >
+> > Hello Experts,
+> >
+> > I'm collecting the correlations between 8 variables from several studies.
+> > If a study has used a single measure for all these 8 variables, I will need
+> > 28 rows (assuming no missing) to capture all those correlations i.e.,
+> > var1.var2 = combn(1:8, 2, FUN=\(i)paste(i,collapse = ".")):
+> >
+> >     study   ri   var1.var2
+> > 1)  1        .1   1.2
+> >  ...
+> > 28) 1       .2    7.8
+> >
+> > But if a study has used, say, two measures (e.g., 1, 2) for two of those 8
+> > variables (e.g., variables "1" and "2" in 'var1.var2'), then, I wonder how
+> > **best** to capture the additional 13 correlations arising due to the
+> > additional measure used for "1" and "2" in that study in my data for
+> > multilevel modeling purposes?
+> >
+> > One approach might be to add a single column called, say "measure" to add
+> > just those additional rows in that multi-measure study:
+> >
+> >     study   ri   var1.var2  measure
+> > 1)   1       .1    1.2
+> >  ...
+> > 6)   1       .6     1.7           1
+> > 7)   1       .4     1.7           2
+> > ...
+> > 12)  1       .8     2.7          1
+> > 13)  1       .7     2.7          2
+> > ...
+> >
+> > But this looks messy. For instance, what should be the value of "measure"
+> > for the var1.var2 rows that have used a single measure (e.g., var1.var2 ==
+> > 1.2)? And can "measure" coded this way be used in the random part of the
+> > model (metafor::http://rma.mv)?
+> >
+> > Thanks,
+> > Yuhang
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Dec 14 17:11:34 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 14 Dec 2023 16:11:34 +0000
+Subject: [R-meta] About choosing the reference
+In-Reply-To: <CAPm5Ok2S1sn9kuu+DaJJrA+RJJtX29J-w-4=Ec6V=AYwM5kNZQ@mail.gmail.com>
+References: <CAPm5Ok2S1sn9kuu+DaJJrA+RJJtX29J-w-4=Ec6V=AYwM5kNZQ@mail.gmail.com>
+Message-ID: <AS8PR08MB91939237BE3934A67A5910338B8CA@AS8PR08MB9193.eurprd08.prod.outlook.com>
+
+Dear Nick,
+
+Please do not post in HTML format. See what this can do to posts -- makes things quite unreadable. See also the notes on the mailing list page: https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+All of these results just reflect different contrasts of the same two-way interaction. So there is not one that is inherently preferable. This is not an issue specific to meta-analysis. You would face the same issue in any regression model with such a two-way interaction. If the two-way interaction as a whole is significant (based on a test of all three interaction terms, so the chi^2- or F-test with df=3), then one could examine four simple contrasts (between M and U of pos for each of the four levels of dur).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of ?????? via R-sig-meta-analysis
+> Sent: Thursday, December 14, 2023 15:10
+> To: r-sig-meta-analysis at r-project.org
+> Cc: ?????? <t571 at wlgsh.tp.edu.tw>
+> Subject: [R-meta] About choosing the reference
+>
+> Dear all,
+>
+>        When performing meta-regression analysis, I use this code to change
+> turn a variable into a factor:
+>
+> dat$duration <- relevel
+> <http://stat.ethz.ch/R-manual/R-devel/library/stats/html/relevel.html>(factor
+> <http://stat.ethz.ch/R-manual/R-
+> devel/library/base/html/factor.html>(dat$duration),
+> ref="S")
+>
+>        In my data, the duration moderator has four values including S
+> (short), M (medium), L (long), and NA (not provided). And I tried to figure
+> out the interaction between this moderator and another moderator named
+> "Posttest type" with two values of M (meaning) and U (use). The problem I
+> face now is that with different ference I used,  the coefficiency will
+> differ, for example,
+> (a) I use M as reference for duration, and this is the result
+>
+>                           estimate       se        zval          pval
+>      ci.lb           ci.ub
+>
+> durS:posU  2.3309  0.8690 2.6824 0.0073  0.6278  4.0341   **
+>
+>
+> (b) I use N/A as reference for duration, and this is the result
+>
+>                                                         estimate
+>  se             zval          pval           ci.lb            ci.ub
+>
+> durS:posU  1.7890  1.4294 1.2516 0.2107 -1.0126  4.5906
+>
+> (c) I use L as reference for duration, and this is the result
+>
+>                             estimate       se              zval
+>  pval           ci.lb            ci.ub
+>
+> durS:posU  1.2827  0.9275  1.3829 0.1667 -0.5352 3.1005
+>
+>
+> So, eventually, which one should I choose to be the final result? Is
+> there any criteria to choose between the three?
+>
+> Nick
+>
+> ??? (Nick Chen)
+> Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+
+From @m @end|ng |rom mcm@@ter@c@  Thu Dec 14 17:50:49 2023
+From: @m @end|ng |rom mcm@@ter@c@ (Marimuthu S)
+Date: Thu, 14 Dec 2023 16:50:49 +0000
+Subject: [R-meta] Database for Dose Response Meta-analysis
+Message-ID: <YT3PR01MB589118DDFB1EAB097EF015A6DA8CA@YT3PR01MB5891.CANPRD01.PROD.OUTLOOK.COM>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231214/61da4c75/attachment.html>
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Thu Dec 14 18:00:58 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 14 Dec 2023 17:00:58 +0000
+Subject: [R-meta] Database for Dose Response Meta-analysis
+In-Reply-To: <YT3PR01MB589118DDFB1EAB097EF015A6DA8CA@YT3PR01MB5891.CANPRD01.PROD.OUTLOOK.COM>
+References: <YT3PR01MB589118DDFB1EAB097EF015A6DA8CA@YT3PR01MB5891.CANPRD01.PROD.OUTLOOK.COM>
+Message-ID: <2ea63e38-0be4-72f3-08d4-6917096a0281@dewey.myzen.co.uk>
+
+Dear Marimuthu
+
+There seems to be one in the metadat package (on CRAN). Look for 
+obrien2003 in the manual.
+
+Michael
+
+On 14/12/2023 16:50, Marimuthu S via R-sig-meta-analysis wrote:
+> Dear All,
+> 
+> I was wondering if anyone knows a database consisting of studies for 
+> dose response meta-analysis. I have accessed the datasets in 
+> "dosresmeta" package, but I was hoping to get more studies for my research.
+> 
+> Best wishes,
+> 
+> Marimuthu
+> 
+> 
+> <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>	Virus-free.www.avg.com <http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient>
+> 
+> <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+Michael
+
+
+From ye|eng@y@ng1 @end|ng |rom un@w@edu@@u  Fri Dec 15 00:40:30 2023
+From: ye|eng@y@ng1 @end|ng |rom un@w@edu@@u (Yefeng Yang)
+Date: Thu, 14 Dec 2023 23:40:30 +0000
+Subject: [R-meta] effect size estimates distribution and field-specific
+ benchmarks
+In-Reply-To: <SYCPR01MB54235A90D16AB8874D0DD6769D8CA@SYCPR01MB5423.ausprd01.prod.outlook.com>
+References: <SYCPR01MB54235A90D16AB8874D0DD6769D8CA@SYCPR01MB5423.ausprd01.prod.outlook.com>
+Message-ID: <SYCPR01MB54233D332FA8131F3559A0AA9D8CA@SYCPR01MB5423.ausprd01.prod.outlook.com>
+
+Dear community,
+
+I have a question about the effect size distribution. It would be great if you would like to share your wisdom or just comment on it.
+
+I briefly describe my question as follows:
+
+I have a collection of effect size estimates of a specific field, say using SMD. Somehow, the dataset is free of publication bias. Now I want to derive the empirical benchmarks to inform the magnitude of the effect size estimates.
+I am clear about the pitfalls of using empirical benchmarks because the interpretation of effect size should be specific to the context of the question/field. But for now, let's discuss the technical approaches to get reliable benchmarks.
+
+At the moment, I am using four approaches:
+
+  1.  using the empirical distribution to get the relevant percentiles, say 25, 50, 75th
+  2.  using the mixture model to approximate the distribution and get relevant percentiles
+  3.  fitting a meta-analysis model to get mean and variance, and then recover the normal distribution to get the relevant percentiles
+  4.  fitting a Bayesian MA and get the posterior distribution
+
+My purpose is to see whether different approaches converge in terms of the benchmarks (or more precisely, percentiles). Do you have any other approaches? General comments or suggestions are also welcome.
+
+Regards,
+Yefeng
+
+	[[alternative HTML version deleted]]
+
+
+From |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de  Fri Dec 15 13:39:58 2023
+From: |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de (Lukasz Stasielowicz)
+Date: Fri, 15 Dec 2023 13:39:58 +0100
+Subject: [R-meta] effect size estimates distribution and field-specific
+ benchmarks
+In-Reply-To: <mailman.5037.7.1702638002.22263.r-sig-meta-analysis@r-project.org>
+References: <mailman.5037.7.1702638002.22263.r-sig-meta-analysis@r-project.org>
+Message-ID: <a350bd69-8772-42bb-9fdf-fbd435eef7f0@uni-osnabrueck.de>
+
+Dear Yefeng,
+
+
+Effect size benchmarks is an interesting topic.
+
+I will mention one potential question related to the third approach you 
+described: Is it really a realistic assumption that the effect sizes are 
+normally distributed?
+
+The question follows from the work of Bosco and colleagues, e.g.
+Bosco, F. A., Aguinis, H., Singh, K., Field, J. G., & Pierce, C. A. 
+(2015). Correlational effect size benchmarks. Journal of Applied 
+Psychology, 100(2), 431?449. https://doi.org/10.1037/a0038047
+
+In one table (p. 436), they report percentiles for the distribution of 
+effect sizes, which are based on approximately 150,000 effect sizes.
+If we compare the distance between the 20th, 50th, and 80th percentiles, 
+then it seems that the distribution is not symmetrical:
+20th percentile vs. 50 percentile: r = .05 vs. r = .16 [Diff = .11]
+80th percentile vs. 50 percentile: r = .36 vs. r = .16 [Diff = .20]
+A similar pattern can be seen if we divide effect sizes into categories 
+(e.g., construct type).
+
+Of course, it is possible that the effects are distributed normally in 
+your dataset or that you have already thought about the normality 
+assumption. I just wanted to point out potential questions.
+
+Another issue that comes to mind pertains to the Bayesian analysis. The 
+choice of the prior distribution (t, normal, Cauchy, etc.) might 
+influence the shape of the posterior distribution. Therefore, one would 
+need a strong justification for testing only one prior. One possible 
+solution is to conduct sensitivity analyses with different distributions 
+and parameter values (mean, sd, etc.). Similar posterior distributions 
+would indicate that the results are relatively robust.
+
+
+
+
+Best,
+Lukasz
+-- 
+Lukasz Stasielowicz
+Osnabr?ck University
+Institute for Psychology
+Research methods, psychological assessment, and evaluation
+Lise-Meitner-Stra?e 3
+49076 Osnabr?ck (Germany)
+Twitter: https://twitter.com/l_stasielowicz
+Tel.: +49 541 969-7735
+
+
+
+On 15.12.2023 12:00, r-sig-meta-analysis-request at r-project.org wrote:
+> Send R-sig-meta-analysis mailing list submissions to
+> 	r-sig-meta-analysis at r-project.org
+> 
+> To subscribe or unsubscribe via the World Wide Web, visit
+> 	https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> or, via email, send a message with subject or body 'help' to
+> 	r-sig-meta-analysis-request at r-project.org
+> 
+> You can reach the person managing the list at
+> 	r-sig-meta-analysis-owner at r-project.org
+> 
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of R-sig-meta-analysis digest..."
+> 
+> 
+> Today's Topics:
+> 
+>     1. effect size estimates distribution and field-specific
+>        benchmarks (Yefeng Yang)
+> 
+> ----------------------------------------------------------------------
+> 
+> Message: 1
+> Date: Thu, 14 Dec 2023 23:40:30 +0000
+> From: Yefeng Yang <yefeng.yang1 at unsw.edu.au>
+> To: "r-sig-meta-analysis at r-project.org"
+> 	<r-sig-meta-analysis at r-project.org>
+> Subject: [R-meta] effect size estimates distribution and
+> 	field-specific benchmarks
+> Message-ID:
+> 	<SYCPR01MB54233D332FA8131F3559A0AA9D8CA at SYCPR01MB5423.ausprd01.prod.outlook.com>
+> 	
+> Content-Type: text/plain; charset="utf-8"
+> 
+> Dear community,
+> 
+> I have a question about the effect size distribution. It would be great if you would like to share your wisdom or just comment on it.
+> 
+> I briefly describe my question as follows:
+> 
+> I have a collection of effect size estimates of a specific field, say using SMD. Somehow, the dataset is free of publication bias. Now I want to derive the empirical benchmarks to inform the magnitude of the effect size estimates.
+> I am clear about the pitfalls of using empirical benchmarks because the interpretation of effect size should be specific to the context of the question/field. But for now, let's discuss the technical approaches to get reliable benchmarks.
+> 
+> At the moment, I am using four approaches:
+> 
+>    1.  using the empirical distribution to get the relevant percentiles, say 25, 50, 75th
+>    2.  using the mixture model to approximate the distribution and get relevant percentiles
+>    3.  fitting a meta-analysis model to get mean and variance, and then recover the normal distribution to get the relevant percentiles
+>    4.  fitting a Bayesian MA and get the posterior distribution
+> 
+> My purpose is to see whether different approaches converge in terms of the benchmarks (or more precisely, percentiles). Do you have any other approaches? General comments or suggestions are also welcome.
+> 
+> Regards,
+> Yefeng
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> 
+> 
+> 
+> ------------------------------
+> 
+> Subject: Digest Footer
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> 
+> ------------------------------
+> 
+> End of R-sig-meta-analysis Digest, Vol 79, Issue 20
+> ***************************************************
+
+
+From d@|e@w@@tee|e @end|ng |rom gm@||@com  Sat Dec 16 00:29:15 2023
+From: d@|e@w@@tee|e @end|ng |rom gm@||@com (Dale Steele)
+Date: Fri, 15 Dec 2023 18:29:15 -0500
+Subject: [R-meta] using netmeta::netsplit()
+Message-ID: <CAK-DBaCqAcmPNS77+JVjrnqvsA6VNaiaaJbGtLbWRkse_Sx7CQ@mail.gmail.com>
+
+I'm doing a network meta-analysis, using netmeta (v2.9-0). There are a
+large number
+of potential comparisons in my network.
+
+My current plot displays all comparisons (too many) where
+least one study contributes direct evidence.
+
+ns1 <- netsplit(net1)
+forest(ns1, show = "both")
+
+My goal is to produce a forest plot showing only comparisons for which there
+are at least 3 studies with direct evidence.
+
+I think I want the 7 comparisons where k > 2
+> which(ns1$k > 2)
+[1] 120 127 130 132 147 237 253
+
+Thanks!
+
+--Dale
+
+	[[alternative HTML version deleted]]
+
+
+From chr|@t|@n@roever @end|ng |rom med@un|-goett|ngen@de  Mon Dec 18 12:58:03 2023
+From: chr|@t|@n@roever @end|ng |rom med@un|-goett|ngen@de (=?utf-8?B?UsO2dmVyLCBDaHJpc3RpYW4=?=)
+Date: Mon, 18 Dec 2023 11:58:03 +0000
+Subject: [R-meta] Database for Dose Response Meta-analysis
+In-Reply-To: <2ea63e38-0be4-72f3-08d4-6917096a0281@dewey.myzen.co.uk>
+References: <YT3PR01MB589118DDFB1EAB097EF015A6DA8CA@YT3PR01MB5891.CANPRD01.PROD.OUTLOOK.COM>
+ <2ea63e38-0be4-72f3-08d4-6917096a0281@dewey.myzen.co.uk>
+Message-ID: <b73f6064e8c41aa67a5e4ebf69719216d912fc4f.camel@med.uni-goettingen.de>
+
+Dear Marimuthu,
+
+the "metadat" package contains (at least) two additional data sets; if
+you install the current version from github, via
+
+  remotes::install_github("wviechtb/metadat", upgrade=FALSE)
+
+there are (at least) two more examples, namely, the "dat.ursino2021"
+and "dat.roever2022" data sets; have a look whether these suit your
+purpose (both are using binay endpoints).
+There is another small example included in this preprint:
+  https://arxiv.org/abs/2202.00502
+(see Table 4).
+
+Cheers,
+
+Christian
+
+
+On Thu, 2023-12-14 at 17:00 +0000, Michael Dewey via R-sig-meta-
+analysis wrote:
+> Dear Marimuthu
+> 
+> There seems to be one in the metadat package (on CRAN). Look for 
+> obrien2003 in the manual.
+> 
+> Michael
+> 
+> On 14/12/2023 16:50, Marimuthu S via R-sig-meta-analysis wrote:
+> > Dear All,
+> > 
+> > I was wondering if anyone knows a database consisting of studies
+> > for 
+> > dose response meta-analysis. I have accessed the datasets in 
+> > "dosresmeta" package, but I was hoping to get more studies for my
+> > research.
+> > 
+> > Best wishes,
+> > 
+> > Marimuthu
+> > 
+> > 
+> > <
+> > http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient
+> > >	Virus-free.www.avg.com <
+> > http://www.avg.com/email-signature?utm_medium=email&utm_source=link&utm_campaign=sig-email&utm_content=emailclient
+> > >
+> > 
+> > <#DAB4FAD8-2DD7-40BB-A1B8-4E2AA1F9FDF2>
+> > 
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ 
+> > R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+From @m @end|ng |rom mcm@@ter@c@  Mon Dec 18 16:44:15 2023
+From: @m @end|ng |rom mcm@@ter@c@ (Marimuthu S)
+Date: Mon, 18 Dec 2023 15:44:15 +0000
+Subject: [R-meta] Database for Dose Response Meta-analysis
+In-Reply-To: <b73f6064e8c41aa67a5e4ebf69719216d912fc4f.camel@med.uni-goettingen.de>
+References: <YT3PR01MB589118DDFB1EAB097EF015A6DA8CA@YT3PR01MB5891.CANPRD01.PROD.OUTLOOK.COM>
+ <2ea63e38-0be4-72f3-08d4-6917096a0281@dewey.myzen.co.uk>
+ <b73f6064e8c41aa67a5e4ebf69719216d912fc4f.camel@med.uni-goettingen.de>
+Message-ID: <YT3PR01MB5891199E9BB3AE459DD33A93DA90A@YT3PR01MB5891.CANPRD01.PROD.OUTLOOK.COM>
+
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231218/69ede982/attachment.html>
+
+From t571 @end|ng |rom w|g@h@tp@edu@tw  Tue Dec 19 12:51:09 2023
+From: t571 @end|ng |rom w|g@h@tp@edu@tw (=?UTF-8?B?6Iux5paH56eR6Zmz5ZOB6Kqg?=)
+Date: Tue, 19 Dec 2023 19:51:09 +0800
+Subject: [R-meta] About the coefficient in meta-regression analysis
+Message-ID: <CAPm5Ok0VDWGFO3NhOSSfHExB6CGOco_v=0i79wUK5Bv6exnP1w@mail.gmail.com>
+
+Dear all,
+       This is part of my meta-regression analysis result after I use the
+following code:
+
+> m.gen.edu <- metareg(m.gen, ~edu)
+
+    Model results:
+                               estimate  .....
+intercept                0.6820   .....
+eduH                      0.4590   ......
+eduI                        -0.0834 ......
+eduK                       0.5668 ........
+eduS                       0.2473   .......
+
+     The *edu *here stands for the moderator "educational level" from my
+dataset and the *eduH, eduI, eduK*, and *eduS* stands for different
+subgroups. Does the 0.4590 here represent the coefficient of the subgroup
+*eduH* ? And is there a code to get the overall coefficient of the
+moderator "educational level" rather than the individual coefficient of
+each subgroup?
+
+ Nick Chen
+
+??? (Nick Chen)
+Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Tue Dec 19 14:13:59 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 19 Dec 2023 13:13:59 +0000
+Subject: [R-meta] About the coefficient in meta-regression analysis
+In-Reply-To: <CAPm5Ok0VDWGFO3NhOSSfHExB6CGOco_v=0i79wUK5Bv6exnP1w@mail.gmail.com>
+References: <CAPm5Ok0VDWGFO3NhOSSfHExB6CGOco_v=0i79wUK5Bv6exnP1w@mail.gmail.com>
+Message-ID: <0367e109-2130-4560-64af-61d381f4ff76@dewey.myzen.co.uk>
+
+Dear Nick
+
+Comments in line
+
+On 19/12/2023 11:51, ?????? via R-sig-meta-analysis wrote:
+> Dear all,
+>         This is part of my meta-regression analysis result after I use the
+> following code:
+> 
+>> m.gen.edu <- metareg(m.gen, ~edu)
+> 
+>      Model results:
+>                                 estimate  .....
+> intercept                0.6820   .....
+> eduH                      0.4590   ......
+> eduI                        -0.0834 ......
+> eduK                       0.5668 ........
+> eduS                       0.2473   .......
+> 
+>       The *edu *here stands for the moderator "educational level" from my
+> dataset and the *eduH, eduI, eduK*, and *eduS* stands for different
+> subgroups. Does the 0.4590 here represent the coefficient of the subgroup
+> *eduH* ?
+
+In a model with an intercept each level is compared to a reference level 
+so the value, 0.4590, is the difference estimated between group H and 
+the reference group.
+
+  And is there a code to get the overall coefficient of the
+> moderator "educational level" rather than the individual coefficient of
+> each subgroup?
+
+The short answer is "No". You can do a test for the overall effect of 
+educational level. You could also in a simple model like this remove the 
+intercept so each coefficient would then be tested for its difference 
+from zero.
+
+Michael
+
+> 
+>   Nick Chen
+> 
+> ??? (Nick Chen)
+> Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+
+From t571 @end|ng |rom w|g@h@tp@edu@tw  Tue Dec 19 15:31:01 2023
+From: t571 @end|ng |rom w|g@h@tp@edu@tw (=?UTF-8?B?6Iux5paH56eR6Zmz5ZOB6Kqg?=)
+Date: Tue, 19 Dec 2023 22:31:01 +0800
+Subject: [R-meta] Fwd:  About the coefficient in meta-regression analysis
+In-Reply-To: <CAPm5Ok2R13VGEJ4HguVUCHOdu8nfoHSL_hK4wZV0L44hsLCP5A@mail.gmail.com>
+References: <CAPm5Ok0VDWGFO3NhOSSfHExB6CGOco_v=0i79wUK5Bv6exnP1w@mail.gmail.com>
+ <0367e109-2130-4560-64af-61d381f4ff76@dewey.myzen.co.uk>
+ <CAPm5Ok2R13VGEJ4HguVUCHOdu8nfoHSL_hK4wZV0L44hsLCP5A@mail.gmail.com>
+Message-ID: <CAPm5Ok2DHQBG0zPAfgTZ31Drf6axQJCKB4ghBeMpz=7c_wZeNA@mail.gmail.com>
+
+Dear Michael and all,
+
+       Thank you for the swift response. I do have some further questions
+to ask.
+       (a) So, in order to "remove" the intercept, what code should I use?
+       (b) Let's say my research is about whether using digital games will
+affect the result of English vocabulary acquisition or not. So as you said,
+"... remove the intercept so each coefficient would then be tested for its
+difference from zero." , does that mean if I rerun the code again with the
+removal of intercept and presumably get an estimate of 0.3 from the
+subgroup "eduH" and the p-value is less than 0.05. Can I say that "eduH has
+a positive coefficient to English vocabulary acquisition"? If not, what
+would the coefficient mean here (since there is no intercept to compare to)?
+
+     Thanks again for your kindly help!
+    Nick
+??? (Nick Chen)
+Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+
+
+Michael Dewey <lists at dewey.myzen.co.uk> ? 2023?12?19? ?? ??9:14???
+
+> Dear Nick
+>
+> Comments in line
+>
+> On 19/12/2023 11:51, ?????? via R-sig-meta-analysis wrote:
+> > Dear all,
+> >         This is part of my meta-regression analysis result after I use
+> the
+> > following code:
+> >
+> >> m.gen.edu <- metareg(m.gen, ~edu)
+> >
+> >      Model results:
+> >                                 estimate  .....
+> > intercept                0.6820   .....
+> > eduH                      0.4590   ......
+> > eduI                        -0.0834 ......
+> > eduK                       0.5668 ........
+> > eduS                       0.2473   .......
+> >
+> >       The *edu *here stands for the moderator "educational level" from my
+> > dataset and the *eduH, eduI, eduK*, and *eduS* stands for different
+> > subgroups. Does the 0.4590 here represent the coefficient of the subgroup
+> > *eduH* ?
+>
+> In a model with an intercept each level is compared to a reference level
+> so the value, 0.4590, is the difference estimated between group H and
+> the reference group.
+>
+>   And is there a code to get the overall coefficient of the
+> > moderator "educational level" rather than the individual coefficient of
+> > each subgroup?
+>
+> The short answer is "No". You can do a test for the overall effect of
+> educational level. You could also in a simple model like this remove the
+> intercept so each coefficient would then be tested for its difference
+> from zero.
+>
+> Michael
+>
+> >
+> >   Nick Chen
+> >
+> > ??? (Nick Chen)
+> > Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+> >
+> >       [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> >
+>
+> --
+> Michael
+>
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Dec 20 14:49:35 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 20 Dec 2023 13:49:35 +0000
+Subject: [R-meta] Fwd: About the coefficient in meta-regression analysis
+In-Reply-To: <CAPm5Ok2DHQBG0zPAfgTZ31Drf6axQJCKB4ghBeMpz=7c_wZeNA@mail.gmail.com>
+References: <CAPm5Ok0VDWGFO3NhOSSfHExB6CGOco_v=0i79wUK5Bv6exnP1w@mail.gmail.com>
+ <0367e109-2130-4560-64af-61d381f4ff76@dewey.myzen.co.uk>
+ <CAPm5Ok2R13VGEJ4HguVUCHOdu8nfoHSL_hK4wZV0L44hsLCP5A@mail.gmail.com>
+ <CAPm5Ok2DHQBG0zPAfgTZ31Drf6axQJCKB4ghBeMpz=7c_wZeNA@mail.gmail.com>
+Message-ID: <6dec0875-b4ff-4ff0-d861-0e2c05921052@dewey.myzen.co.uk>
+
+Dear Nick
+
+Comments in-line
+
+On 19/12/2023 14:31, ?????? via R-sig-meta-analysis wrote:
+> Dear Michael and all,
+> 
+>         Thank you for the swift response. I do have some further questions
+> to ask.
+>         (a) So, in order to "remove" the intercept, what code should I use?
+
+I do not use the same package as you but where you currently have educ 
+as the moderator try putting educ - 1
+
+>         (b) Let's say my research is about whether using digital games will
+> affect the result of English vocabulary acquisition or not. So as you said,
+> "... remove the intercept so each coefficient would then be tested for its
+> difference from zero." , does that mean if I rerun the code again with the
+> removal of intercept and presumably get an estimate of 0.3 from the
+> subgroup "eduH" and the p-value is less than 0.05. Can I say that "eduH has
+> a positive coefficient to English vocabulary acquisition"? If not, what
+> would the coefficient mean here (since there is no intercept to compare to)?
+
+It is comparing the estimated effect size with zero. Whether that is a 
+meaningful scientific question is up to you. I would be surprised if the 
+coefficient did turn out to be 0.3 but try it and see. Note that the 
+overall test for the effect of educ will be testing a different 
+hypothesis when you remove the intercept.
+
+Michael
+
+> 
+>       Thanks again for your kindly help!
+>      Nick
+> ??? (Nick Chen)
+> Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+> 
+> 
+> Michael Dewey <lists at dewey.myzen.co.uk> ? 2023?12?19? ?? ??9:14???
+> 
+>> Dear Nick
+>>
+>> Comments in line
+>>
+>> On 19/12/2023 11:51, ?????? via R-sig-meta-analysis wrote:
+>>> Dear all,
+>>>          This is part of my meta-regression analysis result after I use
+>> the
+>>> following code:
+>>>
+>>>> m.gen.edu <- metareg(m.gen, ~edu)
+>>>
+>>>       Model results:
+>>>                                  estimate  .....
+>>> intercept                0.6820   .....
+>>> eduH                      0.4590   ......
+>>> eduI                        -0.0834 ......
+>>> eduK                       0.5668 ........
+>>> eduS                       0.2473   .......
+>>>
+>>>        The *edu *here stands for the moderator "educational level" from my
+>>> dataset and the *eduH, eduI, eduK*, and *eduS* stands for different
+>>> subgroups. Does the 0.4590 here represent the coefficient of the subgroup
+>>> *eduH* ?
+>>
+>> In a model with an intercept each level is compared to a reference level
+>> so the value, 0.4590, is the difference estimated between group H and
+>> the reference group.
+>>
+>>    And is there a code to get the overall coefficient of the
+>>> moderator "educational level" rather than the individual coefficient of
+>>> each subgroup?
+>>
+>> The short answer is "No". You can do a test for the overall effect of
+>> educational level. You could also in a simple model like this remove the
+>> intercept so each coefficient would then be tested for its difference
+>> from zero.
+>>
+>> Michael
+>>
+>>>
+>>>    Nick Chen
+>>>
+>>> ??? (Nick Chen)
+>>> Email: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>
+>>>
+>>>        [[alternative HTML version deleted]]
+>>>
+>>> _______________________________________________
+>>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+>>> To manage your subscription to this mailing list, go to:
+>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>>
+>>
+>> --
+>> Michael
+>>
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+
+
+From gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de  Wed Dec 20 19:26:56 2023
+From: gert@@ruecker @end|ng |rom un|k||n|k-|re|burg@de (=?iso-8859-1?Q?Dr=2E_Gerta_R=FCcker?=)
+Date: Wed, 20 Dec 2023 18:26:56 +0000
+Subject: [R-meta] using netmeta::netsplit()
+In-Reply-To: <CAK-DBaCqAcmPNS77+JVjrnqvsA6VNaiaaJbGtLbWRkse_Sx7CQ@mail.gmail.com>
+References: <CAK-DBaCqAcmPNS77+JVjrnqvsA6VNaiaaJbGtLbWRkse_Sx7CQ@mail.gmail.com>
+Message-ID: <c08ac75048a54bb2be0fd6d554df0cbe@uniklinik-freiburg.de>
+
+Hi Dale,
+
+I don't know the answer to your question (perhaps Guido has an idea), but there is a different way to (hopefully) shorten your output. By
+
+> forest(ns1, only.reference = TRUE)
+
+you see the results only for comparisons with the reference treatment.
+
+Best,
+Gerta
+
+
+UNIVERSIT?TSKLINIKUM FREIBURG
+Institute for Medical Biometry and Statistics
+
+Dr. Gerta R?cker
+Guest Scientist
+
+Stefan-Meier-Stra?e 26 ? 79104 Freiburg
+gerta.ruecker at uniklinik-freiburg.de
+
+https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker
+
+
+-----Urspr?ngliche Nachricht-----
+Von: Dale Steele via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> 
+Gesendet: Samstag, 16. Dezember 2023 00:29
+An: r-sig-meta-analysis at r-project.org
+Cc: Dale Steele <dale.w.steele at gmail.com>
+Betreff: [R-meta] using netmeta::netsplit()
+
+I'm doing a network meta-analysis, using netmeta (v2.9-0). There are a
+large number
+of potential comparisons in my network.
+
+My current plot displays all comparisons (too many) where
+least one study contributes direct evidence.
+
+ns1 <- netsplit(net1)
+forest(ns1, show = "both")
+
+My goal is to produce a forest plot showing only comparisons for which there
+are at least 3 studies with direct evidence.
+
+I think I want the 7 comparisons where k > 2
+> which(ns1$k > 2)
+[1] 120 127 130 132 147 237 253
+
+Thanks!
+
+--Dale
+
+	[[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de  Thu Dec 21 18:30:14 2023
+From: gu|do@@chw@rzer @end|ng |rom un|k||n|k-|re|burg@de (Dr. Guido Schwarzer)
+Date: Thu, 21 Dec 2023 17:30:14 +0000
+Subject: [R-meta] using netmeta::netsplit()
+In-Reply-To: <c08ac75048a54bb2be0fd6d554df0cbe@uniklinik-freiburg.de>
+References: <CAK-DBaCqAcmPNS77+JVjrnqvsA6VNaiaaJbGtLbWRkse_Sx7CQ@mail.gmail.com>
+ <c08ac75048a54bb2be0fd6d554df0cbe@uniklinik-freiburg.de>
+Message-ID: <3E9E40C3-4514-4A2B-8377-676787750D70@uniklinik-freiburg.de>
+
+Dale,
+
+On GitHub, I added a new argument 'subset' to forest.netsplit() and print.netsplit() which can be used to define a subset of comparisons to print. E.g.,
+forest(ns1, subset = k >= 3)
+
+Best,
+Guido
+
+
+From d@|e@w@@tee|e @end|ng |rom gm@||@com  Thu Dec 21 19:59:15 2023
+From: d@|e@w@@tee|e @end|ng |rom gm@||@com (Dale Steele)
+Date: Thu, 21 Dec 2023 13:59:15 -0500
+Subject: [R-meta] using netmeta::netsplit()
+In-Reply-To: <3E9E40C3-4514-4A2B-8377-676787750D70@uniklinik-freiburg.de>
+References: <CAK-DBaCqAcmPNS77+JVjrnqvsA6VNaiaaJbGtLbWRkse_Sx7CQ@mail.gmail.com>
+ <c08ac75048a54bb2be0fd6d554df0cbe@uniklinik-freiburg.de>
+ <3E9E40C3-4514-4A2B-8377-676787750D70@uniklinik-freiburg.de>
+Message-ID: <CAK-DBaC0iH5x_AfeAz9Tmb6TSRg+4dUQ8rx0=XCsQ52daZCQwg@mail.gmail.com>
+
+Guido,
+
+Works like a charm!
+
+Best.
+
+--Dale
+
+On Thu, Dec 21, 2023 at 12:30?PM Dr. Guido Schwarzer <
+guido.schwarzer at uniklinik-freiburg.de> wrote:
+
+> Dale,
+>
+> On GitHub, I added a new argument 'subset' to forest.netsplit() and
+> print.netsplit() which can be used to define a subset of comparisons to
+> print. E.g.,
+> forest(ns1, subset = k >= 3)
+>
+> Best,
+> Guido
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From p|@-m@gd@|en@@@chm|dt @end|ng |rom un|-bonn@de  Thu Dec 21 22:32:28 2023
+From: p|@-m@gd@|en@@@chm|dt @end|ng |rom un|-bonn@de (Pia-Magdalena Schmidt)
+Date: Thu, 21 Dec 2023 22:32:28 +0100
+Subject: [R-meta] Effect size calculation: Hedges g average / dependent
+ groups
+Message-ID: <ximss-29451709@be4.uni-bonn.de>
+
+Dear all,
+
+I would be very grateful if you could help me clarify my calculations.
+
+I am conducting a meta-analysis using metafor and want to calculate Hedges g 
+av (see Lakens, 2013 - doi: 10.3389/fpsyg.2013.00863).
+
+[background: within-design with healthy participants investigating drug 
+effects compared to placebo, repeated measures: 1x drug, 1x placebo (no pre- 
+, post- treatment design); available data: m1i, m2i, sd1i, sd2i, n1i, n2i 
+with n1i = n2i]
+
+1. As I did not find a direct way to calculate Hedges g av in metafor, I 
+calculated the sd (sd_average = (sd1i + sd2i)/2) manually and used ?SMD1?, 
+since this only requires one sd input and should otherwise be the same as 
+?SMD?. Is that right?
+
+2. To check my approach, I compared ?SMD1? with sd2i = sd_pooled and 
+compared the results to ?SMD?. I expected identical effect sizes as I 
+thought that ?SMD1? with sd2i = sd_pooled should match ?SMD?, but my 
+calculations yielded different values for yi & vi.
+
+An example of my code and results:
+
+library(metafor)
+
+# create minimal data
+dat <- structure(list(id = c(1, 2, 3), n_drug = c(10, 20, 15), m_drug = 
+c(435.4, 460, 404), sd_drug = c(60.2, 36.6, 58.09), n_plc = c(10, 20, 15), 
+m_plc = c(493.7, 460, 474), sd_plc = c(89.9, 40.6, 44.93)), class = 
+c("tbl_df", "tbl", "data.frame"), row.names = c(NA, -3L))
+
+sd_average <- 1/2*(dat$`sd_drug` + dat$`sd_plc`)
+sd_pooled <- sqrt(((dat$`n_drug`-1)*dat$`sd_drug`^2 + 
+(dat$`n_plc`-1)*dat$`sd_plc`^2) / (dat$`n_drug`+dat$`n_plc`-2))
+
+# --- Relating Question 1 ---
+# SMD1 with input sd_average
+es_smd1average = escalc(measure="SMD1",
+   n1i = dat$`n_drug`,
+   n2i = dat$`n_plc`,
+   m1i = dat$`m_drug`,
+   m2i = dat$`m_plc`,
+   sd2i= sd_average,
+   vtype ="UB")
+
+# --- Relating Question 2 ---
+# SMD1 with input sd_pooled
+es_smd1pooled= escalc(measure="SMD1",
+   n1i=dat$`n_drug`,
+   n2i =dat$`n_plc`,
+   m1i = dat$`m_drug`,
+   m2i = dat$`m_plc`,
+   sd2i= sd_pooled,
+   vtype ="UB")
+
+# SMD
+es_smd= escalc(measure="SMD",
+   n1i=dat$`n_drug`,
+   n2i =dat$`n_plc`,
+   m1i = dat$`m_drug`,
+   m2i = dat$`m_plc`,
+   sd1i = dat$`sd_drug`,
+   sd2i = dat$`sd_plc`,
+   vtype ="UB")
+
+
+> print(es_smd1pooled)
+
+   yi vi
+1 -0.6964 0.2333
+2 0.0000 0.1000
+3 -1.2743 0.1995
+
+> print(es_smd)
+
+   yi vi
+1 -0.7298 0.2164
+2 0.0000 0.1000
+3 -1.3115 0.1661
+
+I thought about using ?SMCC? instead but ri, t-statistics and p-values are 
+(often) unknown.
+
+Do you have any comments?
+
+Many thanks in advance!
+Best,
+Pia
+
+
+From m|obo4370 @end|ng |rom hotm@||@com  Fri Dec 22 14:32:15 2023
+From: m|obo4370 @end|ng |rom hotm@||@com (Martin Lobo)
+Date: Fri, 22 Dec 2023 13:32:15 +0000
+Subject: [R-meta] meta-analysis of ratios or difference of ratios?
+Message-ID: <SA1P220MB089166F8BC935F568C8FEADFAC94A@SA1P220MB0891.NAMP220.PROD.OUTLOOK.COM>
+
+Hello everyone. I'm Martin from Argentina. I am wanting to do a meta-analysis of the difference in means, baseline-final CRP drug vs pacebo. The problem is that complete data is not reported in most studies. Especially the standard deviation. What I have found is that they report the Final/baseline ratio in both groups. With these data you could calculate the difference in the ratios and their 95% CI. It is feasible to perform a meta-analysis with this data. My options would be meta-analysis of proportions (in this case I have the proportion but I don't know which one to use), perhaps another option would be the generic method of inverse variance where I would meta-analyze the difference in the proportions in both branches. Would any of these options be correct? Or can you tell me what would be the best method in this case? Thank you very much and happy holidays to all.
+
+
+
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Jefe de Dpto Enf. Cardiovasculares y Cardiometabolismo Hospital Militar Campo de Mayo.
+Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Ex Miembro del Area de Investigaci?n de la SAC
+Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+Experto en Lipidos de la Sociedad Argentina de Lipidos.
+Miembro de la Sociedad Argentina de Lipidos.
+Instructor de ACLS de la American Heart Association
+
+
+	[[alternative HTML version deleted]]
+
+
+From th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com  Sat Dec 30 16:25:11 2023
+From: th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com (Tharaka S. Priyadarshana)
+Date: Sat, 30 Dec 2023 23:25:11 +0800
+Subject: [R-meta] Within-study variance in a multilevel meta-analytic model
+Message-ID: <CADWK9cf7q0mnA-Eo7P9V-mOzaZ6516aSAnVyOtYnekn1s3r7Bw@mail.gmail.com>
+
+Dear all,
+
+
+
+In my meta-analysis, I have multiple effect sizes coming from the same
+study, and these effects are nested with the studies.
+
+So, to account for both between-study and within-study
+variance/heterogeneity, I gave identifiers for each study (StudyID) and
+each effect (EffectSizeID), and included them into the model as random
+effects, i.e., "random = ~1 | (StudyID / EffectSizeID)".
+
+
+
+For this, I received a comment from one of the reviewers as follows,
+
+"It took me a long time to figure out why you are using EffectSizeID as a
+random effect, especially since this observation-level random effect
+approach is mainly used to control for overdispersion in Poisson
+regressions. Based on the response to reviewers, I think you are using it
+to account for heteroscedasticity? Focusing on various data sources and
+within-study variability is confusing because each effect size presumable
+comes from just one land cover data source. Framing this as controlling for
+heteroscedasticity would help a lot. If that is not your purpose, please
+edit this paragraph to more clearly explain your approach."
+
+
+I am a bit unsure how should I respond to this reviewer's comment. If I
+understand correctly, once we define the between and within-study
+variance/heterogeneity
+with random variables, we can get the true effects for each observed effect
+(i.e. each row of the dataset), which then can be used to measure the
+average true effect.
+
+
+Could someone please let me know whether my interpretation is correct here?
+or am I missing something??
+
+
+Thank you for your help.
+
+
+With best wishes,
+
+Tharaka
+
+	[[alternative HTML version deleted]]
+
+

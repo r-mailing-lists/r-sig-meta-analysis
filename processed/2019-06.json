@@ -1,0 +1,618 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2019-06",
+  "messages": [
+    {
+      "id": "msg-6d4a4014deaa",
+      "message_id": "<7431e2243fc84e6689f48091119dd529@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (SP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2019-06-01T18:49:22Z",
+      "subject": "[R-meta] model selection using the glmulti",
+      "subject_clean": "[R-meta] model selection using the glmulti",
+      "in_reply_to": "<1ff0d1df.17a61.16af95a60d3.Coremail.zss_1994@163.com>",
+      "references": [
+        "<b11f31e.a244.16af732d820.Coremail.zss_1994@163.com>",
+        "<abdaeeea9b7c4777ab2cdef518855eef@UM-MAIL3214.unimaas.nl>",
+        "<1ff0d1df.17a61.16af95a60d3.Coremail.zss_1994@163.com>"
+      ],
+      "body_plain": "Dear Shuai,\n\nPlease always cc the mailing list.\n\nThe results are only contradictory in so far that two different methods are leading to different conclusions. Maybe climate becomes only relevant when other moderators are included in the model. Without the data and reproducible code, I cannot tell you what is going on.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: shuai [mailto:zss_1994 at 163.com] \nSent: Monday, 27 May, 2019 14:53\nTo: Viechtbauer, Wolfgang (SP)\nSubject: Re:RE: [R-meta] model selection using the glmulti\n\nDear. Wolfgang\n\nThank you very much for your reply!\n\nI have used the code you gave for model selection. And I got this figure:\n\nand we can see that climate is important. (>0.8 climate include arid and humid)\n\nBut when I calculate the Qm of climate using the code as follow:\nr4<-rma(yi,vi, mods=~climate, data=eff1, method=\"REML\")\nI got the result:Qm=0.0467, p=0.8289 so this result means the climate is not important?\n\nAre the results of these two methods contradictory?\n\nLooking forward to your reply,\n\nBest wishes,\nShuai\n\nAt 2019-05-27 17:26:39, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n>Dear Shuai,\n>\n>The example you linked to uses a mixture of continuous and dummy variables. Factors are typically encoded as dummy variables, so as long as your factors only have two levels, it's really the same thing. Factors with more than two levels are typically encoded as a bunch of dummy variables, but we typically do not want to enter/remove individual dummy variables, but the whole factor. Fortunately, this all works like a charm with metafor + glmulti. Here is an example (year and ablat are continuous, alloc is a three-level factor):\n>\n>library(metafor)\n>library(glmulti)\n>\n>dat <- dat.bcg\n>dat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)\n>\n>rma.glmulti <- function(formula, data, ...)\n>   rma(formula, vi, data=data, method=\"ML\", ...)\n>\n>res <- glmulti(yi ~ year + ablat + alloc, data=dat,\n>               level=1, fitfunction=rma.glmulti, crit=\"aicc\", confsetsize=8, plotty=FALSE)\n>\n>print(res)\n>weightable(res)\n>plot(res)\n>plot(res, type=\"s\")\n>\n># check the fit of a model that includes alloc\n>summary(res at objects[[5]])\n>\n>Best,\n>Wolfgang\n>\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of shuai\n>Sent: Monday, 27 May, 2019 4:51\n>To: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] model selection using the glmulti\n>\n>Dear Mr./Ms.\n>\n>I'd like to perform a model selection using the glmulti(http://www.metafor-project.org/doku.php/tips:model_selection_with_glmulti_and_mumin),\n>\n>I noticed that there are only continuous variables(length, wic, feedback, infor, pers, imag, meta) in this example: res <- glmulti(yi ~ length+ wic + feedback + info + pers + imag + meta, data=dat,\n>level=1, fitfunction=rma.glmulti, crit=\"aicc\", confsetsize=128)\n>\n>What if I have continuous variables and categorical variables?  such as distance:1,2,3,10,20km...etc, and ecosystem types: grassland, wetland, cropland...etc\n>\n>Any help you can provide would be really appreciated!\n>\n>Thank you very much and looking forward to your reply!\n>Best wishes,\n>Shuai",
+      "body_snippet": "Dear Shuai,\n\nPlease always cc the mailing list.\n\nThe results are only contradictory in so far that two different methods are leading to different conclusions. Maybe climate becomes only relevant when ",
+      "thread_id": "thread-6d4a4014deaa",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-1451ee540598",
+      "message_id": "<BN6PR17MB0979B158D04A1F728802747EB61A0@BN6PR17MB0979.namprd17.prod.outlook.com>",
+      "from_name": "Hiam S. Chemaitelly",
+      "from_email_hash": "2020d97b6e102873abf6a1353887875f59f908c51ee882c3eee1c153bc9baa50",
+      "date": "2019-06-01T19:00:48Z",
+      "subject": "[R-meta] Stepwise meta-regression",
+      "subject_clean": "[R-meta] Stepwise meta-regression",
+      "in_reply_to": "<79d3205c-746a-14e1-947c-0aa7703ccd9f@dewey.myzen.co.uk>",
+      "references": [
+        "<BN6PR17MB09798E3D109E9B8FB792EAA9B61F0@BN6PR17MB0979.namprd17.prod.outlook.com>",
+        "<79d3205c-746a-14e1-947c-0aa7703ccd9f@dewey.myzen.co.uk>"
+      ],
+      "body_plain": "Dear Michael,\n\nI am sorry for the delayed reply.\n\nMany thanks for sharing this very useful resource. It is very informative and insightful.\n\nI am looking at how different a priori defined factors affect the prevalence of a sexually transmitted infection in a population. The data are based on a systematic review of studies reporting the prevalence of this infection in the population of interest.\n\nI am sorry to trouble you, but can you please clarify what you meant by \" You do presumably realise that it leads to models which do not replicate on new datasets and the confidence intervals it gives do not have their usual meaning?\"\n\nMany thanks for all of your time and support to this end.\n\nBest regards,\nHiam\n\nHiam Chemaitelly\nSenior Research Specialist, Epidemiologist\nInfectious Disease Epidemiology Group\nWeill Cornell Medicine-Qatar\nEducation City, POBox: 24144, Doha, Qatar\nPhone: + (974) 4492 8443, Fax: + (974) 4492 8422\nEmail: hsc2001 at qatar-med.cornell.edu\n\n-----Original Message-----\nFrom: Michael Dewey <lists at dewey.myzen.co.uk>\nSent: Friday, May 31, 2019 6:01 PM\nTo: Hiam S. Chemaitelly <hsc2001 at qatar-med.cornell.edu>; r-sig-meta-analysis at r-project.org\nCc: Laith Jamal Abu Raddad <lja2002 at qatar-med.cornell.edu>\nSubject: Re: [R-meta] Stepwise meta-regression\n\nDoes\nhttp://www.metafor-project.org/doku.php/tips:model_selection_with_glmulti_and_mumin\nhelp?\n\nIt might help if you had stated what your scientific question is which demands variable subset selection. You do presumably realise that it leads to models which do not replicate on new datasets and the confidence intervals it gives do not have their usual meaning?\n\nMichael\n\nOn 29/05/2019 19:30, Hiam S. Chemaitelly wrote:\n> Dear R-sig-meta-analysis admin,\n>\n> I hope this email finds you well.\n>\n> I am interested in doing stepwise meta-regression for a small dataset, but I could not find a way to do it. I have been advised to contact this mailing list asking for help with this matter.\n>\n> My question is: is there a way to do stepwise meta-regression with the outcome being prevalence and independent variables including time as well as categorical variables? If not, what could be an alternative option?\n>\n> Looking forward to hearing from you.\n>\n> Best regards,\n> Hiam\n>\n> Hiam Chemaitelly\n> Senior Research Specialist, Epidemiologist Infectious Disease\n> Epidemiology Group Weill Cornell Medicine-Qatar Education City, POBox:\n> 24144, Doha, Qatar\n> Phone: + (974) 4492 8443, Fax: + (974) 4492 8422\n> Email: hsc2001 at qatar-med.cornell.edu\n>\n> Disclaimer: This email and its attachments may be confidential and are intended solely for the use of the individual to whom it is addressed. If you are not the intended recipient, any reading, printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply function and then permanently delete what you have received.\n>\n> [[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list\n> R-sig-meta-analysis at r-project.org\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n> ---\n> This email has been checked for viruses by AVG.\n> https://www.avg.com\n>\n>\n\n--\nMichael\nhttp://www.dewey.myzen.co.uk/home.html\nDisclaimer: This email and its attachments may be confidential and are intended solely for the use of the individual to whom it is addressed. If you are not the intended recipient, any reading, printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply function and then permanently delete what you have received.",
+      "body_snippet": "Dear Michael,\n\nI am sorry for the delayed reply.\n\nMany thanks for sharing this very useful resource. It is very informative and insightful.\n\nI am looking at how different a priori defined factors affe",
+      "thread_id": "thread-1451ee540598",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-c182cadb57e2",
+      "message_id": "<4a7a039b.426d.16b1610536a.Coremail.zss_1994@163.com>",
+      "from_name": "shuai",
+      "from_email_hash": "470414d5017a6422b7fb62a70dced80b07f9ea282ae28c54c01a313e62b9f9ff",
+      "date": "2019-06-02T10:41:37+08:00",
+      "subject": "[R-meta] model selection using the glmulti",
+      "subject_clean": "[R-meta] model selection using the glmulti",
+      "in_reply_to": "<7431e2243fc84e6689f48091119dd529@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<b11f31e.a244.16af732d820.Coremail.zss_1994@163.com>",
+        "<abdaeeea9b7c4777ab2cdef518855eef@UM-MAIL3214.unimaas.nl>",
+        "<1ff0d1df.17a61.16af95a60d3.Coremail.zss_1994@163.com>",
+        "<7431e2243fc84e6689f48091119dd529@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "Dear Wolfgang,\n\n\nThe attachments were my raw data (shuai. csv), the code (shuai. txt), and my results/question/explain (suhai. docx).\n\n\nI put my figures and table in the word, all in all, I don't know why these two methods led to different results, and I hope you can help me.\n\n\nThank you very much.\n\n\nYours, sincerely\n\n\nShuai\n\nAt 2019-06-02 02:49:22, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n>Dear Shuai,\n>\n>Please always cc the mailing list.\n>\n>The results are only contradictory in so far that two different methods are leading to different conclusions. Maybe climate becomes only relevant when other moderators are included in the model. Without the data and reproducible code, I cannot tell you what is going on.\n>\n>Best,\n>Wolfgang\n>\n>-----Original Message-----\n>From: shuai [mailto:zss_1994 at 163.com] \n>Sent: Monday, 27 May, 2019 14:53\n>To: Viechtbauer, Wolfgang (SP)\n>Subject: Re:RE: [R-meta] model selection using the glmulti\n>\n>Dear. Wolfgang\n>\n>Thank you very much for your reply!\n>\n>I have used the code you gave for model selection. And I got this figure:\n>\n>and we can see that climate is important. (>0.8 climate include arid and humid)\n>\n>But when I calculate the Qm of climate using the code as follow:\n>r4<-rma(yi,vi, mods=~climate, data=eff1, method=\"REML\")\n>I got the result:Qm=0.0467, p=0.8289 so this result means the climate is not important?\n>\n>Are the results of these two methods contradictory?\n>\n>Looking forward to your reply,\n>\n>Best wishes,\n>Shuai\n>\n>At 2019-05-27 17:26:39, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n>>Dear Shuai,\n>>\n>>The example you linked to uses a mixture of continuous and dummy variables. Factors are typically encoded as dummy variables, so as long as your factors only have two levels, it's really the same thing. Factors with more than two levels are typically encoded as a bunch of dummy variables, but we typically do not want to enter/remove individual dummy variables, but the whole factor. Fortunately, this all works like a charm with metafor + glmulti. Here is an example (year and ablat are continuous, alloc is a three-level factor):\n>>\n>>library(metafor)\n>>library(glmulti)\n>>\n>>dat <- dat.bcg\n>>dat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)\n>>\n>>rma.glmulti <- function(formula, data, ...)\n>>   rma(formula, vi, data=data, method=\"ML\", ...)\n>>\n>>res <- glmulti(yi ~ year + ablat + alloc, data=dat,\n>>               level=1, fitfunction=rma.glmulti, crit=\"aicc\", confsetsize=8, plotty=FALSE)\n>>\n>>print(res)\n>>weightable(res)\n>>plot(res)\n>>plot(res, type=\"s\")\n>>\n>># check the fit of a model that includes alloc\n>>summary(res at objects[[5]])\n>>\n>>Best,\n>>Wolfgang\n>>\n>>-----Original Message-----\n>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of shuai\n>>Sent: Monday, 27 May, 2019 4:51\n>>To: r-sig-meta-analysis at r-project.org\n>>Subject: [R-meta] model selection using the glmulti\n>>\n>>Dear Mr./Ms.\n>>\n>>I'd like to perform a model selection using the glmulti(http://www.metafor-project.org/doku.php/tips:model_selection_with_glmulti_and_mumin),\n>>\n>>I noticed that there are only continuous variables(length, wic, feedback, infor, pers, imag, meta) in this example: res <- glmulti(yi ~ length+ wic + feedback + info + pers + imag + meta, data=dat,\n>>level=1, fitfunction=rma.glmulti, crit=\"aicc\", confsetsize=128)\n>>\n>>What if I have continuous variables and categorical variables?  such as distance:1,2,3,10,20km...etc, and ecosystem types: grassland, wetland, cropland...etc\n>>\n>>Any help you can provide would be really appreciated!\n>>\n>>Thank you very much and looking forward to your reply!\n>>Best wishes,\n>>Shuai\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190602/d6cebcc9/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: shuai.csv\nType: application/octet-stream\nSize: 11980 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190602/d6cebcc9/attachment-0001.obj>\n\n-------------- next part --------------\nAn embedded and charset-unspecified text was scrubbed...\nName: shuai.txt\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190602/d6cebcc9/attachment-0001.txt>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: shuai.docx\nType: application/vnd.openxmlformats-officedocument.wordprocessingml.document\nSize: 96229 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190602/d6cebcc9/attachment-0001.docx>",
+      "body_snippet": "Dear Wolfgang,\n\n\nThe attachments were my raw data (shuai. csv), the code (shuai. txt), and my results/question/explain (suhai. docx).\n\n\nI put my figures and table in the word, all in all, I don't know",
+      "thread_id": "thread-6d4a4014deaa",
+      "thread_depth": 1,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-179f81f7afd9",
+      "message_id": "<5e2cd93.5476.16b16bd8fd9.Coremail.zss_1994@163.com>",
+      "from_name": "shuai",
+      "from_email_hash": "470414d5017a6422b7fb62a70dced80b07f9ea282ae28c54c01a313e62b9f9ff",
+      "date": "2019-06-02T13:50:50+08:00",
+      "subject": "[R-meta] model selection using the glmulti",
+      "subject_clean": "[R-meta] model selection using the glmulti",
+      "in_reply_to": "<7431e2243fc84e6689f48091119dd529@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<b11f31e.a244.16af732d820.Coremail.zss_1994@163.com>",
+        "<abdaeeea9b7c4777ab2cdef518855eef@UM-MAIL3214.unimaas.nl>",
+        "<1ff0d1df.17a61.16af95a60d3.Coremail.zss_1994@163.com>",
+        "<7431e2243fc84e6689f48091119dd529@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "Dear Wolfgang,\n\n\nI have figured out the question I just asked you.\n\n\nThe important value(> or < 0.8) of the moderators is the importance of the best model. So I should not calculate one by one.\n\n\nThank you very much and have a nice weekend!\n\n\nDanke, cheers\n\n\nShuai\n\n\n\nAt 2019-06-02 02:49:22, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n>Dear Shuai,\n>\n>Please always cc the mailing list.\n>\n>The results are only contradictory in so far that two different methods are leading to different conclusions. Maybe climate becomes only relevant when other moderators are included in the model. Without the data and reproducible code, I cannot tell you what is going on.\n>\n>Best,\n>Wolfgang\n>\n>-----Original Message-----\n>From: shuai [mailto:zss_1994 at 163.com] \n>Sent: Monday, 27 May, 2019 14:53\n>To: Viechtbauer, Wolfgang (SP)\n>Subject: Re:RE: [R-meta] model selection using the glmulti\n>\n>Dear. Wolfgang\n>\n>Thank you very much for your reply!\n>\n>I have used the code you gave for model selection. And I got this figure:\n>\n>and we can see that climate is important. (>0.8 climate include arid and humid)\n>\n>But when I calculate the Qm of climate using the code as follow:\n>r4<-rma(yi,vi, mods=~climate, data=eff1, method=\"REML\")\n>I got the result:Qm=0.0467, p=0.8289 so this result means the climate is not important?\n>\n>Are the results of these two methods contradictory?\n>\n>Looking forward to your reply,\n>\n>Best wishes,\n>Shuai\n>\n>At 2019-05-27 17:26:39, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n>>Dear Shuai,\n>>\n>>The example you linked to uses a mixture of continuous and dummy variables. Factors are typically encoded as dummy variables, so as long as your factors only have two levels, it's really the same thing. Factors with more than two levels are typically encoded as a bunch of dummy variables, but we typically do not want to enter/remove individual dummy variables, but the whole factor. Fortunately, this all works like a charm with metafor + glmulti. Here is an example (year and ablat are continuous, alloc is a three-level factor):\n>>\n>>library(metafor)\n>>library(glmulti)\n>>\n>>dat <- dat.bcg\n>>dat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)\n>>\n>>rma.glmulti <- function(formula, data, ...)\n>>   rma(formula, vi, data=data, method=\"ML\", ...)\n>>\n>>res <- glmulti(yi ~ year + ablat + alloc, data=dat,\n>>               level=1, fitfunction=rma.glmulti, crit=\"aicc\", confsetsize=8, plotty=FALSE)\n>>\n>>print(res)\n>>weightable(res)\n>>plot(res)\n>>plot(res, type=\"s\")\n>>\n>># check the fit of a model that includes alloc\n>>summary(res at objects[[5]])\n>>\n>>Best,\n>>Wolfgang\n>>\n>>-----Original Message-----\n>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of shuai\n>>Sent: Monday, 27 May, 2019 4:51\n>>To: r-sig-meta-analysis at r-project.org\n>>Subject: [R-meta] model selection using the glmulti\n>>\n>>Dear Mr./Ms.\n>>\n>>I'd like to perform a model selection using the glmulti(http://www.metafor-project.org/doku.php/tips:model_selection_with_glmulti_and_mumin),\n>>\n>>I noticed that there are only continuous variables(length, wic, feedback, infor, pers, imag, meta) in this example: res <- glmulti(yi ~ length+ wic + feedback + info + pers + imag + meta, data=dat,\n>>level=1, fitfunction=rma.glmulti, crit=\"aicc\", confsetsize=128)\n>>\n>>What if I have continuous variables and categorical variables?  such as distance:1,2,3,10,20km...etc, and ecosystem types: grassland, wetland, cropland...etc\n>>\n>>Any help you can provide would be really appreciated!\n>>\n>>Thank you very much and looking forward to your reply!\n>>Best wishes,\n>>Shuai\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Wolfgang,\n\n\nI have figured out the question I just asked you.\n\n\nThe important value(> or < 0.8) of the moderators is the importance of the best model. So I should not calculate one by one.\n\n\nThan",
+      "thread_id": "thread-6d4a4014deaa",
+      "thread_depth": 1,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-09699a25bfd4",
+      "message_id": "<7ef10878-d0f2-5c49-267f-afe65f26cd0d@dewey.myzen.co.uk>",
+      "from_name": "Michael Dewey",
+      "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
+      "date": "2019-06-02T11:54:05+01:00",
+      "subject": "[R-meta] Stepwise meta-regression",
+      "subject_clean": "[R-meta] Stepwise meta-regression",
+      "in_reply_to": "<BN6PR17MB0979B158D04A1F728802747EB61A0@BN6PR17MB0979.namprd17.prod.outlook.com>",
+      "references": [
+        "<BN6PR17MB09798E3D109E9B8FB792EAA9B61F0@BN6PR17MB0979.namprd17.prod.outlook.com>",
+        "<79d3205c-746a-14e1-947c-0aa7703ccd9f@dewey.myzen.co.uk>",
+        "<BN6PR17MB0979B158D04A1F728802747EB61A0@BN6PR17MB0979.namprd17.prod.outlook.com>"
+      ],
+      "body_plain": "Dear Hiam\n\nTry\nhttps://www.stata.com/support/faqs/statistics/stepwise-regression-problems/\n\nI know it comes from a Stata FAQ but it is a convenient summary of some \nof the sources.\n\nFor a more recent non-technical summary\n\n@article{babyak04,\n    author = {Babyak, M A},\n    title = {What you see may not be what you get: a brief, nontechnical\n       introduction to overfitting in regression--type models},\n    journal = {Psychosomatic Medicine},\n    year = {2004},\n    volume = {66},\n    pages = {411--421}\n}\n\nMichael\n\nOn 01/06/2019 20:00, Hiam S. Chemaitelly wrote:\n> Dear Michael,\n> \n> I am sorry for the delayed reply.\n> \n> Many thanks for sharing this very useful resource. It is very informative and insightful.\n> \n> I am looking at how different a priori defined factors affect the prevalence of a sexually transmitted infection in a population. The data are based on a systematic review of studies reporting the prevalence of this infection in the population of interest.\n> \n> I am sorry to trouble you, but can you please clarify what you meant by \" You do presumably realise that it leads to models which do not replicate on new datasets and the confidence intervals it gives do not have their usual meaning?\"\n> \n> Many thanks for all of your time and support to this end.\n> \n> Best regards,\n> Hiam\n> \n> Hiam Chemaitelly\n> Senior Research Specialist, Epidemiologist\n> Infectious Disease Epidemiology Group\n> Weill Cornell Medicine-Qatar\n> Education City, POBox: 24144, Doha, Qatar\n> Phone: + (974) 4492 8443, Fax: + (974) 4492 8422\n> Email: hsc2001 at qatar-med.cornell.edu\n> \n> -----Original Message-----\n> From: Michael Dewey <lists at dewey.myzen.co.uk>\n> Sent: Friday, May 31, 2019 6:01 PM\n> To: Hiam S. Chemaitelly <hsc2001 at qatar-med.cornell.edu>; r-sig-meta-analysis at r-project.org\n> Cc: Laith Jamal Abu Raddad <lja2002 at qatar-med.cornell.edu>\n> Subject: Re: [R-meta] Stepwise meta-regression\n> \n> Does\n> http://www.metafor-project.org/doku.php/tips:model_selection_with_glmulti_and_mumin\n> help?\n> \n> It might help if you had stated what your scientific question is which demands variable subset selection. You do presumably realise that it leads to models which do not replicate on new datasets and the confidence intervals it gives do not have their usual meaning?\n> \n> Michael\n> \n> On 29/05/2019 19:30, Hiam S. Chemaitelly wrote:\n>> Dear R-sig-meta-analysis admin,\n>>\n>> I hope this email finds you well.\n>>\n>> I am interested in doing stepwise meta-regression for a small dataset, but I could not find a way to do it. I have been advised to contact this mailing list asking for help with this matter.\n>>\n>> My question is: is there a way to do stepwise meta-regression with the outcome being prevalence and independent variables including time as well as categorical variables? If not, what could be an alternative option?\n>>\n>> Looking forward to hearing from you.\n>>\n>> Best regards,\n>> Hiam\n>>\n>> Hiam Chemaitelly\n>> Senior Research Specialist, Epidemiologist Infectious Disease\n>> Epidemiology Group Weill Cornell Medicine-Qatar Education City, POBox:\n>> 24144, Doha, Qatar\n>> Phone: + (974) 4492 8443, Fax: + (974) 4492 8422\n>> Email: hsc2001 at qatar-med.cornell.edu\n>>\n>> Disclaimer: This email and its attachments may be confidential and are intended solely for the use of the individual to whom it is addressed. If you are not the intended recipient, any reading, printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply function and then permanently delete what you have received.\n>>\n>> [[alternative HTML version deleted]]\n>>\n>> _______________________________________________\n>> R-sig-meta-analysis mailing list\n>> R-sig-meta-analysis at r-project.org\n>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>>\n>> ---\n>> This email has been checked for viruses by AVG.\n>> https://www.avg.com\n>>\n>>\n> \n> --\n> Michael\n> http://www.dewey.myzen.co.uk/home.html\n> Disclaimer: This email and its attachments may be confidential and are intended solely for the use of the individual to whom it is addressed. If you are not the intended recipient, any reading, printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply function and then permanently delete what you have received.\n> \n\n-- \nMichael\nhttp://www.dewey.myzen.co.uk/home.html",
+      "body_snippet": "Dear Hiam\n\nTry\nhttps://www.stata.com/support/faqs/statistics/stepwise-regression-problems/\n\nI know it comes from a Stata FAQ but it is a convenient summary of some \nof the sources.\n\nFor a more recent ",
+      "thread_id": "thread-1451ee540598",
+      "thread_depth": 1,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-f8d3107f62eb",
+      "message_id": "<BN6PR17MB0979482A656D69F5EFAC0F12B61B0@BN6PR17MB0979.namprd17.prod.outlook.com>",
+      "from_name": "Hiam S. Chemaitelly",
+      "from_email_hash": "2020d97b6e102873abf6a1353887875f59f908c51ee882c3eee1c153bc9baa50",
+      "date": "2019-06-02T12:14:27Z",
+      "subject": "[R-meta] Stepwise meta-regression",
+      "subject_clean": "[R-meta] Stepwise meta-regression",
+      "in_reply_to": "<7ef10878-d0f2-5c49-267f-afe65f26cd0d@dewey.myzen.co.uk>",
+      "references": [
+        "<BN6PR17MB09798E3D109E9B8FB792EAA9B61F0@BN6PR17MB0979.namprd17.prod.outlook.com>",
+        "<79d3205c-746a-14e1-947c-0aa7703ccd9f@dewey.myzen.co.uk>",
+        "<BN6PR17MB0979B158D04A1F728802747EB61A0@BN6PR17MB0979.namprd17.prod.outlook.com>",
+        "<7ef10878-d0f2-5c49-267f-afe65f26cd0d@dewey.myzen.co.uk>"
+      ],
+      "body_plain": "Dear Michael,\n\nMany thanks for sharing this link and article. We found these very useful to decide about next steps.\n\nWe truly appreciate your time and support.\n\nBest regards,\nHiam\n\n-----Original Message-----\nFrom: Michael Dewey <lists at dewey.myzen.co.uk>\nSent: Sunday, June 2, 2019 1:54 PM\nTo: Hiam S. Chemaitelly <hsc2001 at qatar-med.cornell.edu>; r-sig-meta-analysis at r-project.org\nCc: Laith Jamal Abu Raddad <lja2002 at qatar-med.cornell.edu>\nSubject: Re: [R-meta] Stepwise meta-regression\n\nDear Hiam\n\nTry\nhttps://www.stata.com/support/faqs/statistics/stepwise-regression-problems/\n\nI know it comes from a Stata FAQ but it is a convenient summary of some of the sources.\n\nFor a more recent non-technical summary\n\n@article{babyak04,\n    author = {Babyak, M A},\n    title = {What you see may not be what you get: a brief, nontechnical\n       introduction to overfitting in regression--type models},\n    journal = {Psychosomatic Medicine},\n    year = {2004},\n    volume = {66},\n    pages = {411--421}\n}\n\nMichael\n\nOn 01/06/2019 20:00, Hiam S. Chemaitelly wrote:\n> Dear Michael,\n>\n> I am sorry for the delayed reply.\n>\n> Many thanks for sharing this very useful resource. It is very informative and insightful.\n>\n> I am looking at how different a priori defined factors affect the prevalence of a sexually transmitted infection in a population. The data are based on a systematic review of studies reporting the prevalence of this infection in the population of interest.\n>\n> I am sorry to trouble you, but can you please clarify what you meant by \" You do presumably realise that it leads to models which do not replicate on new datasets and the confidence intervals it gives do not have their usual meaning?\"\n>\n> Many thanks for all of your time and support to this end.\n>\n> Best regards,\n> Hiam\n>\n> Hiam Chemaitelly\n> Senior Research Specialist, Epidemiologist Infectious Disease\n> Epidemiology Group Weill Cornell Medicine-Qatar Education City, POBox:\n> 24144, Doha, Qatar\n> Phone: + (974) 4492 8443, Fax: + (974) 4492 8422\n> Email: hsc2001 at qatar-med.cornell.edu\n>\n> -----Original Message-----\n> From: Michael Dewey <lists at dewey.myzen.co.uk>\n> Sent: Friday, May 31, 2019 6:01 PM\n> To: Hiam S. Chemaitelly <hsc2001 at qatar-med.cornell.edu>;\n> r-sig-meta-analysis at r-project.org\n> Cc: Laith Jamal Abu Raddad <lja2002 at qatar-med.cornell.edu>\n> Subject: Re: [R-meta] Stepwise meta-regression\n>\n> Does\n> http://www.metafor-project.org/doku.php/tips:model_selection_with_glmu\n> lti_and_mumin\n> help?\n>\n> It might help if you had stated what your scientific question is which demands variable subset selection. You do presumably realise that it leads to models which do not replicate on new datasets and the confidence intervals it gives do not have their usual meaning?\n>\n> Michael\n>\n> On 29/05/2019 19:30, Hiam S. Chemaitelly wrote:\n>> Dear R-sig-meta-analysis admin,\n>>\n>> I hope this email finds you well.\n>>\n>> I am interested in doing stepwise meta-regression for a small dataset, but I could not find a way to do it. I have been advised to contact this mailing list asking for help with this matter.\n>>\n>> My question is: is there a way to do stepwise meta-regression with the outcome being prevalence and independent variables including time as well as categorical variables? If not, what could be an alternative option?\n>>\n>> Looking forward to hearing from you.\n>>\n>> Best regards,\n>> Hiam\n>>\n>> Hiam Chemaitelly\n>> Senior Research Specialist, Epidemiologist Infectious Disease\n>> Epidemiology Group Weill Cornell Medicine-Qatar Education City, POBox:\n>> 24144, Doha, Qatar\n>> Phone: + (974) 4492 8443, Fax: + (974) 4492 8422\n>> Email: hsc2001 at qatar-med.cornell.edu\n>>\n>> Disclaimer: This email and its attachments may be confidential and are intended solely for the use of the individual to whom it is addressed. If you are not the intended recipient, any reading, printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply function and then permanently delete what you have received.\n>>\n>> [[alternative HTML version deleted]]\n>>\n>> _______________________________________________\n>> R-sig-meta-analysis mailing list\n>> R-sig-meta-analysis at r-project.org\n>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>>\n>> ---\n>> This email has been checked for viruses by AVG.\n>> https://www.avg.com\n>>\n>>\n>\n> --\n> Michael\n> http://www.dewey.myzen.co.uk/home.html\n> Disclaimer: This email and its attachments may be confidential and are intended solely for the use of the individual to whom it is addressed. If you are not the intended recipient, any reading, printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply function and then permanently delete what you have received.\n>\n\n--\nMichael\nhttp://www.dewey.myzen.co.uk/home.html\nDisclaimer: This email and its attachments may be confidential and are intended solely for the use of the individual to whom it is addressed. If you are not the intended recipient, any reading, printing, storage, disclosure, copying or any other action taken in respect of this e-mail is prohibited and may be unlawful. If you are not the intended recipient, please notify the sender immediately by using the reply function and then permanently delete what you have received.",
+      "body_snippet": "Dear Michael,\n\nMany thanks for sharing this link and article. We found these very useful to decide about next steps.\n\nWe truly appreciate your time and support.\n\nBest regards,\nHiam\n\n-----Original Mess",
+      "thread_id": "thread-1451ee540598",
+      "thread_depth": 2,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-bae53905497e",
+      "message_id": "<e7e46deb973946b58ecb0ec6c0e3ecaa@Exch2-3.slu.se>",
+      "from_name": "Magnus Magnusson",
+      "from_email_hash": "e1410e30aef2309778f662055a502ff04584c2d403f51d1f27c3510f5f51e574",
+      "date": "2019-06-15T18:19:02Z",
+      "subject": "[R-meta] Parameter redundancy",
+      "subject_clean": "[R-meta] Parameter redundancy",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear all,\n\nI am using the metafor package (rma.mv) and is currently evaluating publication bias for a multilevel model by using the Eggers regression test.\n\nI saw in a post answered by the package author, Wolfgang Viechtbauer, at the cross validated forum that for some measures you have to be aware of potential parameter redundancy (between the measure and the variance of the measure) when using the test.\n\nI wonder (1) which measures this refers to and (2) how severe this problem likely is for the judging the outcome of a pub-bias test.\n\nBest wishes,\nMagnus Magnusson, postdoc at the Swedish University of Agricultural Sciences based in Ume?\n\n--------------------------------------------------------------------\nMagnus Magnusson\nPost doc position at\nDepartment of Wildlife, Fish and Environmental Studies\nSwedish University of Agricultural Sciences\nSE-901 83 Ume?\nSweden\nphone: +46(0)90-7868587\ne-post: magnus.magnusson at slu.se\n\n\n---\nN?r du skickar e-post till SLU s? inneb?r detta att SLU behandlar dina personuppgifter. F?r att l?sa mer om hur detta g?r till, klicka h?r <https://www.slu.se/om-slu/kontakta-slu/personuppgifter/>\nE-mailing SLU will result in SLU processing your personal data. For more information on how this is done, click here <https://www.slu.se/en/about-slu/contact-slu/personal-data/>",
+      "body_snippet": "Dear all,\n\nI am using the metafor package (rma.mv) and is currently evaluating publication bias for a multilevel model by using the Eggers regression test.\n\nI saw in a post answered by the package aut",
+      "thread_id": "thread-bae53905497e",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-3f71ab1327e2",
+      "message_id": "<15dc1d4f88fe4905879441f27465ed33@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (SP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2019-06-15T18:36:04Z",
+      "subject": "[R-meta] Parameter redundancy",
+      "subject_clean": "[R-meta] Parameter redundancy",
+      "in_reply_to": "<e7e46deb973946b58ecb0ec6c0e3ecaa@Exch2-3.slu.se>",
+      "references": [
+        "<e7e46deb973946b58ecb0ec6c0e3ecaa@Exch2-3.slu.se>"
+      ],
+      "body_plain": "Hi Magnus,\n\nMy point was that for certain outcome/effect-size measures, the sampling variance is a function of the size of the outcome/effect. For example:\n\n- for the raw correlation coefficient, the usual large-sample approximation to the sampling variance is (1-r^2)^2 / (n-1), which depends on r\n\n- for the standardized mean difference, the usual large-sample approximation to the sampling variance is 1/n1 + 1/n2 + d^2 / (2*(n1+n2)), which depends on d\n\nFor other measures, there can also be such dependencies, although sometimes they are not as obvious.\n\nHence, if we use a form of the 'regression test' (to check for funnel plot asymmetry) where we use the sampling variance (or some function thereof, such as its square root) as the 'predictor', then this can result in inflated Type I error rates of the regression test. To avoid this problem, we can use the sample size (or some function thereof, such as its reciprocal) as the predictor or use an outcome measure where the sampling variance is not a function of the size of the outcome/effect (e.g., those that are obtained via a variance-stabilizing transformation, such as the r-to-z transformed correlation coefficient or the arcsine square root transformed risk difference).\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Magnus Magnusson\nSent: Saturday, 15 June, 2019 20:19\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Parameter redundancy\n\nDear all,\n\nI am using the metafor package (rma.mv) and is currently evaluating publication bias for a multilevel model by using the Eggers regression test.\n\nI saw in a post answered by the package author, Wolfgang Viechtbauer, at the cross validated forum that for some measures you have to be aware of potential parameter redundancy (between the measure and the variance of the measure) when using the test.\n\nI wonder (1) which measures this refers to and (2) how severe this problem likely is for the judging the outcome of a pub-bias test.\n\nBest wishes,\nMagnus Magnusson, postdoc at the Swedish University of Agricultural Sciences based in Ume?\n\n--------------------------------------------------------------------\nMagnus Magnusson\nPost doc position at\nDepartment of Wildlife, Fish and Environmental Studies\nSwedish University of Agricultural Sciences\nSE-901 83 Ume?\nSweden\nphone: +46(0)90-7868587\ne-post: magnus.magnusson at slu.se",
+      "body_snippet": "Hi Magnus,\n\nMy point was that for certain outcome/effect-size measures, the sampling variance is a function of the size of the outcome/effect. For example:\n\n- for the raw correlation coefficient, the ",
+      "thread_id": "thread-bae53905497e",
+      "thread_depth": 1,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-cf656fe495b2",
+      "message_id": "<CAFUVuJygAY3zdpUO8Ryj-TwSxGh4ZvOcbeXKXgBsj+ji2OT4kQ@mail.gmail.com>",
+      "from_name": "James Pustejovsky",
+      "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
+      "date": "2019-06-15T14:39:24-05:00",
+      "subject": "[R-meta] Parameter redundancy",
+      "subject_clean": "[R-meta] Parameter redundancy",
+      "in_reply_to": "<15dc1d4f88fe4905879441f27465ed33@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<e7e46deb973946b58ecb0ec6c0e3ecaa@Exch2-3.slu.se>",
+        "<15dc1d4f88fe4905879441f27465ed33@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "Magnus,\n\nFollowing up on Wolfgang's reply, here are some pointers to methodological\narticles on how this problem plays out (and how to fix it!) with different\neffect size metrics:\n\n   - Odds ratios: Moreno SG, Sutton AJ, Ades A, et al. Assessment of\n   regression-based methods to adjust for publication bias through\n   a comprehensive simulation study. BMC Med Res Methodol. 2009;9(1):17.\n   https://doi.org/10.1186/1471-2288-9-2\n   - Raw proportions: Hunter JP, Saratzis A, Sutton AJ, Boucher RH, Sayers\n   RD, Bown MJ. In meta-analyses of proportion studies, funnel plots were\n   found to be an inaccurate method of assessing publication bias. J Clin\n   Epidemiol. 2014;67(8):897-903.\n   https://doi.org/10.1016/j.jclinepi.2014.03.003\n   - Hazard ratios: Debray TP, Moons KG, Riley RD. Detecting small-study\n   effects and funnel plot asymmetry in meta-analysis of survival data: a\n   comparison of new and existing tests. Res Synth Methods. 2018;9(1):41-50.\n   https://doi.org/10.1002/jrsm.1266\n   - Standardized mean differences: Pustejovsky JE, Rodgers MA. Testing for\n   funnel plot asymmetry of standardized mean differences. Res SynMeth.\n   2019;1-15 https://doi.org/10.1002/jrsm.1332\n\nJames\n\nOn Sat, Jun 15, 2019 at 1:36 PM Viechtbauer, Wolfgang (SP) <\nwolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n\n> Hi Magnus,\n>\n> My point was that for certain outcome/effect-size measures, the sampling\n> variance is a function of the size of the outcome/effect. For example:\n>\n> - for the raw correlation coefficient, the usual large-sample\n> approximation to the sampling variance is (1-r^2)^2 / (n-1), which depends\n> on r\n>\n> - for the standardized mean difference, the usual large-sample\n> approximation to the sampling variance is 1/n1 + 1/n2 + d^2 / (2*(n1+n2)),\n> which depends on d\n>\n> For other measures, there can also be such dependencies, although\n> sometimes they are not as obvious.\n>\n> Hence, if we use a form of the 'regression test' (to check for funnel plot\n> asymmetry) where we use the sampling variance (or some function thereof,\n> such as its square root) as the 'predictor', then this can result in\n> inflated Type I error rates of the regression test. To avoid this problem,\n> we can use the sample size (or some function thereof, such as its\n> reciprocal) as the predictor or use an outcome measure where the sampling\n> variance is not a function of the size of the outcome/effect (e.g., those\n> that are obtained via a variance-stabilizing transformation, such as the\n> r-to-z transformed correlation coefficient or the arcsine square root\n> transformed risk difference).\n>\n> Best,\n> Wolfgang\n>\n> -----Original Message-----\n> From: R-sig-meta-analysis [mailto:\n> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Magnus Magnusson\n> Sent: Saturday, 15 June, 2019 20:19\n> To: r-sig-meta-analysis at r-project.org\n> Subject: [R-meta] Parameter redundancy\n>\n> Dear all,\n>\n> I am using the metafor package (rma.mv) and is currently evaluating\n> publication bias for a multilevel model by using the Eggers regression test.\n>\n> I saw in a post answered by the package author, Wolfgang Viechtbauer, at\n> the cross validated forum that for some measures you have to be aware of\n> potential parameter redundancy (between the measure and the variance of the\n> measure) when using the test.\n>\n> I wonder (1) which measures this refers to and (2) how severe this problem\n> likely is for the judging the outcome of a pub-bias test.\n>\n> Best wishes,\n> Magnus Magnusson, postdoc at the Swedish University of Agricultural\n> Sciences based in Ume?\n>\n> --------------------------------------------------------------------\n> Magnus Magnusson\n> Post doc position at\n> Department of Wildlife, Fish and Environmental Studies\n> Swedish University of Agricultural Sciences\n> SE-901 83 Ume?\n> Sweden\n> phone: +46(0)90-7868587\n> e-post: magnus.magnusson at slu.se\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list\n> R-sig-meta-analysis at r-project.org\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Magnus,\n\nFollowing up on Wolfgang's reply, here are some pointers to methodological\narticles on how this problem plays out (and how to fix it!) with different\neffect size metrics:\n\n   - Odds ratios: M",
+      "thread_id": "thread-bae53905497e",
+      "thread_depth": 2,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-57b4341579fe",
+      "message_id": "<20190615224030.EGroupware.NEFmGRPz0XwFj4k-Sj6x7gC@egroupware.imbi.uni-freiburg.de>",
+      "from_name": "Gerta Ruecker",
+      "from_email_hash": "a893fc53d744dfaa93c68a40713dd35f8cf76aa5a66f0bd185540dd9e4a79126",
+      "date": "2019-06-15T22:40:30+02:00",
+      "subject": "[R-meta] Parameter redundancy",
+      "subject_clean": "[R-meta] Parameter redundancy",
+      "in_reply_to": "<15dc1d4f88fe4905879441f27465ed33@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<e7e46deb973946b58ecb0ec6c0e3ecaa@Exch2-3.slu.se>",
+        "<15dc1d4f88fe4905879441f27465ed33@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "..\n\nDear all,\n\nFurther references:\n\n\n(Odds ratio, to understand the problem:) \nSchwarzer G, Antes G, Schumacher M. Inflation of type I error rate in two statistical tests for the detection of publication bias in meta-analyses with binary outcomes. Stat Med. 2002 Sep 15;21(17):2465-77.\n\n\n(Arcsine test:)\nR?cker G, Schwarzer G, Carpenter J. Arcsine test for publication bias in meta-analyses with binary outcomes. Stat Med. 2008 Feb 28;27(5):746-63.\n\n\n(Adjusting:)\nR?cker G1, Carpenter JR, Schwarzer G. Detecting and adjusting for small-study effects in meta-analysis. Biom J. 2011 Mar;53(2):351-68. doi: 10.1002/bimj.201000151. Epub 2011 Jan 14.\n\n\n(General recommendations:)\nSterne JA et al. Recommendations for examining and interpreting funnel plot asymmetry in meta-analyses of randomised controlled trials. BMJ. 2011 Jul 22;343:d4002. doi: 10.1136/bmj.d4002.\n\nBest,\nGerta\n\n \n----------------urspr?ngliche Nachricht-----------------\nVon: James Pustejovsky [jepusto at gmail.com]\nAn: \"Viechtbauer, Wolfgang (SP)\" [wolfgang.viechtbauer at maastrichtuniversity.nl]\nKopie: Magnus Magnusson [Magnus.Magnusson at slu.se], r-sig-meta-analysis at r-project.org\nDatum: Sat, 15 Jun 2019 14:39:24 -0500\n-------------------------------------------------\n \n \n> Magnus,\n> \n> Following up on Wolfgang's reply, here are some pointers to methodological\n> articles on how this problem plays out (and how to fix it!) with different\n> effect size metrics:\n> \n> - Odds ratios: Moreno SG, Sutton AJ, Ades A, et al. Assessment of\n>    regression-based methods to adjust for publication bias through\n> a comprehensive simulation study. BMC Med Res Methodol. 2009;9(1):17.\n>    https://doi.org/10.1186/1471-2288-9-2\n> - Raw proportions: Hunter JP, Saratzis A, Sutton AJ, Boucher RH, Sayers\n> RD, Bown MJ. In meta-analyses of proportion studies, funnel plots were\n> found to be an inaccurate method of assessing publication bias. J Clin\n>    Epidemiol. 2014;67(8):897-903.\n>    https://doi.org/10.1016/j.jclinepi.2014.03.003\n> - Hazard ratios: Debray TP, Moons KG, Riley RD. Detecting small-study\n> effects and funnel plot asymmetry in meta-analysis of survival data: a\n> comparison of new and existing tests. Res Synth Methods. 2018;9(1):41-50.\n>    https://doi.org/10.1002/jrsm.1266\n> - Standardized mean differences: Pustejovsky JE, Rodgers MA. Testing for\n> funnel plot asymmetry of standardized mean differences. Res SynMeth.\n>    2019;1-15 https://doi.org/10.1002/jrsm.1332\n> \n> James\n> \n> On Sat, Jun 15, 2019 at 1:36 PM Viechtbauer, Wolfgang (SP) <\n> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n> \n>> Hi Magnus,\n>>\n>> My point was that for certain outcome/effect-size measures, the sampling\n>> variance is a function of the size of the outcome/effect. For example:\n>>\n>> - for the raw correlation coefficient, the usual large-sample\n>> approximation to the sampling variance is (1-r^2)^2 / (n-1), which depends\n>> on r\n>>\n>> - for the standardized mean difference, the usual large-sample\n>> approximation to the sampling variance is 1/n1 + 1/n2 + d^2 / (2*(n1+n2)),\n>> which depends on d\n>>\n>> For other measures, there can also be such dependencies, although\n>> sometimes they are not as obvious.\n>>\n>> Hence, if we use a form of the 'regression test' (to check for funnel plot\n>> asymmetry) where we use the sampling variance (or some function thereof,\n>> such as its square root) as the 'predictor', then this can result in\n>> inflated Type I error rates of the regression test. To avoid this problem,\n>> we can use the sample size (or some function thereof, such as its\n>> reciprocal) as the predictor or use an outcome measure where the sampling\n>> variance is not a function of the size of the outcome/effect (e.g., those\n>> that are obtained via a variance-stabilizing transformation, such as the\n>> r-to-z transformed correlation coefficient or the arcsine square root\n>> transformed risk difference).\n>>\n>> Best,\n>> Wolfgang\n>>\n>> -----Original Message-----\n>> From: R-sig-meta-analysis [mailto:\n>> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Magnus Magnusson\n>> Sent: Saturday, 15 June, 2019 20:19\n>> To: r-sig-meta-analysis at r-project.org\n>> Subject: [R-meta] Parameter redundancy\n>>\n>> Dear all,\n>>\n>> I am using the metafor package (rma.mv) and is currently evaluating\n>> publication bias for a multilevel model by using the Eggers regression test.\n>>\n>> I saw in a post answered by the package author, Wolfgang Viechtbauer, at\n>> the cross validated forum that for some measures you have to be aware of\n>> potential parameter redundancy (between the measure and the variance of the\n>> measure) when using the test.\n>>\n>> I wonder (1) which measures this refers to and (2) how severe this problem\n>> likely is for the judging the outcome of a pub-bias test.\n>>\n>> Best wishes,\n>> Magnus Magnusson, postdoc at the Swedish University of Agricultural\n>> Sciences based in Ume?\n>>\n>> --------------------------------------------------------------------\n>> Magnus Magnusson\n>> Post doc position at\n>> Department of Wildlife, Fish and Environmental Studies\n>> Swedish University of Agricultural Sciences\n>> SE-901 83 Ume?\n>> Sweden\n>> phone: +46(0)90-7868587\n>> e-post: magnus.magnusson at slu.se\n>>\n>> _______________________________________________\n>> R-sig-meta-analysis mailing list\n>> R-sig-meta-analysis at r-project.org\n>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>>\n> \n> [[alternative HTML version deleted]]\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list\n> R-sig-meta-analysis at r-project.org\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n\n\n-- \nGerta Ruecker\nInstitute of Medical Biometry and Statistics,\nFaculty of Medicine and Medical Center - University of Freiburg\nPostal Address: Stefan-Meier-Str. 26, 79104 Freiburg\nPhone: +49/761/\t203-6673\nMail: Ruecker at imbi.uni-freiburg.de \nHomepage: http://www.imbi.uni-freiburg.de",
+      "body_snippet": "..\n\nDear all,\n\nFurther references:\n\n\n(Odds ratio, to understand the problem:) \nSchwarzer G, Antes G, Schumacher M. Inflation of type I error rate in two statistical tests for the detection of publicat",
+      "thread_id": "thread-bae53905497e",
+      "thread_depth": 2,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-792c073e0117",
+      "message_id": "<CY4PR02MB3383AC9320327A0320B40F59B9E50@CY4PR02MB3383.namprd02.prod.outlook.com>",
+      "from_name": "James Meyer",
+      "from_email_hash": "344318638c38ad12f1fa4c1b8143217341592db0a52997d8234f3a0f4623c1fd",
+      "date": "2019-06-19T11:58:05Z",
+      "subject": "[R-meta] convergence in Mada",
+      "subject_clean": "[R-meta] convergence in Mada",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "How can you tell if convergence has been accomplished using the reitsma() function in mada ? Which package do you recommend using for DTA meta-analysis if you have a small number of studies?\n\nSincerely\nJames C Meyer\nSent from Mail<https://go.microsoft.com/fwlink/?LinkId=550986> for Windows 10\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "How can you tell if convergence has been accomplished using the reitsma() function in mada ? Which package do you recommend using for DTA meta-analysis if you have a small number of studies?\n\nSincerel",
+      "thread_id": "thread-792c073e0117",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-df9f615992f8",
+      "message_id": "<CAMU7UxEX+G7qj2KyO+0CyCWmxociaNAgVJbE0GkgYECrM4cuQw@mail.gmail.com>",
+      "from_name": "Philipp Doebler",
+      "from_email_hash": "853cf43cbeae5f8bc1d9825baecbea404e38b2bfa5ffbec1e8fa50d685b1ab29",
+      "date": "2019-06-19T14:59:09+02:00",
+      "subject": "[R-meta] convergence in Mada",
+      "subject_clean": "[R-meta] convergence in Mada",
+      "in_reply_to": "<CY4PR02MB3383AC9320327A0320B40F59B9E50@CY4PR02MB3383.namprd02.prod.outlook.com>",
+      "references": [
+        "<CY4PR02MB3383AC9320327A0320B40F59B9E50@CY4PR02MB3383.namprd02.prod.outlook.com>"
+      ],
+      "body_plain": "Hi James,\n\nI have rarely had convergence problems. There are three potential problems:\n\n(1) Low number of studies (5 model parameters...) but mada throws a warning\nif I remember correctly.\n(2) Little variance in the false positive rates and/or sensitivities.\nEspecially relevant if all studies have the same sensitivity of, say, 95%.\nThis can sometimes lead to a degenerate covariance matrix of the bivarate\nrandom effect.\n(3) A perfect between study correlation of logit(sens) and logit(fpr). If\nthere is any suspicion, calculate the correlation matrix with cov2cor.\n\nAlso have a look at all standard errors and confidence intervals. The\nrecent simulation study of Vogelsang et al. (2018) discusses convergence\nissues of mada (and other packages).\n\nKind wishes,\n   Philipp\n\n\n\n\nOn Wed, Jun 19, 2019 at 2:32 PM James Meyer <\noutlook_655291802F3BAFF3 at outlook.com> wrote:\n\n>\n> How can you tell if convergence has been accomplished using the reitsma()\n> function in mada ? Which package do you recommend using for DTA\n> meta-analysis if you have a small number of studies?\n>\n> Sincerely\n> James C Meyer\n> Sent from Mail<https://go.microsoft.com/fwlink/?LinkId=550986> for\n> Windows 10\n>\n>\n>         [[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list\n> R-sig-meta-analysis at r-project.org\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n\n\n-- \nProf. Dr. Philipp Doebler\nTechnische Universit?t Dortmund\nFakult?t Statistik\nVogelpothsweg 87\n44227 Dortmund\n\nTel.: +49 231-755 8259\nFax: +49 231-755 3918\ndoebler at statistik.tu-dortmund.de\nwww.statistik.tu-dortmund.de/1261.html\n\n\nWichtiger Hinweis: Die Information in dieser E-Mail ist vertraulich. Sie\nist ausschlie?lich f?r den Adressaten bestimmt. Sollten Sie nicht der\nf?r diese E-Mail bestimmte Adressat sein, unterrichten Sie bitte den\nAbsender und vernichten Sie diese Mail. Vielen Dank.\nUnbeschadet der Korrespondenz per E-Mail, sind unsere Erkl?rungen\nausschlie?lich final rechtsverbindlich, wenn sie in herk?mmlicher\nSchriftform (mit eigenh?ndiger Unterschrift) oder durch ?bermittlung\neines solchen Schriftst?cks per Telefax erfolgen.\n\nImportant note: The information included in this e-mail is confidential.\nIt is solely intended for the recipient. If you are not the intended\nrecipient of this e-mail please contact the sender and delete this\nmessage. Thank you.\nWithout prejudice of e-mail correspondence, our statements are only\nlegally binding when they are made in the conventional written form\n(with personal signature) or when such documents are sent by fax.\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi James,\n\nI have rarely had convergence problems. There are three potential problems:\n\n(1) Low number of studies (5 model parameters...) but mada throws a warning\nif I remember correctly.\n(2) Little ",
+      "thread_id": "thread-792c073e0117",
+      "thread_depth": 1,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-8d66c8b70347",
+      "message_id": "<DB6PR05MB322262C486099B5D4BDE9C17A0E50@DB6PR05MB3222.eurprd05.prod.outlook.com>",
+      "from_name": "CHAPPELL Francesca",
+      "from_email_hash": "8b6d0235116cd83308d2557b58d574da89d43ede9e6a5de2a6e6216f6504958d",
+      "date": "2019-06-19T13:11:45Z",
+      "subject": "[R-meta] convergence in Mada",
+      "subject_clean": "[R-meta] convergence in Mada",
+      "in_reply_to": "<CAMU7UxEX+G7qj2KyO+0CyCWmxociaNAgVJbE0GkgYECrM4cuQw@mail.gmail.com>",
+      "references": [
+        "<CY4PR02MB3383AC9320327A0320B40F59B9E50@CY4PR02MB3383.namprd02.prod.outlook.com>",
+        "<CAMU7UxEX+G7qj2KyO+0CyCWmxociaNAgVJbE0GkgYECrM4cuQw@mail.gmail.com>"
+      ],
+      "body_plain": "On a related note, it can also be useful to profile the likelihood of the correlation coefficient - estimation of correlation coefficient can be particularly poor even when convergence is achieved.\n\nFrancesca\n\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Philipp Doebler\nSent: 19 June 2019 13:59\nTo: James Meyer <outlook_655291802F3BAFF3 at outlook.com>\nCc: r-sig-meta-analysis at r-project.org\nSubject: Re: [R-meta] convergence in Mada\n\nHi James,\n\nI have rarely had convergence problems. There are three potential problems:\n\n(1) Low number of studies (5 model parameters...) but mada throws a warning if I remember correctly.\n(2) Little variance in the false positive rates and/or sensitivities.\nEspecially relevant if all studies have the same sensitivity of, say, 95%.\nThis can sometimes lead to a degenerate covariance matrix of the bivarate random effect.\n(3) A perfect between study correlation of logit(sens) and logit(fpr). If there is any suspicion, calculate the correlation matrix with cov2cor.\n\nAlso have a look at all standard errors and confidence intervals. The recent simulation study of Vogelsang et al. (2018) discusses convergence issues of mada (and other packages).\n\nKind wishes,\n   Philipp\n\n\n\n\nOn Wed, Jun 19, 2019 at 2:32 PM James Meyer < outlook_655291802F3BAFF3 at outlook.com> wrote:\n\n>\n> How can you tell if convergence has been accomplished using the\n> reitsma() function in mada ? Which package do you recommend using for\n> DTA meta-analysis if you have a small number of studies?\n>\n> Sincerely\n> James C Meyer\n> Sent from Mail<https://go.microsoft.com/fwlink/?LinkId=550986> for\n> Windows 10\n>\n>\n>         [[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list\n> R-sig-meta-analysis at r-project.org\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n\n\n--\nProf. Dr. Philipp Doebler\nTechnische Universit?t Dortmund\nFakult?t Statistik\nVogelpothsweg 87\n44227 Dortmund\n\nTel.: +49 231-755 8259\nFax: +49 231-755 3918\ndoebler at statistik.tu-dortmund.de\nwww.statistik.tu-dortmund.de/1261.html\n\n\nWichtiger Hinweis: Die Information in dieser E-Mail ist vertraulich. Sie ist ausschlie?lich f?r den Adressaten bestimmt. Sollten Sie nicht der f?r diese E-Mail bestimmte Adressat sein, unterrichten Sie bitte den Absender und vernichten Sie diese Mail. Vielen Dank.\nUnbeschadet der Korrespondenz per E-Mail, sind unsere Erkl?rungen ausschlie?lich final rechtsverbindlich, wenn sie in herk?mmlicher Schriftform (mit eigenh?ndiger Unterschrift) oder durch ?bermittlung eines solchen Schriftst?cks per Telefax erfolgen.\n\nImportant note: The information included in this e-mail is confidential.\nIt is solely intended for the recipient. If you are not the intended recipient of this e-mail please contact the sender and delete this message. Thank you.\nWithout prejudice of e-mail correspondence, our statements are only legally binding when they are made in the conventional written form (with personal signature) or when such documents are sent by fax.\n\n[[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list\nR-sig-meta-analysis at r-project.org\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\nThe University of Edinburgh is a charitable body, registered in Scotland, with registration number SC005336.",
+      "body_snippet": "On a related note, it can also be useful to profile the likelihood of the correlation coefficient - estimation of correlation coefficient can be particularly poor even when convergence is achieved.\n\nF",
+      "thread_id": "thread-792c073e0117",
+      "thread_depth": 2,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-f0ce5410eeea",
+      "message_id": "<3accdf3d-5f08-3dcb-af02-5b5288e54ab5@imbi.uni-freiburg.de>",
+      "from_name": "Gerta Ruecker",
+      "from_email_hash": "b8466b08926411d09adb587db813c335876cd83daddecf7ababf13033fb66de7",
+      "date": "2019-06-19T15:19:49+02:00",
+      "subject": "[R-meta] convergence in Mada",
+      "subject_clean": "[R-meta] convergence in Mada",
+      "in_reply_to": "<CAMU7UxEX+G7qj2KyO+0CyCWmxociaNAgVJbE0GkgYECrM4cuQw@mail.gmail.com>",
+      "references": [
+        "<CY4PR02MB3383AC9320327A0320B40F59B9E50@CY4PR02MB3383.namprd02.prod.outlook.com>",
+        "<CAMU7UxEX+G7qj2KyO+0CyCWmxociaNAgVJbE0GkgYECrM4cuQw@mail.gmail.com>"
+      ],
+      "body_plain": "Dear Philipp,\n\nCould you please give a link or full bibliographic details for the paper \nyou cited (Vogelsang et al., 2018)? I couldn't find it.\n\nBest,\n\nGerta\n\n\nAm 19.06.2019 um 14:59 schrieb Philipp Doebler:\n> Hi James,\n>\n> I have rarely had convergence problems. There are three potential problems:\n>\n> (1) Low number of studies (5 model parameters...) but mada throws a warning\n> if I remember correctly.\n> (2) Little variance in the false positive rates and/or sensitivities.\n> Especially relevant if all studies have the same sensitivity of, say, 95%.\n> This can sometimes lead to a degenerate covariance matrix of the bivarate\n> random effect.\n> (3) A perfect between study correlation of logit(sens) and logit(fpr). If\n> there is any suspicion, calculate the correlation matrix with cov2cor.\n>\n> Also have a look at all standard errors and confidence intervals. The\n> recent simulation study of Vogelsang et al. (2018) discusses convergence\n> issues of mada (and other packages).\n>\n> Kind wishes,\n>     Philipp\n>\n>\n>\n>\n> On Wed, Jun 19, 2019 at 2:32 PM James Meyer <\n> outlook_655291802F3BAFF3 at outlook.com> wrote:\n>\n>> How can you tell if convergence has been accomplished using the reitsma()\n>> function in mada ? Which package do you recommend using for DTA\n>> meta-analysis if you have a small number of studies?\n>>\n>> Sincerely\n>> James C Meyer\n>> Sent from Mail<https://go.microsoft.com/fwlink/?LinkId=550986> for\n>> Windows 10\n>>\n>>\n>>          [[alternative HTML version deleted]]\n>>\n>> _______________________________________________\n>> R-sig-meta-analysis mailing list\n>> R-sig-meta-analysis at r-project.org\n>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>>\n>\n-- \n\nDr. rer. nat. Gerta R?cker, Dipl.-Math.\n\nInstitute of Medical Biometry and Statistics,\nFaculty of Medicine and Medical Center - University of Freiburg\n\nStefan-Meier-Str. 26, D-79104 Freiburg, Germany\n\nPhone:    +49/761/203-6673\nFax:      +49/761/203-6680\nMail:     ruecker at imbi.uni-freiburg.de\nHomepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view",
+      "body_snippet": "Dear Philipp,\n\nCould you please give a link or full bibliographic details for the paper \nyou cited (Vogelsang et al., 2018)? I couldn't find it.\n\nBest,\n\nGerta\n\n\nAm 19.06.2019 um 14:59 schrieb Philipp ",
+      "thread_id": "thread-792c073e0117",
+      "thread_depth": 2,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-56dfbec70a9e",
+      "message_id": "<CAMU7UxEOwXF1q4myvx0xPXSniY6sdMcEzJRtSdpm0Zrgy7FSeA@mail.gmail.com>",
+      "from_name": "Philipp Doebler",
+      "from_email_hash": "853cf43cbeae5f8bc1d9825baecbea404e38b2bfa5ffbec1e8fa50d685b1ab29",
+      "date": "2019-06-19T15:22:28+02:00",
+      "subject": "[R-meta] convergence in Mada",
+      "subject_clean": "[R-meta] convergence in Mada",
+      "in_reply_to": "<3accdf3d-5f08-3dcb-af02-5b5288e54ab5@imbi.uni-freiburg.de>",
+      "references": [
+        "<CY4PR02MB3383AC9320327A0320B40F59B9E50@CY4PR02MB3383.namprd02.prod.outlook.com>",
+        "<CAMU7UxEX+G7qj2KyO+0CyCWmxociaNAgVJbE0GkgYECrM4cuQw@mail.gmail.com>",
+        "<3accdf3d-5f08-3dcb-af02-5b5288e54ab5@imbi.uni-freiburg.de>"
+      ],
+      "body_plain": "Hi Gerta,\n\nthe paper appeared in Methods Inf Med:\n\nVogelgesang F, Schlattmann P, Dewey M (2018).  The Evaluation of Bivariate\nMixed Models in Meta-analyses of Diagnostic Accuracy Studies with SAS,\nStata and R. Methods Inf Med. 2018 May;57(3):111-119. doi:\n10.3414/ME17-01-0021.\n\nKind wishes,\n   Philipp\n\n\n\n\nOn Wed, Jun 19, 2019 at 3:19 PM Gerta Ruecker <ruecker at imbi.uni-freiburg.de>\nwrote:\n\n> Dear Philipp,\n>\n> Could you please give a link or full bibliographic details for the paper\n> you cited (Vogelsang et al., 2018)? I couldn't find it.\n>\n> Best,\n>\n> Gerta\n>\n>\n> Am 19.06.2019 um 14:59 schrieb Philipp Doebler:\n> > Hi James,\n> >\n> > I have rarely had convergence problems. There are three potential\n> problems:\n> >\n> > (1) Low number of studies (5 model parameters...) but mada throws a\n> warning\n> > if I remember correctly.\n> > (2) Little variance in the false positive rates and/or sensitivities.\n> > Especially relevant if all studies have the same sensitivity of, say,\n> 95%.\n> > This can sometimes lead to a degenerate covariance matrix of the bivarate\n> > random effect.\n> > (3) A perfect between study correlation of logit(sens) and logit(fpr). If\n> > there is any suspicion, calculate the correlation matrix with cov2cor.\n> >\n> > Also have a look at all standard errors and confidence intervals. The\n> > recent simulation study of Vogelsang et al. (2018) discusses convergence\n> > issues of mada (and other packages).\n> >\n> > Kind wishes,\n> >     Philipp\n> >\n> >\n> >\n> >\n> > On Wed, Jun 19, 2019 at 2:32 PM James Meyer <\n> > outlook_655291802F3BAFF3 at outlook.com> wrote:\n> >\n> >> How can you tell if convergence has been accomplished using the\n> reitsma()\n> >> function in mada ? Which package do you recommend using for DTA\n> >> meta-analysis if you have a small number of studies?\n> >>\n> >> Sincerely\n> >> James C Meyer\n> >> Sent from Mail<https://go.microsoft.com/fwlink/?LinkId=550986> for\n> >> Windows 10\n> >>\n> >>\n> >>          [[alternative HTML version deleted]]\n> >>\n> >> _______________________________________________\n> >> R-sig-meta-analysis mailing list\n> >> R-sig-meta-analysis at r-project.org\n> >> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> >>\n> >\n> --\n>\n> Dr. rer. nat. Gerta R?cker, Dipl.-Math.\n>\n> Institute of Medical Biometry and Statistics,\n> Faculty of Medicine and Medical Center - University of Freiburg\n>\n> Stefan-Meier-Str. 26, D-79104 Freiburg, Germany\n>\n> Phone:    +49/761/203-6673\n> Fax:      +49/761/203-6680\n> Mail:     ruecker at imbi.uni-freiburg.de\n> Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view\n>\n>\n\n-- \nProf. Dr. Philipp Doebler\nTechnische Universit?t Dortmund\nFakult?t Statistik\nVogelpothsweg 87\n44227 Dortmund\n\nTel.: +49 231-755 8259\nFax: +49 231-755 3918\ndoebler at statistik.tu-dortmund.de\nwww.statistik.tu-dortmund.de/1261.html\n\n\nWichtiger Hinweis: Die Information in dieser E-Mail ist vertraulich. Sie\nist ausschlie?lich f?r den Adressaten bestimmt. Sollten Sie nicht der\nf?r diese E-Mail bestimmte Adressat sein, unterrichten Sie bitte den\nAbsender und vernichten Sie diese Mail. Vielen Dank.\nUnbeschadet der Korrespondenz per E-Mail, sind unsere Erkl?rungen\nausschlie?lich final rechtsverbindlich, wenn sie in herk?mmlicher\nSchriftform (mit eigenh?ndiger Unterschrift) oder durch ?bermittlung\neines solchen Schriftst?cks per Telefax erfolgen.\n\nImportant note: The information included in this e-mail is confidential.\nIt is solely intended for the recipient. If you are not the intended\nrecipient of this e-mail please contact the sender and delete this\nmessage. Thank you.\nWithout prejudice of e-mail correspondence, our statements are only\nlegally binding when they are made in the conventional written form\n(with personal signature) or when such documents are sent by fax.\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Gerta,\n\nthe paper appeared in Methods Inf Med:\n\nVogelgesang F, Schlattmann P, Dewey M (2018).  The Evaluation of Bivariate\nMixed Models in Meta-analyses of Diagnostic Accuracy Studies with SAS,\nSta",
+      "thread_id": "thread-792c073e0117",
+      "thread_depth": 3,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-0663b7c26211",
+      "message_id": "<7b9ba799-1f18-33de-3213-37e76b711bd3@imbi.uni-freiburg.de>",
+      "from_name": "Gerta Ruecker",
+      "from_email_hash": "b8466b08926411d09adb587db813c335876cd83daddecf7ababf13033fb66de7",
+      "date": "2019-06-19T15:29:37+02:00",
+      "subject": "[R-meta] convergence in Mada",
+      "subject_clean": "[R-meta] convergence in Mada",
+      "in_reply_to": "<CAMU7UxEOwXF1q4myvx0xPXSniY6sdMcEzJRtSdpm0Zrgy7FSeA@mail.gmail.com>",
+      "references": [
+        "<CY4PR02MB3383AC9320327A0320B40F59B9E50@CY4PR02MB3383.namprd02.prod.outlook.com>",
+        "<CAMU7UxEX+G7qj2KyO+0CyCWmxociaNAgVJbE0GkgYECrM4cuQw@mail.gmail.com>",
+        "<3accdf3d-5f08-3dcb-af02-5b5288e54ab5@imbi.uni-freiburg.de>",
+        "<CAMU7UxEOwXF1q4myvx0xPXSniY6sdMcEzJRtSdpm0Zrgy7FSeA@mail.gmail.com>"
+      ],
+      "body_plain": "Thank you! You had misspelled the first author's name, that's why I \ncouldn't find it.\n\nGerta\n\nAm 19.06.2019 um 15:22 schrieb Philipp Doebler:\n> Hi Gerta,\n>\n> the paper appeared in Methods Inf Med:\n>\n> Vogelgesang F, Schlattmann P, Dewey M (2018).? The Evaluation of \n> Bivariate Mixed Models in Meta-analyses of Diagnostic Accuracy Studies \n> with SAS, Stata and R. Methods Inf Med. 2018 May;57(3):111-119. doi: \n> 10.3414/ME17-01-0021.\n>\n> Kind wishes,\n> ? ?Philipp\n>\n>\n>\n>\n> On Wed, Jun 19, 2019 at 3:19 PM Gerta Ruecker \n> <ruecker at imbi.uni-freiburg.de <mailto:ruecker at imbi.uni-freiburg.de>> \n> wrote:\n>\n>     Dear Philipp,\n>\n>     Could you please give a link or full bibliographic details for the\n>     paper\n>     you cited (Vogelsang et al., 2018)? I couldn't find it.\n>\n>     Best,\n>\n>     Gerta\n>\n>\n>     Am 19.06.2019 um 14:59 schrieb Philipp Doebler:\n>     > Hi James,\n>     >\n>     > I have rarely had convergence problems. There are three\n>     potential problems:\n>     >\n>     > (1) Low number of studies (5 model parameters...) but mada\n>     throws a warning\n>     > if I remember correctly.\n>     > (2) Little variance in the false positive rates and/or\n>     sensitivities.\n>     > Especially relevant if all studies have the same sensitivity of,\n>     say, 95%.\n>     > This can sometimes lead to a degenerate covariance matrix of the\n>     bivarate\n>     > random effect.\n>     > (3) A perfect between study correlation of logit(sens) and\n>     logit(fpr). If\n>     > there is any suspicion, calculate the correlation matrix with\n>     cov2cor.\n>     >\n>     > Also have a look at all standard errors and confidence\n>     intervals. The\n>     > recent simulation study of Vogelsang et al. (2018) discusses\n>     convergence\n>     > issues of mada (and other packages).\n>     >\n>     > Kind wishes,\n>     >? ? ?Philipp\n>     >\n>     >\n>     >\n>     >\n>     > On Wed, Jun 19, 2019 at 2:32 PM James Meyer <\n>     > outlook_655291802F3BAFF3 at outlook.com\n>     <mailto:outlook_655291802F3BAFF3 at outlook.com>> wrote:\n>     >\n>     >> How can you tell if convergence has been accomplished using the\n>     reitsma()\n>     >> function in mada ? Which package do you recommend using for DTA\n>     >> meta-analysis if you have a small number of studies?\n>     >>\n>     >> Sincerely\n>     >> James C Meyer\n>     >> Sent from Mail<https://go.microsoft.com/fwlink/?LinkId=550986> for\n>     >> Windows 10\n>     >>\n>     >>\n>     >>? ? ? ? ? [[alternative HTML version deleted]]\n>     >>\n>     >> _______________________________________________\n>     >> R-sig-meta-analysis mailing list\n>     >> R-sig-meta-analysis at r-project.org\n>     <mailto:R-sig-meta-analysis at r-project.org>\n>     >> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>     >>\n>     >\n>     -- \n>\n>     Dr. rer. nat. Gerta R?cker, Dipl.-Math.\n>\n>     Institute of Medical Biometry and Statistics,\n>     Faculty of Medicine and Medical Center - University of Freiburg\n>\n>     Stefan-Meier-Str. 26, D-79104 Freiburg, Germany\n>\n>     Phone:? ? +49/761/203-6673\n>     Fax:? ? ? +49/761/203-6680\n>     Mail: ruecker at imbi.uni-freiburg.de\n>     <mailto:ruecker at imbi.uni-freiburg.de>\n>     Homepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view\n>\n>\n>\n> -- \n> Prof. Dr. Philipp Doebler\n> Technische Universit?t Dortmund\n> Fakult?t Statistik\n> Vogelpothsweg 87\n> 44227 Dortmund\n>\n> Tel.: +49 231-755 8259\n> Fax: +49 231-755 3918\n> doebler at statistik.tu-dortmund.de <mailto:doebler at statistik.tu-dortmund.de>\n> www.statistik.tu-dortmund.de/1261.html \n> <http://www.statistik.tu-dortmund.de/1261.html>\n>\n>\n> Wichtiger Hinweis: Die Information in dieser E-Mail ist vertraulich. Sie\n> ist ausschlie?lich f?r den Adressaten bestimmt. Sollten Sie nicht der\n> f?r diese E-Mail bestimmte Adressat sein, unterrichten Sie bitte den\n> Absender und vernichten Sie diese Mail. Vielen Dank.\n> Unbeschadet der Korrespondenz per E-Mail, sind unsere Erkl?rungen\n> ausschlie?lich final rechtsverbindlich, wenn sie in herk?mmlicher\n> Schriftform (mit eigenh?ndiger Unterschrift) oder durch ?bermittlung\n> eines solchen Schriftst?cks per Telefax erfolgen.\n>\n> Important note: The information included in this e-mail is confidential.\n> It is solely intended for the recipient. If you are not the intended\n> recipient of this e-mail please contact the sender and delete this\n> message. Thank you.\n> Without prejudice of e-mail correspondence, our statements are only\n> legally binding when they are made in the conventional written form\n> (with personal signature) or when such documents are sent by fax.\n\n-- \n\nDr. rer. nat. Gerta R?cker, Dipl.-Math.\n\nInstitute of Medical Biometry and Statistics,\nFaculty of Medicine and Medical Center - University of Freiburg\n\nStefan-Meier-Str. 26, D-79104 Freiburg, Germany\n\nPhone:    +49/761/203-6673\nFax:      +49/761/203-6680\nMail:     ruecker at imbi.uni-freiburg.de\nHomepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Thank you! You had misspelled the first author's name, that's why I \ncouldn't find it.\n\nGerta\n\nAm 19.06.2019 um 15:22 schrieb Philipp Doebler:\n> Hi Gerta,\n>\n> the paper appeared in Methods Inf Med:\n>\n",
+      "thread_id": "thread-792c073e0117",
+      "thread_depth": 4,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-870b6bb7d721",
+      "message_id": "<A86C6438FB909A409DDEF926277952B611356C17@PPWEXCH2KX13.coh.org>",
+      "from_name": "Yuan Chun Ding",
+      "from_email_hash": "4c3d8a8986e0c4237cd2bee5255cedaa43565dfd39df772582998250c41f290e",
+      "date": "2019-06-24T16:33:27Z",
+      "subject": "[R-meta] do I need to do meta analysis and how to perform meta analysis for observational studies",
+      "subject_clean": "[R-meta] do I need to do meta analysis and how to perform meta analysis for observational studies",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear meta-analysis users,\n\nI have collected raw data from five observational studies, so a total of 1300 observations or patients, then for each patients there are 17,000 variables, since all five studies used the same method to measure gene expression values for over 16900 genes (plus some phenotypic variables, 17000 variables in total). Then I normalized gene expression data for all 16900 genes, and then calculated an immune score for each patient based on gene expression values for those  16900 genes.   I need to run a multivariable logistic regression to test association between the estimated immune score and a cancer development phenotype by adjusting for  covariates such as age, race etc.  My first question is :   do I really need to use the meta analysis approach?  I originally just ran multivariable logistic regression by considering all 1300 patients are from one combined study (patient phenotype (yes or no) = immune score + 6 covariates, so estimating adjusted OR).  Then I thought about including study ID as a  random factor in the model or calculate OR for each of five study, then pool the five OR to get an overall OR.  What do you think?   The second question:  from reading meta analysis paper,  the following R code to run meta analysis was design to run  clinical trials (randomized design) with confounding variables controlled in each study, so only univariate logistic regression analysis required, no need to adjust covariate; so how to calculate overall adjusted OR by meta analysis?  if I calculate adjusted OR for each study, I will get \" Estimate\" (for OR) and  \"Std. Error\" in each study. if using metafor, I guess I need to convert OR to logOR (Y in the example code below), then standard error to variance (V), is that right?  also how to convert from standard error in each study to variance?\n\nY <- with(dat.bcg, log(tpos * cneg/(tneg * cpos)))\nV <- with(dat.bcg, 1/tpos + 1/cneg + 1/tneg + 1/cpos)\ncbind(Y, V)\n\nresult.or.FE <- rma(yi = Y, vi = V, method = \"FE\") # Log Odds Ratio\nresult.or.FE\n\nresult.or.DL <- rma(yi = Y, vi = V, method = \"DL\")\nresult.or.DL\n\nThank you very much in advance,\n\nYuan Ding from City of Hope National Medical center\n\n------------------------------------------------------------\n-SECURITY/CONFIDENTIALITY WARNING-\n\nThis message and any attachments are intended solely for the individual or entity to which they are addressed. This communication may contain information that is privileged, confidential, or exempt from disclosure under applicable law (e.g., personal health information, research data, financial information). Because this e-mail has been sent without encryption, individuals other than the intended recipient may be able to view the information, forward it to others or tamper with the information without the knowledge or consent of the sender. If you are not the intended recipient, or the employee or person responsible for delivering the message to the intended recipient, any dissemination, distribution or copying of the communication is strictly prohibited. If you received the communication in error, please notify the sender immediately by replying to this message and deleting the message and any accompanying files from your system. If, due to the security risks, you do not wish to receive further communications via e-mail, please reply to this message and inform the sender that you do not wish to receive further e-mail from the sender. (LCP301)\n------------------------------------------------------------\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear meta-analysis users,\n\nI have collected raw data from five observational studies, so a total of 1300 observations or patients, then for each patients there are 17,000 variables, since all five stu",
+      "thread_id": "thread-870b6bb7d721",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-67a6d9ed3b2c",
+      "message_id": "<F9D7B033-6A34-45D3-B94A-AB9343A1988C@my.fsu.edu>",
+      "from_name": "Mia Daucourt",
+      "from_email_hash": "895e40cc9856d89f39c0bfccd36418d7bbdc6625dae331f48622479727408868",
+      "date": "2019-06-25T16:24:31Z",
+      "subject": "[R-meta] Random vs. Fixed Effects model in metafor with multiple effect sizes per study",
+      "subject_clean": "[R-meta] Random vs. Fixed Effects model in metafor with multiple effect sizes per study",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Good afternoon,\nI?d like to run a fisher?s z meta-analysis with multiple effect sizes per study. As such, I have it set up in a multilevel framework. I have two questions:\n1.Do I have to run it as a random effects model or can I run it as a fixed effects multilevel model?\n2. If not, then I should run random effects model. However, when I run it as a random effects multilevel model I get non-significant heterogeneity. Is it still proper to run a moderator analysis when you do not find significant heterogeneity?\nPlease let me know if you have any insight on the best course of action to take!\n\nMy best,\n\nMia Daucourt\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Good afternoon,\nI?d like to run a fisher?s z meta-analysis with multiple effect sizes per study. As such, I have it set up in a multilevel framework. I have two questions:\n1.Do I have to run it as a r",
+      "thread_id": "thread-67a6d9ed3b2c",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-4c6dbb4efdeb",
+      "message_id": "<F29AEA03-4FE2-4931-9C3B-4AACD58A067F@gmail.com>",
+      "from_name": "Mia Daucourt",
+      "from_email_hash": "5c204e8fe3bd42337baf24412394324f57aa613c6196f285ea0957bf2dc5cff2",
+      "date": "2019-06-25T12:31:50-04:00",
+      "subject": "[R-meta] Random vs. Fixed Effects model in metafor with multiple effect sizes per study",
+      "subject_clean": "[R-meta] Random vs. Fixed Effects model in metafor with multiple effect sizes per study",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Good afternoon,\n\nI?d like to run a fisher?s z meta-analysis with multiple effect sizes per study. As such, I have it set up in a multilevel framework. I have two questions:\n\n1.Do I have to run it as a random effects model or can I run it as a fixed effects multilevel model?\n\n2. If not, then I should run random effects model. However, when I run it as a random effects multilevel model I get non-significant heterogeneity. Is it still proper to run a moderator analysis when you do not find significant heterogeneity?\n\nPlease let me know if you have any insight on the best course of action to take!\n\n\nMy best,\n\nMia Daucourt\n\n\nFlorida State University\nDevelopmental Psychology PhD student\nIDCD Hart lab\ndaucourt at psy.fsu.edu\n\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Good afternoon,\n\nI?d like to run a fisher?s z meta-analysis with multiple effect sizes per study. As such, I have it set up in a multilevel framework. I have two questions:\n\n1.Do I have to run it as a",
+      "thread_id": "thread-4c6dbb4efdeb",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-61bef8ad12fd",
+      "message_id": "<865310805.108424.1561534340962@mail.yahoo.com>",
+      "from_name": "jideofor thomas",
+      "from_email_hash": "62566bd50f748186636b72d194947ccbdb0fcbc7efd33d997e2de70ba9eced41",
+      "date": "2019-06-26T07:32:20Z",
+      "subject": "[R-meta] Impact of very high tau-square value.",
+      "subject_clean": "[R-meta] Impact of very high tau-square value.",
+      "in_reply_to": null,
+      "references": [
+        "<865310805.108424.1561534340962.ref@mail.yahoo.com>"
+      ],
+      "body_plain": "Hi all,\nI did a random effect meta-analysis using the metafor package and I obtained a tau-squared ( heterogeneity)? value greater than 1.\n\nI was worried because I am nit sure what to make of it; so I did the same analysis under the Bayesian framework. I also obtained a tau-squared value of about 32.8.??\nI find it confusing, for one it is quite high and secondly I hadn't come across any discussion on how high the tau-squared value could get.\nMy questions are:\nHow high can the tau-squared value? be?\nSecondly, under this situation can I go ahead and interpret my result but with a warning on the amount of heterogeneity present in the study?? Or does the high value of the tau-square make non-sense of my analysis?\nThanks in advance for your response.?\nJide Ogbu\n\n\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi all,\nI did a random effect meta-analysis using the metafor package and I obtained a tau-squared ( heterogeneity)? value greater than 1.\n\nI was worried because I am nit sure what to make of it; so I",
+      "thread_id": "thread-61bef8ad12fd",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-ae14b912ff71",
+      "message_id": "<67d67a36-355a-19f3-01e7-092a1ff269da@imbi.uni-freiburg.de>",
+      "from_name": "Gerta Ruecker",
+      "from_email_hash": "b8466b08926411d09adb587db813c335876cd83daddecf7ababf13033fb66de7",
+      "date": "2019-06-26T11:27:19+02:00",
+      "subject": "[R-meta] Impact of very high tau-square value.",
+      "subject_clean": "[R-meta] Impact of very high tau-square value.",
+      "in_reply_to": "<865310805.108424.1561534340962@mail.yahoo.com>",
+      "references": [
+        "<865310805.108424.1561534340962.ref@mail.yahoo.com>",
+        "<865310805.108424.1561534340962@mail.yahoo.com>"
+      ],
+      "body_plain": "Dear Jide,\n\nin principle, tau -squared can take every non-negative value. Note that \ntau is the standard deviation of the random effects. That is, it is \nmeasured on the same scale as the outcome and has the same dimension. \nThat is, if you measure blood pressure, it is on the scale of blood \npressure, mmHg; if you measure body weight, it is on the scale of body \nweight, i.e. kg. There is no other general rule.\n\nIf you look at a dimensionless outcome (e.g., (log) odds ratio or \nstandardized mean difference), the same holds: tau is on the log odds \nscale or on the normal scale, respectively.\n\nThus the meaning of your values depends on what you are measuring.\n\nSee the attached paper, page 7.\n\nBest,\n\nGerta\n\nAm 26.06.2019 um 09:32 schrieb jideofor thomas:\n> Hi all,\n> I did a random effect meta-analysis using the metafor package and I obtained a tau-squared ( heterogeneity)? value greater than 1.\n>\n> I was worried because I am nit sure what to make of it; so I did the same analysis under the Bayesian framework. I also obtained a tau-squared value of about 32.8.\n> I find it confusing, for one it is quite high and secondly I hadn't come across any discussion on how high the tau-squared value could get.\n> My questions are:\n> How high can the tau-squared value? be?\n> Secondly, under this situation can I go ahead and interpret my result but with a warning on the amount of heterogeneity present in the study?? Or does the high value of the tau-square make non-sense of my analysis?\n> Thanks in advance for your response.\n> Jide Ogbu\n>\n>\n>\n>\n> \t[[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list\n> R-sig-meta-analysis at r-project.org\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n-- \n\nDr. rer. nat. Gerta R?cker, Dipl.-Math.\n\nInstitute of Medical Biometry and Statistics,\nFaculty of Medicine and Medical Center - University of Freiburg\n\nStefan-Meier-Str. 26, D-79104 Freiburg, Germany\n\nPhone:    +49/761/203-6673\nFax:      +49/761/203-6680\nMail:     ruecker at imbi.uni-freiburg.de\nHomepage: https://www.imbi.uni-freiburg.de/persons/ruecker/person_view\n\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: RuckerSchwarzerCarpenterSchumacherI2BMC2008.pdf\nType: application/pdf\nSize: 325306 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190626/c7aaac76/attachment-0001.pdf>",
+      "body_snippet": "Dear Jide,\n\nin principle, tau -squared can take every non-negative value. Note that \ntau is the standard deviation of the random effects. That is, it is \nmeasured on the same scale as the outcome and ",
+      "thread_id": "thread-61bef8ad12fd",
+      "thread_depth": 1,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-e16317c58880",
+      "message_id": "<9a9dd9df-3f33-25d9-18e4-8f2f610e3a96@imbi.uni-freiburg.de>",
+      "from_name": "Guido Schwarzer",
+      "from_email_hash": "872d01aec9370d1aca9e16bc6072bd8bf96d7c7f1fd329ec0428e91445dd11f6",
+      "date": "2019-06-26T11:28:20+02:00",
+      "subject": "[R-meta] Impact of very high tau-square value.",
+      "subject_clean": "[R-meta] Impact of very high tau-square value.",
+      "in_reply_to": "<865310805.108424.1561534340962@mail.yahoo.com>",
+      "references": [
+        "<865310805.108424.1561534340962.ref@mail.yahoo.com>",
+        "<865310805.108424.1561534340962@mail.yahoo.com>"
+      ],
+      "body_plain": "Dear Jide Ogbu,\n\nIt is not possible to give any specific advice on your dataset as you do \nnot provide sufficient information. So, I will make some general comments.\n\nA plethora of methods to estimate tau-squared is available (Veroniki et \nal., 2016) and they can give different estimates; see argument 'method' \nin metafor.\n\nFurthermore, whether a tau-squared value of 32.8 is large depends on the \noutcome measure (and for some outcomes on the underlying metric). This \nvalue could be judged to be small if you are interested in a mean \ndifference - depending on your metric. However, if your outcome measure \nis a standardized mean difference or a log odds ratio a tau-squared \nvalue of 32.8 would be very extreme.\n\nBest wishes, Guido\n\nVeroniki AA, Jackson D, Viechtbauer W, Bender R, Bowden J, Knapp G, et \nal. Methods to estimate the between-study variance and its uncertainty \nin meta-analysis. Research Synthesis Methods. 2016;7:55?79.",
+      "body_snippet": "Dear Jide Ogbu,\n\nIt is not possible to give any specific advice on your dataset as you do \nnot provide sufficient information. So, I will make some general comments.\n\nA plethora of methods to estimate",
+      "thread_id": "thread-61bef8ad12fd",
+      "thread_depth": 1,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-ebdac84923f5",
+      "message_id": "<EFD74C1B-FFF4-4A55-A4C0-C6D06B4C2A30@yahoo.com>",
+      "from_name": "Samantha Cooper",
+      "from_email_hash": "718fca84d8020b7360f88bb6582af1736a9df9476df7f10f185b6edc7ba5b46d",
+      "date": "2019-06-29T09:29:30-05:00",
+      "subject": "[R-meta] Can you please help me?",
+      "subject_clean": "[R-meta] Can you please help me?",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi there, \nI?m a PhD student in need of some advice... can you please help me?\nI?m currently writing a meta-analysis and I found a link that describes how to compute power for a meta-analysis. The issue with this method is that it only considers the old way of doing meta-analysis (i.e., one effect size per study). I do not know how to compute power for a meta-analysis using a multi-level modeling framework.\n\nI reached out to Daniel Quintana and he suggested I reach out to all of you for help with this.\n\n\nhttps://towardsdatascience.com/how-to-calculate-statistical-power-for-your-meta-analysis-e108ee586ae8 \n\n\nI look forward to hearing from you!\nSamantha Cooper \nSent from my iPhone\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi there, \nI?m a PhD student in need of some advice... can you please help me?\nI?m currently writing a meta-analysis and I found a link that describes how to compute power for a meta-analysis. The iss",
+      "thread_id": "thread-ebdac84923f5",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-5a2e6aff02cd",
+      "message_id": "<001101d52e8a$24b76160$6e262420$@upd.unibe.ch>",
+      "from_name": "dirk@richter m@iii@g oii upd@u@ibe@ch",
+      "from_email_hash": "bbb7fe7cdb9e7fc08bdc6af8b0262e678239aa926b1840cb1066d55b0bc62c70",
+      "date": "2019-06-29T16:51:32+02:00",
+      "subject": "[R-meta] Transformation of meta-regression coefficients to ORs",
+      "subject_clean": "[R-meta] Transformation of meta-regression coefficients to ORs",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear mailing list members\n\nA reviewer of a paper I have authored has requested to transform the beta\nestimates of a meta-regression result into odds ratios. The analysis was\nconducted with the metafor rma.mv function. Although I understand the point\nof this suggestion, I have looked into several textbooks and review articles\nand have not found anything in this regard.\nBefore I start searching for a code to do this, I would like to kindly ask\nfor opinions on this issue. And if it is reasonable to do so I would be\ngrateful to see a coding example.\n\nMany thanks in advance,\nDirk Richter\n\nUNIVERSIT?RE PSYCHIATRISCHE DIENSTE BERN (UPD) AG\nZENTRUM PSYCHIATRISCHE REHABILITATION\n\nDirk Richter, Dr. phil. habil.\nLeiter Forschung und Entwicklung\nMurtenstrasse 46\nCH-3008 Bern\nTel. +41 31 632 4707\nMobil + 41 76 717 5220\nE-Mail: dirk.richter at upd.unibe.ch \n\n\nBern University Hospital for Mental Health\nCenter for Psychiatric Rehabilitation\nDirk Richter, Dr. phil., PhD\nHead of Research and Development\nMurtenstrasse 46\nCH-3008 Bern\nSwitzerland\nPhone +41 31 632 4707\nMobile Phone +41 76 717 5220",
+      "body_snippet": "Dear mailing list members\n\nA reviewer of a paper I have authored has requested to transform the beta\nestimates of a meta-regression result into odds ratios. The analysis was\nconducted with the metafor",
+      "thread_id": "thread-5a2e6aff02cd",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-98d89d9241b6",
+      "message_id": "<26C55DFF-E7C5-4233-9372-4141A66B4B86@yahoo.com>",
+      "from_name": "Samantha Cooper",
+      "from_email_hash": "718fca84d8020b7360f88bb6582af1736a9df9476df7f10f185b6edc7ba5b46d",
+      "date": "2019-06-29T11:15:08-05:00",
+      "subject": "[R-meta] Can you please help me",
+      "subject_clean": "[R-meta] Can you please help me",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hello,\nI'm a Doctoral Student at the University of Nebraska in Lincoln, NE and I would greatly appreciate your help.\nI found a link (see below) that describes how to compute power for a meta-analysis. The issue with this method is that it only considers the old way of doing meta-analysis (i.e., one effect size per study). I do not know how to compute power for a meta-analysis using a multi-level modeling framework. Can you please help me?\nThank you!\nSamantha Cooper\n\n\nhttps://towardsdatascience.com/how-to-calculate-statistical-power-for-your-meta-analysis-e108ee586ae8",
+      "body_snippet": "Hello,\nI'm a Doctoral Student at the University of Nebraska in Lincoln, NE and I would greatly appreciate your help.\nI found a link (see below) that describes how to compute power for a meta-analysis.",
+      "thread_id": "thread-98d89d9241b6",
+      "thread_depth": 0,
+      "month": "2019-06"
+    },
+    {
+      "id": "msg-ea94e1e0b7a8",
+      "message_id": "<1C6B4255-8945-40CD-8274-AD28DFB5BCD6@gmail.com>",
+      "from_name": "James Pustejovsky",
+      "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
+      "date": "2019-06-29T11:40:48-05:00",
+      "subject": "[R-meta] Can you please help me?",
+      "subject_clean": "[R-meta] Can you please help me?",
+      "in_reply_to": "<EFD74C1B-FFF4-4A55-A4C0-C6D06B4C2A30@yahoo.com>",
+      "references": [
+        "<EFD74C1B-FFF4-4A55-A4C0-C6D06B4C2A30@yahoo.com>"
+      ],
+      "body_plain": "Samantha,\n\nThis is a really good question. Unfortunately, I don?t know if power analyses for more complicated scenarios have been worked out?and even if they have been, they would likely require making some pretty specific assumptions about the studies (like the number of ES per study and the correlation between ES estimates from the same study).\n\nFor ?ballpark? power analysis, I think it would be pretty reasonable to use the existing resources for univariate meta-analysis. If you have multiple ES estimates that are correlated, you?ll gain a little bit more power than if there were only one per study?but the difference might be pretty minor.\n\nAs an aside, Terri Pigott has some nice resources for determining power for subgroup analysis based on random effects models:\nhttps://www.psycharchives.org/handle/20.500.12034/2077\n\nJames\n\n> On Jun 29, 2019, at 9:29 AM, Samantha Cooper <samantha.cooper90 at yahoo.com> wrote:\n> \n> Hi there, \n> I?m a PhD student in need of some advice... can you please help me?\n> I?m currently writing a meta-analysis and I found a link that describes how to compute power for a meta-analysis. The issue with this method is that it only considers the old way of doing meta-analysis (i.e., one effect size per study). I do not know how to compute power for a meta-analysis using a multi-level modeling framework.\n> \n> I reached out to Daniel Quintana and he suggested I reach out to all of you for help with this.\n> \n> \n> https://towardsdatascience.com/how-to-calculate-statistical-power-for-your-meta-analysis-e108ee586ae8 \n> \n> \n> I look forward to hearing from you!\n> Samantha Cooper \n> Sent from my iPhone\n>    [[alternative HTML version deleted]]\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list\n> R-sig-meta-analysis at r-project.org\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Samantha,\n\nThis is a really good question. Unfortunately, I don?t know if power analyses for more complicated scenarios have been worked out?and even if they have been, they would likely require makin",
+      "thread_id": "thread-ebdac84923f5",
+      "thread_depth": 1,
+      "month": "2019-06"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-6d4a4014deaa",
+      "subject": "[R-meta] model selection using the glmulti",
+      "message_count": 3,
+      "participants": [
+        "Viechtbauer, Wolfgang (SP)",
+        "shuai"
+      ],
+      "started": "2019-06-01T18:49:22+00:00",
+      "last_reply": "2019-06-02T13:50:50+08:00",
+      "root_message_id": "msg-6d4a4014deaa"
+    },
+    {
+      "id": "thread-1451ee540598",
+      "subject": "[R-meta] Stepwise meta-regression",
+      "message_count": 3,
+      "participants": [
+        "Hiam S. Chemaitelly",
+        "Michael Dewey"
+      ],
+      "started": "2019-06-01T19:00:48+00:00",
+      "last_reply": "2019-06-02T12:14:27+00:00",
+      "root_message_id": "msg-1451ee540598"
+    },
+    {
+      "id": "thread-bae53905497e",
+      "subject": "[R-meta] Parameter redundancy",
+      "message_count": 4,
+      "participants": [
+        "Gerta Ruecker",
+        "James Pustejovsky",
+        "Magnus Magnusson",
+        "Viechtbauer, Wolfgang (SP)"
+      ],
+      "started": "2019-06-15T18:19:02+00:00",
+      "last_reply": "2019-06-15T22:40:30+02:00",
+      "root_message_id": "msg-bae53905497e"
+    },
+    {
+      "id": "thread-792c073e0117",
+      "subject": "[R-meta] convergence in Mada",
+      "message_count": 6,
+      "participants": [
+        "CHAPPELL Francesca",
+        "Gerta Ruecker",
+        "James Meyer",
+        "Philipp Doebler"
+      ],
+      "started": "2019-06-19T11:58:05+00:00",
+      "last_reply": "2019-06-19T15:29:37+02:00",
+      "root_message_id": "msg-792c073e0117"
+    },
+    {
+      "id": "thread-870b6bb7d721",
+      "subject": "[R-meta] do I need to do meta analysis and how to perform meta analysis for observational studies",
+      "message_count": 1,
+      "participants": [
+        "Yuan Chun Ding"
+      ],
+      "started": "2019-06-24T16:33:27+00:00",
+      "last_reply": "2019-06-24T16:33:27+00:00",
+      "root_message_id": "msg-870b6bb7d721"
+    },
+    {
+      "id": "thread-4c6dbb4efdeb",
+      "subject": "[R-meta] Random vs. Fixed Effects model in metafor with multiple effect sizes per study",
+      "message_count": 1,
+      "participants": [
+        "Mia Daucourt"
+      ],
+      "started": "2019-06-25T12:31:50-04:00",
+      "last_reply": "2019-06-25T12:31:50-04:00",
+      "root_message_id": "msg-4c6dbb4efdeb"
+    },
+    {
+      "id": "thread-67a6d9ed3b2c",
+      "subject": "[R-meta] Random vs. Fixed Effects model in metafor with multiple effect sizes per study",
+      "message_count": 1,
+      "participants": [
+        "Mia Daucourt"
+      ],
+      "started": "2019-06-25T16:24:31+00:00",
+      "last_reply": "2019-06-25T16:24:31+00:00",
+      "root_message_id": "msg-67a6d9ed3b2c"
+    },
+    {
+      "id": "thread-61bef8ad12fd",
+      "subject": "[R-meta] Impact of very high tau-square value.",
+      "message_count": 3,
+      "participants": [
+        "Gerta Ruecker",
+        "Guido Schwarzer",
+        "jideofor thomas"
+      ],
+      "started": "2019-06-26T07:32:20+00:00",
+      "last_reply": "2019-06-26T11:28:20+02:00",
+      "root_message_id": "msg-61bef8ad12fd"
+    },
+    {
+      "id": "thread-ebdac84923f5",
+      "subject": "[R-meta] Can you please help me?",
+      "message_count": 2,
+      "participants": [
+        "James Pustejovsky",
+        "Samantha Cooper"
+      ],
+      "started": "2019-06-29T09:29:30-05:00",
+      "last_reply": "2019-06-29T11:40:48-05:00",
+      "root_message_id": "msg-ebdac84923f5"
+    },
+    {
+      "id": "thread-98d89d9241b6",
+      "subject": "[R-meta] Can you please help me",
+      "message_count": 1,
+      "participants": [
+        "Samantha Cooper"
+      ],
+      "started": "2019-06-29T11:15:08-05:00",
+      "last_reply": "2019-06-29T11:15:08-05:00",
+      "root_message_id": "msg-98d89d9241b6"
+    },
+    {
+      "id": "thread-5a2e6aff02cd",
+      "subject": "[R-meta] Transformation of meta-regression coefficients to ORs",
+      "message_count": 1,
+      "participants": [
+        "dirk@richter m@iii@g oii upd@u@ibe@ch"
+      ],
+      "started": "2019-06-29T16:51:32+02:00",
+      "last_reply": "2019-06-29T16:51:32+02:00",
+      "root_message_id": "msg-5a2e6aff02cd"
+    }
+  ]
+}

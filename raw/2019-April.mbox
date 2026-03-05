@@ -1,0 +1,2317 @@
+From there@@@@tr@tm@nn @end|ng |rom @enckenberg@de  Tue Apr  2 09:22:52 2019
+From: there@@@@tr@tm@nn @end|ng |rom @enckenberg@de (Theresa Stratmann)
+Date: Tue, 2 Apr 2019 09:22:52 +0200 (CEST)
+Subject: [R-meta] variance explained by fixed & random effects
+In-Reply-To: <ce2ed0091d574ad68d537622ed5eff76@UM-MAIL3214.unimaas.nl>
+References: <1389903449.78447.1552494510536@office.mailbox.org>
+ <d90e1125ddcf4bedaf6d0169a2fdbd23@UM-MAIL3214.unimaas.nl>
+ <727921928.2648.1552580011265@office.mailbox.org>
+ <496488744.37992.1553590664635@office.mailbox.org>
+ <ce2ed0091d574ad68d537622ed5eff76@UM-MAIL3214.unimaas.nl>
+Message-ID: <44479435.91476.1554189772622@office.mailbox.org>
+
+Dear Wolfgang,
+
+Thank-you so much for the answers. This last part is exactly what I was looking for. I was struggling with total variance vs. heterogeneity because usually I think in terms of total variance. 
+
+Thanks for taking the time!
+
+Theresa
+
+
+> On March 29, 2019 at 12:10 PM "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> 
+> (I get so excited when I talk about this stuff that I (again) hit 'Send' too soon! Sorry -- continued properly below.)
+> 
+> Yes, this is a good reference.
+> 
+> I will try to address a few of your questions.
+> 
+> 1) What does it means if the pseudo R^2 statistic is negative?
+> 
+> R^2 type measures in meta-analysis are typically computed as proportional reductions in variance components (that reflect heterogeneity) when predictors/moderators are added to the model. However, for the models we typically use for a meta-analysis, there is no guarantee that the variance components always decrease (or remain unchanged) when we add predictors. So, it can happen that a variance component increases, in which case the R^2 value is technically negative. An example:
+> 
+> library(metafor)
+> 
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+> 
+> res0 <- rma(yi, vi, data=dat)
+> res1 <- rma(yi, vi, mods = ~ alloc, data=dat)
+> res1
+> 
+> # proportional 'reduction' in tau^2 (how R^2 is computed here)
+> (res0$tau2 - res1$tau2) / res0$tau2
+> 
+> If you look at 'res1', R^2 is given as 0%, since negative R^2 values are simply set to 0.
+> 
+> So what does this mean? I would say it simply means that there is no reduction in the estimate of tau^2, so 'alloc' does not account for any heterogeneity.
+> 
+> But also keep in mind that the value of R^2 is an estimate that can be quite inaccurate esp. if the number of studies is small (https://onlinelibrary.wiley.com/doi/abs/10.1111/bmsp.12002). One may need maybe 30 or even more studies to get a fairly decent estimate (but don't quote me on that number).
+> 
+> Another important point here is that we compute R^2 based on how much *heterogeneity* is accounted for, not how much of the *total variance* is accounted for. So, for example:
+> 
+> res1 <- rma(yi, vi, mods = ~ ablat, data=dat)
+> res1
+> 
+> This suggests that ~76% of the heterogeneity is accounted for by 'ablat' (but again, this estimate could be way off with k=13). But the total variance in this example is tau^2 plus the amount of sampling variability in the estimates (the 'vi' values). Since each study has a different amount of sampling variability, it isn't super clear how we then should think of the total variance, but one commonly used approach is to compute a 'typical' sampling variance and use that to define the total variance. For example, Higgins and Thompson (2002) suggest to compute the 'typical' sampling variance with:
+> 
+> k <- res1$k
+> wi <- 1/dat$vi
+> vt <- (k-1) / (sum(wi) - sum(wi^2)/sum(wi)) 
+> vt
+> 
+> Others (https://academic.oup.com/aje/article/150/2/206/55325) have suggested using the harmonic mean, which would be:
+> 
+> 1/mean(wi)
+> 
+> Regardless, we can then use tau^2 + vt as the total variance. Then how much of the *total variance* does 'ablat' account?
+> 
+> ((res0$tau2 + vt) - (res1$tau2 + vt)) / (res0$tau2 + vt)
+> 
+> That yields about 70%. Why don't we do that? For one, we like larger R^2 values :) But study-level moderators cannot account for sampling variability, so one could also argue it is a bit unfair to see how much of the total variability is accounted for.
+> 
+> 2) How can we think of variance accounted for by random effects?
+> 
+> Another issue in this discussion is the question of how to think of variance accounted for by random effects. It makes no sense to ask how much heterogeneity is accounted for by tau^2 here, since that is always 100%. It makes sense to ask how much of the total variability is due to the random effects. In the context of model 'res0', that would be:
+> 
+> res0$tau2 / (res0$tau2 + vt)
+> 
+> If you look at res0, you will see that this is I^2.
+> 
+> For model 'res1', things are a bit more tricky. One approach would be as follow. We again define res0$tau2 + vt as the total variability (note I am using res0$tau2 here, so the amount of heterogeneity before we include moderators, plus sampling variability). Then:
+> 
+> res1$tau2 / (res0$tau2 + vt)
+> 
+> indicates how much of this total variability is due to the random effects, that is, residual heterogeneity (about 22%). And:
+> 
+> vt / (res0$tau2 + vt)
+> 
+> indicates how much of this total variability is due to sampling variability (about 8%). And by subtraction, we then have:
+> 
+> 1 - res1$tau2 / (res0$tau2 + vt) - vt / (res0$tau2 + vt)
+> 
+> which indicates how much of the total variability is due to 'ablat' (about 70%).
+> 
+> This is *not* something that has been done or suggested before, but makes sense and is completely defensible.
+> 
+> I hope this helps.
+> 
+> Best,
+> Wolfgang
+> -----Original Message-----
+> From: Theresa Stratmann [mailto:theresa.stratmann at senckenberg.de] 
+> Sent: Tuesday, 26 March, 2019 9:58
+> To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] variance explained by fixed & random effects
+> 
+> Hi all,
+> 
+> A paper from Nakagawa & Santos (2012) seems to answer my question (specifically the section "Heterogeneity - Quantifying Heterogeneity"). 
+> 
+> Nakagawa, S. & Santos, E.S.A. Evol Ecol (2012) 26: 1253. https://doi.org/10.1007/s10682-012-9555-5
+> 
+> Theresa
+> 
+> > On March 14, 2019 at 5:13 PM Theresa Stratmann <theresa.stratmann at senckenberg.de> wrote:
+> > 
+> > Dear Wolfgang,
+> > 
+> > Thank-you for the fast reply! 
+> > 
+> > So the code is easy enough, but I am struggling to understand some of the nuance/ how to properly think about the different numbers. I have added some questions, between the dashed lines, below your answers. If they are within the scope of the mailing list and not to cumbersome, I would be curious for some explanations to help clear up my confusion. 
+> > 
+> > Thanks!
+> > 
+> > Theresa
+> > 
+> > One way of estimating an R^2-type measure for the fixed effects is to fit the reduced model without the predictor and then compute the proportional reduction in the variance components:
+> > 
+> > res0 <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat) 
+> > pmax(0, (res0$sigma2 - res$sigma2) / res0$sigma2) * 100
+> > max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100
+> > 
+> > One can compute this per component or overall. There is no guarantee that the value is >= 0, so I use pmax()/max() to set negative values to 0. One could debate whether it even makes sense here to estimate how much of the school-level heterogeneity is accounted for by 'year'(since this is a district-level predictor), but that's another issue.
+> > 
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > ***
+> > So we have: 
+> > 
+> > sigma^2 for res0 .... heterogeneity in district & school:
+> > 0.06506194 0.03273652
+> > sigma^2 for res1 .... heterogeneity in district & school, accounting for year:
+> > 0.11482670 0.03208976
+> > 
+> > (res0$sigma2 - res$sigma2) / res0$sigma2
+> > -0.76488265  0.01975659
+> > 
+> > So it looks like accounting for year increases the heterogeneity in district.
+> > 
+> > Acknowledging and moving on from the fact that year is not the best fixed effect... What does it mean if the value is negative/zero? 
+> > There is more variance in the random intercepts when you include the fixed effect? 
+> > Adding this particular fixed effect does not improve the model? 
+> > If I was writing this up, could I say: "Accounting for year does not explain any additional variation in the estimated variance of the random intercepts."
+> > More specifically: 
+> > "The heterogeneity accounted for by year is 0% for district level variance, and 1.98% for school level variance."
+> > "The overall heterogeneity accounted for by year is 0%." ???
+> > 
+> > Thinking about marginal and conditional R^2 for mixed-effects models, there is a separation of fixed and random effects: fixed effects account for X% of the variation
+> > and random effects accounting for Y% of the variation and Z% residual variance. But here the fixed effect is somehow included 
+> > in the sigma^2 (estimated variance of the random intercepts)?  This just confuses me a bit/ I missed the thought process. 
+> > 
+> > ***
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > 
+> > I am not sure how to think of the question how much variance is explained by a random effect here. One could ask how much of the total heterogeneity 
+> > is due to district- and school-level variance, which would be:
+> > 
+> > res0$sigma2 / sum(res0$sigma2) * 100
+> > 
+> > Or one could ask how much of the unaccounted for heterogeneity (so heterogeneity not accounted for by 'year') is due to district- and school-level variance, which would be:
+> > 
+> > res$sigma2 / sum(res$sigma2) * 100
+> > 
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > ***
+> > So, to double check, the heterogeneity accounted for by year is, what you showed above: 
+> > 
+> > max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100
+> > 
+> > We also know that: 
+> > 
+> > res0$sigma2 / sum(res0$sigma2) * 100  = 66.52655; 33.47345
+> > 
+> > max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100 = 0
+> > 
+> > Since these have the same denominator... is it true that: 
+> > [max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100] + sum(res0$sigma2 / sum(res0$sigma2) * 100) = 100
+> > (I check on my data and the answer seems to be no...)
+> > ***
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > 
+> > Or one could ask how much of the total variance (so heterogeneity + sampling variance) is due to district- and school-level variance, which would be:
+> > 
+> > k <- res$k
+> > wi <- 1/dat$vi
+> > s2 <- (k-1) * sum(wi) / (sum(wi)^2 - sum(wi^2))
+> > 
+> > res0$sigma2 / (sum(res0$sigma2) + s2) * 100
+> > 
+> > (here I am using the Higgins & Thompson, 2002, definition of a 'typical' sampling variance).
+> > 
+> > Or one could ask how much of the unaccounted for variance (so unaccounted for heterogeneity [heterogeneity not accounted for by 'year'] + sampling variance)
+> > is due to district- and school-level variance, which would be:
+> > 
+> > res1$sigma2 / (sum(res1$sigma2) + s2) * 100
+> > 
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > ***
+> > Can one ask here how much of the total variance (estimate of variance in true effects + sample variation) is accounted for by year? This is really what I want. 
+> > ***
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > 
+> > > On March 13, 2019 at 6:00 PM "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> > > 
+> > > 
+> > > Dear Theresa,
+> > > 
+> > > You forgot some parts in your code, so to make this example reproducible, let's use this model:
+> > > 
+> > > dat <- dat.konstantopoulos2011 
+> > > res <- rma.mv(yi, vi, mods = ~ factor(year), random = ~ 1 | district/school, data=dat)
+> > > 
+> > > And I would consider schools nested within districts here, but this isn't pertinent to the issue.
+> > > 
+> > > One way of estimating an R^2-type measure for the fixed effects is to fit the reduced model without the predictor and then compute the proportional reduction in the variance components:
+> > > 
+> > > res0 <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat) 
+> > > pmax(0, (res0$sigma2 - res$sigma2) / res0$sigma2) * 100
+> > > max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100
+> > > 
+> > > One can compute this per component or overall. There is no guarantee that the value is >= 0, so I use pmax()/max() to set negative values to 0. One could debate whether it even makes sense here to estimate how much of the school-level heterogeneity is accounted for by 'year' (since this is a district-level predictor), but that's another issue.
+> > > 
+> > > I am not sure how to think of the question how much variance is explained by a random effect here. One could ask how much of the total heterogeneity is due to district- and schol-level variance, which would be:
+> > > 
+> > > res0$sigma2 / sum(res0$sigma2) * 100
+> > > 
+> > > Or one could ask how much of the unaccounted for heterogeneity (so heterogeneity not accounted for by 'year') is due to district- and schol-level variance, which would be:
+> > > 
+> > > res$sigma2 / sum(res$sigma2) * 100
+> > > 
+> > > Or one could ask how much of the total variance (so heterogenity + sampling variance) is due to district- and schol-level variance, which would be:
+> > > 
+> > > k <- res$k
+> > > wi <- 1/dat$vi
+> > > s2 <- (k-1) * sum(wi) / (sum(wi)^2 - sum(wi^2))
+> > > res0$sigma2 / (sum(res0$sigma2) + s2) * 100
+> > > 
+> > > (here I am using the Higgins & Thompson, 2002, definition of a 'typical' sampling variance).
+> > > 
+> > > Or one could ask how much of the unaccounted for variance (so unaccounted for heterogenity + sampling variance) is due to district- and schol-level variance, which would be:
+> > > 
+> > > res1$sigma2 / (sum(res1$sigma2) + s2) * 100
+> > > 
+> > > These are at least some possibilities.
+> > > 
+> > > Best,
+> > > Wolfgang
+> > > 
+> > > -----Original Message-----
+> > > From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Theresa Stratmann
+> > > Sent: Wednesday, 13 March, 2019 17:29
+> > > To: r-sig-meta-analysis at r-project.org
+> > > Subject: [R-meta] variance explained by fixed & random effects
+> > > 
+> > > Dear Meta-Analysis Community,
+> > > 
+> > > I am using the metafor package to help me summarize some data on habitat selection. I have a question whose answer I have not found yet on the useful metafor website, and was hoping that someone could help me (or point me to an online resource I missed). 
+> > > 
+> > > As part of the description of my meta-analysis I would like to explain how much of the variation in habitat selection is due to my fixed effects (season) versus my random effects (individual & year). 
+> > > 
+> > > For a normal mixed-effects model I know how to compute the marginal and conditional R^2 (Nakagawa & Schielzeth 2013), but I am wondering how to do this correctly for a meta-analysis, or maybe, better said, talk about variance explained by the fixed and random effects. 
+> > > 
+> > > First I looked into I^2 and the post on this for random effect models. But then I read more from Borenstein et al. (https://www.meta-analysis-workshops.com/download/common-mistakes1.pdf) and was not quiet sure anymore if this is what I want (I^2 = proportion of observed variance that reflects variance in the true effects and not the sampling error ... so this seems more of a summary for the entire model (?), which also needs to be treated with care and presented properly). 
+> > > 
+> > > Then I found this question on this mailing list: https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2017-September/000232.html  ...but cannot really get this code to produce anything sensible, because I guess I am not clear on the formula for res0 vs. res1. 
+> > > 
+> > > So I will give a different example, which closely approximates what I am trying to do (a model with fixed & random effects): 
+> > > 
+> > > dat <- dat.konstantopoulos2011 
+> > > res <- rma.mv(yi, vi, mods = ~ factor(year), list( ~ 1 | district , ~ 1|school)  data=dat) 
+> > > res 
+> > > 
+> > > How would you calculate / correctly describe variance explained by the fixed effects (year)? By the random effects (district, school)? I am not tied to a particular statistic, just want to make sure that whatever I do is an honest representation of my results and gives readers (& myself) the information they need to interpret the results. 
+> > > 
+> > > I am new to meta-analyses and this is just a small part of my project, so I have been able to do some reading, but not an in-depth dive. Therefore I would appreciate any help you can offer.
+> > > 
+> > > Many thanks,
+> > > 
+> > > Theresa Stratmann 
+> > > 
+> > > B.S. Ecology, The University of Georgia 
+> > > M.S. Wildlife & Fisheries Biology, Clemson University 
+> > > 
+> > > PhD Student 
+> > > Goethe University 
+> > > and 
+> > > Senckenberg Biodiversity and Climate Research Center
+
+
+From there@@@@tr@tm@nn @end|ng |rom @enckenberg@de  Tue Apr  2 09:38:08 2019
+From: there@@@@tr@tm@nn @end|ng |rom @enckenberg@de (Theresa Stratmann)
+Date: Tue, 2 Apr 2019 09:38:08 +0200 (CEST)
+Subject: [R-meta] variance explained by fixed & random effects
+In-Reply-To: <ce2ed0091d574ad68d537622ed5eff76@UM-MAIL3214.unimaas.nl>
+References: <1389903449.78447.1552494510536@office.mailbox.org>
+ <d90e1125ddcf4bedaf6d0169a2fdbd23@UM-MAIL3214.unimaas.nl>
+ <727921928.2648.1552580011265@office.mailbox.org>
+ <496488744.37992.1553590664635@office.mailbox.org>
+ <ce2ed0091d574ad68d537622ed5eff76@UM-MAIL3214.unimaas.nl>
+Message-ID: <666280841.91811.1554190688904@office.mailbox.org>
+
+Actually, sorry, one more question ... 
+
+Let's say we were to use: 
+
+library(metafor)
+
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+
+res2 <- rma.mv(yi, vi, mods = ~ alloc, random = ~1|ablat, data=dat)
+
+Do we then use sigma2 instead of tau2? 
+
+Theresa
+
+> On March 29, 2019 at 12:10 PM "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> 
+> (I get so excited when I talk about this stuff that I (again) hit 'Send' too soon! Sorry -- continued properly below.)
+> 
+> Yes, this is a good reference.
+> 
+> I will try to address a few of your questions.
+> 
+> 1) What does it means if the pseudo R^2 statistic is negative?
+> 
+> R^2 type measures in meta-analysis are typically computed as proportional reductions in variance components (that reflect heterogeneity) when predictors/moderators are added to the model. However, for the models we typically use for a meta-analysis, there is no guarantee that the variance components always decrease (or remain unchanged) when we add predictors. So, it can happen that a variance component increases, in which case the R^2 value is technically negative. An example:
+> 
+> library(metafor)
+> 
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+> 
+> res0 <- rma(yi, vi, data=dat)
+> res1 <- rma(yi, vi, mods = ~ alloc, data=dat)
+> res1
+> 
+> # proportional 'reduction' in tau^2 (how R^2 is computed here)
+> (res0$tau2 - res1$tau2) / res0$tau2
+> 
+> If you look at 'res1', R^2 is given as 0%, since negative R^2 values are simply set to 0.
+> 
+> So what does this mean? I would say it simply means that there is no reduction in the estimate of tau^2, so 'alloc' does not account for any heterogeneity.
+> 
+> But also keep in mind that the value of R^2 is an estimate that can be quite inaccurate esp. if the number of studies is small (https://onlinelibrary.wiley.com/doi/abs/10.1111/bmsp.12002). One may need maybe 30 or even more studies to get a fairly decent estimate (but don't quote me on that number).
+> 
+> Another important point here is that we compute R^2 based on how much *heterogeneity* is accounted for, not how much of the *total variance* is accounted for. So, for example:
+> 
+> res1 <- rma(yi, vi, mods = ~ ablat, data=dat)
+> res1
+> 
+> This suggests that ~76% of the heterogeneity is accounted for by 'ablat' (but again, this estimate could be way off with k=13). But the total variance in this example is tau^2 plus the amount of sampling variability in the estimates (the 'vi' values). Since each study has a different amount of sampling variability, it isn't super clear how we then should think of the total variance, but one commonly used approach is to compute a 'typical' sampling variance and use that to define the total variance. For example, Higgins and Thompson (2002) suggest to compute the 'typical' sampling variance with:
+> 
+> k <- res1$k
+> wi <- 1/dat$vi
+> vt <- (k-1) / (sum(wi) - sum(wi^2)/sum(wi)) 
+> vt
+> 
+> Others (https://academic.oup.com/aje/article/150/2/206/55325) have suggested using the harmonic mean, which would be:
+> 
+> 1/mean(wi)
+> 
+> Regardless, we can then use tau^2 + vt as the total variance. Then how much of the *total variance* does 'ablat' account?
+> 
+> ((res0$tau2 + vt) - (res1$tau2 + vt)) / (res0$tau2 + vt)
+> 
+> That yields about 70%. Why don't we do that? For one, we like larger R^2 values :) But study-level moderators cannot account for sampling variability, so one could also argue it is a bit unfair to see how much of the total variability is accounted for.
+> 
+> 2) How can we think of variance accounted for by random effects?
+> 
+> Another issue in this discussion is the question of how to think of variance accounted for by random effects. It makes no sense to ask how much heterogeneity is accounted for by tau^2 here, since that is always 100%. It makes sense to ask how much of the total variability is due to the random effects. In the context of model 'res0', that would be:
+> 
+> res0$tau2 / (res0$tau2 + vt)
+> 
+> If you look at res0, you will see that this is I^2.
+> 
+> For model 'res1', things are a bit more tricky. One approach would be as follow. We again define res0$tau2 + vt as the total variability (note I am using res0$tau2 here, so the amount of heterogeneity before we include moderators, plus sampling variability). Then:
+> 
+> res1$tau2 / (res0$tau2 + vt)
+> 
+> indicates how much of this total variability is due to the random effects, that is, residual heterogeneity (about 22%). And:
+> 
+> vt / (res0$tau2 + vt)
+> 
+> indicates how much of this total variability is due to sampling variability (about 8%). And by subtraction, we then have:
+> 
+> 1 - res1$tau2 / (res0$tau2 + vt) - vt / (res0$tau2 + vt)
+> 
+> which indicates how much of the total variability is due to 'ablat' (about 70%).
+> 
+> This is *not* something that has been done or suggested before, but makes sense and is completely defensible.
+> 
+> I hope this helps.
+> 
+> Best,
+> Wolfgang
+> -----Original Message-----
+> From: Theresa Stratmann [mailto:theresa.stratmann at senckenberg.de] 
+> Sent: Tuesday, 26 March, 2019 9:58
+> To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+> Subject: Re: [R-meta] variance explained by fixed & random effects
+> 
+> Hi all,
+> 
+> A paper from Nakagawa & Santos (2012) seems to answer my question (specifically the section "Heterogeneity - Quantifying Heterogeneity"). 
+> 
+> Nakagawa, S. & Santos, E.S.A. Evol Ecol (2012) 26: 1253. https://doi.org/10.1007/s10682-012-9555-5
+> 
+> Theresa
+> 
+> > On March 14, 2019 at 5:13 PM Theresa Stratmann <theresa.stratmann at senckenberg.de> wrote:
+> > 
+> > Dear Wolfgang,
+> > 
+> > Thank-you for the fast reply! 
+> > 
+> > So the code is easy enough, but I am struggling to understand some of the nuance/ how to properly think about the different numbers. I have added some questions, between the dashed lines, below your answers. If they are within the scope of the mailing list and not to cumbersome, I would be curious for some explanations to help clear up my confusion. 
+> > 
+> > Thanks!
+> > 
+> > Theresa
+> > 
+> > One way of estimating an R^2-type measure for the fixed effects is to fit the reduced model without the predictor and then compute the proportional reduction in the variance components:
+> > 
+> > res0 <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat) 
+> > pmax(0, (res0$sigma2 - res$sigma2) / res0$sigma2) * 100
+> > max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100
+> > 
+> > One can compute this per component or overall. There is no guarantee that the value is >= 0, so I use pmax()/max() to set negative values to 0. One could debate whether it even makes sense here to estimate how much of the school-level heterogeneity is accounted for by 'year'(since this is a district-level predictor), but that's another issue.
+> > 
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > ***
+> > So we have: 
+> > 
+> > sigma^2 for res0 .... heterogeneity in district & school:
+> > 0.06506194 0.03273652
+> > sigma^2 for res1 .... heterogeneity in district & school, accounting for year:
+> > 0.11482670 0.03208976
+> > 
+> > (res0$sigma2 - res$sigma2) / res0$sigma2
+> > -0.76488265  0.01975659
+> > 
+> > So it looks like accounting for year increases the heterogeneity in district.
+> > 
+> > Acknowledging and moving on from the fact that year is not the best fixed effect... What does it mean if the value is negative/zero? 
+> > There is more variance in the random intercepts when you include the fixed effect? 
+> > Adding this particular fixed effect does not improve the model? 
+> > If I was writing this up, could I say: "Accounting for year does not explain any additional variation in the estimated variance of the random intercepts."
+> > More specifically: 
+> > "The heterogeneity accounted for by year is 0% for district level variance, and 1.98% for school level variance."
+> > "The overall heterogeneity accounted for by year is 0%." ???
+> > 
+> > Thinking about marginal and conditional R^2 for mixed-effects models, there is a separation of fixed and random effects: fixed effects account for X% of the variation
+> > and random effects accounting for Y% of the variation and Z% residual variance. But here the fixed effect is somehow included 
+> > in the sigma^2 (estimated variance of the random intercepts)?  This just confuses me a bit/ I missed the thought process. 
+> > 
+> > ***
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > 
+> > I am not sure how to think of the question how much variance is explained by a random effect here. One could ask how much of the total heterogeneity 
+> > is due to district- and school-level variance, which would be:
+> > 
+> > res0$sigma2 / sum(res0$sigma2) * 100
+> > 
+> > Or one could ask how much of the unaccounted for heterogeneity (so heterogeneity not accounted for by 'year') is due to district- and school-level variance, which would be:
+> > 
+> > res$sigma2 / sum(res$sigma2) * 100
+> > 
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > ***
+> > So, to double check, the heterogeneity accounted for by year is, what you showed above: 
+> > 
+> > max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100
+> > 
+> > We also know that: 
+> > 
+> > res0$sigma2 / sum(res0$sigma2) * 100  = 66.52655; 33.47345
+> > 
+> > max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100 = 0
+> > 
+> > Since these have the same denominator... is it true that: 
+> > [max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100] + sum(res0$sigma2 / sum(res0$sigma2) * 100) = 100
+> > (I check on my data and the answer seems to be no...)
+> > ***
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > 
+> > Or one could ask how much of the total variance (so heterogeneity + sampling variance) is due to district- and school-level variance, which would be:
+> > 
+> > k <- res$k
+> > wi <- 1/dat$vi
+> > s2 <- (k-1) * sum(wi) / (sum(wi)^2 - sum(wi^2))
+> > 
+> > res0$sigma2 / (sum(res0$sigma2) + s2) * 100
+> > 
+> > (here I am using the Higgins & Thompson, 2002, definition of a 'typical' sampling variance).
+> > 
+> > Or one could ask how much of the unaccounted for variance (so unaccounted for heterogeneity [heterogeneity not accounted for by 'year'] + sampling variance)
+> > is due to district- and school-level variance, which would be:
+> > 
+> > res1$sigma2 / (sum(res1$sigma2) + s2) * 100
+> > 
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > ***
+> > Can one ask here how much of the total variance (estimate of variance in true effects + sample variation) is accounted for by year? This is really what I want. 
+> > ***
+> > -----------------------------------------------------------------------------------------------------------------------------------------
+> > 
+> > > On March 13, 2019 at 6:00 PM "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> > > 
+> > > 
+> > > Dear Theresa,
+> > > 
+> > > You forgot some parts in your code, so to make this example reproducible, let's use this model:
+> > > 
+> > > dat <- dat.konstantopoulos2011 
+> > > res <- rma.mv(yi, vi, mods = ~ factor(year), random = ~ 1 | district/school, data=dat)
+> > > 
+> > > And I would consider schools nested within districts here, but this isn't pertinent to the issue.
+> > > 
+> > > One way of estimating an R^2-type measure for the fixed effects is to fit the reduced model without the predictor and then compute the proportional reduction in the variance components:
+> > > 
+> > > res0 <- rma.mv(yi, vi, random = ~ 1 | district/school, data=dat) 
+> > > pmax(0, (res0$sigma2 - res$sigma2) / res0$sigma2) * 100
+> > > max(0, (sum(res0$sigma2) - sum(res$sigma2)) / sum(res0$sigma2)) * 100
+> > > 
+> > > One can compute this per component or overall. There is no guarantee that the value is >= 0, so I use pmax()/max() to set negative values to 0. One could debate whether it even makes sense here to estimate how much of the school-level heterogeneity is accounted for by 'year' (since this is a district-level predictor), but that's another issue.
+> > > 
+> > > I am not sure how to think of the question how much variance is explained by a random effect here. One could ask how much of the total heterogeneity is due to district- and schol-level variance, which would be:
+> > > 
+> > > res0$sigma2 / sum(res0$sigma2) * 100
+> > > 
+> > > Or one could ask how much of the unaccounted for heterogeneity (so heterogeneity not accounted for by 'year') is due to district- and schol-level variance, which would be:
+> > > 
+> > > res$sigma2 / sum(res$sigma2) * 100
+> > > 
+> > > Or one could ask how much of the total variance (so heterogenity + sampling variance) is due to district- and schol-level variance, which would be:
+> > > 
+> > > k <- res$k
+> > > wi <- 1/dat$vi
+> > > s2 <- (k-1) * sum(wi) / (sum(wi)^2 - sum(wi^2))
+> > > res0$sigma2 / (sum(res0$sigma2) + s2) * 100
+> > > 
+> > > (here I am using the Higgins & Thompson, 2002, definition of a 'typical' sampling variance).
+> > > 
+> > > Or one could ask how much of the unaccounted for variance (so unaccounted for heterogenity + sampling variance) is due to district- and schol-level variance, which would be:
+> > > 
+> > > res1$sigma2 / (sum(res1$sigma2) + s2) * 100
+> > > 
+> > > These are at least some possibilities.
+> > > 
+> > > Best,
+> > > Wolfgang
+> > > 
+> > > -----Original Message-----
+> > > From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Theresa Stratmann
+> > > Sent: Wednesday, 13 March, 2019 17:29
+> > > To: r-sig-meta-analysis at r-project.org
+> > > Subject: [R-meta] variance explained by fixed & random effects
+> > > 
+> > > Dear Meta-Analysis Community,
+> > > 
+> > > I am using the metafor package to help me summarize some data on habitat selection. I have a question whose answer I have not found yet on the useful metafor website, and was hoping that someone could help me (or point me to an online resource I missed). 
+> > > 
+> > > As part of the description of my meta-analysis I would like to explain how much of the variation in habitat selection is due to my fixed effects (season) versus my random effects (individual & year). 
+> > > 
+> > > For a normal mixed-effects model I know how to compute the marginal and conditional R^2 (Nakagawa & Schielzeth 2013), but I am wondering how to do this correctly for a meta-analysis, or maybe, better said, talk about variance explained by the fixed and random effects. 
+> > > 
+> > > First I looked into I^2 and the post on this for random effect models. But then I read more from Borenstein et al. (https://www.meta-analysis-workshops.com/download/common-mistakes1.pdf) and was not quiet sure anymore if this is what I want (I^2 = proportion of observed variance that reflects variance in the true effects and not the sampling error ... so this seems more of a summary for the entire model (?), which also needs to be treated with care and presented properly). 
+> > > 
+> > > Then I found this question on this mailing list: https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2017-September/000232.html  ...but cannot really get this code to produce anything sensible, because I guess I am not clear on the formula for res0 vs. res1. 
+> > > 
+> > > So I will give a different example, which closely approximates what I am trying to do (a model with fixed & random effects): 
+> > > 
+> > > dat <- dat.konstantopoulos2011 
+> > > res <- rma.mv(yi, vi, mods = ~ factor(year), list( ~ 1 | district , ~ 1|school)  data=dat) 
+> > > res 
+> > > 
+> > > How would you calculate / correctly describe variance explained by the fixed effects (year)? By the random effects (district, school)? I am not tied to a particular statistic, just want to make sure that whatever I do is an honest representation of my results and gives readers (& myself) the information they need to interpret the results. 
+> > > 
+> > > I am new to meta-analyses and this is just a small part of my project, so I have been able to do some reading, but not an in-depth dive. Therefore I would appreciate any help you can offer.
+> > > 
+> > > Many thanks,
+> > > 
+> > > Theresa Stratmann 
+> > > 
+> > > B.S. Ecology, The University of Georgia 
+> > > M.S. Wildlife & Fisheries Biology, Clemson University 
+> > > 
+> > > PhD Student 
+> > > Goethe University 
+> > > and 
+> > > Senckenberg Biodiversity and Climate Research Center
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Apr  3 11:53:26 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Wed, 3 Apr 2019 09:53:26 +0000
+Subject: [R-meta] variance explained by fixed & random effects
+In-Reply-To: <666280841.91811.1554190688904@office.mailbox.org>
+References: <1389903449.78447.1552494510536@office.mailbox.org>
+ <d90e1125ddcf4bedaf6d0169a2fdbd23@UM-MAIL3214.unimaas.nl>
+ <727921928.2648.1552580011265@office.mailbox.org>
+ <496488744.37992.1553590664635@office.mailbox.org>
+ <ce2ed0091d574ad68d537622ed5eff76@UM-MAIL3214.unimaas.nl>
+ <666280841.91811.1554190688904@office.mailbox.org>
+Message-ID: <e4df59b7437f4587abc0c7278647c4b6@UM-MAIL3214.unimaas.nl>
+
+In principle, yes.
+
+But, I highly question the sensibility of any model that does not include estimate-level random effects. In the model you posted, random effects are added for each level of ablat, but this assumes that true effects are homogeneous for the same level of ablat. That is a big assumption and one that I don't think is (a priori) justified. 
+
+I frequently see the same issue when people are fitting multilevel models. Instead of *adding* random effects for some higher level clustering variable to a model that already includes estimate level random effects, only cluster level random effects are included in the model. For a discussion of this, see:
+
+http://www.metafor-project.org/doku.php/analyses:konstantopoulos2011#a_common_mistake_in_the_three-level_model
+
+In your example, I therefore would say that one should fit:
+
+res2 <- rma.mv(yi, vi, mods = ~ alloc, random = ~1|ablat/trial, data=dat)
+
+In this case, the random effects for ablat (which has 9 levels) are difficult to distinguish from the trial (i.e., estimate) level random effects (13 different levels). In fact, it turns out in this case that the trial level variance component is estimated to be 0, so in the end, the fit of the model is the same. But in general, I think one should at least start with a model that includes estimate level random effects.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Theresa Stratmann [mailto:theresa.stratmann at senckenberg.de] 
+Sent: Tuesday, 02 April, 2019 9:38
+To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+Subject: RE: [R-meta] variance explained by fixed & random effects
+
+Actually, sorry, one more question ... 
+
+Let's say we were to use: 
+
+library(metafor)
+
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+
+res2 <- rma.mv(yi, vi, mods = ~ alloc, random = ~1|ablat, data=dat)
+
+Do we then use sigma2 instead of tau2? 
+
+Theresa
+
+> On March 29, 2019 at 12:10 PM "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> 
+> (I get so excited when I talk about this stuff that I (again) hit 'Send' too soon! Sorry -- continued properly below.)
+> 
+> Yes, this is a good reference.
+> 
+> I will try to address a few of your questions.
+> 
+> 1) What does it means if the pseudo R^2 statistic is negative?
+> 
+> R^2 type measures in meta-analysis are typically computed as proportional reductions in variance components (that reflect heterogeneity) when predictors/moderators are added to the model. However, for the models we typically use for a meta-analysis, there is no guarantee that the variance components always decrease (or remain unchanged) when we add predictors. So, it can happen that a variance component increases, in which case the R^2 value is technically negative. An example:
+> 
+> library(metafor)
+> 
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+> 
+> res0 <- rma(yi, vi, data=dat)
+> res1 <- rma(yi, vi, mods = ~ alloc, data=dat)
+> res1
+> 
+> # proportional 'reduction' in tau^2 (how R^2 is computed here)
+> (res0$tau2 - res1$tau2) / res0$tau2
+> 
+> If you look at 'res1', R^2 is given as 0%, since negative R^2 values are simply set to 0.
+> 
+> So what does this mean? I would say it simply means that there is no reduction in the estimate of tau^2, so 'alloc' does not account for any heterogeneity.
+> 
+> But also keep in mind that the value of R^2 is an estimate that can be quite inaccurate esp. if the number of studies is small (https://onlinelibrary.wiley.com/doi/abs/10.1111/bmsp.12002). One may need maybe 30 or even more studies to get a fairly decent estimate (but don't quote me on that number).
+> 
+> Another important point here is that we compute R^2 based on how much *heterogeneity* is accounted for, not how much of the *total variance* is accounted for. So, for example:
+> 
+> res1 <- rma(yi, vi, mods = ~ ablat, data=dat)
+> res1
+> 
+> This suggests that ~76% of the heterogeneity is accounted for by 'ablat' (but again, this estimate could be way off with k=13). But the total variance in this example is tau^2 plus the amount of sampling variability in the estimates (the 'vi' values). Since each study has a different amount of sampling variability, it isn't super clear how we then should think of the total variance, but one commonly used approach is to compute a 'typical' sampling variance and use that to define the total variance. For example, Higgins and Thompson (2002) suggest to compute the 'typical' sampling variance with:
+> 
+> k <- res1$k
+> wi <- 1/dat$vi
+> vt <- (k-1) / (sum(wi) - sum(wi^2)/sum(wi)) 
+> vt
+> 
+> Others (https://academic.oup.com/aje/article/150/2/206/55325) have suggested using the harmonic mean, which would be:
+> 
+> 1/mean(wi)
+> 
+> Regardless, we can then use tau^2 + vt as the total variance. Then how much of the *total variance* does 'ablat' account?
+> 
+> ((res0$tau2 + vt) - (res1$tau2 + vt)) / (res0$tau2 + vt)
+> 
+> That yields about 70%. Why don't we do that? For one, we like larger R^2 values :) But study-level moderators cannot account for sampling variability, so one could also argue it is a bit unfair to see how much of the total variability is accounted for.
+> 
+> 2) How can we think of variance accounted for by random effects?
+> 
+> Another issue in this discussion is the question of how to think of variance accounted for by random effects. It makes no sense to ask how much heterogeneity is accounted for by tau^2 here, since that is always 100%. It makes sense to ask how much of the total variability is due to the random effects. In the context of model 'res0', that would be:
+> 
+> res0$tau2 / (res0$tau2 + vt)
+> 
+> If you look at res0, you will see that this is I^2.
+> 
+> For model 'res1', things are a bit more tricky. One approach would be as follow. We again define res0$tau2 + vt as the total variability (note I am using res0$tau2 here, so the amount of heterogeneity before we include moderators, plus sampling variability). Then:
+> 
+> res1$tau2 / (res0$tau2 + vt)
+> 
+> indicates how much of this total variability is due to the random effects, that is, residual heterogeneity (about 22%). And:
+> 
+> vt / (res0$tau2 + vt)
+> 
+> indicates how much of this total variability is due to sampling variability (about 8%). And by subtraction, we then have:
+> 
+> 1 - res1$tau2 / (res0$tau2 + vt) - vt / (res0$tau2 + vt)
+> 
+> which indicates how much of the total variability is due to 'ablat' (about 70%).
+> 
+> This is *not* something that has been done or suggested before, but makes sense and is completely defensible.
+> 
+> I hope this helps.
+> 
+> Best,
+> Wolfgang
+
+From there@@@@tr@tm@nn @end|ng |rom @enckenberg@de  Fri Apr  5 10:30:55 2019
+From: there@@@@tr@tm@nn @end|ng |rom @enckenberg@de (Theresa Stratmann)
+Date: Fri, 5 Apr 2019 10:30:55 +0200 (CEST)
+Subject: [R-meta] variance explained by fixed & random effects
+In-Reply-To: <e4df59b7437f4587abc0c7278647c4b6@UM-MAIL3214.unimaas.nl>
+References: <1389903449.78447.1552494510536@office.mailbox.org>
+ <d90e1125ddcf4bedaf6d0169a2fdbd23@UM-MAIL3214.unimaas.nl>
+ <727921928.2648.1552580011265@office.mailbox.org>
+ <496488744.37992.1553590664635@office.mailbox.org>
+ <ce2ed0091d574ad68d537622ed5eff76@UM-MAIL3214.unimaas.nl>
+ <666280841.91811.1554190688904@office.mailbox.org>
+ <e4df59b7437f4587abc0c7278647c4b6@UM-MAIL3214.unimaas.nl>
+Message-ID: <534720806.125567.1554453055392@office.mailbox.org>
+
+Sorry, it's hard for me to give examples, given that my data is extremely different from a meta-analysis of medical studies. My question was more - when I use rma.mv (as I need to do for my data), my tau is 0... but I have values for sigma^2. So I just want to know if I can substitute simga^2 for tau in the code you provide? 
+
+Thanks!
+Theresa
+
+> On April 3, 2019 at 11:53 AM "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> 
+> In principle, yes.
+> 
+> But, I highly question the sensibility of any model that does not include estimate-level random effects. In the model you posted, random effects are added for each level of ablat, but this assumes that true effects are homogeneous for the same level of ablat. That is a big assumption and one that I don't think is (a priori) justified. 
+> 
+> I frequently see the same issue when people are fitting multilevel models. Instead of *adding* random effects for some higher level clustering variable to a model that already includes estimate level random effects, only cluster level random effects are included in the model. For a discussion of this, see:
+> 
+> http://www.metafor-project.org/doku.php/analyses:konstantopoulos2011#a_common_mistake_in_the_three-level_model
+> 
+> In your example, I therefore would say that one should fit:
+> 
+> res2 <- rma.mv(yi, vi, mods = ~ alloc, random = ~1|ablat/trial, data=dat)
+> 
+> In this case, the random effects for ablat (which has 9 levels) are difficult to distinguish from the trial (i.e., estimate) level random effects (13 different levels). In fact, it turns out in this case that the trial level variance component is estimated to be 0, so in the end, the fit of the model is the same. But in general, I think one should at least start with a model that includes estimate level random effects.
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: Theresa Stratmann [mailto:theresa.stratmann at senckenberg.de] 
+> Sent: Tuesday, 02 April, 2019 9:38
+> To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+> Subject: RE: [R-meta] variance explained by fixed & random effects
+> 
+> Actually, sorry, one more question ... 
+> 
+> Let's say we were to use: 
+> 
+> library(metafor)
+> 
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+> 
+> res2 <- rma.mv(yi, vi, mods = ~ alloc, random = ~1|ablat, data=dat)
+> 
+> Do we then use sigma2 instead of tau2? 
+> 
+> Theresa
+> 
+> > On March 29, 2019 at 12:10 PM "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> > 
+> > 
+> > (I get so excited when I talk about this stuff that I (again) hit 'Send' too soon! Sorry -- continued properly below.)
+> > 
+> > Yes, this is a good reference.
+> > 
+> > I will try to address a few of your questions.
+> > 
+> > 1) What does it means if the pseudo R^2 statistic is negative?
+> > 
+> > R^2 type measures in meta-analysis are typically computed as proportional reductions in variance components (that reflect heterogeneity) when predictors/moderators are added to the model. However, for the models we typically use for a meta-analysis, there is no guarantee that the variance components always decrease (or remain unchanged) when we add predictors. So, it can happen that a variance component increases, in which case the R^2 value is technically negative. An example:
+> > 
+> > library(metafor)
+> > 
+> > dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+> > 
+> > res0 <- rma(yi, vi, data=dat)
+> > res1 <- rma(yi, vi, mods = ~ alloc, data=dat)
+> > res1
+> > 
+> > # proportional 'reduction' in tau^2 (how R^2 is computed here)
+> > (res0$tau2 - res1$tau2) / res0$tau2
+> > 
+> > If you look at 'res1', R^2 is given as 0%, since negative R^2 values are simply set to 0.
+> > 
+> > So what does this mean? I would say it simply means that there is no reduction in the estimate of tau^2, so 'alloc' does not account for any heterogeneity.
+> > 
+> > But also keep in mind that the value of R^2 is an estimate that can be quite inaccurate esp. if the number of studies is small (https://onlinelibrary.wiley.com/doi/abs/10.1111/bmsp.12002). One may need maybe 30 or even more studies to get a fairly decent estimate (but don't quote me on that number).
+> > 
+> > Another important point here is that we compute R^2 based on how much *heterogeneity* is accounted for, not how much of the *total variance* is accounted for. So, for example:
+> > 
+> > res1 <- rma(yi, vi, mods = ~ ablat, data=dat)
+> > res1
+> > 
+> > This suggests that ~76% of the heterogeneity is accounted for by 'ablat' (but again, this estimate could be way off with k=13). But the total variance in this example is tau^2 plus the amount of sampling variability in the estimates (the 'vi' values). Since each study has a different amount of sampling variability, it isn't super clear how we then should think of the total variance, but one commonly used approach is to compute a 'typical' sampling variance and use that to define the total variance. For example, Higgins and Thompson (2002) suggest to compute the 'typical' sampling variance with:
+> > 
+> > k <- res1$k
+> > wi <- 1/dat$vi
+> > vt <- (k-1) / (sum(wi) - sum(wi^2)/sum(wi)) 
+> > vt
+> > 
+> > Others (https://academic.oup.com/aje/article/150/2/206/55325) have suggested using the harmonic mean, which would be:
+> > 
+> > 1/mean(wi)
+> > 
+> > Regardless, we can then use tau^2 + vt as the total variance. Then how much of the *total variance* does 'ablat' account?
+> > 
+> > ((res0$tau2 + vt) - (res1$tau2 + vt)) / (res0$tau2 + vt)
+> > 
+> > That yields about 70%. Why don't we do that? For one, we like larger R^2 values :) But study-level moderators cannot account for sampling variability, so one could also argue it is a bit unfair to see how much of the total variability is accounted for.
+> > 
+> > 2) How can we think of variance accounted for by random effects?
+> > 
+> > Another issue in this discussion is the question of how to think of variance accounted for by random effects. It makes no sense to ask how much heterogeneity is accounted for by tau^2 here, since that is always 100%. It makes sense to ask how much of the total variability is due to the random effects. In the context of model 'res0', that would be:
+> > 
+> > res0$tau2 / (res0$tau2 + vt)
+> > 
+> > If you look at res0, you will see that this is I^2.
+> > 
+> > For model 'res1', things are a bit more tricky. One approach would be as follow. We again define res0$tau2 + vt as the total variability (note I am using res0$tau2 here, so the amount of heterogeneity before we include moderators, plus sampling variability). Then:
+> > 
+> > res1$tau2 / (res0$tau2 + vt)
+> > 
+> > indicates how much of this total variability is due to the random effects, that is, residual heterogeneity (about 22%). And:
+> > 
+> > vt / (res0$tau2 + vt)
+> > 
+> > indicates how much of this total variability is due to sampling variability (about 8%). And by subtraction, we then have:
+> > 
+> > 1 - res1$tau2 / (res0$tau2 + vt) - vt / (res0$tau2 + vt)
+> > 
+> > which indicates how much of the total variability is due to 'ablat' (about 70%).
+> > 
+> > This is *not* something that has been done or suggested before, but makes sense and is completely defensible.
+> > 
+> > I hope this helps.
+> > 
+> > Best,
+> > Wolfgang
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sun Apr  7 03:35:21 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sun, 7 Apr 2019 01:35:21 +0000
+Subject: [R-meta] variance explained by fixed & random effects
+In-Reply-To: <534720806.125567.1554453055392@office.mailbox.org>
+References: <1389903449.78447.1552494510536@office.mailbox.org>
+ <d90e1125ddcf4bedaf6d0169a2fdbd23@UM-MAIL3214.unimaas.nl>
+ <727921928.2648.1552580011265@office.mailbox.org>
+ <496488744.37992.1553590664635@office.mailbox.org>
+ <ce2ed0091d574ad68d537622ed5eff76@UM-MAIL3214.unimaas.nl>
+ <666280841.91811.1554190688904@office.mailbox.org>
+ <e4df59b7437f4587abc0c7278647c4b6@UM-MAIL3214.unimaas.nl>
+ <534720806.125567.1554453055392@office.mailbox.org>
+Message-ID: <1e98bd38652d427595919d9e6a0f4e43@UM-MAIL3214.unimaas.nl>
+
+Yes, you can.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: Theresa Stratmann [mailto:theresa.stratmann at senckenberg.de] 
+Sent: Friday, 05 April, 2019 10:31
+To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+Subject: RE: [R-meta] variance explained by fixed & random effects
+
+Sorry, it's hard for me to give examples, given that my data is extremely different from a meta-analysis of medical studies. My question was more - when I use rma.mv (as I need to do for my data), my tau is 0... but I have values for sigma^2. So I just want to know if I can substitute simga^2 for tau in the code you provide? 
+
+Thanks!
+Theresa
+
+> On April 3, 2019 at 11:53 AM "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> 
+> In principle, yes.
+> 
+> But, I highly question the sensibility of any model that does not include estimate-level random effects. In the model you posted, random effects are added for each level of ablat, but this assumes that true effects are homogeneous for the same level of ablat. That is a big assumption and one that I don't think is (a priori) justified. 
+> 
+> I frequently see the same issue when people are fitting multilevel models. Instead of *adding* random effects for some higher level clustering variable to a model that already includes estimate level random effects, only cluster level random effects are included in the model. For a discussion of this, see:
+> 
+> http://www.metafor-project.org/doku.php/analyses:konstantopoulos2011#a_common_mistake_in_the_three-level_model
+> 
+> In your example, I therefore would say that one should fit:
+> 
+> res2 <- rma.mv(yi, vi, mods = ~ alloc, random = ~1|ablat/trial, data=dat)
+> 
+> In this case, the random effects for ablat (which has 9 levels) are difficult to distinguish from the trial (i.e., estimate) level random effects (13 different levels). In fact, it turns out in this case that the trial level variance component is estimated to be 0, so in the end, the fit of the model is the same. But in general, I think one should at least start with a model that includes estimate level random effects.
+> 
+> Best,
+> Wolfgang
+> 
+> -----Original Message-----
+> From: Theresa Stratmann [mailto:theresa.stratmann at senckenberg.de] 
+> Sent: Tuesday, 02 April, 2019 9:38
+> To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+> Subject: RE: [R-meta] variance explained by fixed & random effects
+> 
+> Actually, sorry, one more question ... 
+> 
+> Let's say we were to use: 
+> 
+> library(metafor)
+> 
+> dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+> 
+> res2 <- rma.mv(yi, vi, mods = ~ alloc, random = ~1|ablat, data=dat)
+> 
+> Do we then use sigma2 instead of tau2? 
+> 
+> Theresa
+> 
+> > On March 29, 2019 at 12:10 PM "Viechtbauer, Wolfgang (SP)" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> > 
+> > 
+> > (I get so excited when I talk about this stuff that I (again) hit 'Send' too soon! Sorry -- continued properly below.)
+> > 
+> > Yes, this is a good reference.
+> > 
+> > I will try to address a few of your questions.
+> > 
+> > 1) What does it means if the pseudo R^2 statistic is negative?
+> > 
+> > R^2 type measures in meta-analysis are typically computed as proportional reductions in variance components (that reflect heterogeneity) when predictors/moderators are added to the model. However, for the models we typically use for a meta-analysis, there is no guarantee that the variance components always decrease (or remain unchanged) when we add predictors. So, it can happen that a variance component increases, in which case the R^2 value is technically negative. An example:
+> > 
+> > library(metafor)
+> > 
+> > dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+> > 
+> > res0 <- rma(yi, vi, data=dat)
+> > res1 <- rma(yi, vi, mods = ~ alloc, data=dat)
+> > res1
+> > 
+> > # proportional 'reduction' in tau^2 (how R^2 is computed here)
+> > (res0$tau2 - res1$tau2) / res0$tau2
+> > 
+> > If you look at 'res1', R^2 is given as 0%, since negative R^2 values are simply set to 0.
+> > 
+> > So what does this mean? I would say it simply means that there is no reduction in the estimate of tau^2, so 'alloc' does not account for any heterogeneity.
+> > 
+> > But also keep in mind that the value of R^2 is an estimate that can be quite inaccurate esp. if the number of studies is small (https://onlinelibrary.wiley.com/doi/abs/10.1111/bmsp.12002). One may need maybe 30 or even more studies to get a fairly decent estimate (but don't quote me on that number).
+> > 
+> > Another important point here is that we compute R^2 based on how much *heterogeneity* is accounted for, not how much of the *total variance* is accounted for. So, for example:
+> > 
+> > res1 <- rma(yi, vi, mods = ~ ablat, data=dat)
+> > res1
+> > 
+> > This suggests that ~76% of the heterogeneity is accounted for by 'ablat' (but again, this estimate could be way off with k=13). But the total variance in this example is tau^2 plus the amount of sampling variability in the estimates (the 'vi' values). Since each study has a different amount of sampling variability, it isn't super clear how we then should think of the total variance, but one commonly used approach is to compute a 'typical' sampling variance and use that to define the total variance. For example, Higgins and Thompson (2002) suggest to compute the 'typical' sampling variance with:
+> > 
+> > k <- res1$k
+> > wi <- 1/dat$vi
+> > vt <- (k-1) / (sum(wi) - sum(wi^2)/sum(wi)) 
+> > vt
+> > 
+> > Others (https://academic.oup.com/aje/article/150/2/206/55325) have suggested using the harmonic mean, which would be:
+> > 
+> > 1/mean(wi)
+> > 
+> > Regardless, we can then use tau^2 + vt as the total variance. Then how much of the *total variance* does 'ablat' account?
+> > 
+> > ((res0$tau2 + vt) - (res1$tau2 + vt)) / (res0$tau2 + vt)
+> > 
+> > That yields about 70%. Why don't we do that? For one, we like larger R^2 values :) But study-level moderators cannot account for sampling variability, so one could also argue it is a bit unfair to see how much of the total variability is accounted for.
+> > 
+> > 2) How can we think of variance accounted for by random effects?
+> > 
+> > Another issue in this discussion is the question of how to think of variance accounted for by random effects. It makes no sense to ask how much heterogeneity is accounted for by tau^2 here, since that is always 100%. It makes sense to ask how much of the total variability is due to the random effects. In the context of model 'res0', that would be:
+> > 
+> > res0$tau2 / (res0$tau2 + vt)
+> > 
+> > If you look at res0, you will see that this is I^2.
+> > 
+> > For model 'res1', things are a bit more tricky. One approach would be as follow. We again define res0$tau2 + vt as the total variability (note I am using res0$tau2 here, so the amount of heterogeneity before we include moderators, plus sampling variability). Then:
+> > 
+> > res1$tau2 / (res0$tau2 + vt)
+> > 
+> > indicates how much of this total variability is due to the random effects, that is, residual heterogeneity (about 22%). And:
+> > 
+> > vt / (res0$tau2 + vt)
+> > 
+> > indicates how much of this total variability is due to sampling variability (about 8%). And by subtraction, we then have:
+> > 
+> > 1 - res1$tau2 / (res0$tau2 + vt) - vt / (res0$tau2 + vt)
+> > 
+> > which indicates how much of the total variability is due to 'ablat' (about 70%).
+> > 
+> > This is *not* something that has been done or suggested before, but makes sense and is completely defensible.
+> > 
+> > I hope this helps.
+> > 
+> > Best,
+> > Wolfgang
+
+From m|obo4370 @end|ng |rom hotm@||@com  Mon Apr  8 02:31:49 2019
+From: m|obo4370 @end|ng |rom hotm@||@com (Martin Lobo)
+Date: Mon, 8 Apr 2019 00:31:49 +0000
+Subject: [R-meta] Raw OR and adjusted OR. Sample Size Adjusted in
+ meta-analisys
+In-Reply-To: <mailman.1475.3340.1552925925.8486.r-sig-meta-analysis@r-project.org>
+References: <mailman.1475.3340.1552925925.8486.r-sig-meta-analysis@r-project.org>
+Message-ID: <MN2PR20MB28149782D8C62E1419DB89F5AC2C0@MN2PR20MB2814.namprd20.prod.outlook.com>
+
+Dears Michel and Wolfgang:
+
+Thankyou for your answers.
+
+I have seen several meta-analysis publications with adjusted summary measures. These meta-analyzes are not individual data. I attach a meta-analysis of what I want to do to clarify the idea of what I'm trying to do.
+
+best regards
+
+
+
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Jefe de Cardiolog?a Hospital Militar Campo de Mayo
+Ex Jefe de Unidad Coronaria Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Miembro del Area de Investigaci?n de la SAC
+Ex Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Miembro Asesor del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+
+Instructor de ACLS de la American Heart Association
+
+
+________________________________
+De: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> en nombre de r-sig-meta-analysis-request at r-project.org <r-sig-meta-analysis-request at r-project.org>
+Enviado: lunes, 18 de marzo de 2019 13:18
+Para: r-sig-meta-analysis at r-project.org
+Asunto: R-sig-meta-analysis Digest, Vol 22, Issue 18
+
+Send R-sig-meta-analysis mailing list submissions to
+        r-sig-meta-analysis at r-project.org
+
+To subscribe or unsubscribe via the World Wide Web, visit
+        https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=02%7C01%7C%7C3bdf0b5d19e8430ad5ed08d6abbd6891%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C636885227320789567&amp;sdata=qLlwmGzFzHUhZuoq2w9ke7PKt0yjPUGgN63NmpptJoc%3D&amp;reserved=0
+or, via email, send a message with subject or body 'help' to
+        r-sig-meta-analysis-request at r-project.org
+
+You can reach the person managing the list at
+        r-sig-meta-analysis-owner at r-project.org
+
+When replying, please edit your Subject line so it is more specific
+than "Re: Contents of R-sig-meta-analysis digest..."
+
+
+Today's Topics:
+
+   1. Re: R-sig-meta-analysis Digest, Vol 22, Issue 17 (Martin Lobo)
+   2. Re: doubt about meta analysis (Martin Lobo)
+   3. Re: doubt about meta analysis (Viechtbauer, Wolfgang (SP))
+
+----------------------------------------------------------------------
+
+Message: 1
+Date: Mon, 18 Mar 2019 15:51:56 +0000
+From: Martin Lobo <mlobo4370 at hotmail.com>
+To: "r-sig-meta-analysis-request at r-project.org"
+        <r-sig-meta-analysis-request at r-project.org>,
+        "r-sig-meta-analysis at r-project.org"
+        <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] R-sig-meta-analysis Digest, Vol 22, Issue 17
+Message-ID:
+        <MN2PR20MB28141D4DD38574420411E625AC470 at MN2PR20MB2814.namprd20.prod.outlook.com>
+
+Content-Type: text/plain; charset="utf-8"
+
+
+Dear Michael, thank you for answering, this technique has been used for several years, and in general the original publications do not include the adjusted values. Imagine that it would be very difficult for all publications to include adjustment for the variables that interest us. Even some meta-analyzes adjust for years of publication, something interesting due to changes in the way patients are treated year after year.
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Ex Jefe de Unidad Coronaria
+Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Miembro del Area de Investigaci?n de la SAC
+Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director  y actual Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Instructor de ACLS de la AHA para la Fundaci?n Cardiol?gica Argentina
+
+
+________________________________
+De: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> en nombre de r-sig-meta-analysis-request at r-project.org <r-sig-meta-analysis-request at r-project.org>
+Enviado: lunes, 18 de marzo de 2019 08:07
+Para: r-sig-meta-analysis at r-project.org
+Asunto: R-sig-meta-analysis Digest, Vol 22, Issue 17
+
+Send R-sig-meta-analysis mailing list submissions to
+        r-sig-meta-analysis at r-project.org
+
+To subscribe or unsubscribe via the World Wide Web, visit
+        https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Feur04.safelinks.protection.outlook.com%2F%3Furl%3Dhttps%253A%252F%252Fstat.ethz.ch%252Fmailman%252Flistinfo%252Fr-sig-meta-analysis%26data%3D02%257C01%257C%257C1a79c51562604cd6f03008d6ab922a41%257C84df9e7fe9f640afb435aaaaaaaaaaaa%257C1%257C0%257C636885041586795971%26sdata%3DHnbhaGcf9O4ITSdnmYNvkphnxgkZSxTHsg%252FDtVx%252FZ3Y%253D%26reserved%3D0&amp;data=02%7C01%7C%7C3bdf0b5d19e8430ad5ed08d6abbd6891%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C636885227320789567&amp;sdata=S5aLUtlp1g%2BSAW3hrwh7rnLIaLKiJvnwisXae2Vo700%3D&amp;reserved=0
+or, via email, send a message with subject or body 'help' to
+        r-sig-meta-analysis-request at r-project.org
+
+You can reach the person managing the list at
+        r-sig-meta-analysis-owner at r-project.org
+
+When replying, please edit your Subject line so it is more specific
+than "Re: Contents of R-sig-meta-analysis digest..."
+
+
+Today's Topics:
+
+   1. Re: doubt about meta analysis (Michael Dewey)
+
+----------------------------------------------------------------------
+
+Message: 1
+Date: Sun, 17 Mar 2019 16:13:22 +0000
+From: Michael Dewey <lists at dewey.myzen.co.uk>
+To: Martin Lobo <mlobo4370 at hotmail.com>,
+        "r-sig-meta-analysis at r-project.org"
+        <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] doubt about meta analysis
+Message-ID: <56fe7327-206b-fa39-1be2-57a11083cb93 at dewey.myzen.co.uk>
+Content-Type: text/plain; charset="utf-8"; Format="flowed"
+
+Dear Martin
+
+Unless either (a) the primary studies have published the adjusted OR, or
+(b) you have the original data and can calculate it then I think the
+answer is that waht you want to do is not possible.
+
+Michael
+
+On 17/03/2019 06:41, Martin Lobo wrote:
+> Hi, my name is martin lobo. I?m cardiologist from argentina.
+> I would like to ask you a question. I am wanting to do a meta analysis with the meta and metafor packages in R. I have not managed to adjust the odds ratio for certain covariates. That is, I need part of the crude OR, an adjusted OR for example, by age, cholesterol, sex, etc. Could I be oriented to achieve this type of adjustment in the meta analysis?
+>  From already thank you very much
+>
+> Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+> Especialista Jerarquizado en Cardiolog?a
+> Ex Jefe de Unidad Coronaria
+> Hospital Militar Campo de Mayo
+> Miembro Titular de la Sociedad Argentina de Cardiolog?a
+> Fellow American College of Cardiology
+> Fellow European Society of Cardiology
+> Miembro del Area de Investigaci?n de la SAC
+> Director del Consejo de Aterosclerosis y Trombosis de la SAC
+> Ex Director  y actual Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+>
+> Instructor de ACLS de la AHA para la Fundaci?n Cardiol?gica Argentina
+>
+>
+>        [[alternative HTML version deleted]]
+>
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Feur04.safelinks.protection.outlook.com%2F%3Furl%3Dhttps%253A%252F%252Fstat.ethz.ch%252Fmailman%252Flistinfo%252Fr-sig-meta-analysis%26data%3D02%257C01%257C%257C1a79c51562604cd6f03008d6ab922a41%257C84df9e7fe9f640afb435aaaaaaaaaaaa%257C1%257C0%257C636885041586795971%26sdata%3DHnbhaGcf9O4ITSdnmYNvkphnxgkZSxTHsg%252FDtVx%252FZ3Y%253D%26reserved%3D0&amp;data=02%7C01%7C%7C3bdf0b5d19e8430ad5ed08d6abbd6891%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C636885227320789567&amp;sdata=S5aLUtlp1g%2BSAW3hrwh7rnLIaLKiJvnwisXae2Vo700%3D&amp;reserved=0
+>
+
+--
+Michael
+https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Feur04.safelinks.protection.outlook.com%2F%3Furl%3Dhttp%253A%252F%252Fwww.dewey.myzen.co.uk%252Fhome.html%26data%3D02%257C01%257C%257C1a79c51562604cd6f03008d6ab922a41%257C84df9e7fe9f640afb435aaaaaaaaaaaa%257C1%257C0%257C636885041586795971%26sdata%3Dcsxjd9UY2MFE0VDiq1yUX3gmW8Akmf5DfQtiJF%252Bnp3M%253D%26reserved%3D0&amp;data=02%7C01%7C%7C3bdf0b5d19e8430ad5ed08d6abbd6891%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C636885227320799578&amp;sdata=%2Fzg%2B3nuD%2BQLFMNg%2FDglYZa6mzVZ5Gg%2FZOk1eMgaY7xU%3D&amp;reserved=0
+
+
+
+
+------------------------------
+
+Subject: Digest Footer
+
+_______________________________________________
+R-sig-meta-analysis mailing list
+R-sig-meta-analysis at r-project.org
+https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Feur04.safelinks.protection.outlook.com%2F%3Furl%3Dhttps%253A%252F%252Fstat.ethz.ch%252Fmailman%252Flistinfo%252Fr-sig-meta-analysis%26data%3D02%257C01%257C%257C1a79c51562604cd6f03008d6ab922a41%257C84df9e7fe9f640afb435aaaaaaaaaaaa%257C1%257C0%257C636885041586795971%26sdata%3DHnbhaGcf9O4ITSdnmYNvkphnxgkZSxTHsg%252FDtVx%252FZ3Y%253D%26reserved%3D0&amp;data=02%7C01%7C%7C3bdf0b5d19e8430ad5ed08d6abbd6891%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C636885227320799578&amp;sdata=dUTX1orxNrQDZ%2FYVO40wsZNwGEokVlvRwmx73NZnZ7Y%3D&amp;reserved=0
+
+
+------------------------------
+
+End of R-sig-meta-analysis Digest, Vol 22, Issue 17
+***************************************************
+
+        [[alternative HTML version deleted]]
+
+
+
+------------------------------
+
+Message: 2
+Date: Mon, 18 Mar 2019 15:52:28 +0000
+From: Martin Lobo <mlobo4370 at hotmail.com>
+To: Michael Dewey <lists at dewey.myzen.co.uk>,
+        "r-sig-meta-analysis at r-project.org"
+        <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] doubt about meta analysis
+Message-ID:
+        <MN2PR20MB2814A1824A2FC8934E97BA24AC470 at MN2PR20MB2814.namprd20.prod.outlook.com>
+
+Content-Type: text/plain; charset="utf-8"
+
+Dear Michael, thank you for answering, this technique has been used for several years, and in general the original publications do not include the adjusted values. Imagine that it would be very difficult for all publications to include adjustment for the variables that interest us. Even some meta-analyzes adjust for years of publication, something interesting due to changes in the way patients are treated year after year.
+
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Ex Jefe de Unidad Coronaria
+Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Miembro del Area de Investigaci?n de la SAC
+Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director  y actual Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Instructor de ACLS de la AHA para la Fundaci?n Cardiol?gica Argentina
+
+
+________________________________
+De: Michael Dewey <lists at dewey.myzen.co.uk>
+Enviado: domingo, 17 de marzo de 2019 13:13
+Para: Martin Lobo; r-sig-meta-analysis at r-project.org
+Asunto: Re: [R-meta] doubt about meta analysis
+
+Dear Martin
+
+Unless either (a) the primary studies have published the adjusted OR, or
+(b) you have the original data and can calculate it then I think the
+answer is that waht you want to do is not possible.
+
+Michael
+
+On 17/03/2019 06:41, Martin Lobo wrote:
+> Hi, my name is martin lobo. I?m cardiologist from argentina.
+> I would like to ask you a question. I am wanting to do a meta analysis with the meta and metafor packages in R. I have not managed to adjust the odds ratio for certain covariates. That is, I need part of the crude OR, an adjusted OR for example, by age, cholesterol, sex, etc. Could I be oriented to achieve this type of adjustment in the meta analysis?
+>  From already thank you very much
+>
+> Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+> Especialista Jerarquizado en Cardiolog?a
+> Ex Jefe de Unidad Coronaria
+> Hospital Militar Campo de Mayo
+> Miembro Titular de la Sociedad Argentina de Cardiolog?a
+> Fellow American College of Cardiology
+> Fellow European Society of Cardiology
+> Miembro del Area de Investigaci?n de la SAC
+> Director del Consejo de Aterosclerosis y Trombosis de la SAC
+> Ex Director  y actual Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+>
+> Instructor de ACLS de la AHA para la Fundaci?n Cardiol?gica Argentina
+>
+>
+>        [[alternative HTML version deleted]]
+>
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=02%7C01%7C%7C3bdf0b5d19e8430ad5ed08d6abbd6891%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C636885227320799578&amp;sdata=QSDqqdn%2FNaPnGKEjxflGp83C2MK3FyL%2B4l5rMVVTlbA%3D&amp;reserved=0
+>
+
+--
+Michael
+https://eur02.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.dewey.myzen.co.uk%2Fhome.html&amp;data=02%7C01%7C%7C3bdf0b5d19e8430ad5ed08d6abbd6891%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C636885227320809583&amp;sdata=A6SXn%2BpgGkDOIuXilLi%2BWTwli3XqYdyfAqKTQttlv5Y%3D&amp;reserved=0
+
+        [[alternative HTML version deleted]]
+
+
+
+------------------------------
+
+Message: 3
+Date: Mon, 18 Mar 2019 16:07:17 +0000
+From: "Viechtbauer, Wolfgang (SP)"
+        <wolfgang.viechtbauer at maastrichtuniversity.nl>
+To: Martin Lobo <mlobo4370 at hotmail.com>, Michael Dewey
+        <lists at dewey.myzen.co.uk>, "r-sig-meta-analysis at r-project.org"
+        <r-sig-meta-analysis at r-project.org>
+Subject: Re: [R-meta] doubt about meta analysis
+Message-ID: <cd858502d4544fee9c8fc6cc37942413 at UM-MAIL3214.unimaas.nl>
+Content-Type: text/plain; charset="utf-8"
+
+Dear Lorenzo,
+
+It isn't clear to me what exactly it is that you are after. As Michael said, only the primary studies can provide adjusted ORs (or if you had the raw data and would do an 'individual patient data meta-analysis'). Of course, one can include predictors ('moderators') in a meta-regression model, but that isn't the same thing as adjusting ORs based on individual patient data.
+
+To use the example of using publication year as a moderator:
+
+### load metafor package
+library(metafor)
+
+### calculate log odds ratios and corresponding sampling variances
+dat <- escalc(measure="OR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+
+### meta-regression model with 'year' as moderator
+res <- rma(yi, vi, mods = ~ year, data=dat)
+res
+
+One can compute predicted ORs at various values of 'year' now. For example:
+
+### predicted OR in 1966
+predict(res, newmods=1966, transf=exp)
+
+I wouldn't call this an 'adjusted' OR though. It is simply the predicted OR in 1966 based on this model.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Martin Lobo
+Sent: Monday, 18 March, 2019 16:52
+To: Michael Dewey; r-sig-meta-analysis at r-project.org
+Subject: Re: [R-meta] doubt about meta analysis
+
+Dear Michael, thank you for answering, this technique has been used for several years, and in general the original publications do not include the adjusted values. Imagine that it would be very difficult for all publications to include adjustment for the variables that interest us. Even some meta-analyzes adjust for years of publication, something interesting due to changes in the way patients are treated year after year.
+
+Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+Especialista Jerarquizado en Cardiolog?a
+Ex Jefe de Unidad Coronaria
+Hospital Militar Campo de Mayo
+Miembro Titular de la Sociedad Argentina de Cardiolog?a
+Fellow American College of Cardiology
+Fellow European Society of Cardiology
+Miembro del Area de Investigaci?n de la SAC
+Director del Consejo de Aterosclerosis y Trombosis de la SAC
+Ex Director  y actual Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+
+Instructor de ACLS de la AHA para la Fundaci?n Cardiol?gica Argentina
+
+________________________________
+De: Michael Dewey <lists at dewey.myzen.co.uk>
+Enviado: domingo, 17 de marzo de 2019 13:13
+Para: Martin Lobo; r-sig-meta-analysis at r-project.org
+Asunto: Re: [R-meta] doubt about meta analysis
+
+Dear Martin
+
+Unless either (a) the primary studies have published the adjusted OR, or
+(b) you have the original data and can calculate it then I think the
+answer is that waht you want to do is not possible.
+
+Michael
+
+On 17/03/2019 06:41, Martin Lobo wrote:
+> Hi, my name is martin lobo. I?m cardiologist from argentina.
+> I would like to ask you a question. I am wanting to do a meta analysis with the meta and metafor packages in R. I have not managed to adjust the odds ratio for certain covariates. That is, I need part of the crude OR, an adjusted OR for example, by age, cholesterol, sex, etc. Could I be oriented to achieve this type of adjustment in the meta analysis?
+>  From already thank you very much
+>
+> Lorenzo Mart?n Lobo MTSAC, FACC, FESC
+> Especialista Jerarquizado en Cardiolog?a
+> Ex Jefe de Unidad Coronaria
+> Hospital Militar Campo de Mayo
+> Miembro Titular de la Sociedad Argentina de Cardiolog?a
+> Fellow American College of Cardiology
+> Fellow European Society of Cardiology
+> Miembro del Area de Investigaci?n de la SAC
+> Director del Consejo de Aterosclerosis y Trombosis de la SAC
+> Ex Director  y actual Miembro Asesor del Consejo de Epidemiolog?a y Prevenci?n Cardiovascular de la SAC
+>
+> Instructor de ACLS de la AHA para la Fundaci?n Cardiol?gica Argentina
+
+
+------------------------------
+
+Subject: Digest Footer
+
+_______________________________________________
+R-sig-meta-analysis mailing list
+R-sig-meta-analysis at r-project.org
+https://eur02.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&amp;data=02%7C01%7C%7C3bdf0b5d19e8430ad5ed08d6abbd6891%7C84df9e7fe9f640afb435aaaaaaaaaaaa%7C1%7C0%7C636885227320809583&amp;sdata=EFIWjJ0RSMreY4B2uBWv9zQ6T0k6uF%2FFtEBLKoUmQz0%3D&amp;reserved=0
+
+
+------------------------------
+
+End of R-sig-meta-analysis Digest, Vol 22, Issue 18
+***************************************************
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190408/482eea75/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Association Between Baseline LDL-C Level and Total.pdf
+Type: application/pdf
+Size: 411568 bytes
+Desc: Association Between Baseline LDL-C Level and Total.pdf
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20190408/482eea75/attachment-0001.pdf>
+
+From @oumr| @end|ng |rom gm@||@com  Tue Apr  9 14:35:59 2019
+From: @oumr| @end|ng |rom gm@||@com (Nabil Soumri)
+Date: Tue, 9 Apr 2019 13:35:59 +0100
+Subject: [R-meta] Meta-analysis including (co)variances matrices
+Message-ID: <CAGjn1do9E4M5-_yejdJM54od8zdr3OP88y6Jipa=nLH+0j1qJg@mail.gmail.com>
+
+Dear Wolfgang et all.
+I could provide a ?meta-estimate?  by a weighted average of estimates of
+covariance matrices from a dozen analysis. These covariance matrices are
+square matrices of different sizes. My question is how I compare matrices
+in a meta-analysis. or otherwise how I include matrices in the data that
+will be used for the meta-analysis.
+Best regards.
+*______________*
+SOUMRI NABIL
+Institut National de la Recherche  Agronomique de Tunisie
+Laboratoire des productions Animales et Fourrag?res
+T?l:    +216 71 23 00 24
+Fax:   +216 71 75 28 97
+GSM: +216 54 74 10 77
+CC: nabil.soumri at iresa.agrinet.tn
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Tue Apr  9 15:02:02 2019
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Tue, 9 Apr 2019 14:02:02 +0100
+Subject: [R-meta] Meta-analysis including (co)variances matrices
+In-Reply-To: <CAGjn1do9E4M5-_yejdJM54od8zdr3OP88y6Jipa=nLH+0j1qJg@mail.gmail.com>
+References: <CAGjn1do9E4M5-_yejdJM54od8zdr3OP88y6Jipa=nLH+0j1qJg@mail.gmail.com>
+Message-ID: <023d0305-0e54-3576-78d9-b0701c72794a@dewey.myzen.co.uk>
+
+You may have to give us some more detail about what you want to do with 
+the matrices but it might be worth your while seeing if the metaSEM 
+package is relevant to your needs
+
+https://cran.r-project.org/package=metaSEM
+
+Michael
+
+On 09/04/2019 13:35, Nabil Soumri wrote:
+> Dear Wolfgang et all.
+> I could provide a ?meta-estimate?  by a weighted average of estimates of
+> covariance matrices from a dozen analysis. These covariance matrices are
+> square matrices of different sizes. My question is how I compare matrices
+> in a meta-analysis. or otherwise how I include matrices in the data that
+> will be used for the meta-analysis.
+> Best regards.
+> *______________*
+> SOUMRI NABIL
+> Institut National de la Recherche  Agronomique de Tunisie
+> Laboratoire des productions Animales et Fourrag?res
+> T?l:    +216 71 23 00 24
+> Fax:   +216 71 75 28 97
+> GSM: +216 54 74 10 77
+> CC: nabil.soumri at iresa.agrinet.tn
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From |@b|@n@@che||h@@@ @end|ng |rom y@|e@edu  Tue Apr  9 20:44:25 2019
+From: |@b|@n@@che||h@@@ @end|ng |rom y@|e@edu (Fabian Schellhaas)
+Date: Tue, 9 Apr 2019 14:44:25 -0400
+Subject: [R-meta] Credibility intervals with RVE
+Message-ID: <CAJz9w=09na4-KvKFsUfeGHWH4pDp5LJVvARXHyzwatjs6s7mFg@mail.gmail.com>
+
+Hi all,
+
+Credibility intervals can be useful because ? in contrast to confidence
+intervals ? they consider the heterogeneity of synthesized effects and make
+predictions about the range of values within which the true effect of
+future studies will likely fall (e.g., IntHout et al., 2016).
+
+It is straightforward enough to calculate credibility intervals for rma and
+rma.mv objects in metafor using the `predict` function. However, (a) how
+would one compute credibility intervals for multivariate multilevel
+meta-analytic models with cluster-robust variance estimation, and (b) is
+doing so even meaningful, given that the covariance matrix has only been
+aproximated? I included more details about both questions below.
+
+Thanks a lot!
+Fabian
+
+-----
+
+Regarding question (a), I would compute the credibility interval for a
+simplified example as follows:
+
+# fit model
+vcv <- clubSandwich::impute_covariance_matrix(vi = data$vi, cluster =
+data$cluster_id, r = 0.7)
+m <- metafor::rma.mv(yi, vcv, random = ~ 1 | cluster_id/es_id, data = data)
+robu <- clubSandwich::coef_test(m, vcov = "CR2")
+
+# compute 95% credibility interval
+robu$beta - 1.96*sqrt(sum(m$sigma2) + robu$SE^2)
+robu$beta + 1.96*sqrt(sum(m$sigma2) + robu$SE^2)
+
+Regarding question (b), since V in this model is just a rough approximation
+of the empirical covariance structure, the variance components of the model
+are also just an approximation as well. Even when using cluster-robust
+standard errors for the computation of the credibility intervals, we still
+use the model's approximated variance components, and thus the credibility
+interval provides just a rough guess of the range within which future
+studies will fall.
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Tue Apr  9 22:25:16 2019
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Tue, 9 Apr 2019 15:25:16 -0500
+Subject: [R-meta] Credibility intervals with RVE
+In-Reply-To: <CAJz9w=09na4-KvKFsUfeGHWH4pDp5LJVvARXHyzwatjs6s7mFg@mail.gmail.com>
+References: <CAJz9w=09na4-KvKFsUfeGHWH4pDp5LJVvARXHyzwatjs6s7mFg@mail.gmail.com>
+Message-ID: <CAFUVuJzQTyJzTn0hp7XrUT7MW3jF5qbGU-M0mockkL4JkzZKGw@mail.gmail.com>
+
+Fabian,
+
+a) Your approach is exactly what I would do (and have done in the past).
+b) You are exactly right about the limitations of the approach. With RVE,
+it's recommended to conduct sensitivity analyses. You could do the same
+thing here, and report how the prediction interval changes depending on the
+assumed value of r.
+
+James
+
+On Tue, Apr 9, 2019 at 1:44 PM Fabian Schellhaas <fabian.schellhaas at yale.edu>
+wrote:
+
+> Hi all,
+>
+> Credibility intervals can be useful because ? in contrast to confidence
+> intervals ? they consider the heterogeneity of synthesized effects and make
+> predictions about the range of values within which the true effect of
+> future studies will likely fall (e.g., IntHout et al., 2016).
+>
+> It is straightforward enough to calculate credibility intervals for rma and
+> rma.mv objects in metafor using the `predict` function. However, (a) how
+> would one compute credibility intervals for multivariate multilevel
+> meta-analytic models with cluster-robust variance estimation, and (b) is
+> doing so even meaningful, given that the covariance matrix has only been
+> aproximated? I included more details about both questions below.
+>
+> Thanks a lot!
+> Fabian
+>
+> -----
+>
+> Regarding question (a), I would compute the credibility interval for a
+> simplified example as follows:
+>
+> # fit model
+> vcv <- clubSandwich::impute_covariance_matrix(vi = data$vi, cluster =
+> data$cluster_id, r = 0.7)
+> m <- metafor::rma.mv(yi, vcv, random = ~ 1 | cluster_id/es_id, data =
+> data)
+> robu <- clubSandwich::coef_test(m, vcov = "CR2")
+>
+> # compute 95% credibility interval
+> robu$beta - 1.96*sqrt(sum(m$sigma2) + robu$SE^2)
+> robu$beta + 1.96*sqrt(sum(m$sigma2) + robu$SE^2)
+>
+> Regarding question (b), since V in this model is just a rough approximation
+> of the empirical covariance structure, the variance components of the model
+> are also just an approximation as well. Even when using cluster-robust
+> standard errors for the computation of the credibility intervals, we still
+> use the model's approximated variance components, and thus the credibility
+> interval provides just a rough guess of the range within which future
+> studies will fall.
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From |@b|@n@@che||h@@@ @end|ng |rom y@|e@edu  Tue Apr  9 23:23:38 2019
+From: |@b|@n@@che||h@@@ @end|ng |rom y@|e@edu (Fabian Schellhaas)
+Date: Tue, 9 Apr 2019 17:23:38 -0400
+Subject: [R-meta] Credibility intervals with RVE
+In-Reply-To: <CAFUVuJzQTyJzTn0hp7XrUT7MW3jF5qbGU-M0mockkL4JkzZKGw@mail.gmail.com>
+References: <CAJz9w=09na4-KvKFsUfeGHWH4pDp5LJVvARXHyzwatjs6s7mFg@mail.gmail.com>
+ <CAFUVuJzQTyJzTn0hp7XrUT7MW3jF5qbGU-M0mockkL4JkzZKGw@mail.gmail.com>
+Message-ID: <CAJz9w=1RVMR8f2hH3MC3ncf+7vvPGFywC=jZUgeGb5pTpbV4Vg@mail.gmail.com>
+
+Hi James,
+
+Thanks a lot for the quick response -- very helpful as always! We already
+report sensitivity analyses across different levels of rho (under others),
+so I'll just add deltas for the upper and lower bounds of the credibility
+interval.
+
+Cheers,
+Fabian
+
+
+On Tue, Apr 9, 2019 at 4:25 PM James Pustejovsky <jepusto at gmail.com> wrote:
+
+> Fabian,
+>
+> a) Your approach is exactly what I would do (and have done in the past).
+> b) You are exactly right about the limitations of the approach. With RVE,
+> it's recommended to conduct sensitivity analyses. You could do the same
+> thing here, and report how the prediction interval changes depending on the
+> assumed value of r.
+>
+> James
+>
+> On Tue, Apr 9, 2019 at 1:44 PM Fabian Schellhaas <
+> fabian.schellhaas at yale.edu> wrote:
+>
+>> Hi all,
+>>
+>> Credibility intervals can be useful because ? in contrast to confidence
+>> intervals ? they consider the heterogeneity of synthesized effects and
+>> make
+>> predictions about the range of values within which the true effect of
+>> future studies will likely fall (e.g., IntHout et al., 2016).
+>>
+>> It is straightforward enough to calculate credibility intervals for rma
+>> and
+>> rma.mv objects in metafor using the `predict` function. However, (a) how
+>> would one compute credibility intervals for multivariate multilevel
+>> meta-analytic models with cluster-robust variance estimation, and (b) is
+>> doing so even meaningful, given that the covariance matrix has only been
+>> aproximated? I included more details about both questions below.
+>>
+>> Thanks a lot!
+>> Fabian
+>>
+>> -----
+>>
+>> Regarding question (a), I would compute the credibility interval for a
+>> simplified example as follows:
+>>
+>> # fit model
+>> vcv <- clubSandwich::impute_covariance_matrix(vi = data$vi, cluster =
+>> data$cluster_id, r = 0.7)
+>> m <- metafor::rma.mv(yi, vcv, random = ~ 1 | cluster_id/es_id, data =
+>> data)
+>> robu <- clubSandwich::coef_test(m, vcov = "CR2")
+>>
+>> # compute 95% credibility interval
+>> robu$beta - 1.96*sqrt(sum(m$sigma2) + robu$SE^2)
+>> robu$beta + 1.96*sqrt(sum(m$sigma2) + robu$SE^2)
+>>
+>> Regarding question (b), since V in this model is just a rough
+>> approximation
+>> of the empirical covariance structure, the variance components of the
+>> model
+>> are also just an approximation as well. Even when using cluster-robust
+>> standard errors for the computation of the credibility intervals, we still
+>> use the model's approximated variance components, and thus the credibility
+>> interval provides just a rough guess of the range within which future
+>> studies will fall.
+>>
+>>         [[alternative HTML version deleted]]
+>>
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From m@o@j@cob@on @end|ng |rom @pp@@org  Wed Apr 10 16:15:33 2019
+From: m@o@j@cob@on @end|ng |rom @pp@@org (Mao Jacobson)
+Date: Wed, 10 Apr 2019 14:15:33 +0000
+Subject: [R-meta] Meta-analysis within a school district
+Message-ID: <7EED4C10-5C5E-4912-8CC2-7D584D194EDC@spps.org>
+
+I?m using meta-analysis to examine the impact of programs on meeting district goals (e.g., high school graduation, college enrollment, etc.). I will have dependent effect sizes because students can participate in multiple programs. This is the first time I?m using meta-analysis. I have two questions:
+
+
+  1.  How do I get a forest plot with the RVE summary effect size using metafor and clubSandwich?
+  2.  I?m using schools as the cluster variable, but I?m not quite sure how to code programs that operate in multiple schools. Does anyone have any advice/suggestions?
+
+Your help is appreciated! Thanks so much!
+
+Mao Jacobson, Ph.D.
+Program Evaluator
+Department of Research, Evaluation and Assessment
+Saint Paul Public Schools
+360 Colborne Street
+Saint Paul, MN 55102
+
+	[[alternative HTML version deleted]]
+
+
+From dy|ew@k|91 @end|ng |rom gm@||@com  Wed Apr 10 20:32:17 2019
+From: dy|ew@k|91 @end|ng |rom gm@||@com (Lukas Dylewski)
+Date: Wed, 10 Apr 2019 12:32:17 -0600
+Subject: [R-meta] meta-analysis metafor - calculate effect size
+Message-ID: <CAHsioX84nmCHABSnijx_3CZGSE7Z-zk6iRHRfnwt9RA9yAKW1g@mail.gmail.com>
+
+Dear  Wolfgang ,
+
+I am working with a meta-analysis in R (metafor package) using a mixed
+model framework to examine experimental effects of rodent seed predation on
+plant recruitment as a function of various plant species characteristics. I
+decided to go with metafor given that this allowed to account for random
+factors (specifically the study source, each of which typically estimated
+effects for multiple species) while testing for the influence of multiple
+fixed factors in the same model.
+
+
+
+The one snag I?ve hit concerns deriving estimates of the mean effect size
+(the response) for my two classes of ?status? (native or exotic) while
+accounting for the values of the continuous covariate ?logmass.?  From
+playing with another meta-analysis package (OpenMEE, an interface that
+relies on the R package meta.analysis, which does not allow the addition of
+random factors).
+
+
+How I can estimate the mean effect size for "status" (alien and native)
+representative logmass values? Can I use the equation? But I?m unclear how
+I would calculate the associated SE for each estimate.  Could the solution
+possibly be as easy as a simple equation that you already have??
+
+
+Best
+-- 
+?ukasz Dylewski, M. Sc.
+PhD Student
+
+Department of Zoology, Institute of Zoology
+Pozna? University of Life Sciences
+Wojska Polskiego 71C
+60-625 Pozna?, Poland
+
+http://ecology1.wixsite.com/farmlandecology
+
+	[[alternative HTML version deleted]]
+
+
+From @1begr@| @end|ng |rom un|-tr|er@de  Sat Apr 13 12:42:18 2019
+From: @1begr@| @end|ng |rom un|-tr|er@de (Graf, Benedikt)
+Date: Sat, 13 Apr 2019 10:42:18 +0000
+Subject: [R-meta] Fixed Intercept in mixed effect models Interpretation
+Message-ID: <fab92ca0c1674aad85a39f9ee02c92f4@uni-trier.de>
+
+Hello,
+
+
+
+In a seminar a few months ago my interest in meta-analysis was raised. Since then I have been working on a meta-analysis, which I calculate with metafor.
+
+I have a question for you regarding categorical moderator analysis with metafor. For my core analysis I calculated random effect models. These show a high heritability, which is why I conclude on moderators (which I also coded). Examples would be the type of survey or methodological aspects. I use the following syntax for moderator analyses (example "context" as categorial variable and "gender" as interval/ratio variable):
+
+
+
+mod.context <- rma(yi, vi, weighted=TRUE, method="HE", mods = ~ factor(Context)-1, data=dataset) mod.context
+
+confint(mod.context)
+
+
+
+mod.sex <- rma(yi, vi, weighted=TRUE, method="HE", mods = ~ Sex_female-1, data=dataset) mod.sex
+
+confint(mod.sex)
+
+
+
+I partially adopted this syntax from the seminar. I work with Fishers z correlations and a small number of studies. My question refers to the fixation of the intercept and what it means. I want to determine the influence of the categorical factor "context" on my overall effect - do I have to fix the intercept or not? The same applies to gender - assuming I have an effect of x on y, how do I interpret the influence of a fixed or non-fixed intercept on this relationship? (I don't get R? displayed with fixed intercept - is it because the effect x to y is fixed?). I'm new on this field and want to do things right - therefore I would be very grateful for your help.
+
+
+
+Best regards,
+
+Bene
+
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Sat Apr 13 15:25:06 2019
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Sat, 13 Apr 2019 14:25:06 +0100
+Subject: [R-meta] Fixed Intercept in mixed effect models Interpretation
+In-Reply-To: <fab92ca0c1674aad85a39f9ee02c92f4@uni-trier.de>
+References: <fab92ca0c1674aad85a39f9ee02c92f4@uni-trier.de>
+Message-ID: <05ca5911-56e0-efbd-c75c-8d620ff02b03@dewey.myzen.co.uk>
+
+Dear Benedikt
+
+See comments in-line below
+
+On 13/04/2019 11:42, Graf, Benedikt wrote:
+> Hello,
+> 
+> 
+> 
+> In a seminar a few months ago my interest in meta-analysis was raised. Since then I have been working on a meta-analysis, which I calculate with metafor.
+> 
+> I have a question for you regarding categorical moderator analysis with metafor. For my core analysis I calculated random effect models. These show a high heritability, which is why I conclude on moderators (which I also coded). Examples would be the type of survey or methodological aspects. I use the following syntax for moderator analyses (example "context" as categorial variable and "gender" as interval/ratio variable):
+> 
+> 
+> 
+> mod.context <- rma(yi, vi, weighted=TRUE, method="HE", mods = ~ factor(Context)-1, data=dataset) mod.context
+
+You have told R to fit a model without intercept so you will get one 
+coefficient for each level of Context. Your Alternative would be to 
+remove the -1 and get the intercept and one fewer coefficient for 
+Context. This is not explicitly something to do with metafor, it is how 
+linear model functions like lm() and glm() work. Try it and see, you 
+will not break anything.
+
+One thing to note is that if you test the moderator variable with the 
+two models you are testing two different hypotheses. The way you are 
+doing it tests whether the estimated effect is equal to zero, the other 
+way tests whether the estimated effect is the same for each level of 
+Context.
+> 
+> confint(mod.context)
+> 
+> 
+> 
+> mod.sex <- rma(yi, vi, weighted=TRUE, method="HE", mods = ~ Sex_female-1, data=dataset) mod.sex
+> 
+> confint(mod.sex)
+> 
+
+Have you actually coded Sex as a factor? It would be much better to do 
+so if not.
+
+> 
+> 
+> I partially adopted this syntax from the seminar. I work with Fishers z correlations and a small number of studies. My question refers to the fixation of the intercept and what it means. I want to determine the influence of the categorical factor "context" on my overall effect - do I have to fix the intercept or not? The same applies to gender - assuming I have an effect of x on y, how do I interpret the influence of a fixed or non-fixed intercept on this relationship? (I don't get R? displayed with fixed intercept - is it because the effect x to y is fixed?). I'm new on this field and want to do things right - therefore I would be very grateful for your help.
+> 
+> 
+> 
+> Best regards,
+> 
+> Bene
+> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> 
+> 
+> ---
+> This email has been checked for viruses by AVG.
+> https://www.avg.com
+> 
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From dy|ew@k|91 @end|ng |rom gm@||@com  Sat Apr 13 19:53:15 2019
+From: dy|ew@k|91 @end|ng |rom gm@||@com (Lukas Dylewski)
+Date: Sat, 13 Apr 2019 11:53:15 -0600
+Subject: [R-meta] overall effect size
+Message-ID: <CAHsioX8ZijMoLp9V5MR3xpzQ=9_xQQe0O6dGxbf8PMSFYM21XA@mail.gmail.com>
+
+Dear  Wolfgang ,
+
+I am working with a meta-analysis in R (metafor package) using a mixed
+model framework to examine experimental effects of rodent seed predation on
+plant recruitment as a function of various plant species characteristics. I
+decided to go with metafor given that this allowed to account for random
+factors (specifically the study source, each of which typically estimated
+effects for multiple species) while testing for the influence of multiple
+fixed factors in the same model.
+
+
+
+The one snag I?ve hit concerns deriving estimates of the mean effect size
+(the response) for my two classes of ?status? (native or exotic) while
+accounting for the values of the continuous covariate ?logmass.?  From
+playing with another meta-analysis package (OpenMEE, an interface that
+relies on the R package meta.analysis, which does not allow the addition of
+random factors).
+
+
+How I can estimate the mean effect size for "status" (alien and native)
+representative logmass values? Can I use the equation? But I?m unclear how
+I would calculate the associated SE for each estimate.  Could the solution
+possibly be as easy as a simple equation that you already have??
+
+
+The models look like:
+
+res1 <- rma.mv(yi, vi, mods = ~ logmass + I(logmass^2)+ factor(status) +
+logmass:factor(status), random=~1|pub,data=metaan, method="REML")
+
+Best
+Lukasz
+-- 
+?ukasz Dylewski, M. Sc.
+PhD Student
+
+Department of Zoology, Institute of Zoology
+Pozna? University of Life Sciences
+Wojska Polskiego 71C
+60-625 Pozna?, Poland
+
+http://ecology1.wixsite.com/farmlandecology
+
+	[[alternative HTML version deleted]]
+
+
+From G@Gr@m @end|ng |rom cg|@r@org  Wed Apr 17 15:39:38 2019
+From: G@Gr@m @end|ng |rom cg|@r@org (Gram, Gil (IITA))
+Date: Wed, 17 Apr 2019 13:39:38 +0000
+Subject: [R-meta] rma.mv predict() with newmods
+Message-ID: <88F9FBFF-F078-4D74-A17D-EC54C01ED202@cgiar.org>
+
+Dear Wolfgang and the Metafor community,
+
+
+I?m running in the same problem Cesar Terrer Moreno ran into a while ago without response (https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-February/000582.html). When running the predict(newmods) function on my rma.mv model, I get the error "Multiple matches for the same variable name.? I?ve tried 2 different ways, and also tried looking at the function code on Github, in vain.
+
+# My model based on a dataset of 3941 rows:
+# ML_intRate_TiQ2 = rma.mv(yi, vi, method = 'ML', struct="UN", sparse=TRUE, data=dat, # mods = ~ classOR:totalN + classMR:totalN + classMR:classOR:totalN + classOR:I(totalN^2) + classMR:I(totalN^2) + classMR:classOR:I(totalN^2) + classMR:classOR:time:totalN + cropSys + idF, # random = list(~1|ref, ~1|idRow, ~ treatment|idSite, ~ treatment|idSite.time))
+# where
+# classOR ?> "zero" "one" "two" "three" "four" "Manure"
+# classMR ?> "0" ?1"
+# totalN ?> numerical value ranging [0:720]
+# time ?> numerical value ranging [0:26]
+# First level of cropSys = ?biomass'
+# First level of idF = ?NPK?
+# treatment ?> "Control" "MR" "OR" "ORMR"
+
+# 1. First method X <- expand.grid(totalN = 0:250 , classOR = levels(dtRMA$classOR) , classMR = levels(dtRMA$classMR) # , time = 0:26 , cropSys = levels(dtRMA$cropSys)[1] , idF = levels(dtRMA$idF)[1]) predict(MOD, newmods = X, tau2.levels = c('Control', 'OR', 'MR', 'ORMR'), gamma2.levels = c('Control', 'OR', 'MR', 'ORMR'))
+# 2. Second method X <- model.matrix(~ classOR:totalN + classMR:totalN + classMR:classOR:totalN + classOR:I(totalN^2) + classMR:I(totalN^2) + classMR:classOR:I(totalN^2) + classMR:classOR:time:totalN + cropSys + idF, data=dtRMA_rate) predict(MOD, newmods = X, tau2.levels = c('Control', 'OR', 'MR', 'ORMR'), gamma2.levels = c('Control', 'OR', 'MR', 'ORMR'))
+
+
+Looking forward to some feedback!
+
+
+
+Gil Gram
+PhD researcher  |  Natural resource management/CCAFS
+International Institute of Tropical Agriculture (IITA)
+East African Hub/Kampala/Country office
+Address: IITA-Uganda Plot 15B, Naguru East Road. P.O Box 7878, Kampala
+Mobile: +256 755 315236  |  Belgium Mobile: +32 484 981200
+Skype: gil.gram
+
+
+	[[alternative HTML version deleted]]
+
+
+From @@||y@o|derb@k @end|ng |rom un|-u|m@de  Tue Apr 30 16:05:07 2019
+From: @@||y@o|derb@k @end|ng |rom un|-u|m@de (Sally Olderbak)
+Date: Tue, 30 Apr 2019 16:05:07 +0200
+Subject: [R-meta] Forest plot with groups
+Message-ID: <b08d6fb1-b062-2ab5-5a1b-d48eb8841f89@uni-ulm.de>
+
+Hi Everyone,
+
+We are trying to create a forest plot figure that graphs study-level 
+estimates according to different variable categories. For example, I 
+want to model effects for psychopathy and I want to group estimates by 
+different factors within psychopathy. So the figure would include 
+study-level estimates for Psychopathy Factor 1 followed by study-level 
+estimates for Psychopathy Factor 2. Below each group, we would present 
+the average effect size within that group, followed by a third estimate 
+averaging across both groups. Here is an example of what we would like 
+to do, but it is for the metafor package, which we cannot use because we 
+have observations nested within studies.
+
+http://metafor-project.org/doku.php/plots:forest_plot_with_subgroups
+
+Is this possible to do in Robumeta and if so, does anyone have any 
+syntax they can share with us on how to do this?
+
+Thank you in advance for your help!
+
+best regards, Sally
+
+-- 
+Sally Olderbak, PhD
+Margarete von Wrangell Fellow
+Universit?t Ulm
+Fakult?t Ingenieurwissenschaften, Informatik und Psychologie
+Institut f?r Psychologie und P?dagogik
+Abt. Differentielle Psychologie und Psychologische Diagnostik
+D-89069 Ulm
+
+Tel: +49-(0)731/50 31142
+Fax: +49-(0)731/50 31149
+Email: sally.olderbak at uni-ulm.de
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Apr 30 20:42:25 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 30 Apr 2019 18:42:25 +0000
+Subject: [R-meta] overall effect size
+In-Reply-To: <CAHsioX8ZijMoLp9V5MR3xpzQ=9_xQQe0O6dGxbf8PMSFYM21XA@mail.gmail.com>
+References: <CAHsioX8ZijMoLp9V5MR3xpzQ=9_xQQe0O6dGxbf8PMSFYM21XA@mail.gmail.com>
+Message-ID: <2b302c93ac224cefbcc6ff66184d96a7@UM-MAIL3214.unimaas.nl>
+
+Dear Lukas,
+
+You could use the predict() function to compute the predicted average effect for a each level of 'status' when fixing 'logmass' to the mean of this moderator. The predict() function will also give you the SE. It will be something like:
+
+predict(res1, newmods = c())
+
+but without the output from res1, I cannot tell you what needs to go inside the c().
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Lukas Dylewski
+Sent: Saturday, 13 April, 2019 19:53
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] overall effect size
+
+Dear  Wolfgang ,
+
+I am working with a meta-analysis in R (metafor package) using a mixed
+model framework to examine experimental effects of rodent seed predation on
+plant recruitment as a function of various plant species characteristics. I
+decided to go with metafor given that this allowed to account for random
+factors (specifically the study source, each of which typically estimated
+effects for multiple species) while testing for the influence of multiple
+fixed factors in the same model.
+
+The one snag I?ve hit concerns deriving estimates of the mean effect size
+(the response) for my two classes of ?status? (native or exotic) while
+accounting for the values of the continuous covariate ?logmass.?  From
+playing with another meta-analysis package (OpenMEE, an interface that
+relies on the R package meta.analysis, which does not allow the addition of
+random factors).
+
+How I can estimate the mean effect size for "status" (alien and native)
+representative logmass values? Can I use the equation? But I?m unclear how
+I would calculate the associated SE for each estimate.  Could the solution
+possibly be as easy as a simple equation that you already have??
+
+The models look like:
+
+res1 <- rma.mv(yi, vi, mods = ~ logmass + I(logmass^2)+ factor(status) +
+logmass:factor(status), random=~1|pub,data=metaan, method="REML")
+
+Best
+Lukasz
+-- 
+?ukasz Dylewski, M. Sc.
+PhD Student
+
+Department of Zoology, Institute of Zoology
+Pozna? University of Life Sciences
+Wojska Polskiego 71C
+60-625 Pozna?, Poland
+
+http://ecology1.wixsite.com/farmlandecology
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Apr 30 20:49:11 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 30 Apr 2019 18:49:11 +0000
+Subject: [R-meta] rma.mv predict() with newmods
+In-Reply-To: <88F9FBFF-F078-4D74-A17D-EC54C01ED202@cgiar.org>
+References: <88F9FBFF-F078-4D74-A17D-EC54C01ED202@cgiar.org>
+Message-ID: <58de5c562a354113b04f28f2dd9d1c0b@UM-MAIL3214.unimaas.nl>
+
+Dear Gil,
+
+I have a hard time reading this code. A small and fully reproducible example that illustrates the problem would be much easier to work with.
+
+But did you read the rest of the thread you posted? Especially:
+
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-February/000585.html
+
+So, in case you haven't done so, make sure you (re)install the latest 'devel' version of the metafor package.
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Gram, Gil (IITA)
+Sent: Wednesday, 17 April, 2019 15:40
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] rma.mv predict() with newmods
+
+Dear Wolfgang and the Metafor community,
+
+I?m running in the same problem Cesar Terrer Moreno ran into a while ago without response (https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-February/000582.html). When running the predict(newmods) function on my rma.mv model, I get the error "Multiple matches for the same variable name.? I?ve tried 2 different ways, and also tried looking at the function code on Github, in vain.
+
+# My model based on a dataset of 3941 rows:
+# ML_intRate_TiQ2 = rma.mv(yi, vi, method = 'ML', struct="UN", sparse=TRUE, data=dat, # mods = ~ classOR:totalN + classMR:totalN + classMR:classOR:totalN + classOR:I(totalN^2) + classMR:I(totalN^2) + classMR:classOR:I(totalN^2) + classMR:classOR:time:totalN + cropSys + idF, # random = list(~1|ref, ~1|idRow, ~ treatment|idSite, ~ treatment|idSite.time))
+# where
+# classOR ?> "zero" "one" "two" "three" "four" "Manure"
+# classMR ?> "0" ?1"
+# totalN ?> numerical value ranging [0:720]
+# time ?> numerical value ranging [0:26]
+# First level of cropSys = ?biomass'
+# First level of idF = ?NPK?
+# treatment ?> "Control" "MR" "OR" "ORMR"
+
+# 1. First method X <- expand.grid(totalN = 0:250 , classOR = levels(dtRMA$classOR) , classMR = levels(dtRMA$classMR) # , time = 0:26 , cropSys = levels(dtRMA$cropSys)[1] , idF = levels(dtRMA$idF)[1]) predict(MOD, newmods = X, tau2.levels = c('Control', 'OR', 'MR', 'ORMR'), gamma2.levels = c('Control', 'OR', 'MR', 'ORMR'))
+# 2. Second method X <- model.matrix(~ classOR:totalN + classMR:totalN + classMR:classOR:totalN + classOR:I(totalN^2) + classMR:I(totalN^2) + classMR:classOR:I(totalN^2) + classMR:classOR:time:totalN + cropSys + idF, data=dtRMA_rate) predict(MOD, newmods = X, tau2.levels = c('Control', 'OR', 'MR', 'ORMR'), gamma2.levels = c('Control', 'OR', 'MR', 'ORMR'))
+
+Looking forward to some feedback!
+
+Gil Gram
+PhD researcher  |  Natural resource management/CCAFS
+International Institute of Tropical Agriculture (IITA)
+East African Hub/Kampala/Country office
+Address: IITA-Uganda Plot 15B, Naguru East Road. P.O Box 7878, Kampala
+Mobile: +256 755 315236  |  Belgium Mobile: +32 484 981200
+Skype: gil.gram
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Apr 30 20:50:11 2019
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 30 Apr 2019 18:50:11 +0000
+Subject: [R-meta] Forest plot with groups
+In-Reply-To: <b08d6fb1-b062-2ab5-5a1b-d48eb8841f89@uni-ulm.de>
+References: <b08d6fb1-b062-2ab5-5a1b-d48eb8841f89@uni-ulm.de>
+Message-ID: <57b39414354a46cc9e69120a9db24d40@UM-MAIL3214.unimaas.nl>
+
+Dear Sally,
+
+> Here is an example of what we would like to do, but it is 
+> for the metafor package, which we cannot use because we 
+> have observations nested within studies.
+
+Why do you think metafor is not suitable to handle this? Here are a bunch of illustrative analyses showing how to handle nested estimates:
+
+http://www.metafor-project.org/doku.php/analyses#multivariate_multilevel_meta-analysis_models
+
+Best,
+Wolfgang
+
+-----Original Message-----
+From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Sally Olderbak
+Sent: Tuesday, 30 April, 2019 16:05
+To: r-sig-meta-analysis at r-project.org
+Subject: [R-meta] Forest plot with groups
+
+Hi Everyone,
+
+We are trying to create a forest plot figure that graphs study-level 
+estimates according to different variable categories. For example, I 
+want to model effects for psychopathy and I want to group estimates by 
+different factors within psychopathy. So the figure would include 
+study-level estimates for Psychopathy Factor 1 followed by study-level 
+estimates for Psychopathy Factor 2. Below each group, we would present 
+the average effect size within that group, followed by a third estimate 
+averaging across both groups. Here is an example of what we would like 
+to do, but it is for the metafor package, which we cannot use because we 
+have observations nested within studies.
+
+http://metafor-project.org/doku.php/plots:forest_plot_with_subgroups
+
+Is this possible to do in Robumeta and if so, does anyone have any 
+syntax they can share with us on how to do this?
+
+Thank you in advance for your help!
+
+best regards, Sally
+
+-- 
+Sally Olderbak, PhD
+Margarete von Wrangell Fellow
+Universit?t Ulm
+Fakult?t Ingenieurwissenschaften, Informatik und Psychologie
+Institut f?r Psychologie und P?dagogik
+Abt. Differentielle Psychologie und Psychologische Diagnostik
+D-89069 Ulm
+
+Tel: +49-(0)731/50 31142
+Fax: +49-(0)731/50 31149
+Email: sally.olderbak at uni-ulm.de
+
+From dy|ew@k|91 @end|ng |rom gm@||@com  Tue Apr 30 21:20:07 2019
+From: dy|ew@k|91 @end|ng |rom gm@||@com (Lukas Dylewski)
+Date: Tue, 30 Apr 2019 21:20:07 +0200
+Subject: [R-meta] overall effect size
+In-Reply-To: <2b302c93ac224cefbcc6ff66184d96a7@UM-MAIL3214.unimaas.nl>
+References: <CAHsioX8ZijMoLp9V5MR3xpzQ=9_xQQe0O6dGxbf8PMSFYM21XA@mail.gmail.com>
+ <2b302c93ac224cefbcc6ff66184d96a7@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAHsioX_0Fp-vM4OhKPB1RuFPPG+tWJOmOkNoRXgArPqxZvY+rA@mail.gmail.com>
+
+Dear Wolfgang,
+
+Thank you very much for the answers.
+Really helped me your tips and codes.
+
+Lukasz
+
+wt., 30 kwi 2019 o 20:42 Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> napisa?(a):
+
+> Dear Lukas,
+>
+> You could use the predict() function to compute the predicted average
+> effect for a each level of 'status' when fixing 'logmass' to the mean of
+> this moderator. The predict() function will also give you the SE. It will
+> be something like:
+>
+> predict(res1, newmods = c())
+>
+> but without the output from res1, I cannot tell you what needs to go
+> inside the c().
+>
+> Best,
+> Wolfgang
+>
+> -----Original Message-----
+> From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Lukas Dylewski
+> Sent: Saturday, 13 April, 2019 19:53
+> To: r-sig-meta-analysis at r-project.org
+> Subject: [R-meta] overall effect size
+>
+> Dear  Wolfgang ,
+>
+> I am working with a meta-analysis in R (metafor package) using a mixed
+> model framework to examine experimental effects of rodent seed predation on
+> plant recruitment as a function of various plant species characteristics. I
+> decided to go with metafor given that this allowed to account for random
+> factors (specifically the study source, each of which typically estimated
+> effects for multiple species) while testing for the influence of multiple
+> fixed factors in the same model.
+>
+> The one snag I?ve hit concerns deriving estimates of the mean effect size
+> (the response) for my two classes of ?status? (native or exotic) while
+> accounting for the values of the continuous covariate ?logmass.?  From
+> playing with another meta-analysis package (OpenMEE, an interface that
+> relies on the R package meta.analysis, which does not allow the addition of
+> random factors).
+>
+> How I can estimate the mean effect size for "status" (alien and native)
+> representative logmass values? Can I use the equation? But I?m unclear how
+> I would calculate the associated SE for each estimate.  Could the solution
+> possibly be as easy as a simple equation that you already have??
+>
+> The models look like:
+>
+> res1 <- rma.mv(yi, vi, mods = ~ logmass + I(logmass^2)+ factor(status) +
+> logmass:factor(status), random=~1|pub,data=metaan, method="REML")
+>
+> Best
+> Lukasz
+> --
+> ?ukasz Dylewski, M. Sc.
+> PhD Student
+>
+> Department of Zoology, Institute of Zoology
+> Pozna? University of Life Sciences
+> Wojska Polskiego 71C
+> 60-625 Pozna?, Poland
+>
+> http://ecology1.wixsite.com/farmlandecology
+>
+
+
+-- 
+?ukasz Dylewski, M. Sc.
+PhD Student
+
+Department of Zoology, Institute of Zoology
+Pozna? University of Life Sciences
+Wojska Polskiego 71C
+60-625 Pozna?, Poland
+
+http://ecology1.wixsite.com/farmlandecology
+
+	[[alternative HTML version deleted]]
+
+

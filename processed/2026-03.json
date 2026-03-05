@@ -1,0 +1,55 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2026-03",
+  "messages": [
+    {
+      "id": "msg-83027a0d3986",
+      "message_id": "<CAKeUzcWBQugBLt_pj76TcUqAJGfnp1HPcofVoJ0r17xcDG+fjQ@mail.gmail.com>",
+      "from_name": "Andrzej Andrzej",
+      "from_email_hash": "7c554e8252f0b40e643bdc9f889b2358611865127646840bfc5d94defbde1e87",
+      "date": "2026-03-02T14:02:12+01:00",
+      "subject": "[R-meta] Customising Prediction Distribution in metafor",
+      "subject_clean": "[R-meta] Customising Prediction Distribution in metafor",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi,\n1. Is it possible to customise placement of Predictive Distribution results\nand distribution small plot in a forest plot or this can be done only by\nmetafor automatically?\nI mean if I want to place it lower or to the right hand side of the plot\n(both: the results and small plot and \"Predictive Distribution [95%PI]\"\nsubtitle  ?\n2. How does a Predictive Distribution results are calculated for non-normal\ndistributions ?\n3. How to calculate the \"lighter grey area\" in Predictive Distribution\nsmall plot - here it says - it was about ( P ?  > 1) = 11 %. How to get\nthat 0.11 ?\n\n\nhttps://www.youtube.com/watch?v=IKmak-mml5w&t=58s\n\ntime:10:58\n\nThank you,\nAndrzej\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi,\n1. Is it possible to customise placement of Predictive Distribution results\nand distribution small plot in a forest plot or this can be done only by\nmetafor automatically?\nI mean if I want to plac",
+      "thread_id": "thread-83027a0d3986",
+      "thread_depth": 0,
+      "month": "2026-03"
+    },
+    {
+      "id": "msg-fc20545c3d8c",
+      "message_id": "<PA4PR08MB74357B6D13C98726E38179018B7EA@PA4PR08MB7435.eurprd08.prod.outlook.com>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2026-03-02T14:13:01Z",
+      "subject": "[R-meta] Customising Prediction Distribution in metafor",
+      "subject_clean": "[R-meta] Customising Prediction Distribution in metafor",
+      "in_reply_to": "<CAKeUzcWBQugBLt_pj76TcUqAJGfnp1HPcofVoJ0r17xcDG+fjQ@mail.gmail.com>",
+      "references": [
+        "<CAKeUzcWBQugBLt_pj76TcUqAJGfnp1HPcofVoJ0r17xcDG+fjQ@mail.gmail.com>"
+      ],
+      "body_plain": "Dear Andrzej,\n\nPlease see below for my responses.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Andrzej Andrzej via R-sig-meta-analysis\n> Sent: Monday, March 2, 2026 14:02\n> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-\n> project.org>\n> Cc: Andrzej Andrzej <xaf3111.developers at gmail.com>\n> Subject: [R-meta] Customising Prediction Distribution in metafor\n> \n> Hi,\n> 1. Is it possible to customise placement of Predictive Distribution results\n> and distribution small plot in a forest plot or this can be done only by\n> metafor automatically?\n> I mean if I want to place it lower or to the right hand side of the plot\n> (both: the results and small plot and \"Predictive Distribution [95%PI]\"\n> subtitle  ?\n\nIf you want to put the predictive distribution into a different row, then you should first create the forest plot without it and then use the addpoly() function to add it. For example:\n\ndat <- dat.bcg\ndat <- escalc(measure=\"RR\", ai=tpos, bi=tneg,\n                            ci=cpos, di=cneg, data=dat,\n                            slab=paste0(author, \", \", year))\nres <- rma(yi, vi, data=dat)\nres\n\nforest(res, ylim=c(-5,16))\naddpoly(res, predstyle=\"dist\", row=c(NA,-4))\n\nNote that the 'row' argument for addpoly() can actually be two numbers, one for the summary polygon (which is already shown in the forst plot, so setting the first value to NA just skips plotting it again) and the other for the location of the predictive distribution.\n\n> 2. How does a Predictive Distribution results are calculated for non-normal\n> distributions ?\n\nThere are many methods. In the presentation you are referring to, I essentially used the method by Wand and Lee (2019; https://doi.org/10.1002/jrsm.1345). Basically, this is just using kernel density estimation on the BLUPs, which you can get with the blup() function (Wang and Lee actually don?t quite use the BLUPs but something very similar to them, but the difference is negligible). So, for example:\n\nforest(res, ylim=c(-5,16), predstyle=\"dist\")\ndens <- density(blup(res)$pred)\naddpoly(res, predstyle=\"dist\", preddist=dens, row=c(NA,-4))\n\n> 3. How to calculate the \"lighter grey area\" in Predictive Distribution\n> small plot - here it says - it was about ( P ?  > 1) = 11 %. How to get\n> that 0.11 ?\n\nThis one assumes normality. So you just need the center of the predictive distribution, which is just coef(res), and the standard error of the PI, which is part of what is returned by predict(). So:\n\npred <- predict(res)\npnorm(0, mean=coef(res), sd=pred$pi.se, lower.tail=FALSE)\n \n> https://www.youtube.com/watch?v=IKmak-mml5w&t=58s\n> \n> time:10:58\n> \n> Thank you,\n> Andrzej",
+      "body_snippet": "Dear Andrzej,\n\nPlease see below for my responses.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Andrzej Andrze",
+      "thread_id": "thread-83027a0d3986",
+      "thread_depth": 1,
+      "month": "2026-03"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-83027a0d3986",
+      "subject": "[R-meta] Customising Prediction Distribution in metafor",
+      "message_count": 2,
+      "participants": [
+        "Andrzej Andrzej",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2026-03-02T14:02:12+01:00",
+      "last_reply": "2026-03-02T14:13:01+00:00",
+      "root_message_id": "msg-83027a0d3986"
+    }
+  ]
+}

@@ -1,0 +1,1014 @@
+From he||enm|r554 @end|ng |rom gm@||@com  Mon Nov  9 13:00:18 2020
+From: he||enm|r554 @end|ng |rom gm@||@com (Hellen Mirr)
+Date: Mon, 9 Nov 2020 12:00:18 +0000
+Subject: [R-meta] Meta-regression question
+Message-ID: <CAF6nRJoraQBi8D=z5oJ4VCwKM1NYiFa0g_vs-wdfDdQ=Hy70Gw@mail.gmail.com>
+
+Hello
+
+Apologies if this has already been answered and thank you in advance for
+your help!
+
+We are doing a multilevel meta-analysis and would like to run a
+meta-regression to see differences across performance as a function of a
+grouping variable we have.
+
+Our dataset structure is as follows.
+We have two patient groups (A and B) and their performance on a series of
+tasks across several studies. All these tasks are of specific categories,
+e.g. Computing, Imagery, Reading - etc. in the variable "task_category"
+
+We have fit a multi-level meta as follows:
+model1 <-rma.mv(yi, vi, random = ~ 1 | Study/Task, tdist=TRUE, data=df)
+and then applied RVE as some studies reported multiple effect sizes for the
+same patients
+robust_model<- robust(model1, cluster = df$Study, adjust = TRUE) and also
+with clubsandwich
+coef_test () function for better small-sample adjustments.
+
+We would now like to run a meta-regression to see if there are differences
+in performance based on the category of tasks (which is coded in the
+variable "task_category")
+
+Would this be appropriate? As I am getting a bit confused and not sure this
+is the right approach
+metaregression_model <-rma.mv(yi, vi, random = ~ 1 | Study/Task, tdist =
+TRUE, data = df,
+                                 method = "REML",
+                                 mods = ~ (task_category))
+
+
+Thank you!
+
+Best,
+Hellen
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Nov  9 13:57:54 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 9 Nov 2020 12:57:54 +0000
+Subject: [R-meta] Meta-regression question
+In-Reply-To: <CAF6nRJoraQBi8D=z5oJ4VCwKM1NYiFa0g_vs-wdfDdQ=Hy70Gw@mail.gmail.com>
+References: <CAF6nRJoraQBi8D=z5oJ4VCwKM1NYiFa0g_vs-wdfDdQ=Hy70Gw@mail.gmail.com>
+Message-ID: <03bed422fa43424bb86e7eb4278deed8@UM-MAIL3214.unimaas.nl>
+
+Dear Hellen,
+
+Just to clarify: Is 'Task' the same as 'task_category'? Or is task_category 'broader', such that there may be multiple tasks within the same study that fall under the same category?
+
+In the latter case, you could even consider the model:
+
+random = ~ 1 | Study/task_category/Task
+
+But whether this is sensible also depends on how often you actually have multiple tasks for the same category within studies (if this occurs only rarely, then distinguishing these two levels is difficult).
+
+Regardless, yes, your last model does make sense, but you don't need the parentheses, so 'mods = ~ task_category' is sufficient (assuming that 'task_category' is either a factor or a character variable; if it is numeric, then you need 'mods = ~ factor(task_category)').
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Hellen Mirr
+>Sent: Monday, 09 November, 2020 13:00
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Meta-regression question
+>
+>Hello
+>
+>Apologies if this has already been answered and thank you in advance for
+>your help!
+>
+>We are doing a multilevel meta-analysis and would like to run a
+>meta-regression to see differences across performance as a function of a
+>grouping variable we have.
+>
+>Our dataset structure is as follows.
+>We have two patient groups (A and B) and their performance on a series of
+>tasks across several studies. All these tasks are of specific categories,
+>e.g. Computing, Imagery, Reading - etc. in the variable "task_category"
+>
+>We have fit a multi-level meta as follows:
+>model1 <-rma.mv(yi, vi, random = ~ 1 | Study/Task, tdist=TRUE, data=df)
+>and then applied RVE as some studies reported multiple effect sizes for the
+>same patients
+>robust_model<- robust(model1, cluster = df$Study, adjust = TRUE) and also
+>with clubsandwich
+>coef_test () function for better small-sample adjustments.
+>
+>We would now like to run a meta-regression to see if there are differences
+>in performance based on the category of tasks (which is coded in the
+>variable "task_category")
+>
+>Would this be appropriate? As I am getting a bit confused and not sure this
+>is the right approach
+>metaregression_model <-rma.mv(yi, vi, random = ~ 1 | Study/Task, tdist =
+>TRUE, data = df,
+>                                 method = "REML",
+>                                 mods = ~ (task_category))
+>
+>Thank you!
+>
+>Best,
+>Hellen
+
+
+From he||enm|r554 @end|ng |rom gm@||@com  Mon Nov  9 14:51:54 2020
+From: he||enm|r554 @end|ng |rom gm@||@com (Hellen Mirr)
+Date: Mon, 9 Nov 2020 13:51:54 +0000
+Subject: [R-meta] Meta-regression question
+In-Reply-To: <03bed422fa43424bb86e7eb4278deed8@UM-MAIL3214.unimaas.nl>
+References: <CAF6nRJoraQBi8D=z5oJ4VCwKM1NYiFa0g_vs-wdfDdQ=Hy70Gw@mail.gmail.com>
+ <03bed422fa43424bb86e7eb4278deed8@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAF6nRJoqmvtSWoUryNdRDsda7oKwVbJ4Vy4cANg=NnGE2CexkA@mail.gmail.com>
+
+Dear Wolfgang,
+
+Thank you very much for your reply, your explanations are always super
+useful!
+
+To answer your question, the "task_category" variable is indeed  'broader'
+than that of "task", because there are multiple tasks within the same study
+that do indeed fall under the same category
+
+Thanks again for the help!
+
+
+On Mon, Nov 9, 2020 at 12:58 PM Viechtbauer, Wolfgang (SP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Hellen,
+>
+> Just to clarify: Is 'Task' the same as 'task_category'? Or is
+> task_category 'broader', such that there may be multiple tasks within the
+> same study that fall under the same category?
+>
+> In the latter case, you could even consider the model:
+>
+> random = ~ 1 | Study/task_category/Task
+>
+> But whether this is sensible also depends on how often you actually have
+> multiple tasks for the same category within studies (if this occurs only
+> rarely, then distinguishing these two levels is difficult).
+>
+> Regardless, yes, your last model does make sense, but you don't need the
+> parentheses, so 'mods = ~ task_category' is sufficient (assuming that
+> 'task_category' is either a factor or a character variable; if it is
+> numeric, then you need 'mods = ~ factor(task_category)').
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org]
+> >On Behalf Of Hellen Mirr
+> >Sent: Monday, 09 November, 2020 13:00
+> >To: r-sig-meta-analysis at r-project.org
+> >Subject: [R-meta] Meta-regression question
+> >
+> >Hello
+> >
+> >Apologies if this has already been answered and thank you in advance for
+> >your help!
+> >
+> >We are doing a multilevel meta-analysis and would like to run a
+> >meta-regression to see differences across performance as a function of a
+> >grouping variable we have.
+> >
+> >Our dataset structure is as follows.
+> >We have two patient groups (A and B) and their performance on a series of
+> >tasks across several studies. All these tasks are of specific categories,
+> >e.g. Computing, Imagery, Reading - etc. in the variable "task_category"
+> >
+> >We have fit a multi-level meta as follows:
+> >model1 <-rma.mv(yi, vi, random = ~ 1 | Study/Task, tdist=TRUE, data=df)
+> >and then applied RVE as some studies reported multiple effect sizes for
+> the
+> >same patients
+> >robust_model<- robust(model1, cluster = df$Study, adjust = TRUE) and also
+> >with clubsandwich
+> >coef_test () function for better small-sample adjustments.
+> >
+> >We would now like to run a meta-regression to see if there are differences
+> >in performance based on the category of tasks (which is coded in the
+> >variable "task_category")
+> >
+> >Would this be appropriate? As I am getting a bit confused and not sure
+> this
+> >is the right approach
+> >metaregression_model <-rma.mv(yi, vi, random = ~ 1 | Study/Task, tdist =
+> >TRUE, data = df,
+> >                                 method = "REML",
+> >                                 mods = ~ (task_category))
+> >
+> >Thank you!
+> >
+> >Best,
+> >Hellen
+>
+
+	[[alternative HTML version deleted]]
+
+
+From |o@n@@@||n@@cr|@te@ @end|ng |rom gm@||@com  Sat Nov 14 15:43:39 2020
+From: |o@n@@@||n@@cr|@te@ @end|ng |rom gm@||@com (Ioana Cristea)
+Date: Sat, 14 Nov 2020 15:43:39 +0100
+Subject: [R-meta] Meta-analysis including multiple intervention arms
+Message-ID: <CAL_hygQx2HoNyFqTRnySOHn9Lc9kqnYZmsWb=oNi0XEeHX=TkQ@mail.gmail.com>
+
+Dear all
+I am doing a meta-analysis of randomized trials where some trials have
+multiple outcomes of interest (depression measured with different scales)
+and a few have more than one active arms, usually 2 intervention arms and
+control (therapy A compared to control, therapy B compared to control).
+I am using robust variance estimator. My question is: for the cases where
+there are multiple active intervention arms in a trial, compared to the
+same control arm, should I adjust the sample size of the control arm (ie,
+splitting by 2 if there are 2 active interventions compared to control)?
+Thank you
+Ioana
+
+-- 
+Ioana-Alina Cristea, Ph.D.
+Assistant Professor
+Department of Brain and Behavioral Sciences
+University of Pavia, Piazza Botta 11, 27100 Pavia, Italy
+
+Research affiliate
+METRICS (Meta-research Innovation Center at Stanford)
+Stanford University, California, USA
+Editorial Advisory Board Lancet Psychiatry
+<https://www.thelancet.com/journals/lanpsy/home>
+International Editorial Board BJPsych Open
+<https://www.cambridge.org/core/journals/bjpsych-open>
+
+ORCid: http://orcid.org/0000-0002-9854-7076
+Publons: https://publons.com/author/1196647/ioana-alina-cristea#profile
+Researchgate: https://www.researchgate.net/profile/Ioana_Cristea
+Twitter: https://twitter.com/IoanaA_Cristea
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Sat Nov 14 16:29:29 2020
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Sat, 14 Nov 2020 09:29:29 -0600
+Subject: [R-meta] Meta-analysis including multiple intervention arms
+In-Reply-To: <CAL_hygQx2HoNyFqTRnySOHn9Lc9kqnYZmsWb=oNi0XEeHX=TkQ@mail.gmail.com>
+References: <CAL_hygQx2HoNyFqTRnySOHn9Lc9kqnYZmsWb=oNi0XEeHX=TkQ@mail.gmail.com>
+Message-ID: <0400B1EE-18B3-4FC3-973C-BACBFBD8EDD7@gmail.com>
+
+The short answer is no. If you are using RVE with a correlated effects working model, the (assumed) correlation between the effect sizes from each intervention arm takes care of the issue. Splitting the control sample size would over-correct, so that the study would end up with less weight than it should receive.
+
+James
+
+> On Nov 14, 2020, at 8:44 AM, Ioana Cristea <ioana.alina.cristea at gmail.com> wrote:
+> 
+> ?Dear all
+> I am doing a meta-analysis of randomized trials where some trials have
+> multiple outcomes of interest (depression measured with different scales)
+> and a few have more than one active arms, usually 2 intervention arms and
+> control (therapy A compared to control, therapy B compared to control).
+> I am using robust variance estimator. My question is: for the cases where
+> there are multiple active intervention arms in a trial, compared to the
+> same control arm, should I adjust the sample size of the control arm (ie,
+> splitting by 2 if there are 2 active interventions compared to control)?
+> Thank you
+> Ioana
+> 
+> -- 
+> Ioana-Alina Cristea, Ph.D.
+> Assistant Professor
+> Department of Brain and Behavioral Sciences
+> University of Pavia, Piazza Botta 11, 27100 Pavia, Italy
+> 
+> Research affiliate
+> METRICS (Meta-research Innovation Center at Stanford)
+> Stanford University, California, USA
+> Editorial Advisory Board Lancet Psychiatry
+> <https://www.thelancet.com/journals/lanpsy/home>
+> International Editorial Board BJPsych Open
+> <https://www.cambridge.org/core/journals/bjpsych-open>
+> 
+> ORCid: http://orcid.org/0000-0002-9854-7076
+> Publons: https://publons.com/author/1196647/ioana-alina-cristea#profile
+> Researchgate: https://www.researchgate.net/profile/Ioana_Cristea
+> Twitter: https://twitter.com/IoanaA_Cristea
+> 
+>    [[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From |o@n@@@||n@@cr|@te@ @end|ng |rom gm@||@com  Sat Nov 14 16:30:35 2020
+From: |o@n@@@||n@@cr|@te@ @end|ng |rom gm@||@com (Ioana Cristea)
+Date: Sat, 14 Nov 2020 16:30:35 +0100
+Subject: [R-meta] Meta-analysis including multiple intervention arms
+In-Reply-To: <0400B1EE-18B3-4FC3-973C-BACBFBD8EDD7@gmail.com>
+References: <CAL_hygQx2HoNyFqTRnySOHn9Lc9kqnYZmsWb=oNi0XEeHX=TkQ@mail.gmail.com>
+ <0400B1EE-18B3-4FC3-973C-BACBFBD8EDD7@gmail.com>
+Message-ID: <CAL_hygQqddnGjYJM7sq4rho-c4m0SeKpSf3k5AnxAdZN7C--Tw@mail.gmail.com>
+
+Thank you, that's what I thought!
+Best
+Ioana
+
+On Sat, Nov 14, 2020 at 4:29 PM James Pustejovsky <jepusto at gmail.com> wrote:
+
+> The short answer is no. If you are using RVE with a correlated effects
+> working model, the (assumed) correlation between the effect sizes from each
+> intervention arm takes care of the issue. Splitting the control sample size
+> would over-correct, so that the study would end up with less weight than it
+> should receive.
+>
+> James
+>
+> > On Nov 14, 2020, at 8:44 AM, Ioana Cristea <
+> ioana.alina.cristea at gmail.com> wrote:
+> >
+> > ?Dear all
+> > I am doing a meta-analysis of randomized trials where some trials have
+> > multiple outcomes of interest (depression measured with different scales)
+> > and a few have more than one active arms, usually 2 intervention arms and
+> > control (therapy A compared to control, therapy B compared to control).
+> > I am using robust variance estimator. My question is: for the cases where
+> > there are multiple active intervention arms in a trial, compared to the
+> > same control arm, should I adjust the sample size of the control arm (ie,
+> > splitting by 2 if there are 2 active interventions compared to control)?
+> > Thank you
+> > Ioana
+> >
+> > --
+> > Ioana-Alina Cristea, Ph.D.
+> > Assistant Professor
+> > Department of Brain and Behavioral Sciences
+> > University of Pavia, Piazza Botta 11, 27100 Pavia, Italy
+> >
+> > Research affiliate
+> > METRICS (Meta-research Innovation Center at Stanford)
+> > Stanford University, California, USA
+> > Editorial Advisory Board Lancet Psychiatry
+> > <https://www.thelancet.com/journals/lanpsy/home>
+> > International Editorial Board BJPsych Open
+> > <https://www.cambridge.org/core/journals/bjpsych-open>
+> >
+> > ORCid: http://orcid.org/0000-0002-9854-7076
+> > Publons: https://publons.com/author/1196647/ioana-alina-cristea#profile
+> > Researchgate: https://www.researchgate.net/profile/Ioana_Cristea
+> > Twitter: https://twitter.com/IoanaA_Cristea
+> >
+> >    [[alternative HTML version deleted]]
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list
+> > R-sig-meta-analysis at r-project.org
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+
+-- 
+Ioana-Alina Cristea, Ph.D.
+Assistant Professor
+Department of Brain and Behavioral Sciences
+University of Pavia, Piazza Botta 11, 27100 Pavia, Italy
+
+Research affiliate
+METRICS (Meta-research Innovation Center at Stanford)
+Stanford University, California, USA
+Editorial Advisory Board Lancet Psychiatry
+<https://www.thelancet.com/journals/lanpsy/home>
+International Editorial Board BJPsych Open
+<https://www.cambridge.org/core/journals/bjpsych-open>
+
+ORCid: http://orcid.org/0000-0002-9854-7076
+Publons: https://publons.com/author/1196647/ioana-alina-cristea#profile
+Researchgate: https://www.researchgate.net/profile/Ioana_Cristea
+Twitter: https://twitter.com/IoanaA_Cristea
+
+	[[alternative HTML version deleted]]
+
+
+From @c @end|ng |rom |mb|@un|-|re|burg@de  Sun Nov 15 15:34:11 2020
+From: @c @end|ng |rom |mb|@un|-|re|burg@de (Guido Schwarzer)
+Date: Sun, 15 Nov 2020 15:34:11 +0100
+Subject: [R-meta] Meta-analysis including multiple intervention arms
+In-Reply-To: <0400B1EE-18B3-4FC3-973C-BACBFBD8EDD7@gmail.com>
+References: <CAL_hygQx2HoNyFqTRnySOHn9Lc9kqnYZmsWb=oNi0XEeHX=TkQ@mail.gmail.com>
+ <0400B1EE-18B3-4FC3-973C-BACBFBD8EDD7@gmail.com>
+Message-ID: <6bf729fd-e850-7269-91eb-c4877188a0de@imbi.uni-freiburg.de>
+
+Am 14.11.20 um 16:29 schrieb James Pustejovsky:
+
+> [...] Splitting the control sample size would over-correct, so that the study would end up with less weight than it should receive.
+
+Is this also true if you have a (very) large between-study variance?
+
+In such cases each estimate gets essentially the same weight in a 
+meta-analysis which means that a study with two estimates gets twice the 
+weight (not sure about this relationsship if using RVE).
+
+Best wishes
+Guido
+
+
+From jepu@to @end|ng |rom gm@||@com  Sun Nov 15 16:13:58 2020
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Sun, 15 Nov 2020 09:13:58 -0600
+Subject: [R-meta] Meta-analysis including multiple intervention arms
+In-Reply-To: <6bf729fd-e850-7269-91eb-c4877188a0de@imbi.uni-freiburg.de>
+References: <6bf729fd-e850-7269-91eb-c4877188a0de@imbi.uni-freiburg.de>
+Message-ID: <226B037D-BF4A-450F-9054-A542AE9F528E@gmail.com>
+
+It depends on the structure of the random effects (i.e., the ?working model? in the RVE framework).
+
+If one used a model with independent random effects for each ES estimate, then yes, increased heterogeneity would mean that the study with 2 effects receives more weight. 
+
+But the ?correlated effects? working model has a study-level random effect, which hits all ES estimates within the study. In the case, the study ends up getting the appropriate amount of weight in the overall average.
+
+> On Nov 15, 2020, at 8:34 AM, Guido Schwarzer <sc at imbi.uni-freiburg.de> wrote:
+> 
+> ?Am 14.11.20 um 16:29 schrieb James Pustejovsky:
+> 
+>> [...] Splitting the control sample size would over-correct, so that the study would end up with less weight than it should receive.
+> 
+> Is this also true if you have a (very) large between-study variance?
+> 
+> In such cases each estimate gets essentially the same weight in a meta-analysis which means that a study with two estimates gets twice the weight (not sure about this relationsship if using RVE).
+> 
+> Best wishes
+> Guido
+
+
+From |o@n@@@||n@@cr|@te@ @end|ng |rom gm@||@com  Sun Nov 15 16:31:40 2020
+From: |o@n@@@||n@@cr|@te@ @end|ng |rom gm@||@com (Ioana Cristea)
+Date: Sun, 15 Nov 2020 16:31:40 +0100
+Subject: [R-meta] Meta-analysis including multiple intervention arms
+In-Reply-To: <226B037D-BF4A-450F-9054-A542AE9F528E@gmail.com>
+References: <6bf729fd-e850-7269-91eb-c4877188a0de@imbi.uni-freiburg.de>
+ <226B037D-BF4A-450F-9054-A542AE9F528E@gmail.com>
+Message-ID: <CAL_hygS-FGuC=JtLDQCvUbvtQ2ewZpVpD_9ReSKuVDYvUaRneg@mail.gmail.com>
+
+Hi
+Thank you both. Yes, to clarify I am using correlated effects, and the
+study with more effects is only considered once.
+See here: https://cran.r-project.org/web/packages/robumeta/robumeta.pdf
+Ioana
+
+On Sun, Nov 15, 2020 at 4:14 PM James Pustejovsky <jepusto at gmail.com> wrote:
+
+> It depends on the structure of the random effects (i.e., the ?working
+> model? in the RVE framework).
+>
+> If one used a model with independent random effects for each ES estimate,
+> then yes, increased heterogeneity would mean that the study with 2 effects
+> receives more weight.
+>
+> But the ?correlated effects? working model has a study-level random
+> effect, which hits all ES estimates within the study. In the case, the
+> study ends up getting the appropriate amount of weight in the overall
+> average.
+>
+> > On Nov 15, 2020, at 8:34 AM, Guido Schwarzer <sc at imbi.uni-freiburg.de>
+> wrote:
+> >
+> > ?Am 14.11.20 um 16:29 schrieb James Pustejovsky:
+> >
+> >> [...] Splitting the control sample size would over-correct, so that the
+> study would end up with less weight than it should receive.
+> >
+> > Is this also true if you have a (very) large between-study variance?
+> >
+> > In such cases each estimate gets essentially the same weight in a
+> meta-analysis which means that a study with two estimates gets twice the
+> weight (not sure about this relationsship if using RVE).
+> >
+> > Best wishes
+> > Guido
+>
+
+
+-- 
+Ioana-Alina Cristea, Ph.D.
+Assistant Professor
+Department of Brain and Behavioral Sciences
+University of Pavia, Piazza Botta 11, 27100 Pavia, Italy
+
+Research affiliate
+METRICS (Meta-research Innovation Center at Stanford)
+Stanford University, California, USA
+Editorial Advisory Board Lancet Psychiatry
+<https://www.thelancet.com/journals/lanpsy/home>
+International Editorial Board BJPsych Open
+<https://www.cambridge.org/core/journals/bjpsych-open>
+
+ORCid: http://orcid.org/0000-0002-9854-7076
+Publons: https://publons.com/author/1196647/ioana-alina-cristea#profile
+Researchgate: https://www.researchgate.net/profile/Ioana_Cristea
+Twitter: https://twitter.com/IoanaA_Cristea
+
+	[[alternative HTML version deleted]]
+
+
+From r@o@@@deboer @end|ng |rom t||burgun|ver@|ty@edu  Mon Nov 16 14:26:49 2020
+From: r@o@@@deboer @end|ng |rom t||burgun|ver@|ty@edu (Ricardo de Boer)
+Date: Mon, 16 Nov 2020 14:26:49 +0100
+Subject: [R-meta] Meta analysis for identical multinomial logistic models
+Message-ID: <CAAFvQoMUuWYdDX-jSaqOU4kwfbtm_GKhc4mmxxANPnZJr10b_w@mail.gmail.com>
+
+Dear community,
+
+I was wondering if it is possible to use the metafor package for a
+meta analysis on the results I achieved from multiple multinomial
+models.
+These multinomial models are all identical in the sense that they have
+the same explanatory variables. The difference lies in the input data
+that is used.
+Every model has data from 1 individual, where the dataset varies much
+in the amount of observations per model. The goal is to investigate
+whether these individuals behave differently.
+
+To be more precise, I am using baseball data per pitch from 2008-2019
+to try and investigate if the strategies differ among pitchers and
+which factors contribute to these differences.
+The dependent variable is categorical with the values 'Fastball',
+'Breakingball' and 'Changeup'.
+For every pitcher, I ran the same multinomial model with fixed
+effects. Just to name a few explanatory varaibles: count (factor
+variable with amount of pitches and balls), the number of outs before
+the pitch took place, if the pitcher is left/right handed.
+
+At the moment, I have more than 2000 multinomial models where the
+output summary is saved in a list.
+Is it possible to use the package 'metafor' for my purpose? If so, how
+would my next steps look like?
+I have difficulty understanding how I would use the baseball data and
+the output summary from my multinomial models with fixed effects
+together with the metafor package.
+
+Any assistance is much appreciated.
+
+Ricardo
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Nov 16 15:25:22 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 16 Nov 2020 14:25:22 +0000
+Subject: [R-meta] 
+ Meta analysis for identical multinomial logistic models
+In-Reply-To: <CAAFvQoMUuWYdDX-jSaqOU4kwfbtm_GKhc4mmxxANPnZJr10b_w@mail.gmail.com>
+References: <CAAFvQoMUuWYdDX-jSaqOU4kwfbtm_GKhc4mmxxANPnZJr10b_w@mail.gmail.com>
+Message-ID: <231651d92bc9408686a571f14f9d7d8a@UM-MAIL3214.unimaas.nl>
+
+Hi Ricardo,
+
+For every model, you should be able to extract the model coefficients. There should be 2 coefficients for every explanatory variable (since your dependent variable has 3 categories) and for explanatory variables that are factors with more than 2 levels, the variable will actually be represented by multiple coefficients. But in any case, one should be able to extract those coefficients. Also, one should be able to extract the var-cov matrix of those coefficients. If 'res' is your list with the 2000 models, maybe b <- lapply(res, coef) and V <- lapply(res, vcov) may provide these, but I don't know what you are using for fitting the multinomial models so I cannot try this out.
+
+lapply(res, coef) still gives you a list, which you will want to turn into a vector (try b <- unlist(b)). You then would want to create a corresponding vector with 'player ids' and 'variable ids'. You could then meta-analyze the coefficients with:
+
+rma.mv(b, V, mods = ~ factor(variable.id) - 1, random = ~ factor(variable.id) | player.id, struct="UN", sparse=TRUE, verbose=TRUE)
+
+This could take a while (so setting verbose=TRUE to see the progress) and sparse=TRUE because that should help to speed up model fitting here.
+
+In essence, you are doing a two-step multilevel analysis in this way. An example from a different context is provided here:
+
+http://www.metafor-project.org/doku.php/tips:two_stage_analysis
+
+One could also fit a single multilevel multinomial model.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Ricardo de Boer
+>Sent: Monday, 16 November, 2020 14:27
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Meta analysis for identical multinomial logistic models
+>
+>Dear community,
+>
+>I was wondering if it is possible to use the metafor package for a
+>meta analysis on the results I achieved from multiple multinomial
+>models.
+>These multinomial models are all identical in the sense that they have
+>the same explanatory variables. The difference lies in the input data
+>that is used.
+>Every model has data from 1 individual, where the dataset varies much
+>in the amount of observations per model. The goal is to investigate
+>whether these individuals behave differently.
+>
+>To be more precise, I am using baseball data per pitch from 2008-2019
+>to try and investigate if the strategies differ among pitchers and
+>which factors contribute to these differences.
+>The dependent variable is categorical with the values 'Fastball',
+>'Breakingball' and 'Changeup'.
+>For every pitcher, I ran the same multinomial model with fixed
+>effects. Just to name a few explanatory varaibles: count (factor
+>variable with amount of pitches and balls), the number of outs before
+>the pitch took place, if the pitcher is left/right handed.
+>
+>At the moment, I have more than 2000 multinomial models where the
+>output summary is saved in a list.
+>Is it possible to use the package 'metafor' for my purpose? If so, how
+>would my next steps look like?
+>I have difficulty understanding how I would use the baseball data and
+>the output summary from my multinomial models with fixed effects
+>together with the metafor package.
+>
+>Any assistance is much appreciated.
+>
+>Ricardo
+
+
+From r@o@@@deboer @end|ng |rom t||burgun|ver@|ty@edu  Thu Nov 19 11:14:04 2020
+From: r@o@@@deboer @end|ng |rom t||burgun|ver@|ty@edu (Ricardo de Boer)
+Date: Thu, 19 Nov 2020 11:14:04 +0100
+Subject: [R-meta] No convergence meta analysis of identical multinomial
+ logistic models.
+Message-ID: <CAAFvQoMoP16g7QtDos5NuJrq2nnqBqOaGpJKcvxkgtp+ROpagQ@mail.gmail.com>
+
+Hi,
+
+I am fairly new to meta analysis and at the moment I ran into an
+convergence error and I was wondering what steps need to be undertaken
+to achieve convergence.
+
+Let me first explain to you my problem. The dataset I am using
+contains 8.5 million observations of pitch data in major league
+baseball. I am trying to investigate whether the pitchers
+I have 2000 multinomial models with the same explanatory variables.
+just to name a few explanatory variables: count (factorvariable with
+amount of pitches and balls), the number of outs beforethe pitch took
+place, if the pitcher is left/right handed. The dependent variable is
+categorical with the values 'Fastball', 'Breakingball' and 'Changeup'.
+
+Every model has data from 1 pitcher, where the dataset varies much in
+the amount of observations per model. The goal is to investigate
+whether these individuals behave differently, as well as what
+characteristics of the pitcher make them behave differently.
+
+I already received feedback from Wolgang on how to conduct the meta analysis.
+For every pitcher, I have a multinomial model where the model
+coefficients are extracted  and put in a list (call it: b). This is
+also done for the var-cov of those coefficients(call it: V). Then, I
+unlisted b and V. I created a player.id vector as well as a
+variable.id vector.
+Afterwards it is possible to run a meta analysis on the coefficients
+in the following way:
+(I ran a meta analysis on the first 50 models, not 2000 yet)
+
+rma.mv(b, V, mods = ~ factor(variable.id) - 1, random = ~
+factor(variable.id) | player.id, struct="UN", sparse=TRUE,
+verbose=TRUE)
+
+The above mentioned meta analysis works when struct is set to default,
+"CS" or "HCS", but not with struct = "UN". Although in any meta
+analysis that I have run so far, I receive an warning message that
+says:
+
+Warning message:
+In rma.mv(b, V, mods = ~factor(variable.id) - 1, random =
+~factor(variable.id) |  :
+  Ratio of largest to smallest sampling variance extremely large. May
+not be able to obtain stable results.
+
+When I set the struct ="UN", I get the following error after many
+hours. I seems that it is stuck in a local maxima after many hours of
+running.
+
+Error in rma.mv(b, V, mods = ~factor(variable.id) - 1, random =
+~factor(variable.id) |  :
+  Optimizer (nlminb) did not achieve convergence (convergence = 1).
+In addition: Warning message:
+In rma.mv(b, V, mods = ~factor(variable.id) - 1, random =
+~factor(variable.id) |  :
+Ratio of largest to smallest sampling variance extremely large. May
+not be able to obtain stable results.
+
+Is there a way to reach convergence? Is there anything I can do about
+these warning messages?
+
+I don't know if it helps, but I will mention the ll, tau2 and rho,
+just before I got an error of no convergence. (at the bottom of this
+message).
+
+I believe that I need to manually set tau2 and rho, but I'm not sure.
+
+Lastly, what is the difference in interpretation if I run the below
+mentioned meta analysis compared to the one Wolgang recommended me.
+The difference lies in the random part where I altered it to random =
+~ 1 | player.id and leaving out the struct = "UN", because that is
+disregarded either way then.  What I think is that I ran a mixed
+effects model with only varying intercepts for the pitchers in the
+below mentioned case.
+
+rma.mv(b, V, mods = ~ factor(variable.id) - 1, random = ~ 1 |
+player.id,  sparse=TRUE, verbose=TRUE)
+
+To summarize my questions:
+Is there a way to reach convergence?
+Is there anything I can do about these warning messages?
+What is the difference in interpretation?
+
+Any advice on how to proceed is highly appreciated.
+
+
+ll = -18603.6426
+tau2 = c(0.1508, 0.2016, 0.0593, 0.0729, 0.2317, 0.3542, 0.0452,
+0.0604, 0.0690, 0.0669, 0.1402, 0.3604, 0.2772, 0.2115, 0.1817,
+0.1524, 0.1301, 0.3421, 0.6428, 0.3078, 0.3403, 0.2608, 0.1659,
+0.4243, 0.0119, 0.0363, 0.0862, 0.4163)
+rho = c(0.2289,-0.1471, 0.0524, 0.1389,-0.0911, 0.3515, 0.1262,
+0.2239, 0.4314, 0.1383,-0.0725,-0.0780, 0.0833, 0.5362,-0.2861,
+0.1613,-0.1386,-0.3373, 0.0174,-0.2871, 0.1560, 0.2784, 0.3446,
+0.1405, 0.4257, 0.5349, 0.0060,-0.1630, 0.1319, 0.2658, 0.7631,
+0.5231, 0.5883, 0.0441,-0.0861, 0.5200, 0.1121,-0.0348, 0.2969,
+0.8384, 0.1838, 0.5219,-0.0372, 0.6533, 0.5988,-0.0022, 0.1343,
+0.4633, 0.1505, 0.8475,-0.3028,-0.0324, 0.4166, 0.6198, 0.1990,
+0.0920, 0.0044, 0.0830, 0.5364,-0.1806, 0.8285, 0.1668, 0.2280,
+0.1424, 0.5914,-0.2417, 0.3360,-0.0623,-0.4578,
+0.0022,-0.0712,-0.0746, 0.5757, 0.1784,-0.1073, 0.0367,-0.1341,
+0.0013, 0.0931, 0.3820, 0.1053, 0.0035, 0.1518, 0.1013,-0.0153,
+0.4991, 0.1533, 0.2000, 0.1243, 0.2846, 0.2767,
+0.3803,-0.0541,-0.1176, 0.3366, 0.1470, 0.0853, 0.6318, 0.3464,
+0.2588, 0.3308, 0.1981, 0.1800, 0.7962, 0.2815, 0.1303, 0.4582,
+0.1903, 0.2537, 0.3107, 0.2717,-0.1092, 0.7615, 0.3814, 0.5234,
+0.1995, 0.4969, 0.1606, 0.8527, 0.2849, 0.1483, 0.1083, 0.2908,
+0.2007, 0.7324,-0.1987, 0.2675, 0.4506, 0.5507, 0.2096,
+0.8548,-0.1065, 0.2166, 0.2160, 0.5937, 0.2572, 0.2003, 0.0453,
+0.0985, 0.5423, 0.0211, 0.6948, 0.0843, 0.5098, 0.2643,
+0.7222,-0.1023, 0.8114, 0.2588, 0.5064, 0.3885, 0.7213, 0.0550,
+0.5369,-0.0114,-0.3025,-0.1885,-0.0535,-0.3893,-0.0170,-0.0777,-0.1449,-0.2225,-0.1658,-0.2592,
+0.3576,-0.0914, 0.0188,-0.2216,-0.2069,-0.2428, 0.2988, 0.1031,
+0.1030, 0.1722, 0.0957, 0.3964,-0.1560, 0.1722, 0.0907, 0.2357,
+0.0104, 0.2482,-0.0033, 0.5061, 0.0755, 0.4075,-0.0022, 0.3639,
+0.0933, 0.5728, 0.2217,-0.1232, 0.1043, 0.1923, 0.1117, 0.2038,
+0.3263, 0.0959, 0.1589, 0.0522, 0.2504, 0.6467, 0.5219, 0.5852,
+0.4965, 0.3067, 0.5289, 0.2853, 0.2642,-0.0712, 0.3174,
+0.0415,-0.0727, 0.0858, 0.1702,-0.1773, 0.3730,-0.0070, 0.0960,
+0.0545, 0.3180,-0.1435, 0.7252,-0.0970, 0.6729,-0.0139,
+0.3325,-0.2098, 0.5342, 0.0148, 0.3279, 0.1504,-0.0100, 0.1517,
+0.4155, 0.1276, 0.3376, 0.3259, 0.1824, 0.1891, 0.3813, 0.1976,
+0.5315, 0.3752, 0.6874, 0.4051, 0.6222, 0.3945, 0.0516, 0.1515,
+0.7049,-0.0276,-0.0703, 0.1794, 0.0877, 0.1596, 0.1051,
+0.3875,-0.2280, 0.4786, 0.1099, 0.3915,-0.0411, 0.5162,-0.0749,
+0.5694,-0.0772, 0.7401,-0.1371, 0.6767,-0.2185, 0.3935, 0.1458,
+0.7784, 0.0420,-0.2098,-0.4941, 0.1300, 0.2519, 0.0660,-0.0708,
+0.2505, 0.0839, 0.1530, 0.2263, 0.1785,-0.1884, 0.0688,-0.4143,
+0.2752,-0.2915, 0.2570,-0.0885,-0.3592,-0.4473,-0.3541,-0.4311,
+0.0270,-0.2614,-0.1877,-0.2318, 0.0422, 0.0571,
+0.0623,-0.0238,-0.0887, 0.1438,-0.0286, 0.0653,
+0.0626,-0.0020,-0.0627,-0.0744,-0.0528,-0.0138, 0.0122,
+0.0434,-0.2359,-0.2191,-0.2303, 0.2720,-0.1875, 0.3434,
+0.3613,-0.0998, 0.0538, 0.3671, 0.4282, 0.4665, 0.2392,-0.0677,
+0.5099, 0.4577, 0.4424, 0.3033, 0.1845, 0.2091, 0.1229, 0.3054,
+0.2979, 0.3781, 0.3892,-0.3077,-0.0617, 0.1617,-0.0626, 0.3297,
+0.1311, 0.3860, 0.2505,-0.4281,-0.4427, 0.0005,-0.0658,-0.4593,
+0.0899,-0.2325,-0.2140,-0.2812, 0.0446,-0.3755, 0.0915,-0.2307,
+0.1002,-0.3179, 0.0127,-0.5230,-0.0075,-0.1111, 0.1253,-0.3566,
+0.2783,-0.4834, 0.2381,-0.0100,0.1206,-0.3672)
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Nov 19 12:36:27 2020
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 19 Nov 2020 11:36:27 +0000
+Subject: [R-meta] No convergence meta analysis of identical multinomial
+ logistic models.
+In-Reply-To: <CAAFvQoMoP16g7QtDos5NuJrq2nnqBqOaGpJKcvxkgtp+ROpagQ@mail.gmail.com>
+References: <CAAFvQoMoP16g7QtDos5NuJrq2nnqBqOaGpJKcvxkgtp+ROpagQ@mail.gmail.com>
+Message-ID: <fbdfc87930644577a6b111478ed7d5ce@UM-MAIL3213.unimaas.nl>
+
+Dear Ricardo,
+
+So it seems like you are meta-analyzing 28 different coefficients (based on the length of tau2 you provided). That means that there are 28*29/2 = 406 parameters in the var-cov matrix of the underlying random effects that need to be estimated (28 tau^2 values and 378 correlations). That's *a lot* of parameters compared to how much data you have. Definitely when you 'only' use 50 models/players as input, but even if you use all 2000 it is still a highly complex estimation problem.
+
+The warning about the ratio of the sampling variances is a check that I put into rma.mv() to examine if the sampling variances (the values along the diagonal of the complete V matrix) are very unbalanced. In my experience, there can be cases where this leads to numerical issues. Whether this matters in your case depends on how large/small the sampling variances actually are. If the tau^2 values are sufficiently large (relative to the sampling variances), then the values of the sampling variances tend to matter little and this warning can be safely ignored.
+
+Coming back to the optimization issue, there are several things you can try:
+
+1) Increase the number of iterations. The default for nlminb() is 150 (see help(nlminb)) but that can be increased with control=list(iter.max=10000) (for example). Could also increase the number of function evaluations; e.g., control=list(iter.max=10000, eval.max=10000). In any case, be prepared to wait even longer (days?).
+
+2) Try a different optimizer. rma.mv() allows you to select one of 15+ different ones. See help(rma.mv) and look at the 'Note' section. I would try control=list(optimizer="optim", optmethod="Nelder-Mead") or control=list(optimizer="optim", optmethod="BFGS") as a start. If your computer is beefy and has multiple cores, you can also speed up model fitting with control=list(optimizer="optimParallel", ncpus=<number of cores to use>).
+
+3) Simplify the model. 
+
+a) Do you really need those 28 coefficients? Maybe you can do with fewer.
+
+b) And do you even plan on making comparisons between them? If not, you could also run 28 separate models, one for each coefficient. You might lose some efficiency and you cannot test if there are differences between the coefficients, but the results per coefficient are in principle okay.
+
+c) You could also simplify the random effects structure. struct="CS" reduces the estimation down to two parameters, but assumes equal heterogeneity for every coefficient and equal correlation for each pair. struct="HCS" allows for different tau^2 values but still assumes equal corelations. Whether this makes sense for your data I don't know.
+
+d) 'random = ~ 1 | player.id' is not the way to do. If at all, then 'random = ~ 1 | player.id/variable.id' but this is identical to 'random = ~ factor(variable.id) | player.id' with struct="CS" (assuming that the correlation is positive). See: http://www.metafor-project.org/doku.php/analyses:konstantopoulos2011
+
+e) Fit a simplified model (e.g., struct="CS") as a 'working model' and then use cluster-robust inference for 'fixing things up'. You can do this with robust() or, even better, with the clubSandwich package. See help(robust) for an example. 
+
+In any case, install the 'devel' version of metafor in case you are using the CRAN (2.4-0) version as I have made some minor improvements here and there that might also be useful:
+
+https://github.com/wviechtb/metafor#installation
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On Behalf Of Ricardo de Boer
+>Sent: Thursday, 19 November, 2020 11:14
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] No convergence meta analysis of identical multinomial
+>logistic models.
+>
+>Hi,
+>
+>I am fairly new to meta analysis and at the moment I ran into an
+>convergence error and I was wondering what steps need to be undertaken
+>to achieve convergence.
+>
+>Let me first explain to you my problem. The dataset I am using
+>contains 8.5 million observations of pitch data in major league
+>baseball. I am trying to investigate whether the pitchers
+>I have 2000 multinomial models with the same explanatory variables.
+>just to name a few explanatory variables: count (factorvariable with
+>amount of pitches and balls), the number of outs beforethe pitch took
+>place, if the pitcher is left/right handed. The dependent variable is
+>categorical with the values 'Fastball', 'Breakingball' and 'Changeup'.
+>
+>Every model has data from 1 pitcher, where the dataset varies much in
+>the amount of observations per model. The goal is to investigate
+>whether these individuals behave differently, as well as what
+>characteristics of the pitcher make them behave differently.
+>
+>I already received feedback from Wolgang on how to conduct the meta
+>analysis.
+>For every pitcher, I have a multinomial model where the model
+>coefficients are extracted  and put in a list (call it: b). This is
+>also done for the var-cov of those coefficients(call it: V). Then, I
+>unlisted b and V. I created a player.id vector as well as a
+>variable.id vector.
+>Afterwards it is possible to run a meta analysis on the coefficients
+>in the following way:
+>(I ran a meta analysis on the first 50 models, not 2000 yet)
+>
+>rma.mv(b, V, mods = ~ factor(variable.id) - 1, random = ~
+>factor(variable.id) | player.id, struct="UN", sparse=TRUE,
+>verbose=TRUE)
+>
+>The above mentioned meta analysis works when struct is set to default,
+>"CS" or "HCS", but not with struct = "UN". Although in any meta
+>analysis that I have run so far, I receive an warning message that
+>says:
+>
+>Warning message:
+>In rma.mv(b, V, mods = ~factor(variable.id) - 1, random =
+>~factor(variable.id) |  :
+>  Ratio of largest to smallest sampling variance extremely large. May
+>not be able to obtain stable results.
+>
+>When I set the struct ="UN", I get the following error after many
+>hours. I seems that it is stuck in a local maxima after many hours of
+>running.
+>
+>Error in rma.mv(b, V, mods = ~factor(variable.id) - 1, random =
+>~factor(variable.id) |  :
+>  Optimizer (nlminb) did not achieve convergence (convergence = 1).
+>In addition: Warning message:
+>In rma.mv(b, V, mods = ~factor(variable.id) - 1, random =
+>~factor(variable.id) |  :
+>Ratio of largest to smallest sampling variance extremely large. May
+>not be able to obtain stable results.
+>
+>Is there a way to reach convergence? Is there anything I can do about
+>these warning messages?
+>
+>I don't know if it helps, but I will mention the ll, tau2 and rho,
+>just before I got an error of no convergence. (at the bottom of this
+>message).
+>
+>I believe that I need to manually set tau2 and rho, but I'm not sure.
+>
+>Lastly, what is the difference in interpretation if I run the below
+>mentioned meta analysis compared to the one Wolgang recommended me.
+>The difference lies in the random part where I altered it to random =
+>~ 1 | player.id and leaving out the struct = "UN", because that is
+>disregarded either way then.  What I think is that I ran a mixed
+>effects model with only varying intercepts for the pitchers in the
+>below mentioned case.
+>
+>rma.mv(b, V, mods = ~ factor(variable.id) - 1, random = ~ 1 |
+>player.id,  sparse=TRUE, verbose=TRUE)
+>
+>To summarize my questions:
+>Is there a way to reach convergence?
+>Is there anything I can do about these warning messages?
+>What is the difference in interpretation?
+>
+>Any advice on how to proceed is highly appreciated.
+>
+>ll = -18603.6426
+>tau2 = c(0.1508, 0.2016, 0.0593, 0.0729, 0.2317, 0.3542, 0.0452,
+>0.0604, 0.0690, 0.0669, 0.1402, 0.3604, 0.2772, 0.2115, 0.1817,
+>0.1524, 0.1301, 0.3421, 0.6428, 0.3078, 0.3403, 0.2608, 0.1659,
+>0.4243, 0.0119, 0.0363, 0.0862, 0.4163)
+>rho = c(0.2289,-0.1471, 0.0524, 0.1389,-0.0911, 0.3515, 0.1262,
+>0.2239, 0.4314, 0.1383,-0.0725,-0.0780, 0.0833, 0.5362,-0.2861,
+>0.1613,-0.1386,-0.3373, 0.0174,-0.2871, 0.1560, 0.2784, 0.3446,
+>0.1405, 0.4257, 0.5349, 0.0060,-0.1630, 0.1319, 0.2658, 0.7631,
+>0.5231, 0.5883, 0.0441,-0.0861, 0.5200, 0.1121,-0.0348, 0.2969,
+>0.8384, 0.1838, 0.5219,-0.0372, 0.6533, 0.5988,-0.0022, 0.1343,
+>0.4633, 0.1505, 0.8475,-0.3028,-0.0324, 0.4166, 0.6198, 0.1990,
+>0.0920, 0.0044, 0.0830, 0.5364,-0.1806, 0.8285, 0.1668, 0.2280,
+>0.1424, 0.5914,-0.2417, 0.3360,-0.0623,-0.4578,
+>0.0022,-0.0712,-0.0746, 0.5757, 0.1784,-0.1073, 0.0367,-0.1341,
+>0.0013, 0.0931, 0.3820, 0.1053, 0.0035, 0.1518, 0.1013,-0.0153,
+>0.4991, 0.1533, 0.2000, 0.1243, 0.2846, 0.2767,
+>0.3803,-0.0541,-0.1176, 0.3366, 0.1470, 0.0853, 0.6318, 0.3464,
+>0.2588, 0.3308, 0.1981, 0.1800, 0.7962, 0.2815, 0.1303, 0.4582,
+>0.1903, 0.2537, 0.3107, 0.2717,-0.1092, 0.7615, 0.3814, 0.5234,
+>0.1995, 0.4969, 0.1606, 0.8527, 0.2849, 0.1483, 0.1083, 0.2908,
+>0.2007, 0.7324,-0.1987, 0.2675, 0.4506, 0.5507, 0.2096,
+>0.8548,-0.1065, 0.2166, 0.2160, 0.5937, 0.2572, 0.2003, 0.0453,
+>0.0985, 0.5423, 0.0211, 0.6948, 0.0843, 0.5098, 0.2643,
+>0.7222,-0.1023, 0.8114, 0.2588, 0.5064, 0.3885, 0.7213, 0.0550,
+>0.5369,-0.0114,-0.3025,-0.1885,-0.0535,-0.3893,-0.0170,-0.0777,-0.1449,-
+>0.2225,-0.1658,-0.2592,
+>0.3576,-0.0914, 0.0188,-0.2216,-0.2069,-0.2428, 0.2988, 0.1031,
+>0.1030, 0.1722, 0.0957, 0.3964,-0.1560, 0.1722, 0.0907, 0.2357,
+>0.0104, 0.2482,-0.0033, 0.5061, 0.0755, 0.4075,-0.0022, 0.3639,
+>0.0933, 0.5728, 0.2217,-0.1232, 0.1043, 0.1923, 0.1117, 0.2038,
+>0.3263, 0.0959, 0.1589, 0.0522, 0.2504, 0.6467, 0.5219, 0.5852,
+>0.4965, 0.3067, 0.5289, 0.2853, 0.2642,-0.0712, 0.3174,
+>0.0415,-0.0727, 0.0858, 0.1702,-0.1773, 0.3730,-0.0070, 0.0960,
+>0.0545, 0.3180,-0.1435, 0.7252,-0.0970, 0.6729,-0.0139,
+>0.3325,-0.2098, 0.5342, 0.0148, 0.3279, 0.1504,-0.0100, 0.1517,
+>0.4155, 0.1276, 0.3376, 0.3259, 0.1824, 0.1891, 0.3813, 0.1976,
+>0.5315, 0.3752, 0.6874, 0.4051, 0.6222, 0.3945, 0.0516, 0.1515,
+>0.7049,-0.0276,-0.0703, 0.1794, 0.0877, 0.1596, 0.1051,
+>0.3875,-0.2280, 0.4786, 0.1099, 0.3915,-0.0411, 0.5162,-0.0749,
+>0.5694,-0.0772, 0.7401,-0.1371, 0.6767,-0.2185, 0.3935, 0.1458,
+>0.7784, 0.0420,-0.2098,-0.4941, 0.1300, 0.2519, 0.0660,-0.0708,
+>0.2505, 0.0839, 0.1530, 0.2263, 0.1785,-0.1884, 0.0688,-0.4143,
+>0.2752,-0.2915, 0.2570,-0.0885,-0.3592,-0.4473,-0.3541,-0.4311,
+>0.0270,-0.2614,-0.1877,-0.2318, 0.0422, 0.0571,
+>0.0623,-0.0238,-0.0887, 0.1438,-0.0286, 0.0653,
+>0.0626,-0.0020,-0.0627,-0.0744,-0.0528,-0.0138, 0.0122,
+>0.0434,-0.2359,-0.2191,-0.2303, 0.2720,-0.1875, 0.3434,
+>0.3613,-0.0998, 0.0538, 0.3671, 0.4282, 0.4665, 0.2392,-0.0677,
+>0.5099, 0.4577, 0.4424, 0.3033, 0.1845, 0.2091, 0.1229, 0.3054,
+>0.2979, 0.3781, 0.3892,-0.3077,-0.0617, 0.1617,-0.0626, 0.3297,
+>0.1311, 0.3860, 0.2505,-0.4281,-0.4427, 0.0005,-0.0658,-0.4593,
+>0.0899,-0.2325,-0.2140,-0.2812, 0.0446,-0.3755, 0.0915,-0.2307,
+>0.1002,-0.3179, 0.0127,-0.5230,-0.0075,-0.1111, 0.1253,-0.3566,
+>0.2783,-0.4834, 0.2381,-0.0100,0.1206,-0.3672)
+
+
+From |o@n@@@||n@@cr|@te@ @end|ng |rom gm@||@com  Wed Nov 25 15:42:41 2020
+From: |o@n@@@||n@@cr|@te@ @end|ng |rom gm@||@com (Ioana Cristea)
+Date: Wed, 25 Nov 2020 15:42:41 +0100
+Subject: [R-meta] Subgroup analysis with RVE
+Message-ID: <CAL_hygRtC9+O-gEwznkEeq5LuZsXFb9+7VtU7GegjbWDnM3eiA@mail.gmail.com>
+
+Dear all
+I am running a meta-analysis with robust variance estimation (RVE) and my
+focus is on a categorical variable (a risk of bias domain variable, coded
+dichotomously, high vs low, in the database "0" for low risk and "1" for
+high risk). I estimated effects in the high and low subgroup separately,
+each in an intercept only model. I also ran the RVE model estimating the
+between-study effect of covariates, including my predictor (which is a
+between study variable) as a covariate (it was not significant). I think a
+big problem is that the two subgroups delineated by the categorical
+variable are very uneven in terms of the information contained (one has 45
+effect sizes, one 13) and in my view a test of significance for differences
+between them is not useful.
+One of my co-authors would also like us to run a subgroup analysis. I am
+not sure how to do that, if it is possible with RVE and if it adds anything
+to the model estimating between-study covariates, which I already ran.
+Thank you!
+Ioana
+
+-- 
+Ioana-Alina Cristea, Ph.D.
+Assistant Professor
+Department of Brain and Behavioral Sciences
+University of Pavia, Piazza Botta 11, 27100 Pavia, Italy
+
+Research affiliate
+METRICS (Meta-research Innovation Center at Stanford)
+Stanford University, California, USA
+Editorial Advisory Board Lancet Psychiatry
+<https://www.thelancet.com/journals/lanpsy/home>
+International Editorial Board BJPsych Open
+<https://www.cambridge.org/core/journals/bjpsych-open>
+
+ORCid: http://orcid.org/0000-0002-9854-7076
+Publons: https://publons.com/author/1196647/ioana-alina-cristea#profile
+Researchgate: https://www.researchgate.net/profile/Ioana_Cristea
+Twitter: https://twitter.com/IoanaA_Cristea
+
+	[[alternative HTML version deleted]]
+
+

@@ -1,0 +1,654 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2022-10",
+  "messages": [
+    {
+      "id": "msg-47726029f5f9",
+      "message_id": "<1B407A95-EA93-4CB1-A0E8-DE77DB128D9E@zoology.ubc.ca>",
+      "from_name": "Margaret Slein",
+      "from_email_hash": "68f28a2f79a17d0928b299e183928e5f749d5f0e50fe3f03d33ec6e6c490a7ff",
+      "date": "2022-10-01T23:14:05-07:00",
+      "subject": "[R-meta]  Questions about model averaging with complex multilevel meta-analytic model",
+      "subject_clean": "[R-meta]  Questions about model averaging with complex multilevel meta-analytic model",
+      "in_reply_to": "<e6b26202f10947559d14fe43fb3c0aa8@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<2C600F8E-8015-4E14-86A9-1BED0AE2304A@zoology.ubc.ca>",
+        "<e195e437b3de42fca27f53776936e542@UM-MAIL3214.unimaas.nl>",
+        "<129233CE-6042-4210-B275-648300C5A777@zoology.ubc.ca>",
+        "<b4d17e7786824cdab38f1ec7b1e0f35c@UM-MAIL3214.unimaas.nl>",
+        "<71F36F59-45D4-4AF9-968A-1FD2CFCD3125@zoology.ubc.ca>",
+        "<e6b26202f10947559d14fe43fb3c0aa8@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "1. Tried the example you provided, model.avg did not produce the ?subscript out of bounds? error, but still didn?t yield model averaged coefficient estimates? This was all that was produced in the model.avg output:\n\nModel-averaged coefficients:  \n(full average) \n     Estimate Std. Error z value Pr(>|z|)\n \n(conditional average) \n     Estimate Std. Error z value Pr(>|z|)\nStandard errors cannot be calculated because no component models provide them\n\n*However, if I run just the model.avg(res2) without the summary(), that still yields the same ?subscript out of bounds? error.\n\n2. I tried a simpler version with my own model (just 1 or 2 moderators) and it still yields the same ?subscript out of bounds error? with just model.avg and the summary function as well.\n\n\nIs there a critical point where meta-analytic models do not work well with model averaging in MuMIn?\n\nThank you for your assistance in troubleshooting this.\n\n-m\n\n<*)))><>  <*)))><>   <*)))><>  <*)))><>  \n\nMaggie Slein (she/her/hers)\nPhD Student, O?Connor Lab\nDepartment of Zoology\nUnceded x?m??k??y??m (Musqueam) territory\nUniversity of British Columbia\n\n\n\n\n\n\n\n\n> On Sep 29, 2022, at 2:25 AM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n> \n> Troubleshooting this remotely is difficult.\n> \n> Does this example run?\n> \n> https://gist.github.com/wviechtb/891483eea79da21d057e60fd1e28856b\n> \n> If so, then this is a bit of a head-scratcher given that there is nothing fundamentally different about your model. It just has a lot more fixed effects (and a slightly simpler random effects structure).\n> \n> Maybe start by simplifying the 'mods' part. First try with just 2 or 3 of the variables and see if that works. If the problem only arises when adding more predictors, then this could be a problem with MuMIn. But first, you have to narrow down where the problem is coming from.\n> \n> Best,\n> Wolfgang\n> \n>> -----Original Message-----\n>> From: Margaret Slein [mailto:maslein at zoology.ubc.ca]\n>> Sent: Wednesday, 28 September, 2022 19:56\n>> To: Viechtbauer, Wolfgang (NP)\n>> Cc: r-sig-meta-analysis at r-project.org\n>> Subject: Re: [R-meta] Questions about model averaging with complex multilevel\n>> meta-analytic model\n>> \n>> Hi Wolfgang,\n>> \n>> Yes, very large dataset (1700+). Thank you for the advice on the publication\n>> bias, I will certainly take this into account.\n>> \n>> Related to my original question, I have now fit all my candidate models with ML\n>> rather than REML, which allows me to use model.sel() in the MuMIn package,\n>> however, I am still unable to use the model.avg() function without the error\n>> message \"Error in x$coefficients[, 1L] : subscript out of bounds?. What would\n>> cause this error and how can I model average with rma.mv objects and model.avg()\n>> in the MuMIn package.\n>> \n>> Many thanks,\n>> Maggie\n>> \n>> <*)))><>  <*)))><>   <*)))><>  <*)))><>\n>> \n>> Maggie Slein (she/her/hers)\n>> PhD Student, O?Connor Lab\n>> Department of Zoology\n>> Unceded x?m??k??y??m (Musqueam) territory\n>> University of British Columbia\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "1. Tried the example you provided, model.avg did not produce the ?subscript out of bounds? error, but still didn?t yield model averaged coefficient estimates? This was all that was produced in the mod",
+      "thread_id": "thread-47726029f5f9",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-5f6f5c60be09",
+      "message_id": "<9e90345796fa4118854e32d188520625@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-10-02T10:33:57Z",
+      "subject": "[R-meta]  Questions about model averaging with complex multilevel meta-analytic model",
+      "subject_clean": "[R-meta]  Questions about model averaging with complex multilevel meta-analytic model",
+      "in_reply_to": "<1B407A95-EA93-4CB1-A0E8-DE77DB128D9E@zoology.ubc.ca>",
+      "references": [
+        "<2C600F8E-8015-4E14-86A9-1BED0AE2304A@zoology.ubc.ca>",
+        "<e195e437b3de42fca27f53776936e542@UM-MAIL3214.unimaas.nl>",
+        "<129233CE-6042-4210-B275-648300C5A777@zoology.ubc.ca>",
+        "<b4d17e7786824cdab38f1ec7b1e0f35c@UM-MAIL3214.unimaas.nl>",
+        "<71F36F59-45D4-4AF9-968A-1FD2CFCD3125@zoology.ubc.ca>",
+        "<e6b26202f10947559d14fe43fb3c0aa8@UM-MAIL3214.unimaas.nl>",
+        "<1B407A95-EA93-4CB1-A0E8-DE77DB128D9E@zoology.ubc.ca>"
+      ],
+      "body_plain": "You may be misinterpreting what this exercise is telling you. If the example doesn't run properly on your end, while it does run properly on my end, then this is suggesting that there is an issue with your setup, not that there is a point where MuMIn doesn't work well.\n\nIf I do not run the 'eval(metafor:::.MuMIn)' line, then indeed I get the 'subscript out of bounds' error, plus lots of 'Extra argument ('formula') disregarded' warning messages when running dredge().\n\nSo did you actually run the 'eval(metafor:::.MuMIn)' line before running dredge()? And if you did, did this work or did you get an error message? Could you also post the output from running sessionInfo()?\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: Margaret Slein [mailto:maslein at zoology.ubc.ca]\n>Sent: Sunday, 02 October, 2022 8:14\n>To: Viechtbauer, Wolfgang (NP)\n>Cc: r-sig-meta-analysis at r-project.org\n>Subject: Re: [R-meta] Questions about model averaging with complex multilevel\n>meta-analytic model\n>\n>1. Tried the example you provided, model.avg did not produce the ?subscript out\n>of bounds? error, but still didn?t yield model averaged coefficient estimates?\n>This was all that was produced in the model.avg output:\n>\n>Model-averaged coefficients:\n>(full average)\n>? ? ?Estimate Std. Error z value Pr(>|z|)\n>\n>(conditional average)\n>? ? ?Estimate Std. Error z value Pr(>|z|)\n>Standard errors cannot be calculated because no component models provide them\n>\n>*However, if I run just the model.avg(res2) without the summary(), that still\n>yields the same ?subscript out of bounds? error.\n>\n>2. I tried a simpler version with my own model (just 1 or 2 moderators) and it\n>still yields the same ?subscript out of bounds error? with just model.avg and the\n>summary function as well.\n>\n>Is there a critical point where meta-analytic models do not work well with model\n>averaging in MuMIn?\n>\n>Thank you for your assistance in troubleshooting this.\n>\n>-m\n>\n><*)))><> ?<*)))><> ? <*)))><> ?<*)))><>\n>\n>Maggie Slein (she/her/hers)\n>PhD Student, O?Connor Lab\n>Department of Zoology\n>Unceded x?m??k??y??m (Musqueam)?territory\n>University of British Columbia\n>\n>On Sep 29, 2022, at 2:25 AM, Viechtbauer, Wolfgang (NP)\n><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n>\n>Troubleshooting this remotely is difficult.\n>\n>Does this example run?\n>\n>https://gist.github.com/wviechtb/891483eea79da21d057e60fd1e28856b\n>\n>If so, then this is a bit of a head-scratcher given that there is nothing\n>fundamentally different about your model. It just has a lot more fixed effects\n>(and a slightly simpler random effects structure).\n>\n>Maybe start by simplifying the 'mods' part. First try with just 2 or 3 of the\n>variables and see if that works. If the problem only arises when adding more\n>predictors, then this could be a problem with MuMIn. But first, you have to\n>narrow down where the problem is coming from.\n>\n>Best,\n>Wolfgang\n>\n>-----Original Message-----\n>From: Margaret Slein [mailto:maslein at zoology.ubc.ca]\n>Sent: Wednesday, 28 September, 2022 19:56\n>To: Viechtbauer, Wolfgang (NP)\n>Cc: r-sig-meta-analysis at r-project.org\n>Subject: Re: [R-meta] Questions about model averaging with complex multilevel\n>meta-analytic model\n>\n>Hi Wolfgang,\n>\n>Yes, very large dataset (1700+). Thank you for the advice on the publication\n>bias, I will certainly take this into account.\n>\n>Related to my original question, I have now fit all my candidate models with ML\n>rather than REML, which allows me to use model.sel() in the MuMIn package,\n>however, I am still unable to use the model.avg() function without the error\n>message \"Error in x$coefficients[, 1L] : subscript out of bounds?. What would\n>cause this error and how can I model average with rma.mv objects and model.avg()\n>in the MuMIn package.\n>\n>Many thanks,\n>Maggie\n>\n><*)))><> ?<*)))><> ? <*)))><> ?<*)))><>\n>\n>Maggie Slein (she/her/hers)\n>PhD Student, O?Connor Lab\n>Department of Zoology\n>Unceded x?m??k??y??m (Musqueam)?territory\n>University of British Columbia",
+      "body_snippet": "You may be misinterpreting what this exercise is telling you. If the example doesn't run properly on your end, while it does run properly on my end, then this is suggesting that there is an issue with",
+      "thread_id": "thread-47726029f5f9",
+      "thread_depth": 1,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-45667cbca915",
+      "message_id": "<a515b5d38e3d42799034e2a848815fed@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-10-02T10:49:14Z",
+      "subject": "[R-meta]  phylogenetic information in both moderator and random part of rma.mv?",
+      "subject_clean": "[R-meta]  phylogenetic information in both moderator and random part of rma.mv?",
+      "in_reply_to": "<OL1P279MB0130FAC674961F5C2AFB9FB89E569@OL1P279MB0130.NORP279.PROD.OUTLOOK.COM>",
+      "references": [
+        "<OL1P279MB0130256B409CF2397263847A9E549@OL1P279MB0130.NORP279.PROD.OUTLOOK.COM>",
+        "<2a63b099f0614d92bf69f924eca9c8da@UM-MAIL3214.unimaas.nl>",
+        "<OL1P279MB013013903C8368EA92D524E09E569@OL1P279MB0130.NORP279.PROD.OUTLOOK.COM>",
+        "<55116a2ec2b9444ab3da7ee1ec0608ce@UM-MAIL3214.unimaas.nl>",
+        "<OL1P279MB0130FAC674961F5C2AFB9FB89E569@OL1P279MB0130.NORP279.PROD.OUTLOOK.COM>"
+      ],
+      "body_plain": "1|id is an 'observation-level random effect'. This is one of the core elements of a meta-analysis to model heterogeneity (i.e., variance) in the underlying true outcomes. In a standard linear regression-type model (or mixed-effects model), it is not possible to add such a random effect, because it is completely confounded with the error term (the error term in a standard regression model *is* an observation-level random effect). However, in meta-analytic models, it is possible to add such a random effect, because the model does not contain a separate error term -- the sampling variances of the errors are fed into the model as known constants.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: Sigurd Einum [mailto:sigurd.einum at ntnu.no]\n>Sent: Friday, 30 September, 2022 13:06\n>To: Viechtbauer, Wolfgang (NP); r-sig-meta-analysis at r-project.org\n>Subject: RE: phylogenetic information in both moderator and random part of\n>rma.mv?\n>\n>There are (usually) several rows (observations of Y and associated sampling\n>variance) for each species, as well as for each study. Hence the random structure\n>~ 1|study, ~ 1|species.\n>\n>I tried adding the id variable and the 1|id random structure as you recommended\n>(model estimates of class parameters remain basically unaltered, whereas AICc\n>drops a lot), but I don't really understand what this achieves, and I have never\n>used or encountered the use of such a structure with each observed data point\n>being assigned a separate random effect in mixed models (lme/lmer) previously. Is\n>it somehow related to the weight= varIdent in lme, which allows for different\n>random effects for different groups of observations? But in this case the model\n>allows for different random effects for each single observation? It is probably\n>beyond me to understand this (I'm not a statistician), which is fine, but if\n>possible I would like to try, so if you can point me to a resource where I could\n>read up on this that would be great. I read through this\n>https://wviechtb.github.io/metafor/reference/rma.mv.html but still not sure I got\n>it.\n>\n>Thanks again for all your helpful advice!\n>Sigurd\n>\n>>-----Original Message-----\n>>From: Viechtbauer, Wolfgang (NP)\n>><wolfgang.viechtbauer at maastrichtuniversity.nl>\n>>Sent: Friday, September 30, 2022 11:45 AM\n>>To: r-sig-meta-analysis at r-project.org\n>>Cc: Sigurd Einum <sigurd.einum at ntnu.no>\n>>Subject: RE: phylogenetic information in both moderator and random part of\n>>rma.mv?\n>>\n>>Sounds reasonable.\n>>\n>>One additional thing: I don't know what your data structure actually looks like.\n>Is\n>>each row a different study? Or is each row a different species? If not, then I\n>>would strongly suggest to include '~ 1 | id' where\n>>\n>>Final.data$id <- 1:nrow(Final.data)\n>>\n>>as a random effect (in both mod1 and mod2). Otherwise you would be assuming\n>>homogeneity of true outcomes within studies/species, which is a strong\n>>assumption.\n>>\n>>Best,\n>>Wolfgang",
+      "body_snippet": "1|id is an 'observation-level random effect'. This is one of the core elements of a meta-analysis to model heterogeneity (i.e., variance) in the underlying true outcomes. In a standard linear regressi",
+      "thread_id": "thread-45667cbca915",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-fcc629e66cd5",
+      "message_id": "<596DD6A8-5C4D-426C-9C82-90258D5E0620@zoology.ubc.ca>",
+      "from_name": "Margaret Slein",
+      "from_email_hash": "68f28a2f79a17d0928b299e183928e5f749d5f0e50fe3f03d33ec6e6c490a7ff",
+      "date": "2022-10-03T01:42:19-07:00",
+      "subject": "[R-meta]  Questions about model averaging with complex multilevel meta-analytic model",
+      "subject_clean": "[R-meta]  Questions about model averaging with complex multilevel meta-analytic model",
+      "in_reply_to": "<9e90345796fa4118854e32d188520625@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<2C600F8E-8015-4E14-86A9-1BED0AE2304A@zoology.ubc.ca>",
+        "<e195e437b3de42fca27f53776936e542@UM-MAIL3214.unimaas.nl>",
+        "<129233CE-6042-4210-B275-648300C5A777@zoology.ubc.ca>",
+        "<b4d17e7786824cdab38f1ec7b1e0f35c@UM-MAIL3214.unimaas.nl>",
+        "<71F36F59-45D4-4AF9-968A-1FD2CFCD3125@zoology.ubc.ca>",
+        "<e6b26202f10947559d14fe43fb3c0aa8@UM-MAIL3214.unimaas.nl>",
+        "<1B407A95-EA93-4CB1-A0E8-DE77DB128D9E@zoology.ubc.ca>",
+        "<9e90345796fa4118854e32d188520625@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "1. Amazing, yes the \"eval(metafor:::.MuMIn? did allow me to run your example and get model-averaged coefficient estimates! Wahoo!!\n\nHowever, when I tried running a dredge on my own model, after 10+ hours it had still not finished running.\n\nI?m wondering if this issue is because I am not model dredging, but using different model combinations by hand and trying to average those?\n\n\n2. Here is the session info:\n\n> sessionInfo()\nR version 4.2.1 (2022-06-23)\nPlatform: x86_64-apple-darwin17.0 (64-bit)\nRunning under: macOS Monterey 12.4\n\nMatrix products: default\nLAPACK: /Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib\n\nlocale:\n[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8\n\nattached base packages:\n[1] stats     graphics  grDevices utils     datasets  methods   base     \n\nother attached packages:\n [1] AICcmodavg_2.3-1    devtools_2.4.4      usethis_2.1.6       corrplot_0.92       metaAidR_0.0.0.9000 glmulti_1.0.8      \n [7] leaps_3.1           rJava_1.0-6         wesanderson_0.3.6   ape_5.6-2           viridis_0.6.2       viridisLite_0.4.1  \n[13] MuMIn_1.47.1        rotl_3.0.12         patchwork_1.1.2     metafor_3.8-1       metadat_1.2-0       Matrix_1.5-1       \n[19] forcats_0.5.2       stringr_1.4.1       dplyr_1.0.10        purrr_0.3.4         readr_2.1.2         tidyr_1.2.0        \n[25] tibble_3.1.8        ggplot2_3.3.6       tidyverse_1.3.2    \n\nloaded via a namespace (and not attached):\n [1] VGAM_1.1-7          googledrive_2.0.0   colorspace_2.0-3    ellipsis_0.3.2      fs_1.5.2            rstudioapi_0.14    \n [7] remotes_2.4.2       bit64_4.0.5         fansi_1.0.3         lubridate_1.8.0     mathjaxr_1.6-0      xml2_1.3.3         \n[13] splines_4.2.1       cachem_1.0.6        pkgload_1.3.0       jsonlite_1.8.0      broom_1.0.1         dbplyr_2.2.1       \n[19] shiny_1.7.2         rentrez_1.2.3       compiler_4.2.1      httr_1.4.4          backports_1.4.1     assertthat_0.2.1   \n[25] fastmap_1.1.0       gargle_1.2.1        cli_3.3.0           later_1.3.0         htmltools_0.5.3     prettyunits_1.1.1  \n[31] tools_4.2.1         gtable_0.3.1        glue_1.6.2          Rcpp_1.0.9          cellranger_1.1.0    vctrs_0.4.1        \n[37] nlme_3.1-157        ps_1.7.1            rvest_1.0.3         mime_0.12           miniUI_0.1.1.1      lifecycle_1.0.2    \n[43] pacman_0.5.1        XML_3.99-0.10       googlesheets4_1.0.1 MASS_7.3-57         scales_1.2.1        vroom_1.5.7        \n[49] hms_1.1.2           promises_1.2.0.1    parallel_4.2.1      curl_4.3.2          pbapply_1.5-0       memoise_2.0.1      \n[55] gridExtra_2.3       stringi_1.7.8       pkgbuild_1.3.1      rlang_1.0.5         pkgconfig_2.0.3     rncl_0.8.6         \n[61] lattice_0.20-45     htmlwidgets_1.5.4   bit_4.0.4           processx_3.7.0      tidyselect_1.1.2    plyr_1.8.7         \n[67] magrittr_2.0.3      R6_2.5.1            generics_0.1.3      profvis_0.3.7       DBI_1.1.3           pillar_1.8.1       \n[73] haven_2.5.1         withr_2.5.0         survival_3.3-1      modelr_0.1.9        crayon_1.5.1        utf8_1.2.2         \n[79] tzdb_0.3.0          urlchecker_1.0.1    progress_1.2.2      grid_4.2.1          readxl_1.4.1        callr_3.7.2        \n[85] reprex_2.0.2        digest_0.6.29       xtable_1.8-4        httpuv_1.6.6        unmarked_1.2.5      stats4_4.2.1       \n[91] munsell_0.5.0       sessioninfo_1.2.2  \n\n\n\n<*)))><>  <*)))><>   <*)))><>  <*)))><>  \n\nMaggie Slein (she/her/hers)\nPhD Student, O?Connor Lab\nDepartment of Zoology\nUnceded x?m??k??y??m (Musqueam) territory\nUniversity of British Columbia\n\n\n\n\n\n\n\n\n> On Oct 2, 2022, at 3:33 AM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n> \n> sessionInfo()\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "1. Amazing, yes the \"eval(metafor:::.MuMIn? did allow me to run your example and get model-averaged coefficient estimates! Wahoo!!\n\nHowever, when I tried running a dredge on my own model, after 10+ ho",
+      "thread_id": "thread-47726029f5f9",
+      "thread_depth": 2,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-552d6c2b4efb",
+      "message_id": "<b54c102c63a245129d997df044e4ba5a@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-10-03T09:54:00Z",
+      "subject": "[R-meta]  Questions about model averaging with complex multilevel meta-analytic model",
+      "subject_clean": "[R-meta]  Questions about model averaging with complex multilevel meta-analytic model",
+      "in_reply_to": "<596DD6A8-5C4D-426C-9C82-90258D5E0620@zoology.ubc.ca>",
+      "references": [
+        "<2C600F8E-8015-4E14-86A9-1BED0AE2304A@zoology.ubc.ca>",
+        "<e195e437b3de42fca27f53776936e542@UM-MAIL3214.unimaas.nl>",
+        "<129233CE-6042-4210-B275-648300C5A777@zoology.ubc.ca>",
+        "<b4d17e7786824cdab38f1ec7b1e0f35c@UM-MAIL3214.unimaas.nl>",
+        "<71F36F59-45D4-4AF9-968A-1FD2CFCD3125@zoology.ubc.ca>",
+        "<e6b26202f10947559d14fe43fb3c0aa8@UM-MAIL3214.unimaas.nl>",
+        "<1B407A95-EA93-4CB1-A0E8-DE77DB128D9E@zoology.ubc.ca>",
+        "<9e90345796fa4118854e32d188520625@UM-MAIL3214.unimaas.nl>",
+        "<596DD6A8-5C4D-426C-9C82-90258D5E0620@zoology.ubc.ca>"
+      ],
+      "body_plain": "Happy to hear that. Please follow instructions carefully and don't just skip parts of the code.\n\nI suspect dredge() is trying to fit a very large number of models. This could take a very long time. To figure out how many models there are, you can run:\n\nres <- dredge(full_mod, evaluate=FALSE)\nlength(res)\n\nIf you then still want to go through with this, you might need to consider using parallelization (if you have access to a workstation with many cores or a cluster) as described here:\n\nhttps://gist.github.com/wviechtb/891483eea79da21d057e60fd1e28856b\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: Margaret Slein [mailto:maslein at zoology.ubc.ca]\n>Sent: Monday, 03 October, 2022 10:42\n>To: Viechtbauer, Wolfgang (NP)\n>Cc: r-sig-meta-analysis at r-project.org\n>Subject: Re: [R-meta] Questions about model averaging with complex multilevel\n>meta-analytic model\n>\n>1. Amazing, yes the \"eval(metafor:::.MuMIn? did allow me to run your example and\n>get model-averaged coefficient estimates! Wahoo!!\n>\n>However, when I tried running a dredge on my own model, after 10+ hours it had\n>still not finished running.\n>\n>I?m wondering if this issue is because I am not model dredging, but using\n>different model combinations by hand and trying to average those?\n>\n>2. Here is the session info:\n>\n>> sessionInfo()\n>R version 4.2.1 (2022-06-23)\n>Platform: x86_64-apple-darwin17.0 (64-bit)\n>Running under: macOS Monterey 12.4\n>\n>Matrix products: default\n>LAPACK:\n>/Library/Frameworks/R.framework/Versions/4.2/Resources/lib/libRlapack.dylib\n>\n>locale:\n>[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8\n>\n>attached base packages:\n>[1] stats ? ? graphics ?grDevices utils ? ? datasets ?methods ? base\n>\n>other attached packages:\n>?[1] AICcmodavg_2.3-\n>1 ? ?devtools_2.4.4 ? ? ?usethis_2.1.6 ? ? ? corrplot_0.92 ? ? ? metaAidR_0.0.0.9\n>000 glmulti_1.0.8\n>?[7] leaps_3.1 ? ? ? ? ? rJava_1.0-6 ? ? ? ? wesanderson_0.3.6 ? ape_5.6-\n>2 ? ? ? ? ? viridis_0.6.2 ? ? ? viridisLite_0.4.1\n>[13] MuMIn_1.47.1 ? ? ? ?rotl_3.0.12 ? ? ? ? patchwork_1.1.2 ? ? metafor_3.8-\n>1 ? ? ? metadat_1.2-0 ? ? ? Matrix_1.5-1\n>[19]\n>forcats_0.5.2 ? ? ? stringr_1.4.1 ? ? ? dplyr_1.0.10 ? ? ? ?purrr_0.3.4 ? ? ? ? r\n>eadr_2.1.2 ? ? ? ? tidyr_1.2.0\n>[25] tibble_3.1.8 ? ? ? ?ggplot2_3.3.6 ? ? ? tidyverse_1.3.2\n>\n>loaded via a namespace (and not attached):\n>?[1] VGAM_1.1-7 ? ? ? ? ?googledrive_2.0.0 ? colorspace_2.0-\n>3 ? ?ellipsis_0.3.2 ? ? ?fs_1.5.2 ? ? ? ? ? ?rstudioapi_0.14\n>?[7]\n>remotes_2.4.2 ? ? ? bit64_4.0.5 ? ? ? ? fansi_1.0.3 ? ? ? ? lubridate_1.8.0 ? ? m\n>athjaxr_1.6-0 ? ? ?xml2_1.3.3\n>[13]\n>splines_4.2.1 ? ? ? cachem_1.0.6 ? ? ? ?pkgload_1.3.0 ? ? ? jsonlite_1.8.0 ? ? ?b\n>room_1.0.1 ? ? ? ? dbplyr_2.2.1\n>[19]\n>shiny_1.7.2 ? ? ? ? rentrez_1.2.3 ? ? ? compiler_4.2.1 ? ? ?httr_1.4.4 ? ? ? ? ?b\n>ackports_1.4.1 ? ? assertthat_0.2.1\n>[25]\n>fastmap_1.1.0 ? ? ? gargle_1.2.1 ? ? ? ?cli_3.3.0 ? ? ? ? ? later_1.3.0 ? ? ? ? h\n>tmltools_0.5.3 ? ? prettyunits_1.1.1\n>[31]\n>tools_4.2.1 ? ? ? ? gtable_0.3.1 ? ? ? ?glue_1.6.2 ? ? ? ? ?Rcpp_1.0.9 ? ? ? ? ?c\n>ellranger_1.1.0 ? ?vctrs_0.4.1\n>[37] nlme_3.1-\n>157 ? ? ? ?ps_1.7.1 ? ? ? ? ? ?rvest_1.0.3 ? ? ? ? mime_0.12 ? ? ? ? ? miniUI_0.1\n>.1.1 ? ? ?lifecycle_1.0.2\n>[43] pacman_0.5.1 ? ? ? ?XML_3.99-0.10 ? ? ? googlesheets4_1.0.1 MASS_7.3-\n>57 ? ? ? ? scales_1.2.1 ? ? ? ?vroom_1.5.7\n>[49]\n>hms_1.1.2 ? ? ? ? ? promises_1.2.0.1 ? ?parallel_4.2.1 ? ? ?curl_4.3.2 ? ? ? ? ?p\n>bapply_1.5-0 ? ? ? memoise_2.0.1\n>[55]\n>gridExtra_2.3 ? ? ? stringi_1.7.8 ? ? ? pkgbuild_1.3.1 ? ? ?rlang_1.0.5 ? ? ? ? p\n>kgconfig_2.0.3 ? ? rncl_0.8.6\n>[61] lattice_0.20-\n>45 ? ? htmlwidgets_1.5.4 ? bit_4.0.4 ? ? ? ? ? processx_3.7.0 ? ? ?tidyselect_1.1\n>.2 ? ?plyr_1.8.7\n>[67]\n>magrittr_2.0.3 ? ? ?R6_2.5.1 ? ? ? ? ? ?generics_0.1.3 ? ? ?profvis_0.3.7 ? ? ? D\n>BI_1.1.3 ? ? ? ? ? pillar_1.8.1\n>[73] haven_2.5.1 ? ? ? ? withr_2.5.0 ? ? ? ? survival_3.3-\n>1 ? ? ?modelr_0.1.9 ? ? ? ?crayon_1.5.1 ? ? ? ?utf8_1.2.2\n>[79]\n>tzdb_0.3.0 ? ? ? ? ?urlchecker_1.0.1 ? ?progress_1.2.2 ? ? ?grid_4.2.1 ? ? ? ? ?r\n>eadxl_1.4.1 ? ? ? ?callr_3.7.2\n>[85] reprex_2.0.2 ? ? ? ?digest_0.6.29 ? ? ? xtable_1.8-\n>4 ? ? ? ?httpuv_1.6.6 ? ? ? ?unmarked_1.2.5 ? ? ?stats4_4.2.1\n>[91] munsell_0.5.0 ? ? ? sessioninfo_1.2.2\n>\n>\n><*)))><> ?<*)))><> ? <*)))><> ?<*)))><>\n>\n>Maggie Slein (she/her/hers)\n>PhD Student, O?Connor Lab\n>Department of Zoology\n>Unceded x?m??k??y??m (Musqueam)?territory\n>University of British Columbia",
+      "body_snippet": "Happy to hear that. Please follow instructions carefully and don't just skip parts of the code.\n\nI suspect dredge() is trying to fit a very large number of models. This could take a very long time. To",
+      "thread_id": "thread-47726029f5f9",
+      "thread_depth": 3,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-91ccd099e87d",
+      "message_id": "<C5D80854-26A5-4712-A0DF-EE0533B9D4F9@latrobe.edu.au>",
+      "from_name": "Mick Girdwood",
+      "from_email_hash": "4f9ba839f493b7cf3e0c112874eddc342a79a214819a33c23e831719900ad619",
+      "date": "2022-10-04T01:01:12Z",
+      "subject": "[R-meta] Calculation of variance of ratio of means from summary statistics",
+      "subject_clean": "[R-meta] Calculation of variance of ratio of means from summary statistics",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Thank you for this message board, it?s always so helpful, and sorry for the slightly long question. I am planning a meta-analysis where we are using the ratio of means (RoM) effect measure for comparing outcomes from two sides of the body (i.e. the affected side and unaffected side). E.g. we are looking at a particular muscle strength outcome, this is reported for each side. Most studies we are concerned with will report a mean and sd for each side of the body. We can then use these for the RoM calculations.  In some cases authors will report only a 'limb symmetry index ' - e.g. for each participant the LSI = the affected / non-affected side. These are then summarised and reported for the group as the mean(LSI). In these cases we cannot compute the RoM effect measure, as we don?t have the summaries for each side. My issue is about how to incorporate the limb symmetry index (LSI) data into the meta-analysis.\nI am aware that the RoM is essentially mean[affected] / mean[non-affected], which is slightly different to LSI - mean(affected/nonaffected). The LSI is a good almost perfect approximation of the RoM (I have checked this with data where studies reported both). So this is easy to just use log(LSI) to get an estimate for yi.\nMy issue is around how to determine a precision parameter (vi sei etc) i.e. how can I estimate the variance from the LSI standard deviation provided. I am struggling with this especially as RoM meta-analysis is performed with log transformation, so am not sure how to use the arithmetic SD in this situation. I have a large number of studies where only the LSI mean and SD are provide (and so cannot calculate the RoM from the data for each side). I have done an extensive amount of reading and haven't been able to find anything that works well.\nI first tried converting the SD to confidence intervals, then log transforming these to use, however they overestimate the precision by about a factor of ~2, a problem with using inverse variance methods. I also tried methods from this paper by Quan 2003 (equation 5) https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.1525 however this majorly underestimates the precision.\nThe best solution I've found was by accident - I was looking at using the formula for sample variance SD^2 / (n-1) and accidentally forgot to square the SD in my code, so in effect my formula became sd / (n-1). This was very good/comparable when comparing to the CIs generated by RoM calculations. However this is an obvious accident so I don?t have any justification to proceed with this\nMy questions are How can I use the LSI data and convert these (specifically the variance) for use in analyses In the case of my accidental approach SD/(n-1) - why does this work well? Is there any justification I could call on to use this? Or is it just a major co-incidence that it provides a good estimation? I have a dataset of n=40 on which I tested this on and all were very reasonable approximations. Thank you for your help!\nMick Girdwood\nLa Trobe University | Australia\n\nn.b. I have posted a similar question here - https://stats.stackexchange.com/questions/590611/use-of-ratio-of-means-effect-measure-and-estimation-of-variance-from-mean-of-rat\n\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Thank you for this message board, it?s always so helpful, and sorry for the slightly long question. I am planning a meta-analysis where we are using the ratio of means (RoM) effect measure for compari",
+      "thread_id": "thread-91ccd099e87d",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-210931288ede",
+      "message_id": "<MEAPR01MB54157F00EDD3A7853FBBDF559D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>",
+      "from_name": "Yefeng Yang",
+      "from_email_hash": "87784e4281c6fae4cb30e226216b5b798948e97ac16214150b985d937dd8fb67",
+      "date": "2022-10-04T02:40:42Z",
+      "subject": "[R-meta] terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "subject_clean": "[R-meta] terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi all (especially Wofgang & James),\n\nMy questions: I am confused about whether should we call a multilevel model with a VCV matrix accounting for sampling variances still a multilevel model OR should we call it a multivariate model\n\nI elaborate on my questions as follows:\n\nFor statistically dependent effect sizes, we usually have two[1] 'typical' models to deal with.\n\n\n  1.  For dependence due to multilevel/nested structure (one study contributes more than one effect size estimate), we usually use a multilevel model (with a nested random effect structure) to account for the non-independence if there are 'overlapping individuals' (no correlated sampling errors).\n  2.\n  3.  For dependence due to multivariate structure (one study contributes more than one response variable or outcome), we usually use a multivariate model (with a correlated random effect structure) to account for the non-independence. Also, we should use a variance-covariance matrix to account for the independent sampling errors (either guessing within-study correlation or using formulas).\n\n[1] robust variance estimation (RVE) is also a good approach to dealing with dependent effect sizes in terms of estimating fixed effects (overall effect intercept beta0 or moderator effect slope beta1).  The combination of the RVE with either multilevel or multivariate is also an elegant approach. But RVE is not the focus of my question.\n\nHowever, sometimes we want to use the multilevel model to deal with all types of independence. By doing so, we reformulate the multivariate structure of the data as multilevel/nested data. I mean we: (1) use dummy codes to denote different types of response variables/outcomes, (2) impute or calculate a VCV matrix, and (3) fit a multilevel model.  Through (1) - (3) steps, I account for all types of independence: the correlations between true outcomes and sampling errors. Not 100% sure, but this approach should work well.\n\nSo my question comes: I use a multilevel model but I also use a VCV matrix. What will a multilevel model with a VCV be called? Still a multilevel model, but a multilevel model assumes independent sampling errors (but we have a VCV in the model). Should it be a multivariate model, but we did not account for the correlated random effects only account for the correlated sampling errors? Hope my question is clear.\n\nBest,\n\nYefeng Yang PhD\nResearch Associate\nUNSW, Sydney\n\n\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi all (especially Wofgang & James),\n\nMy questions: I am confused about whether should we call a multilevel model with a VCV matrix accounting for sampling variances still a multilevel model OR should",
+      "thread_id": "thread-210931288ede",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-7f55519be8bd",
+      "message_id": "<9d53b50f5dab4ea88f880eb910c85d6a@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-10-04T07:36:02Z",
+      "subject": "[R-meta] Calculation of variance of ratio of means from summary statistics",
+      "subject_clean": "[R-meta] Calculation of variance of ratio of means from summary statistics",
+      "in_reply_to": "<C5D80854-26A5-4712-A0DF-EE0533B9D4F9@latrobe.edu.au>",
+      "references": [
+        "<C5D80854-26A5-4712-A0DF-EE0533B9D4F9@latrobe.edu.au>"
+      ],
+      "body_plain": "Dear Mick,\n\nSo for some studies you have means and SDs for each side and can compute the (log-transformed) ratio of means (RoM) and corresponding sampling variances with:\n\nyi = log(m1/m2i)\nvi = sd1i^2/(ni*m1i^2) + sd2i^2/(ni*m2i^2) - 2*ri*sd1i*sd2i/(m1i*m2i*ni)\n\nwhere ni refers to the number of individuals. Note that you have paired data, so the equation for computing the sampling variance must incorporate the correlation between the measurements for the two sides (ri). This is measure=\"ROMC\" in escalc(). If you do not know this correlation (because presumably it is not reported), then you could try to make an educated guestimate.\n\nBut for other studies, you have the mean of the ratios (MoR), mean(x1i/x2i), and I assume the corresponding standard deviation of the ratios (SDoR), sd(x1i/x2i)).\n\nTo what extent MoR approximates RoM depends on how close the true means are to 0. To demonstrate:\n\nx1 <- rnorm(1000000, 10, 1)\nx2 <- rnorm(1000000,  5, 1)\n\nmean(x1/x2)\nmean(x1)/mean(x2)\n\nx1 <- rnorm(1000000, 100, 1)\nx2 <- rnorm(1000000,  50, 1)\n\nmean(x1/x2)\nmean(x1)/mean(x2)\n\nAssuming you are in a situation where the means are far enough away from 0 so that this doesn't matter, then how can we incorporate MoR studies into the meta-analysis? It would be:\n\nyi = log(mean(x1i/x2i))\nvi = sd(x1i/x2i))^2 / (ni * mean(x1i/x2i)^2)\n\nor using the abbreviations above\n\nyi = log(MoR)\nvi = SDoR^2 / (ni * MoR^2)\n\nwhere ni is again the sample size. The vi equation comes from a simple application of the delta method (https://en.wikipedia.org/wiki/Delta_method).\n\nI would recommend to code for each yi value whether it is a (log transformed) RoM or MoR value and examine via a moderator analysis whether there is a systematic difference between the two sets.\n\nP.S.: Thanks for pointing out that this was also posted on Cross Validated.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Mick Girdwood\n>Sent: Tuesday, 04 October, 2022 3:01\n>To: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] Calculation of variance of ratio of means from summary\n>statistics\n>\n>Thank you for this message board, it?s always so helpful, and sorry for the\n>slightly long question. I am planning a meta-analysis where we are using the\n>ratio of means (RoM) effect measure for comparing outcomes from two sides of the\n>body (i.e. the affected side and unaffected side). E.g. we are looking at a\n>particular muscle strength outcome, this is reported for each side. Most studies\n>we are concerned with will report a mean and sd for each side of the body. We can\n>then use these for the RoM calculations.  In some cases authors will report only\n>a 'limb symmetry index ' - e.g. for each participant the LSI = the affected /\n>non-affected side. These are then summarised and reported for the group as the\n>mean(LSI). In these cases we cannot compute the RoM effect measure, as we don?t\n>have the summaries for each side. My issue is about how to incorporate the limb\n>symmetry index (LSI) data into the meta-analysis.\n>I am aware that the RoM is essentially mean[affected] / mean[non-affected], which\n>is slightly different to LSI - mean(affected/nonaffected). The LSI is a good\n>almost perfect approximation of the RoM (I have checked this with data where\n>studies reported both). So this is easy to just use log(LSI) to get an estimate\n>for yi.\n>My issue is around how to determine a precision parameter (vi sei etc) i.e. how\n>can I estimate the variance from the LSI standard deviation provided. I am\n>struggling with this especially as RoM meta-analysis is performed with log\n>transformation, so am not sure how to use the arithmetic SD in this situation. I\n>have a large number of studies where only the LSI mean and SD are provide (and so\n>cannot calculate the RoM from the data for each side). I have done an extensive\n>amount of reading and haven't been able to find anything that works well.\n>I first tried converting the SD to confidence intervals, then log transforming\n>these to use, however they overestimate the precision by about a factor of ~2, a\n>problem with using inverse variance methods. I also tried methods from this paper\n>by Quan 2003 (equation 5)\n>https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.1525 however this majorly\n>underestimates the precision.\n>The best solution I've found was by accident - I was looking at using the formula\n>for sample variance SD^2 / (n-1) and accidentally forgot to square the SD in my\n>code, so in effect my formula became sd / (n-1). This was very good/comparable\n>when comparing to the CIs generated by RoM calculations. However this is an\n>obvious accident so I don?t have any justification to proceed with this\n>My questions are How can I use the LSI data and convert these (specifically the\n>variance) for use in analyses In the case of my accidental approach SD/(n-1) -\n>why does this work well? Is there any justification I could call on to use this?\n>Or is it just a major co-incidence that it provides a good estimation? I have a\n>dataset of n=40 on which I tested this on and all were very reasonable\n>approximations. Thank you for your help!\n>Mick Girdwood\n>La Trobe University | Australia\n>\n>n.b. I have posted a similar question here -\n>https://stats.stackexchange.com/questions/590611/use-of-ratio-of-means-effect-\n>measure-and-estimation-of-variance-from-mean-of-rat",
+      "body_snippet": "Dear Mick,\n\nSo for some studies you have means and SDs for each side and can compute the (log-transformed) ratio of means (RoM) and corresponding sampling variances with:\n\nyi = log(m1/m2i)\nvi = sd1i^2",
+      "thread_id": "thread-91ccd099e87d",
+      "thread_depth": 1,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-b3bdc79d6f9c",
+      "message_id": "<a17bab3f06e14ebebdf9555298af73eb@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-10-04T07:54:39Z",
+      "subject": "[R-meta]  terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "subject_clean": "[R-meta]  terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "in_reply_to": "<MEAPR01MB54157F00EDD3A7853FBBDF559D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>",
+      "references": [
+        "<MEAPR01MB54157F00EDD3A7853FBBDF559D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>"
+      ],
+      "body_plain": "Dear Yefeng,\n\nPlease see below for my comments.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Yefeng Yang\n>Sent: Tuesday, 04 October, 2022 4:41\n>To: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] terminologies of multilevel and multivariate model when\n>accounting for correlated errors\n>\n>Hi all (especially Wofgang & James),\n>\n>My questions: I am confused about whether should we call a multilevel model with\n>a VCV matrix accounting for sampling variances still a multilevel model OR should\n>we call it a multivariate model\n>\n>I elaborate on my questions as follows:\n>\n>For statistically dependent effect sizes, we usually have two[1] 'typical' models\n>to deal with.\n>\n>  1.  For dependence due to multilevel/nested structure (one study contributes\n>more than one effect size estimate), we usually use a multilevel model (with a\n>nested random effect structure) to account for the non-independence if there are\n>'overlapping individuals' (no correlated sampling errors).\n\nIf there are overlapping individuals (i.e., the same individuals are used in computing multiple effect size estimates), then the sampling errors *are* correlated, so I am a bit confused here.\n\nSo, let me assume for the moment that there are *no* overlapping individuals, but a study can still yield multiple effect size estiamtes (e.g., for different subgroups). Example of this are:\n\nhttps://www.metafor-project.org/doku.php/analyses:konstantopoulos2011\nhttps://www.metafor-project.org/doku.php/analyses:crede2010\n\nThe model typically used in a multilevel model with 'random = ~ 1 | study/obs' as the random effects structure. However, note that we can reformulate this model into a multivariate parameterization with 'random = ~ obs | study', which is identical in fit (as long as the estimate of rho > 0).\n\nSo, already, I would say the terminology is a bit arbitrary, since we could call this a multilevel or a multivariate model.\n\n>  2.  For dependence due to multivariate structure (one study contributes more\n>than one response variable or outcome), we usually use a multivariate model (with\n>a correlated random effect structure) to account for the non-independence. Also,\n>we should use a variance-covariance matrix to account for the independent\n>sampling errors (either guessing within-study correlation or using formulas).\n\nAn example of this would be:\n\nhttps://www.metafor-project.org/doku.php/analyses:berkey1998\n\nThis would be a 'classical' multivariate meta-analysis and I think most people would call it that.\n\n>[1] robust variance estimation (RVE) is also a good approach to dealing with\n>dependent effect sizes in terms of estimating fixed effects (overall effect\n>intercept beta0 or moderator effect slope beta1).  The combination of the RVE\n>with either multilevel or multivariate is also an elegant approach. But RVE is\n>not the focus of my question.\n>\n>However, sometimes we want to use the multilevel model to deal with all types of\n>independence. By doing so, we reformulate the multivariate structure of the data\n>as multilevel/nested data. I mean we: (1) use dummy codes to denote different\n>types of response variables/outcomes, (2) impute or calculate a VCV matrix, and\n>(3) fit a multilevel model.  Through (1) - (3) steps, I account for all types of\n>independence: the correlations between true outcomes and sampling errors. Not\n>100% sure, but this approach should work well.\n\nAn example along those lines would be (leaving aside the RVE stuff):\n\nhttps://wviechtb.github.io/metadat/reference/dat.assink2016.html\n\nor briefly:\n\ndat <- dat.assink2016\nV <- vcalc(vi, cluster=study, obs=esid, data=dat, rho=0.6)\nrma.mv(yi, V, mods = ~ deltype, random = ~ 1 | study/esid, data=dat)\n\nAgain, this can be reformulated into:\n\nrma.mv(yi, V, mods = ~ deltype, random = ~ esid | study, data=dat)\n\nwith identical fit. So, is this now a multilevel or multivariate model? I would say either term is fine. But the terms are so broad anyway that they communicate very little what was actually done, so either way, one should provide further details (with respect to V and the random-effects structure).\n\n>So my question comes: I use a multilevel model but I also use a VCV matrix. What\n>will a multilevel model with a VCV be called? Still a multilevel model, but a\n>multilevel model assumes independent sampling errors (but we have a VCV in the\n>model). Should it be a multivariate model, but we did not account for the\n>correlated random effects only account for the correlated sampling errors? Hope\n>my question is clear.\n>\n>Best,\n>\n>Yefeng Yang PhD\n>Research Associate\n>UNSW, Sydney",
+      "body_snippet": "Dear Yefeng,\n\nPlease see below for my comments.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Yefeng Yang\n",
+      "thread_id": "thread-210931288ede",
+      "thread_depth": 1,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-c9bf9ee4d6e4",
+      "message_id": "<MEAPR01MB5415771C19BB73B0C26515209D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>",
+      "from_name": "Yefeng Yang",
+      "from_email_hash": "87784e4281c6fae4cb30e226216b5b798948e97ac16214150b985d937dd8fb67",
+      "date": "2022-10-04T08:14:55Z",
+      "subject": "[R-meta] 回复: terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "subject_clean": "[R-meta] 回复: terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "in_reply_to": "<a17bab3f06e14ebebdf9555298af73eb@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<MEAPR01MB54157F00EDD3A7853FBBDF559D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>",
+        "<a17bab3f06e14ebebdf9555298af73eb@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "Hi Wolfgang,\nThanks for your prompt replies. Sorry for the confusion - I missed \"no\" in front of \"overlapping individuals\" in my previous question. Now I know your thoughts. Hope I did not bother you if I have a further question:\n\nTechnically speaking, the multilevel model is identical to the multivariate model with some constraints, for example, assuming a constant within-study correlation (correlation of estimates or sampling errors within clusters) - that is using a random effect with a compound symmetric structure. Is this claim correct?\n\nBest,\n\nYefeng Yang PhD\nResearch Associate\nUNSW, Sydney\n\n________________________________\n??????: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>\n???????: 2022??10??4?? 18:54\n?????: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>\n????: Yefeng Yang <yefeng.yang1 at unsw.edu.au>\n????: RE: terminologies of multilevel and multivariate model when accounting for correlated errors\n\nDear Yefeng,\n\nPlease see below for my comments.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Yefeng Yang\n>Sent: Tuesday, 04 October, 2022 4:41\n>To: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] terminologies of multilevel and multivariate model when\n>accounting for correlated errors\n>\n>Hi all (especially Wofgang & James),\n>\n>My questions: I am confused about whether should we call a multilevel model with\n>a VCV matrix accounting for sampling variances still a multilevel model OR should\n>we call it a multivariate model\n>\n>I elaborate on my questions as follows:\n>\n>For statistically dependent effect sizes, we usually have two[1] 'typical' models\n>to deal with.\n>\n>  1.  For dependence due to multilevel/nested structure (one study contributes\n>more than one effect size estimate), we usually use a multilevel model (with a\n>nested random effect structure) to account for the non-independence if there are\n>'overlapping individuals' (no correlated sampling errors).\n\nIf there are overlapping individuals (i.e., the same individuals are used in computing multiple effect size estimates), then the sampling errors *are* correlated, so I am a bit confused here.\n\nSo, let me assume for the moment that there are *no* overlapping individuals, but a study can still yield multiple effect size estiamtes (e.g., for different subgroups). Example of this are:\n\nhttps://www.metafor-project.org/doku.php/analyses:konstantopoulos2011\nhttps://www.metafor-project.org/doku.php/analyses:crede2010\n\nThe model typically used in a multilevel model with 'random = ~ 1 | study/obs' as the random effects structure. However, note that we can reformulate this model into a multivariate parameterization with 'random = ~ obs | study', which is identical in fit (as long as the estimate of rho > 0).\n\nSo, already, I would say the terminology is a bit arbitrary, since we could call this a multilevel or a multivariate model.\n\n>  2.  For dependence due to multivariate structure (one study contributes more\n>than one response variable or outcome), we usually use a multivariate model (with\n>a correlated random effect structure) to account for the non-independence. Also,\n>we should use a variance-covariance matrix to account for the independent\n>sampling errors (either guessing within-study correlation or using formulas).\n\nAn example of this would be:\n\nhttps://www.metafor-project.org/doku.php/analyses:berkey1998\n\nThis would be a 'classical' multivariate meta-analysis and I think most people would call it that.\n\n>[1] robust variance estimation (RVE) is also a good approach to dealing with\n>dependent effect sizes in terms of estimating fixed effects (overall effect\n>intercept beta0 or moderator effect slope beta1).  The combination of the RVE\n>with either multilevel or multivariate is also an elegant approach. But RVE is\n>not the focus of my question.\n>\n>However, sometimes we want to use the multilevel model to deal with all types of\n>independence. By doing so, we reformulate the multivariate structure of the data\n>as multilevel/nested data. I mean we: (1) use dummy codes to denote different\n>types of response variables/outcomes, (2) impute or calculate a VCV matrix, and\n>(3) fit a multilevel model.  Through (1) - (3) steps, I account for all types of\n>independence: the correlations between true outcomes and sampling errors. Not\n>100% sure, but this approach should work well.\n\nAn example along those lines would be (leaving aside the RVE stuff):\n\nhttps://wviechtb.github.io/metadat/reference/dat.assink2016.html\n\nor briefly:\n\ndat <- dat.assink2016\nV <- vcalc(vi, cluster=study, obs=esid, data=dat, rho=0.6)\nrma.mv(yi, V, mods = ~ deltype, random = ~ 1 | study/esid, data=dat)\n\nAgain, this can be reformulated into:\n\nrma.mv(yi, V, mods = ~ deltype, random = ~ esid | study, data=dat)\n\nwith identical fit. So, is this now a multilevel or multivariate model? I would say either term is fine. But the terms are so broad anyway that they communicate very little what was actually done, so either way, one should provide further details (with respect to V and the random-effects structure).\n\n>So my question comes: I use a multilevel model but I also use a VCV matrix. What\n>will a multilevel model with a VCV be called? Still a multilevel model, but a\n>multilevel model assumes independent sampling errors (but we have a VCV in the\n>model). Should it be a multivariate model, but we did not account for the\n>correlated random effects only account for the correlated sampling errors? Hope\n>my question is clear.\n>\n>Best,\n>\n>Yefeng Yang PhD\n>Research Associate\n>UNSW, Sydney\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Wolfgang,\nThanks for your prompt replies. Sorry for the confusion - I missed \"no\" in front of \"overlapping individuals\" in my previous question. Now I know your thoughts. Hope I did not bother you ",
+      "thread_id": "thread-210931288ede",
+      "thread_depth": 2,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-f370b4680b16",
+      "message_id": "<BCD56198-08D4-4DF3-A65E-3E07E138ED90@latrobe.edu.au>",
+      "from_name": "Mick Girdwood",
+      "from_email_hash": "4f9ba839f493b7cf3e0c112874eddc342a79a214819a33c23e831719900ad619",
+      "date": "2022-10-04T11:45:32Z",
+      "subject": "[R-meta] Calculation of variance of ratio of means from summary statistics",
+      "subject_clean": "[R-meta] Calculation of variance of ratio of means from summary statistics",
+      "in_reply_to": "<9d53b50f5dab4ea88f880eb910c85d6a@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<C5D80854-26A5-4712-A0DF-EE0533B9D4F9@latrobe.edu.au>",
+        "<9d53b50f5dab4ea88f880eb910c85d6a@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "Dear Wolfgang,\n\nThank you so much for this it is super helpful and much more eloquently explained than I did - I think I can see where I got stuck too.\n\nThe paired data was something I knew was an issue, but didn?t see that there was an effect like ROMC built into escalc, and don?t know how to account for before this. Using this has resulted in much greater precision (i.e. tighter confidence intervals).\n\nI had actually tried the calculation for vi you mentioned but it again seemed too precise, but that was because of my incorrect use of ROM!. Now accounting for the correlated pairs with the RoM calculation they are very similar, thank you.\n\nThank you also for the suggestion of the moderator analysis - I had planned sensitivity analyses given the slightly different methods, and agree your suggestions is a good one I will use. I will go and answer my own question pointing to this answer there incase anyone else happens to be in a similar position.\n\nHave a great day!\nMick\n\n\nOn 4 Oct 2022, at 18:36, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl<mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>> wrote:\n\nDear Mick,\n\nSo for some studies you have means and SDs for each side and can compute the (log-transformed) ratio of means (RoM) and corresponding sampling variances with:\n\nyi = log(m1/m2i)\nvi = sd1i^2/(ni*m1i^2) + sd2i^2/(ni*m2i^2) - 2*ri*sd1i*sd2i/(m1i*m2i*ni)\n\nwhere ni refers to the number of individuals. Note that you have paired data, so the equation for computing the sampling variance must incorporate the correlation between the measurements for the two sides (ri). This is measure=\"ROMC\" in escalc(). If you do not know this correlation (because presumably it is not reported), then you could try to make an educated guestimate.\n\nBut for other studies, you have the mean of the ratios (MoR), mean(x1i/x2i), and I assume the corresponding standard deviation of the ratios (SDoR), sd(x1i/x2i)).\n\nTo what extent MoR approximates RoM depends on how close the true means are to 0. To demonstrate:\n\nx1 <- rnorm(1000000, 10, 1)\nx2 <- rnorm(1000000, 5, 1)\n\nmean(x1/x2)\nmean(x1)/mean(x2)\n\nx1 <- rnorm(1000000, 100, 1)\nx2 <- rnorm(1000000, 50, 1)\n\nmean(x1/x2)\nmean(x1)/mean(x2)\n\nAssuming you are in a situation where the means are far enough away from 0 so that this doesn't matter, then how can we incorporate MoR studies into the meta-analysis? It would be:\n\nyi = log(mean(x1i/x2i))\nvi = sd(x1i/x2i))^2 / (ni * mean(x1i/x2i)^2)\n\nor using the abbreviations above\n\nyi = log(MoR)\nvi = SDoR^2 / (ni * MoR^2)\n\nwhere ni is again the sample size. The vi equation comes from a simple application of the delta method (https://en.wikipedia.org/wiki/Delta_method<https://en.wikipedia.org/wiki/Delta_method>).\n\nI would recommend to code for each yi value whether it is a (log transformed) RoM or MoR value and examine via a moderator analysis whether there is a systematic difference between the two sets.\n\nP.S.: Thanks for pointing out that this was also posted on Cross Validated.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Mick Girdwood\n>Sent: Tuesday, 04 October, 2022 3:01\n>To: r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>\n>Subject: [R-meta] Calculation of variance of ratio of means from summary\n>statistics\n>\n>Thank you for this message board, it?s always so helpful, and sorry for the\n>slightly long question. I am planning a meta-analysis where we are using the\n>ratio of means (RoM) effect measure for comparing outcomes from two sides of the\n>body (i.e. the affected side and unaffected side). E.g. we are looking at a\n>particular muscle strength outcome, this is reported for each side. Most studies\n>we are concerned with will report a mean and sd for each side of the body. We can\n>then use these for the RoM calculations. In some cases authors will report only\n>a 'limb symmetry index ' - e.g. for each participant the LSI = the affected /\n>non-affected side. These are then summarised and reported for the group as the\n>mean(LSI). In these cases we cannot compute the RoM effect measure, as we don?t\n>have the summaries for each side. My issue is about how to incorporate the limb\n>symmetry index (LSI) data into the meta-analysis.\n>I am aware that the RoM is essentially mean[affected] / mean[non-affected], which\n>is slightly different to LSI - mean(affected/nonaffected). The LSI is a good\n>almost perfect approximation of the RoM (I have checked this with data where\n>studies reported both). So this is easy to just use log(LSI) to get an estimate\n>for yi.\n>My issue is around how to determine a precision parameter (vi sei etc) i.e. how\n>can I estimate the variance from the LSI standard deviation provided. I am\n>struggling with this especially as RoM meta-analysis is performed with log\n>transformation, so am not sure how to use the arithmetic SD in this situation. I\n>have a large number of studies where only the LSI mean and SD are provide (and so\n>cannot calculate the RoM from the data for each side). I have done an extensive\n>amount of reading and haven't been able to find anything that works well.\n>I first tried converting the SD to confidence intervals, then log transforming\n>these to use, however they overestimate the precision by about a factor of ~2, a\n>problem with using inverse variance methods. I also tried methods from this paper\n>by Quan 2003 (equation 5)\n>https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.1525<https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.1525> however this majorly\n>underestimates the precision.\n>The best solution I've found was by accident - I was looking at using the formula\n>for sample variance SD^2 / (n-1) and accidentally forgot to square the SD in my\n>code, so in effect my formula became sd / (n-1). This was very good/comparable\n>when comparing to the CIs generated by RoM calculations. However this is an\n>obvious accident so I don?t have any justification to proceed with this\n>My questions are How can I use the LSI data and convert these (specifically the\n>variance) for use in analyses In the case of my accidental approach SD/(n-1) -\n>why does this work well? Is there any justification I could call on to use this?\n>Or is it just a major co-incidence that it provides a good estimation? I have a\n>dataset of n=40 on which I tested this on and all were very reasonable\n>approximations. Thank you for your help!\n>Mick Girdwood\n>La Trobe University | Australia\n>\n>n.b. I have posted a similar question here -\n>https://stats.stackexchange.com/questions/590611/use-of-ratio-of-means-effect-<https://stats.stackexchange.com/questions/590611/use-of-ratio-of-means-effect->\n>measure-and-estimation-of-variance-from-mean-of-rat\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Wolfgang,\n\nThank you so much for this it is super helpful and much more eloquently explained than I did - I think I can see where I got stuck too.\n\nThe paired data was something I knew was an iss",
+      "thread_id": "thread-91ccd099e87d",
+      "thread_depth": 2,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-48b4380666c6",
+      "message_id": "<CAFUVuJyYoeGtt9nZ=m95AW+2qCdx-M9_SzKLy7=35LUko7R01g@mail.gmail.com>",
+      "from_name": "James Pustejovsky",
+      "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
+      "date": "2022-10-05T09:36:42-05:00",
+      "subject": "[R-meta] Calculation of variance of ratio of means from summary statistics",
+      "subject_clean": "[R-meta] Calculation of variance of ratio of means from summary statistics",
+      "in_reply_to": "<BCD56198-08D4-4DF3-A65E-3E07E138ED90@latrobe.edu.au>",
+      "references": [
+        "<C5D80854-26A5-4712-A0DF-EE0533B9D4F9@latrobe.edu.au>",
+        "<9d53b50f5dab4ea88f880eb910c85d6a@UM-MAIL3214.unimaas.nl>",
+        "<BCD56198-08D4-4DF3-A65E-3E07E138ED90@latrobe.edu.au>"
+      ],
+      "body_plain": "Hi Mick,\n\nWolfgang's response is spot on, but I'll add a few other notes.\n\nWolfgang noted that degree to which the mean of ratios (MoR) corresponds to\nthe ratio of means (RoM) depends on how far away the means are from zero.\nThat is not the only factor--the correspondence also depends on the\nvariation in the individual ratios (i.e., the variance of the LSIs, in your\ncontext) and the correlation between the ratio and the baseline level. If\nyou call the measurements for an individual participant A and B, and let R\n= B / A denote the individual ratio, then\nE(B) / E(A) = E(R x A) / E(A) = E(R) + Cov(R, A) / E(A) = E(R) + cor(R,A) x\nSD(R) x SD(A) / E(A).\nThus, if there is individual-level heterogeneity in the LSIs--so that SD(R)\nis big--and if the LSIs correlate with the individual measurements, then\nRoM will differ from MoR. So, all the more reason to use moderator analysis\nto account for the difference in metrics.\n\nBesides moderator analysis, another approach would be possible if you have\na substantial number of studies where you can compute BOTH the RoM and the\nMoR. If you can get both measures for enough studies, then you could treat\nthe pair as a bivariate ES measure and use a bivariate meta-analysis to\naccount for the difference between metrics. Here, you need to have enough\nstudies with both RoM and MoR in order to estimate the average difference\nbetween the metrics and the correlation between the metrics. But then you\ncan still include other studies that only report RoM or only report MoR.\n\nJames\n\nOn Tue, Oct 4, 2022 at 6:46 AM Mick Girdwood <M.Girdwood at latrobe.edu.au>\nwrote:\n\n> Dear Wolfgang,\n>\n> Thank you so much for this it is super helpful and much more eloquently\n> explained than I did - I think I can see where I got stuck too.\n>\n> The paired data was something I knew was an issue, but didn?t see that\n> there was an effect like ROMC built into escalc, and don?t know how to\n> account for before this. Using this has resulted in much greater precision\n> (i.e. tighter confidence intervals).\n>\n> I had actually tried the calculation for vi you mentioned but it again\n> seemed too precise, but that was because of my incorrect use of ROM!. Now\n> accounting for the correlated pairs with the RoM calculation they are very\n> similar, thank you.\n>\n> Thank you also for the suggestion of the moderator analysis - I had\n> planned sensitivity analyses given the slightly different methods, and\n> agree your suggestions is a good one I will use. I will go and answer my\n> own question pointing to this answer there incase anyone else happens to be\n> in a similar position.\n>\n> Have a great day!\n> Mick\n>\n>\n> On 4 Oct 2022, at 18:36, Viechtbauer, Wolfgang (NP) <\n> wolfgang.viechtbauer at maastrichtuniversity.nl<mailto:\n> wolfgang.viechtbauer at maastrichtuniversity.nl>> wrote:\n>\n> Dear Mick,\n>\n> So for some studies you have means and SDs for each side and can compute\n> the (log-transformed) ratio of means (RoM) and corresponding sampling\n> variances with:\n>\n> yi = log(m1/m2i)\n> vi = sd1i^2/(ni*m1i^2) + sd2i^2/(ni*m2i^2) - 2*ri*sd1i*sd2i/(m1i*m2i*ni)\n>\n> where ni refers to the number of individuals. Note that you have paired\n> data, so the equation for computing the sampling variance must incorporate\n> the correlation between the measurements for the two sides (ri). This is\n> measure=\"ROMC\" in escalc(). If you do not know this correlation (because\n> presumably it is not reported), then you could try to make an educated\n> guestimate.\n>\n> But for other studies, you have the mean of the ratios (MoR),\n> mean(x1i/x2i), and I assume the corresponding standard deviation of the\n> ratios (SDoR), sd(x1i/x2i)).\n>\n> To what extent MoR approximates RoM depends on how close the true means\n> are to 0. To demonstrate:\n>\n> x1 <- rnorm(1000000, 10, 1)\n> x2 <- rnorm(1000000, 5, 1)\n>\n> mean(x1/x2)\n> mean(x1)/mean(x2)\n>\n> x1 <- rnorm(1000000, 100, 1)\n> x2 <- rnorm(1000000, 50, 1)\n>\n> mean(x1/x2)\n> mean(x1)/mean(x2)\n>\n> Assuming you are in a situation where the means are far enough away from 0\n> so that this doesn't matter, then how can we incorporate MoR studies into\n> the meta-analysis? It would be:\n>\n> yi = log(mean(x1i/x2i))\n> vi = sd(x1i/x2i))^2 / (ni * mean(x1i/x2i)^2)\n>\n> or using the abbreviations above\n>\n> yi = log(MoR)\n> vi = SDoR^2 / (ni * MoR^2)\n>\n> where ni is again the sample size. The vi equation comes from a simple\n> application of the delta method (\n> https://en.wikipedia.org/wiki/Delta_method<\n> https://en.wikipedia.org/wiki/Delta_method>).\n>\n> I would recommend to code for each yi value whether it is a (log\n> transformed) RoM or MoR value and examine via a moderator analysis whether\n> there is a systematic difference between the two sets.\n>\n> P.S.: Thanks for pointing out that this was also posted on Cross Validated.\n>\n> Best,\n> Wolfgang\n>\n> >-----Original Message-----\n> >From: R-sig-meta-analysis [mailto:\n> r-sig-meta-analysis-bounces at r-project.org] On\n> >Behalf Of Mick Girdwood\n> >Sent: Tuesday, 04 October, 2022 3:01\n> >To: r-sig-meta-analysis at r-project.org<mailto:\n> r-sig-meta-analysis at r-project.org>\n> >Subject: [R-meta] Calculation of variance of ratio of means from summary\n> >statistics\n> >\n> >Thank you for this message board, it?s always so helpful, and sorry for\n> the\n> >slightly long question. I am planning a meta-analysis where we are using\n> the\n> >ratio of means (RoM) effect measure for comparing outcomes from two sides\n> of the\n> >body (i.e. the affected side and unaffected side). E.g. we are looking at\n> a\n> >particular muscle strength outcome, this is reported for each side. Most\n> studies\n> >we are concerned with will report a mean and sd for each side of the\n> body. We can\n> >then use these for the RoM calculations. In some cases authors will\n> report only\n> >a 'limb symmetry index ' - e.g. for each participant the LSI = the\n> affected /\n> >non-affected side. These are then summarised and reported for the group\n> as the\n> >mean(LSI). In these cases we cannot compute the RoM effect measure, as we\n> don?t\n> >have the summaries for each side. My issue is about how to incorporate\n> the limb\n> >symmetry index (LSI) data into the meta-analysis.\n> >I am aware that the RoM is essentially mean[affected] /\n> mean[non-affected], which\n> >is slightly different to LSI - mean(affected/nonaffected). The LSI is a\n> good\n> >almost perfect approximation of the RoM (I have checked this with data\n> where\n> >studies reported both). So this is easy to just use log(LSI) to get an\n> estimate\n> >for yi.\n> >My issue is around how to determine a precision parameter (vi sei etc)\n> i.e. how\n> >can I estimate the variance from the LSI standard deviation provided. I am\n> >struggling with this especially as RoM meta-analysis is performed with log\n> >transformation, so am not sure how to use the arithmetic SD in this\n> situation. I\n> >have a large number of studies where only the LSI mean and SD are provide\n> (and so\n> >cannot calculate the RoM from the data for each side). I have done an\n> extensive\n> >amount of reading and haven't been able to find anything that works well.\n> >I first tried converting the SD to confidence intervals, then log\n> transforming\n> >these to use, however they overestimate the precision by about a factor\n> of ~2, a\n> >problem with using inverse variance methods. I also tried methods from\n> this paper\n> >by Quan 2003 (equation 5)\n> >https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.1525<\n> https://onlinelibrary.wiley.com/doi/abs/10.1002/sim.1525> however this\n> majorly\n> >underestimates the precision.\n> >The best solution I've found was by accident - I was looking at using the\n> formula\n> >for sample variance SD^2 / (n-1) and accidentally forgot to square the SD\n> in my\n> >code, so in effect my formula became sd / (n-1). This was very\n> good/comparable\n> >when comparing to the CIs generated by RoM calculations. However this is\n> an\n> >obvious accident so I don?t have any justification to proceed with this\n> >My questions are How can I use the LSI data and convert these\n> (specifically the\n> >variance) for use in analyses In the case of my accidental approach\n> SD/(n-1) -\n> >why does this work well? Is there any justification I could call on to\n> use this?\n> >Or is it just a major co-incidence that it provides a good estimation? I\n> have a\n> >dataset of n=40 on which I tested this on and all were very reasonable\n> >approximations. Thank you for your help!\n> >Mick Girdwood\n> >La Trobe University | Australia\n> >\n> >n.b. I have posted a similar question here -\n> >\n> https://stats.stackexchange.com/questions/590611/use-of-ratio-of-means-effect-\n> <\n> https://stats.stackexchange.com/questions/590611/use-of-ratio-of-means-effect-\n> >\n> >measure-and-estimation-of-variance-from-mean-of-rat\n>\n>\n>         [[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Mick,\n\nWolfgang's response is spot on, but I'll add a few other notes.\n\nWolfgang noted that degree to which the mean of ratios (MoR) corresponds to\nthe ratio of means (RoM) depends on how far away ",
+      "thread_id": "thread-91ccd099e87d",
+      "thread_depth": 3,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-fd3a23fcc37a",
+      "message_id": "<ecc59ee929ef4de687a9e71da255ac6a@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-10-06T12:57:27Z",
+      "subject": "[R-meta]  terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "subject_clean": "[R-meta]  terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "in_reply_to": "<MEAPR01MB5415771C19BB73B0C26515209D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>",
+      "references": [
+        "<MEAPR01MB54157F00EDD3A7853FBBDF559D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>",
+        "<a17bab3f06e14ebebdf9555298af73eb@UM-MAIL3214.unimaas.nl>",
+        "<MEAPR01MB5415771C19BB73B0C26515209D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>"
+      ],
+      "body_plain": "Not 100% sure which two models you are comparing.\n\nrma(yi, V, random = ~ 1 | study/obs)\n\nand\n\nrma(yi, V, random = ~ obs | study)\n\nare identical (as long as the estimate of rho > 0) and neither assumes a 'constant within-study correlation (correlation of estimates or sampling errors within clusters)'. The correlations between the sampling errors are contained in V and those can be of any shape or form (as long as V is positive definite) and that goes for both models.\n\nBoth models assume that the correlations of the underlying true effects within studies follow a compound-symmetric structure. In the multilevel model, this happens as a function of the two random effects, in the multilevel parametrization this happens because struct=\"CS\" by default.\n\nBut I think what you may be trying to get at is that the multivariate parameterization allows for more flexibility if we want to drop the assumption of compound symmetry. For example, in the Berkey et al. (1998) example, we can simply set struct=\"UN\" to allow the amount of heterogeneity to differ for the two 'observations' within the studies (and if there would be more than two outcomes within studies, then each pair would be allowed to have a different correlation). This is indeed not something we can do with the multilevel formulation.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Yefeng Yang\n>Sent: Tuesday, 04 October, 2022 10:15\n>To: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] ??: terminologies of multilevel and multivariate model when\n>accounting for correlated errors\n>\n>Hi Wolfgang,\n>Thanks for your prompt replies. Sorry for the confusion - I missed \"no\" in front\n>of \"overlapping individuals\" in my previous question. Now I know your thoughts.\n>Hope I did not bother you if I have a further question:\n>\n>Technically speaking, the multilevel model is identical to the multivariate model\n>with some constraints, for example, assuming a constant within-study correlation\n>(correlation of estimates or sampling errors within clusters) - that is using a\n>random effect with a compound symmetric structure. Is this claim correct?\n>\n>Best,\n>\n>Yefeng Yang PhD\n>Research Associate\n>UNSW, Sydney\n>\n>________________________________\n>??????: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>\n>???????: 2022??10??4?? 18:54\n>?????: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>\n>????: Yefeng Yang <yefeng.yang1 at unsw.edu.au>\n>????: RE: terminologies of multilevel and multivariate model when accounting for\n>correlated errors\n>\n>Dear Yefeng,\n>\n>Please see below for my comments.\n>\n>Best,\n>Wolfgang\n>\n>>-----Original Message-----\n>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>>Behalf Of Yefeng Yang\n>>Sent: Tuesday, 04 October, 2022 4:41\n>>To: r-sig-meta-analysis at r-project.org\n>>Subject: [R-meta] terminologies of multilevel and multivariate model when\n>>accounting for correlated errors\n>>\n>>Hi all (especially Wofgang & James),\n>>\n>>My questions: I am confused about whether should we call a multilevel model with\n>>a VCV matrix accounting for sampling variances still a multilevel model OR\n>should\n>>we call it a multivariate model\n>>\n>>I elaborate on my questions as follows:\n>>\n>>For statistically dependent effect sizes, we usually have two[1] 'typical'\n>models\n>>to deal with.\n>>\n>>  1.  For dependence due to multilevel/nested structure (one study contributes\n>>more than one effect size estimate), we usually use a multilevel model (with a\n>>nested random effect structure) to account for the non-independence if there are\n>>'overlapping individuals' (no correlated sampling errors).\n>\n>If there are overlapping individuals (i.e., the same individuals are used in\n>computing multiple effect size estimates), then the sampling errors *are*\n>correlated, so I am a bit confused here.\n>\n>So, let me assume for the moment that there are *no* overlapping individuals, but\n>a study can still yield multiple effect size estiamtes (e.g., for different\n>subgroups). Example of this are:\n>\n>https://www.metafor-project.org/doku.php/analyses:konstantopoulos2011\n>https://www.metafor-project.org/doku.php/analyses:crede2010\n>\n>The model typically used in a multilevel model with 'random = ~ 1 | study/obs' as\n>the random effects structure. However, note that we can reformulate this model\n>into a multivariate parameterization with 'random = ~ obs | study', which is\n>identical in fit (as long as the estimate of rho > 0).\n>\n>So, already, I would say the terminology is a bit arbitrary, since we could call\n>this a multilevel or a multivariate model.\n>\n>>  2.  For dependence due to multivariate structure (one study contributes more\n>>than one response variable or outcome), we usually use a multivariate model\n>(with\n>>a correlated random effect structure) to account for the non-independence. Also,\n>>we should use a variance-covariance matrix to account for the independent\n>>sampling errors (either guessing within-study correlation or using formulas).\n>\n>An example of this would be:\n>\n>https://www.metafor-project.org/doku.php/analyses:berkey1998\n>\n>This would be a 'classical' multivariate meta-analysis and I think most people\n>would call it that.\n>\n>>[1] robust variance estimation (RVE) is also a good approach to dealing with\n>>dependent effect sizes in terms of estimating fixed effects (overall effect\n>>intercept beta0 or moderator effect slope beta1).  The combination of the RVE\n>>with either multilevel or multivariate is also an elegant approach. But RVE is\n>>not the focus of my question.\n>>\n>>However, sometimes we want to use the multilevel model to deal with all types of\n>>independence. By doing so, we reformulate the multivariate structure of the data\n>>as multilevel/nested data. I mean we: (1) use dummy codes to denote different\n>>types of response variables/outcomes, (2) impute or calculate a VCV matrix, and\n>>(3) fit a multilevel model.  Through (1) - (3) steps, I account for all types of\n>>independence: the correlations between true outcomes and sampling errors. Not\n>>100% sure, but this approach should work well.\n>\n>An example along those lines would be (leaving aside the RVE stuff):\n>\n>https://wviechtb.github.io/metadat/reference/dat.assink2016.html\n>\n>or briefly:\n>\n>dat <- dat.assink2016\n>V <- vcalc(vi, cluster=study, obs=esid, data=dat, rho=0.6)\n>rma.mv(yi, V, mods = ~ deltype, random = ~ 1 | study/esid, data=dat)\n>\n>Again, this can be reformulated into:\n>\n>rma.mv(yi, V, mods = ~ deltype, random = ~ esid | study, data=dat)\n>\n>with identical fit. So, is this now a multilevel or multivariate model? I would\n>say either term is fine. But the terms are so broad anyway that they communicate\n>very little what was actually done, so either way, one should provide further\n>details (with respect to V and the random-effects structure).\n>\n>>So my question comes: I use a multilevel model but I also use a VCV matrix. What\n>>will a multilevel model with a VCV be called? Still a multilevel model, but a\n>>multilevel model assumes independent sampling errors (but we have a VCV in the\n>>model). Should it be a multivariate model, but we did not account for the\n>>correlated random effects only account for the correlated sampling errors? Hope\n>>my question is clear.\n>>\n>>Best,\n>>\n>>Yefeng Yang PhD\n>>Research Associate\n>>UNSW, Sydney",
+      "body_snippet": "Not 100% sure which two models you are comparing.\n\nrma(yi, V, random = ~ 1 | study/obs)\n\nand\n\nrma(yi, V, random = ~ obs | study)\n\nare identical (as long as the estimate of rho > 0) and neither assumes",
+      "thread_id": "thread-210931288ede",
+      "thread_depth": 3,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-9c14bb6d97df",
+      "message_id": "<MEAPR01MB541535813031991BA1791CF79D5C9@MEAPR01MB5415.ausprd01.prod.outlook.com>",
+      "from_name": "Yefeng Yang",
+      "from_email_hash": "87784e4281c6fae4cb30e226216b5b798948e97ac16214150b985d937dd8fb67",
+      "date": "2022-10-06T23:56:25Z",
+      "subject": "[R-meta] 回复: terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "subject_clean": "[R-meta] 回复: terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "in_reply_to": "<ecc59ee929ef4de687a9e71da255ac6a@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<MEAPR01MB54157F00EDD3A7853FBBDF559D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>",
+        "<a17bab3f06e14ebebdf9555298af73eb@UM-MAIL3214.unimaas.nl>",
+        "<MEAPR01MB5415771C19BB73B0C26515209D5A9@MEAPR01MB5415.ausprd01.prod.outlook.com>",
+        "<ecc59ee929ef4de687a9e71da255ac6a@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "Great Wolfgang!\nI really thank for your time on addressing my concern. I completely understand the two (differences and similirities) now after your explanation. I also want to be a person (like you) who is willing to spend himself/herself valuable time to help an unknown people (like me) when I think I am qualified to be. Very much appreciated!\n\nBest,\nYefeng\n________________________________\n???: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>\n????: 2022?10?6? 23:57\n???: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>\n??: Yefeng Yang <yefeng.yang1 at unsw.edu.au>\n??: RE: terminologies of multilevel and multivariate model when accounting for correlated errors\n\nNot 100% sure which two models you are comparing.\n\nrma(yi, V, random = ~ 1 | study/obs)\n\nand\n\nrma(yi, V, random = ~ obs | study)\n\nare identical (as long as the estimate of rho > 0) and neither assumes a 'constant within-study correlation (correlation of estimates or sampling errors within clusters)'. The correlations between the sampling errors are contained in V and those can be of any shape or form (as long as V is positive definite) and that goes for both models.\n\nBoth models assume that the correlations of the underlying true effects within studies follow a compound-symmetric structure. In the multilevel model, this happens as a function of the two random effects, in the multilevel parametrization this happens because struct=\"CS\" by default.\n\nBut I think what you may be trying to get at is that the multivariate parameterization allows for more flexibility if we want to drop the assumption of compound symmetry. For example, in the Berkey et al. (1998) example, we can simply set struct=\"UN\" to allow the amount of heterogeneity to differ for the two 'observations' within the studies (and if there would be more than two outcomes within studies, then each pair would be allowed to have a different correlation). This is indeed not something we can do with the multilevel formulation.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Yefeng Yang\n>Sent: Tuesday, 04 October, 2022 10:15\n>To: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] ??: terminologies of multilevel and multivariate model when\n>accounting for correlated errors\n>\n>Hi Wolfgang,\n>Thanks for your prompt replies. Sorry for the confusion - I missed \"no\" in front\n>of \"overlapping individuals\" in my previous question. Now I know your thoughts.\n>Hope I did not bother you if I have a further question:\n>\n>Technically speaking, the multilevel model is identical to the multivariate model\n>with some constraints, for example, assuming a constant within-study correlation\n>(correlation of estimates or sampling errors within clusters) - that is using a\n>random effect with a compound symmetric structure. Is this claim correct?\n>\n>Best,\n>\n>Yefeng Yang PhD\n>Research Associate\n>UNSW, Sydney\n>\n>________________________________\n>??????: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>\n>???????: 2022??10??4?? 18:54\n>?????: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>\n>????: Yefeng Yang <yefeng.yang1 at unsw.edu.au>\n>????: RE: terminologies of multilevel and multivariate model when accounting for\n>correlated errors\n>\n>Dear Yefeng,\n>\n>Please see below for my comments.\n>\n>Best,\n>Wolfgang\n>\n>>-----Original Message-----\n>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>>Behalf Of Yefeng Yang\n>>Sent: Tuesday, 04 October, 2022 4:41\n>>To: r-sig-meta-analysis at r-project.org\n>>Subject: [R-meta] terminologies of multilevel and multivariate model when\n>>accounting for correlated errors\n>>\n>>Hi all (especially Wofgang & James),\n>>\n>>My questions: I am confused about whether should we call a multilevel model with\n>>a VCV matrix accounting for sampling variances still a multilevel model OR\n>should\n>>we call it a multivariate model\n>>\n>>I elaborate on my questions as follows:\n>>\n>>For statistically dependent effect sizes, we usually have two[1] 'typical'\n>models\n>>to deal with.\n>>\n>>  1.  For dependence due to multilevel/nested structure (one study contributes\n>>more than one effect size estimate), we usually use a multilevel model (with a\n>>nested random effect structure) to account for the non-independence if there are\n>>'overlapping individuals' (no correlated sampling errors).\n>\n>If there are overlapping individuals (i.e., the same individuals are used in\n>computing multiple effect size estimates), then the sampling errors *are*\n>correlated, so I am a bit confused here.\n>\n>So, let me assume for the moment that there are *no* overlapping individuals, but\n>a study can still yield multiple effect size estiamtes (e.g., for different\n>subgroups). Example of this are:\n>\n>https://www.metafor-project.org/doku.php/analyses:konstantopoulos2011\n>https://www.metafor-project.org/doku.php/analyses:crede2010\n>\n>The model typically used in a multilevel model with 'random = ~ 1 | study/obs' as\n>the random effects structure. However, note that we can reformulate this model\n>into a multivariate parameterization with 'random = ~ obs | study', which is\n>identical in fit (as long as the estimate of rho > 0).\n>\n>So, already, I would say the terminology is a bit arbitrary, since we could call\n>this a multilevel or a multivariate model.\n>\n>>  2.  For dependence due to multivariate structure (one study contributes more\n>>than one response variable or outcome), we usually use a multivariate model\n>(with\n>>a correlated random effect structure) to account for the non-independence. Also,\n>>we should use a variance-covariance matrix to account for the independent\n>>sampling errors (either guessing within-study correlation or using formulas).\n>\n>An example of this would be:\n>\n>https://www.metafor-project.org/doku.php/analyses:berkey1998\n>\n>This would be a 'classical' multivariate meta-analysis and I think most people\n>would call it that.\n>\n>>[1] robust variance estimation (RVE) is also a good approach to dealing with\n>>dependent effect sizes in terms of estimating fixed effects (overall effect\n>>intercept beta0 or moderator effect slope beta1).  The combination of the RVE\n>>with either multilevel or multivariate is also an elegant approach. But RVE is\n>>not the focus of my question.\n>>\n>>However, sometimes we want to use the multilevel model to deal with all types of\n>>independence. By doing so, we reformulate the multivariate structure of the data\n>>as multilevel/nested data. I mean we: (1) use dummy codes to denote different\n>>types of response variables/outcomes, (2) impute or calculate a VCV matrix, and\n>>(3) fit a multilevel model.  Through (1) - (3) steps, I account for all types of\n>>independence: the correlations between true outcomes and sampling errors. Not\n>>100% sure, but this approach should work well.\n>\n>An example along those lines would be (leaving aside the RVE stuff):\n>\n>https://wviechtb.github.io/metadat/reference/dat.assink2016.html\n>\n>or briefly:\n>\n>dat <- dat.assink2016\n>V <- vcalc(vi, cluster=study, obs=esid, data=dat, rho=0.6)\n>rma.mv(yi, V, mods = ~ deltype, random = ~ 1 | study/esid, data=dat)\n>\n>Again, this can be reformulated into:\n>\n>rma.mv(yi, V, mods = ~ deltype, random = ~ esid | study, data=dat)\n>\n>with identical fit. So, is this now a multilevel or multivariate model? I would\n>say either term is fine. But the terms are so broad anyway that they communicate\n>very little what was actually done, so either way, one should provide further\n>details (with respect to V and the random-effects structure).\n>\n>>So my question comes: I use a multilevel model but I also use a VCV matrix. What\n>>will a multilevel model with a VCV be called? Still a multilevel model, but a\n>>multilevel model assumes independent sampling errors (but we have a VCV in the\n>>model). Should it be a multivariate model, but we did not account for the\n>>correlated random effects only account for the correlated sampling errors? Hope\n>>my question is clear.\n>>\n>>Best,\n>>\n>>Yefeng Yang PhD\n>>Research Associate\n>>UNSW, Sydney\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Great Wolfgang!\nI really thank for your time on addressing my concern. I completely understand the two (differences and similirities) now after your explanation. I also want to be a person (like you) ",
+      "thread_id": "thread-210931288ede",
+      "thread_depth": 4,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-3caedfa07616",
+      "message_id": "<CA+dzWjoyjAzMVSZ3cFeZjWeGigiWuEaEwuTOLqF34XZuZ8kPxQ@mail.gmail.com>",
+      "from_name": "Yuhang Hu",
+      "from_email_hash": "b0634bac76ff7996231a855de79b1199f6ae3db82e807c9f518efb38e239b00e",
+      "date": "2022-10-06T20:02:36-07:00",
+      "subject": "[R-meta] Random-effects for correlational studies in rma.mv()",
+      "subject_clean": "[R-meta] Random-effects for correlational studies in rma.mv()",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hello Meta community,\n\nI am meta-analyzing a set of studies correlating a variable (Var1) with a\nset of other variables (Var2s). Each study uses a single scale to measure\n'Var1' and correlates it with different 'Var2's (see data structure below).\n\nConceptually, would it make more sense to consider ' Var2' nested as in:\n\nrandom = ~1| scale/ study/ Var2/ obs\n\nOr crossed with 'scales' and 'studies' as in:\n\nrandom = list(~1| scale/ study/ obs, ~1| Var2)\n\nMany thanks for your time and guidance,\nYuhang\n\nData structure is below:\n\nstudy scale Var2 obs ri\n1     1     1       1   .5\n1     1     2       2   .1\n2     2     1       3   .3\n3     2     2       4   .4\n3     2     3       5   .6\n4     1     1       6   .8\n4     1     3       7   .7\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hello Meta community,\n\nI am meta-analyzing a set of studies correlating a variable (Var1) with a\nset of other variables (Var2s). Each study uses a single scale to measure\n'Var1' and correlates it with",
+      "thread_id": "thread-3caedfa07616",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-6c2c73df43a9",
+      "message_id": "<CACw+Tff2ysbgDBNMHT1hktR7UKb+HW3VG3RT_APWJGAHFwk0DQ@mail.gmail.com>",
+      "from_name": "Catia Oliveira",
+      "from_email_hash": "30516b3226e02bcb5551a11ef10c90c1444a67963e0155c2a6b2c5fb9046fa8d",
+      "date": "2022-10-12T10:14:13Z",
+      "subject": "[R-meta] extracting effect sizes from multiple regression",
+      "subject_clean": "[R-meta] extracting effect sizes from multiple regression",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear all,\n\nI hope this email finds you well.\n\nIs it possible to compare the findings from multiple regressions in a\nmeta-analysis or should one only include the effect sizes from simple\nregression?  If one can incorporate those from multiple regression, should\nwe only compare those with effect sizes from studies that have used the\nsame predictors, or is there some way to extract the necessary information\nfrom a multiple regression?\nThank you!\n\nBest wishes\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear all,\n\nI hope this email finds you well.\n\nIs it possible to compare the findings from multiple regressions in a\nmeta-analysis or should one only include the effect sizes from simple\nregression?  I",
+      "thread_id": "thread-6c2c73df43a9",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-c824ca64f54b",
+      "message_id": "<be7b7430-ac52-bc53-c8c0-cf8cde5a3066@dewey.myzen.co.uk>",
+      "from_name": "Michael Dewey",
+      "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
+      "date": "2022-10-12T13:09:36+01:00",
+      "subject": "[R-meta] extracting effect sizes from multiple regression",
+      "subject_clean": "[R-meta] extracting effect sizes from multiple regression",
+      "in_reply_to": "<CACw+Tff2ysbgDBNMHT1hktR7UKb+HW3VG3RT_APWJGAHFwk0DQ@mail.gmail.com>",
+      "references": [
+        "<CACw+Tff2ysbgDBNMHT1hktR7UKb+HW3VG3RT_APWJGAHFwk0DQ@mail.gmail.com>"
+      ],
+      "body_plain": "Dear Catia\n\nComments in-line\n\nOn 12/10/2022 11:14, Catia Oliveira wrote:\n> Dear all,\n> \n> I hope this email finds you well.\n> \n> Is it possible to compare the findings from multiple regressions in a\n> meta-analysis or should one only include the effect sizes from simple\n> regression?\n\nYes, you can.\n\n   If one can incorporate those from multiple regression, should\n> we only compare those with effect sizes from studies that have used the\n> same predictors,\n\nThat would be the most logical way to go since if the variable in which \nyou are interested has been adjusted for different covariates then the \ncoefficient is estimating different effects. Having said that if the set \nof covariates is similar across studies but with perhaps an extra one \nhere and there then you might take the view that the coefficients are \nbroadly comparable. If you had one set adjusted for age and another \nadjusted for age and sex you might include all of them with a \ncategorical moderator for the different sets of covariates.\n\n  or is there some way to extract the necessary information\n> from a multiple regression?\n\nNot without the raw data I think.\n\nMichael\n\n> Thank you!\n> \n> Best wishes\n> \n> \t[[alternative HTML version deleted]]\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n\n-- \nMichael\nhttp://www.dewey.myzen.co.uk/home.html",
+      "body_snippet": "Dear Catia\n\nComments in-line\n\nOn 12/10/2022 11:14, Catia Oliveira wrote:\n> Dear all,\n> \n> I hope this email finds you well.\n> \n> Is it possible to compare the findings from multiple regressions in a\n>",
+      "thread_id": "thread-6c2c73df43a9",
+      "thread_depth": 1,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-097d06001634",
+      "message_id": "<CACw+Tff0YnRmsFK8YXqe_dqn1EB16KSD6jt+v_e-dHf4sL6_-g@mail.gmail.com>",
+      "from_name": "Catia Oliveira",
+      "from_email_hash": "30516b3226e02bcb5551a11ef10c90c1444a67963e0155c2a6b2c5fb9046fa8d",
+      "date": "2022-10-18T19:53:40Z",
+      "subject": "[R-meta] predictors of longitudinal outcomes",
+      "subject_clean": "[R-meta] predictors of longitudinal outcomes",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear all,\n\nI hope this email finds you well.\nI am interested in analysing longitudinal studies where a particular group\nof individuals (diagnosed at time 1) is followed across time and then have\ntheir skills measured at some later date (follow-up - time 2). I am not\ninterested in estimating the difference in skills between time points, but\ninstead, I want to determine which factors measured at time 1 (e.g.,\ngender, age) predict their skills at time 2. Assuming the models would be\nregressions where the outcome variable at time 2 is predicted by each\nfactor at time 1 independently, could we use cohen's f as the effect size\nfor the meta-analysis and then run a meta-regression to see which factors\nexplain the most variance and which combinations lead to more explanatory\npower? (e.g., voc ~ gender + SES). If this is completely wrong, could you\nplease point me to a study that has examined similar questions?\n\nThe dataset I am imagining would look something like this:\n\nStudy | Moderator | cohen's f | Outcome\n\nS1 | gender | .23  | voc\n\nS1 | SES | .12 | voc\n\nS2| gender | .02 | voc\n\n\nThank you!\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear all,\n\nI hope this email finds you well.\nI am interested in analysing longitudinal studies where a particular group\nof individuals (diagnosed at time 1) is followed across time and then have\ntheir",
+      "thread_id": "thread-097d06001634",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-e7078996395a",
+      "message_id": "<7454505b-7729-4e87-6bf4-7ebc59f86f19@uni-osnabrueck.de>",
+      "from_name": "Lukasz Stasielowicz",
+      "from_email_hash": "8e7698f28015f696c76c8036e33b7e8bcb33cb7948bf9a7b4b00d1a91ed2c1f0",
+      "date": "2022-10-19T16:25:55+02:00",
+      "subject": "[R-meta] predictors of longitudinal outcomes",
+      "subject_clean": "[R-meta] predictors of longitudinal outcomes",
+      "in_reply_to": "<mailman.4248.15.1666173602.36133.r-sig-meta-analysis@r-project.org>",
+      "references": [
+        "<mailman.4248.15.1666173602.36133.r-sig-meta-analysis@r-project.org>"
+      ],
+      "body_plain": "Dear Catia,\n\nWouldn't it be more straightforward to address such research questions \nusing meta-analytic structural equation modeling? One could connect \nantecedents (e.g., gender, SES) with skills at T2 or even T3 if there \nare some studies with multiple measurement occasions. One could also \ncompare different models to examine the relevance of specific predictors.\n\n\nSome resources in case you're not familiar with this approach:\n\nShiny app: https://sjak.shinyapps.io/webMASEM/\n\nVideo demonstration: https://www.youtube.com/watch?v=0v-CdNLa_eo\n\nArticle: Jak, S., Li, H., Kolbe, L., de Jonge, H., & Cheung, M. W. L. \n(2021). Meta?analytic structural equation modeling made easy: A tutorial \nand web application for one?stage MASEM. Research synthesis methods, \n12(5), 590-606. https://doi.org/10.1002/jrsm.1498\n\nThe shiny app is based on the metaSEM package, which enables further \nanalyses within R: \nhttps://cran.r-project.org/web/packages/metaSEM/vignettes/Examples.html\n\n\n\nBest,\nLukasz\n-- \nLukasz Stasielowicz\nOsnabr?ck University\nInstitute for Psychology\nResearch methods, psychological assessment, and evaluation\nSeminarstra?e 20\n49074 Osnabr?ck (Germany)\n\nOn 19.10.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. predictors of longitudinal outcomes (Catia Oliveira)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Tue, 18 Oct 2022 19:53:40 +0000\n> From: Catia Oliveira <catia.oliveira at york.ac.uk>\n> To: R meta <r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] predictors of longitudinal outcomes\n> Message-ID:\n> \t<CACw+Tff0YnRmsFK8YXqe_dqn1EB16KSD6jt+v_e-dHf4sL6_-g at mail.gmail.com>\n> Content-Type: text/plain; charset=\"utf-8\"\n> \n> Dear all,\n> \n> I hope this email finds you well.\n> I am interested in analysing longitudinal studies where a particular group\n> of individuals (diagnosed at time 1) is followed across time and then have\n> their skills measured at some later date (follow-up - time 2). I am not\n> interested in estimating the difference in skills between time points, but\n> instead, I want to determine which factors measured at time 1 (e.g.,\n> gender, age) predict their skills at time 2. Assuming the models would be\n> regressions where the outcome variable at time 2 is predicted by each\n> factor at time 1 independently, could we use cohen's f as the effect size\n> for the meta-analysis and then run a meta-regression to see which factors\n> explain the most variance and which combinations lead to more explanatory\n> power? (e.g., voc ~ gender + SES). If this is completely wrong, could you\n> please point me to a study that has examined similar questions?\n> \n> The dataset I am imagining would look something like this:\n> \n> Study | Moderator | cohen's f | Outcome\n> \n> S1 | gender | .23  | voc\n> \n> S1 | SES | .12 | voc\n> \n> S2| gender | .02 | voc\n> \n> \n> Thank you!\n> \n> \t[[alternative HTML version deleted]]\n> \n> \n> \n> \n> ------------------------------\n> \n> Subject: Digest Footer\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n> \n> ------------------------------\n> \n> End of R-sig-meta-analysis Digest, Vol 65, Issue 11\n> ***************************************************",
+      "body_snippet": "Dear Catia,\n\nWouldn't it be more straightforward to address such research questions \nusing meta-analytic structural equation modeling? One could connect \nantecedents (e.g., gender, SES) with skills at",
+      "thread_id": "thread-e7078996395a",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-35e59b9eee31",
+      "message_id": "<CACw+TfcT42rKsZEpppV3FPLLnemqYziucBg6q8NpanTOSXnNfA@mail.gmail.com>",
+      "from_name": "Catia Oliveira",
+      "from_email_hash": "30516b3226e02bcb5551a11ef10c90c1444a67963e0155c2a6b2c5fb9046fa8d",
+      "date": "2022-10-19T15:26:42Z",
+      "subject": "[R-meta] predictors of longitudinal outcomes",
+      "subject_clean": "[R-meta] predictors of longitudinal outcomes",
+      "in_reply_to": "<7454505b-7729-4e87-6bf4-7ebc59f86f19@uni-osnabrueck.de>",
+      "references": [
+        "<mailman.4248.15.1666173602.36133.r-sig-meta-analysis@r-project.org>",
+        "<7454505b-7729-4e87-6bf4-7ebc59f86f19@uni-osnabrueck.de>"
+      ],
+      "body_plain": "Dear Lukasz,\n\nThank you for your suggestion. That is what I was thinking initially, but\nwas trying to come up with a simpler solution but also did not think it was\nsatisfactory.\n\nBest wishes,\n\nCatia\n\nOn Wed, 19 Oct 2022 at 14:25, Lukasz Stasielowicz <\nlukasz.stasielowicz at uni-osnabrueck.de> wrote:\n\n> Dear Catia,\n>\n> Wouldn't it be more straightforward to address such research questions\n> using meta-analytic structural equation modeling? One could connect\n> antecedents (e.g., gender, SES) with skills at T2 or even T3 if there\n> are some studies with multiple measurement occasions. One could also\n> compare different models to examine the relevance of specific predictors.\n>\n>\n> Some resources in case you're not familiar with this approach:\n>\n> Shiny app: https://sjak.shinyapps.io/webMASEM/\n>\n> Video demonstration: https://www.youtube.com/watch?v=0v-CdNLa_eo\n>\n> Article: Jak, S., Li, H., Kolbe, L., de Jonge, H., & Cheung, M. W. L.\n> (2021). Meta?analytic structural equation modeling made easy: A tutorial\n> and web application for one?stage MASEM. Research synthesis methods,\n> 12(5), 590-606. https://doi.org/10.1002/jrsm.1498\n>\n> The shiny app is based on the metaSEM package, which enables further\n> analyses within R:\n> https://cran.r-project.org/web/packages/metaSEM/vignettes/Examples.html\n>\n>\n>\n> Best,\n> Lukasz\n> --\n> Lukasz Stasielowicz\n> Osnabr?ck University\n> Institute for Psychology\n> Research methods, psychological assessment, and evaluation\n> Seminarstra?e 20\n> 49074 Osnabr?ck (Germany)\n>\n> On 19.10.2022 12:00, r-sig-meta-analysis-request at r-project.org wrote:\n> > Send R-sig-meta-analysis mailing list submissions to\n> >       r-sig-meta-analysis at r-project.org\n> >\n> > To subscribe or unsubscribe via the World Wide Web, visit\n> >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> > or, via email, send a message with subject or body 'help' to\n> >       r-sig-meta-analysis-request at r-project.org\n> >\n> > You can reach the person managing the list at\n> >       r-sig-meta-analysis-owner at r-project.org\n> >\n> > When replying, please edit your Subject line so it is more specific\n> > than \"Re: Contents of R-sig-meta-analysis digest...\"\n> >\n> >\n> > Today's Topics:\n> >\n> >     1. predictors of longitudinal outcomes (Catia Oliveira)\n> >\n> > ----------------------------------------------------------------------\n> >\n> > Message: 1\n> > Date: Tue, 18 Oct 2022 19:53:40 +0000\n> > From: Catia Oliveira <catia.oliveira at york.ac.uk>\n> > To: R meta <r-sig-meta-analysis at r-project.org>\n> > Subject: [R-meta] predictors of longitudinal outcomes\n> > Message-ID:\n> >       <\n> CACw+Tff0YnRmsFK8YXqe_dqn1EB16KSD6jt+v_e-dHf4sL6_-g at mail.gmail.com>\n> > Content-Type: text/plain; charset=\"utf-8\"\n> >\n> > Dear all,\n> >\n> > I hope this email finds you well.\n> > I am interested in analysing longitudinal studies where a particular\n> group\n> > of individuals (diagnosed at time 1) is followed across time and then\n> have\n> > their skills measured at some later date (follow-up - time 2). I am not\n> > interested in estimating the difference in skills between time points,\n> but\n> > instead, I want to determine which factors measured at time 1 (e.g.,\n> > gender, age) predict their skills at time 2. Assuming the models would be\n> > regressions where the outcome variable at time 2 is predicted by each\n> > factor at time 1 independently, could we use cohen's f as the effect size\n> > for the meta-analysis and then run a meta-regression to see which factors\n> > explain the most variance and which combinations lead to more explanatory\n> > power? (e.g., voc ~ gender + SES). If this is completely wrong, could you\n> > please point me to a study that has examined similar questions?\n> >\n> > The dataset I am imagining would look something like this:\n> >\n> > Study | Moderator | cohen's f | Outcome\n> >\n> > S1 | gender | .23  | voc\n> >\n> > S1 | SES | .12 | voc\n> >\n> > S2| gender | .02 | voc\n> >\n> >\n> > Thank you!\n> >\n> >       [[alternative HTML version deleted]]\n> >\n> >\n> >\n> >\n> > ------------------------------\n> >\n> > Subject: Digest Footer\n> >\n> > _______________________________________________\n> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> > To manage your subscription to this mailing list, go to:\n> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> >\n> >\n> > ------------------------------\n> >\n> > End of R-sig-meta-analysis Digest, Vol 65, Issue 11\n> > ***************************************************\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Lukasz,\n\nThank you for your suggestion. That is what I was thinking initially, but\nwas trying to come up with a simpler solution but also did not think it was\nsatisfactory.\n\nBest wishes,\n\nCatia\n\n",
+      "thread_id": "thread-e7078996395a",
+      "thread_depth": 1,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-41f2e66c2df6",
+      "message_id": "<e0376213-05f4-cdd9-ebc7-2dbff718e9d1@unipd.it>",
+      "from_name": "Patrizio E Tressoldi",
+      "from_email_hash": "a716683c164f88555339c266ef96fcafbdd479f25aa862d2711056fb0b3e54fb",
+      "date": "2022-10-20T12:39:00+02:00",
+      "subject": "[R-meta] bootstrap predicted value",
+      "subject_clean": "[R-meta] bootstrap predicted value",
+      "in_reply_to": "<mailman.4248.15.1666173602.36133.r-sig-meta-analysis@r-project.org>",
+      "references": [
+        "<mailman.4248.15.1666173602.36133.r-sig-meta-analysis@r-project.org>"
+      ],
+      "body_plain": "What is the formula to calculate the predictive values with \ncorresponding confidence intervals using the bootstrap procedure?\n\nThank you\n\nPatrizio\n\n-- \nPatrizio E. Tressoldi Ph.D.\nScience of Consciousness Research Group\nStudium Patavinum\nUniversit? di Padova\nPadova - ITALY\nhttp://www.patriziotressoldi.it\nhttps://socrg.org\nhttps://orcid.org/0000-0002-6404-0058\nhttps://opensciences.org/about/manifesto-for-a-post-materialist-science\n\nMake war history\nsupport https://en.emergency.it",
+      "body_snippet": "What is the formula to calculate the predictive values with \ncorresponding confidence intervals using the bootstrap procedure?\n\nThank you\n\nPatrizio\n\n-- \nPatrizio E. Tressoldi Ph.D.\nScience of Consciou",
+      "thread_id": "thread-41f2e66c2df6",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-5fb81be857d8",
+      "message_id": "<CAFUVuJyq_zyvf8qd849rW9e_oyCkfwqDXVw+L_fx+Dh7PZCjBQ@mail.gmail.com>",
+      "from_name": "James Pustejovsky",
+      "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
+      "date": "2022-10-20T15:29:19-05:00",
+      "subject": "[R-meta] bootstrap predicted value",
+      "subject_clean": "[R-meta] bootstrap predicted value",
+      "in_reply_to": "<e0376213-05f4-cdd9-ebc7-2dbff718e9d1@unipd.it>",
+      "references": [
+        "<mailman.4248.15.1666173602.36133.r-sig-meta-analysis@r-project.org>",
+        "<e0376213-05f4-cdd9-ebc7-2dbff718e9d1@unipd.it>"
+      ],
+      "body_plain": "Hi Patrizio,\n\nYour question is not specific enough for someone to provide a response.\nPerhaps if you can provide more context and detail, someone might be able\nto offer pointers. Is this in the context of a meta-analysis? predictive\nvalues of what? What sort of bootstrapping process are you considering?\n\nKind Regards,\nJames\n\nOn Thu, Oct 20, 2022 at 5:39 AM Patrizio E Tressoldi <\npatrizio.tressoldi at unipd.it> wrote:\n\n> What is the formula to calculate the predictive values with\n> corresponding confidence intervals using the bootstrap procedure?\n>\n> Thank you\n>\n> Patrizio\n>\n> --\n> Patrizio E. Tressoldi Ph.D.\n> Science of Consciousness Research Group\n> Studium Patavinum\n> Universit? di Padova\n> Padova - ITALY\n> http://www.patriziotressoldi.it\n> https://socrg.org\n> https://orcid.org/0000-0002-6404-0058\n> https://opensciences.org/about/manifesto-for-a-post-materialist-science\n>\n> Make war history\n> support https://en.emergency.it\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Patrizio,\n\nYour question is not specific enough for someone to provide a response.\nPerhaps if you can provide more context and detail, someone might be able\nto offer pointers. Is this in the contex",
+      "thread_id": "thread-41f2e66c2df6",
+      "thread_depth": 1,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-62970fe47424",
+      "message_id": "<edce83ee-af89-7a57-cbce-1d451d4bc077@unipd.it>",
+      "from_name": "Patrizio E Tressoldi",
+      "from_email_hash": "a716683c164f88555339c266ef96fcafbdd479f25aa862d2711056fb0b3e54fb",
+      "date": "2022-10-21T08:11:12+02:00",
+      "subject": "[R-meta] bootstrap predicted value",
+      "subject_clean": "[R-meta] bootstrap predicted value",
+      "in_reply_to": "<CAFUVuJyq_zyvf8qd849rW9e_oyCkfwqDXVw+L_fx+Dh7PZCjBQ@mail.gmail.com>",
+      "references": [
+        "<mailman.4248.15.1666173602.36133.r-sig-meta-analysis@r-project.org>",
+        "<e0376213-05f4-cdd9-ebc7-2dbff718e9d1@unipd.it>",
+        "<CAFUVuJyq_zyvf8qd849rW9e_oyCkfwqDXVw+L_fx+Dh7PZCjBQ@mail.gmail.com>"
+      ],
+      "body_plain": "Il 20/10/2022 22:29, James Pustejovsky wrote:\n> Hi Patrizio,\n>\n> Your question is not specific enough for someone to provide a \n> response. Perhaps if you can provide more context and detail, someone \n> might be able to offer pointers. Is this in the context of a \n> meta-analysis? predictive values of what? What sort of bootstrapping \n> process are you considering?\n>\n>\nLet's suppose we have to carry out a common meta-analysis with the \nfollowing syntax:\n\n >res= rma(yi,vi, method=\"REML\", data = data,? knha=TRUE)\n\nhow is it possible to apply a bootstrap procedure for the estimation of\n\n >predict(res)\n\n-- \nPatrizio E. Tressoldi Ph.D.\nScience of Consciousness Research Group\nStudium Patavinum\nUniversit? di Padova\nPadova - ITALY\nhttp://www.patriziotressoldi.it  \nhttps://socrg.org\nhttps://orcid.org/0000-0002-6404-0058\nhttps://opensciences.org/about/manifesto-for-a-post-materialist-science\n\nMake war history\nsupporthttps://en.emergency.it  \n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Il 20/10/2022 22:29, James Pustejovsky wrote:\n> Hi Patrizio,\n>\n> Your question is not specific enough for someone to provide a \n> response. Perhaps if you can provide more context and detail, someone ",
+      "thread_id": "thread-41f2e66c2df6",
+      "thread_depth": 2,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-ea74fecb2ef8",
+      "message_id": "<17840c8f69e64fe5b6df90b2bb81d457@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-10-21T11:00:06Z",
+      "subject": "[R-meta] bootstrap predicted value",
+      "subject_clean": "[R-meta] bootstrap predicted value",
+      "in_reply_to": "<edce83ee-af89-7a57-cbce-1d451d4bc077@unipd.it>",
+      "references": [
+        "<mailman.4248.15.1666173602.36133.r-sig-meta-analysis@r-project.org>",
+        "<e0376213-05f4-cdd9-ebc7-2dbff718e9d1@unipd.it>",
+        "<CAFUVuJyq_zyvf8qd849rW9e_oyCkfwqDXVw+L_fx+Dh7PZCjBQ@mail.gmail.com>",
+        "<edce83ee-af89-7a57-cbce-1d451d4bc077@unipd.it>"
+      ],
+      "body_plain": "Dear Patrizio,\n\nThere is an example of bootstrapping here:\n\nhttps://www.metafor-project.org/doku.php/tips:bootstrapping_with_ma\n\nShould be easy to adapt this to bootstrapping what predict() returns.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Patrizio E Tressoldi\n>Sent: Friday, 21 October, 2022 8:11\n>To: James Pustejovsky\n>Cc: r-sig-meta-analysis at r-project.org\n>Subject: Re: [R-meta] bootstrap predicted value\n>\n>Il 20/10/2022 22:29, James Pustejovsky wrote:\n>> Hi Patrizio,\n>>\n>> Your question is not specific enough for someone to provide a\n>> response. Perhaps if you can provide more context and detail, someone\n>> might be able to offer pointers. Is this in the context of a\n>> meta-analysis? predictive values of what? What sort of bootstrapping\n>> process are you considering?\n>>\n>>\n>Let's suppose we have to carry out a common meta-analysis with the\n>following syntax:\n>\n> >res= rma(yi,vi, method=\"REML\", data = data,? knha=TRUE)\n>\n>how is it possible to apply a bootstrap procedure for the estimation of\n>\n> >predict(res)\n>\n>--\n>Patrizio E. Tressoldi Ph.D.\n>Science of Consciousness Research Group\n>Studium Patavinum\n>Universit? di Padova\n>Padova - ITALY\n>http://www.patriziotressoldi.it\n>https://socrg.org\n>https://orcid.org/0000-0002-6404-0058\n>https://opensciences.org/about/manifesto-for-a-post-materialist-science",
+      "body_snippet": "Dear Patrizio,\n\nThere is an example of bootstrapping here:\n\nhttps://www.metafor-project.org/doku.php/tips:bootstrapping_with_ma\n\nShould be easy to adapt this to bootstrapping what predict() returns.\n\n",
+      "thread_id": "thread-41f2e66c2df6",
+      "thread_depth": 3,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-f23b6a6039dd",
+      "message_id": "<275539983.1319420.1667058615041@mail.yahoo.com>",
+      "from_name": "sima dast amooz",
+      "from_email_hash": "1946483548c78d1e5b021c47803e5fb04b90ae04620ae3d6d9683c9c4ac2c992",
+      "date": "2022-10-29T15:50:15Z",
+      "subject": "[R-meta] Ask a question about conducting meta analysis",
+      "subject_clean": "[R-meta] Ask a question about conducting meta analysis",
+      "in_reply_to": null,
+      "references": [
+        "<275539983.1319420.1667058615041.ref@mail.yahoo.com>"
+      ],
+      "body_plain": "I am planning to conduct a meta-analysis through R,\n\n\n\n\n\nMy data set includes the effect size of individualstudies, CI, and the \n\nnumber of treatment and control group cases. Can Iconduct a meta-analysis using R?\n\n\n\n\nIf yes, is the metafor the package I should use?\n\n\n\n\nI eagerly look forward to hearing back from you,\n\n\n\n\nBest wishes,\n\n\n\n\n\n\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "I am planning to conduct a meta-analysis through R,\n\n\n\n\n\nMy data set includes the effect size of individualstudies, CI, and the \n\nnumber of treatment and control group cases. Can Iconduct a meta-analy",
+      "thread_id": "thread-f23b6a6039dd",
+      "thread_depth": 0,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-d0815d8fc68f",
+      "message_id": "<bc0f6baf-0393-2ff3-7a94-b6e2d60b9993@dewey.myzen.co.uk>",
+      "from_name": "Michael Dewey",
+      "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
+      "date": "2022-10-29T17:14:58+01:00",
+      "subject": "[R-meta] Ask a question about conducting meta analysis",
+      "subject_clean": "[R-meta] Ask a question about conducting meta analysis",
+      "in_reply_to": "<275539983.1319420.1667058615041@mail.yahoo.com>",
+      "references": [
+        "<275539983.1319420.1667058615041.ref@mail.yahoo.com>",
+        "<275539983.1319420.1667058615041@mail.yahoo.com>"
+      ],
+      "body_plain": "Have you studied the examples on the metafor homepage \nhttp://www.metafor-project.org/doku.php\n\n\n\nOn 29/10/2022 16:50, sima dast amooz wrote:\n> \n> I am planning to conduct a meta-analysis through R,\n> \n> \n> \n> \n> \n> My data set includes the effect size of individualstudies, CI, and the\n> \n> number of treatment and control group cases. Can Iconduct a meta-analysis using R?\n> \n> \n> \n> \n> If yes, is the metafor the package I should use?\n> \n> \n> \n> \n> I eagerly look forward to hearing back from you,\n> \n> \n> \n> \n> Best wishes,\n> \n> \n> \n> \n> \n> \n> \n> \n> \t[[alternative HTML version deleted]]\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n\n-- \nMichael\nhttp://www.dewey.myzen.co.uk/home.html",
+      "body_snippet": "Have you studied the examples on the metafor homepage \nhttp://www.metafor-project.org/doku.php\n\n\n\nOn 29/10/2022 16:50, sima dast amooz wrote:\n> \n> I am planning to conduct a meta-analysis through R,\n>",
+      "thread_id": "thread-f23b6a6039dd",
+      "thread_depth": 1,
+      "month": "2022-10"
+    },
+    {
+      "id": "msg-599212647f23",
+      "message_id": "<8d27fee69a2e482fb1965b0597503ca0@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-10-30T18:03:41Z",
+      "subject": "[R-meta] Ask a question about conducting meta analysis",
+      "subject_clean": "[R-meta] Ask a question about conducting meta analysis",
+      "in_reply_to": "<bc0f6baf-0393-2ff3-7a94-b6e2d60b9993@dewey.myzen.co.uk>",
+      "references": [
+        "<275539983.1319420.1667058615041.ref@mail.yahoo.com>",
+        "<275539983.1319420.1667058615041@mail.yahoo.com>",
+        "<bc0f6baf-0393-2ff3-7a94-b6e2d60b9993@dewey.myzen.co.uk>"
+      ],
+      "body_plain": "Incidentally, I recently added a function to metafor to facilitate the calculation of the sampling variance of effect sizes from CIs:\n\nhttps://wviechtb.github.io/metafor/reference/conv.wald.html\n\nIts use is illustrated here:\n\nhttps://www.metafor-project.org/doku.php/tips:assembling_data_or\n\nThe example is based on (log) odds ratios, but the same principle applies to other 'effect sizes'.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Michael Dewey\n>Sent: Saturday, 29 October, 2022 18:15\n>To: sima dast amooz; r-sig-meta-analysis at r-project.org\n>Subject: Re: [R-meta] Ask a question about conducting meta analysis\n>\n>Have you studied the examples on the metafor homepage\n>http://www.metafor-project.org/doku.php\n>\n>On 29/10/2022 16:50, sima dast amooz wrote:\n>>\n>> I am planning to conduct a meta-analysis through R,\n>>\n>> My data set includes the effect size of individualstudies, CI, and the\n>> number of treatment and control group cases. Can Iconduct a meta-analysis using\n>R?\n>> If yes, is the metafor the package I should use?\n>> I eagerly look forward to hearing back from you,",
+      "body_snippet": "Incidentally, I recently added a function to metafor to facilitate the calculation of the sampling variance of effect sizes from CIs:\n\nhttps://wviechtb.github.io/metafor/reference/conv.wald.html\n\nIts ",
+      "thread_id": "thread-f23b6a6039dd",
+      "thread_depth": 2,
+      "month": "2022-10"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-47726029f5f9",
+      "subject": "[R-meta]  Questions about model averaging with complex multilevel meta-analytic model",
+      "message_count": 4,
+      "participants": [
+        "Margaret Slein",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2022-10-01T23:14:05-07:00",
+      "last_reply": "2022-10-03T09:54:00+00:00",
+      "root_message_id": "msg-47726029f5f9"
+    },
+    {
+      "id": "thread-45667cbca915",
+      "subject": "[R-meta]  phylogenetic information in both moderator and random part of rma.mv?",
+      "message_count": 1,
+      "participants": [
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2022-10-02T10:49:14+00:00",
+      "last_reply": "2022-10-02T10:49:14+00:00",
+      "root_message_id": "msg-45667cbca915"
+    },
+    {
+      "id": "thread-91ccd099e87d",
+      "subject": "[R-meta] Calculation of variance of ratio of means from summary statistics",
+      "message_count": 4,
+      "participants": [
+        "James Pustejovsky",
+        "Mick Girdwood",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2022-10-04T01:01:12+00:00",
+      "last_reply": "2022-10-05T09:36:42-05:00",
+      "root_message_id": "msg-91ccd099e87d"
+    },
+    {
+      "id": "thread-210931288ede",
+      "subject": "[R-meta] terminologies of multilevel and multivariate model when accounting for correlated errors",
+      "message_count": 5,
+      "participants": [
+        "Viechtbauer, Wolfgang (NP)",
+        "Yefeng Yang"
+      ],
+      "started": "2022-10-04T02:40:42+00:00",
+      "last_reply": "2022-10-06T23:56:25+00:00",
+      "root_message_id": "msg-210931288ede"
+    },
+    {
+      "id": "thread-3caedfa07616",
+      "subject": "[R-meta] Random-effects for correlational studies in rma.mv()",
+      "message_count": 1,
+      "participants": [
+        "Yuhang Hu"
+      ],
+      "started": "2022-10-06T20:02:36-07:00",
+      "last_reply": "2022-10-06T20:02:36-07:00",
+      "root_message_id": "msg-3caedfa07616"
+    },
+    {
+      "id": "thread-6c2c73df43a9",
+      "subject": "[R-meta] extracting effect sizes from multiple regression",
+      "message_count": 2,
+      "participants": [
+        "Catia Oliveira",
+        "Michael Dewey"
+      ],
+      "started": "2022-10-12T10:14:13+00:00",
+      "last_reply": "2022-10-12T13:09:36+01:00",
+      "root_message_id": "msg-6c2c73df43a9"
+    },
+    {
+      "id": "thread-097d06001634",
+      "subject": "[R-meta] predictors of longitudinal outcomes",
+      "message_count": 1,
+      "participants": [
+        "Catia Oliveira"
+      ],
+      "started": "2022-10-18T19:53:40+00:00",
+      "last_reply": "2022-10-18T19:53:40+00:00",
+      "root_message_id": "msg-097d06001634"
+    },
+    {
+      "id": "thread-e7078996395a",
+      "subject": "[R-meta] predictors of longitudinal outcomes",
+      "message_count": 2,
+      "participants": [
+        "Catia Oliveira",
+        "Lukasz Stasielowicz"
+      ],
+      "started": "2022-10-19T16:25:55+02:00",
+      "last_reply": "2022-10-19T15:26:42+00:00",
+      "root_message_id": "msg-e7078996395a"
+    },
+    {
+      "id": "thread-41f2e66c2df6",
+      "subject": "[R-meta] bootstrap predicted value",
+      "message_count": 4,
+      "participants": [
+        "James Pustejovsky",
+        "Patrizio E Tressoldi",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2022-10-20T12:39:00+02:00",
+      "last_reply": "2022-10-21T11:00:06+00:00",
+      "root_message_id": "msg-41f2e66c2df6"
+    },
+    {
+      "id": "thread-f23b6a6039dd",
+      "subject": "[R-meta] Ask a question about conducting meta analysis",
+      "message_count": 3,
+      "participants": [
+        "Michael Dewey",
+        "Viechtbauer, Wolfgang (NP)",
+        "sima dast amooz"
+      ],
+      "started": "2022-10-29T15:50:15+00:00",
+      "last_reply": "2022-10-30T18:03:41+00:00",
+      "root_message_id": "msg-f23b6a6039dd"
+    }
+  ]
+}

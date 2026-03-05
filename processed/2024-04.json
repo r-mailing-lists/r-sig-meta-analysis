@@ -1,0 +1,39 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2024-04",
+  "messages": [
+    {
+      "id": "msg-7204d4ed976e",
+      "message_id": "<CAEfFJJYxboWNL0-asUiH7JJLeMfk=6uhYBk86TpmUkApUzc-0w@mail.gmail.com>",
+      "from_name": "Noah Schroeder",
+      "from_email_hash": "cbb40fc7b415db09367b04e37ea152ea0b26ed9a84507b47ffe51e08c47144e4",
+      "date": "2024-04-30T15:10:36-07:00",
+      "subject": "[R-meta]  Conceptual Question: test of moderators CHE RVE vs 3LMA",
+      "subject_clean": "[R-meta]  Conceptual Question: test of moderators CHE RVE vs 3LMA",
+      "in_reply_to": "<CAFUVuJyQdOanf7wQm2rX=_fTco20jLZRmpj7-o62SS=XaP9vtg@mail.gmail.com>",
+      "references": [
+        "<CAEfFJJb9-UmWwVkJsRvkWHvsBvnSBtVvLOrzmRFdamAw-LGakQ@mail.gmail.com>",
+        "<CAFUVuJyQdOanf7wQm2rX=_fTco20jLZRmpj7-o62SS=XaP9vtg@mail.gmail.com>"
+      ],
+      "body_plain": "Hi James,\n Thank you so much for the detailed reply, this helps a lot!\nHave a great week everyone,\nNoah\n\nOn Tue, Apr 30, 2024 at 2:42?PM James Pustejovsky <jepusto at gmail.com> wrote:\n>\n> The NAs for p-values are caused by degrees of freedom (d.f.) that are very low, zero, or negative. In the small-sample corrections used within the robust variance estimation framework, you can think of the d.f. as a measure of how much information is available to estimate the standard error of the average effect size estimate or the standard error of a beta coefficient in a meta-regression. Very low, zero, or negative degrees of freedom means the structure of the data is such that you can't get much (if any) information to estimate the standard errors, so RVE is not going to work.\n>\n> This mostly occurs when one of the levels of a categorical moderator only includes a single study or a very small number of studies. robust variance estimators are calculated using only the _between-cluster_ variation in outcomes. Thus, if there's only one study in a category there's no information available to look at between-study variation within that category; if there's only two or three studies, there's only a tiny bit of information available to look at between-study variation---this is pretty analogous to trying to calculate a standard deviation from a sample of only three observations.\n>\n> It's possible to get very low degrees of freedom in the RVE framework in a situation where the model-based variance estimator (i.e., what you get from a typical 3-level model without RVE) provides a result because the latter uses a very different approach to estimating standard errors. For one, it is relying on different, stronger assumptions about the structure of the model; for another, it typically also involves some large-sample approximation so might not be as accurate an assessment of uncertainty as the RVE framework.\n>\n> In practice, the NAs for p-values based on RVEs are really an indication that you're using an inappropriate tool for testing the specific hypothesis---RVE-based tests will just not give you an answer, so you shouldn't conclude anything based on their results. One thing you can do is reconsider the hypotheses to be tested, and perhaps limit the hypotheses to those where you have a sufficient number of studies at each level of the moderator. For example, maybe you start out with five categories but in the last two of those categories there's just a single study each. You could revise the hypothesis to test for differences only between the first three categories because it's only there that you have a sufficient sample to even run a test.\n>\n> James\n>\n> On Tue, Apr 30, 2024 at 4:08?PM Noah Schroeder via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:\n>>\n>> Hi Everyone,\n>>  I am learning about CHE RVE meta-analysis and have been experimenting\n>> with it. Something I have noticed is that occasionally, my test of\n>> moderators pvalue will be NA. However, if I run the same code through\n>> a typical three level structure without CHE RVE, I get a pvalue for\n>> the test of moderators. I have the following conceptual questions I am\n>> hoping someone may be able to help with:\n>> 1) what might cause this NA pvalue to occur in the test of moderators\n>> when using CHE RVE?\n>> 2) Should this NA be interpreted? If so, should it be interpreted as a\n>> non-significant result on the test of moderators? I noticed that when\n>> this occurs i generally have notable overlap in the CIs.\n>> 3) In cases where i do get a pval for test of moderator, the levels of\n>> the moderator with only 1 comparison do not provide tval, pval, or CI.\n>> Is this because there is only one comparison at that level, so it is\n>> unable to make estimates to other comparisons within that level?\n>>\n>> For context:\n>> 3LMA code: structured similar to this code from Harrer et al.'s book:\n>>\n>> full.model <- rma.mv(yi = z,\n>>                      V = var.z,\n>>                      slab = author,\n>>                      data = Chernobyl,\n>>                      random = ~ 1 | author/es.id,\n>>                      test = \"t\",\n>>                      method = \"REML\")\n>>\n>>\n>> Conceptual overview of CHE RVE code:\n>> set rho\n>> set V with impute... from clubsandwich\n>> Similar structure for 3LMA, swapping V for the set V value.\n>> then using robust(model,... clubSandwich = TRUE).\n>>\n>> [sorry for not providing actual code, i don't have it on this\n>> computer. i can provide it if it is essential to answering the\n>> question].\n>>\n>> I am a self-taught R user, so if I am missing something really\n>> obvious, please don't hesitate to point it out. Many, many thanks - i\n>> have learned a lot from reading the old messages in this mailing list\n>> (apologies if this has been addressed before and I missed it) and the\n>> various example documentation online, and thank you all who have\n>> developed resources for R!\n>>\n>> Best regards,\n>> Noah\n>>\n>> _______________________________________________\n>> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n>> To manage your subscription to this mailing list, go to:\n>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis",
+      "body_snippet": "Hi James,\n Thank you so much for the detailed reply, this helps a lot!\nHave a great week everyone,\nNoah\n\nOn Tue, Apr 30, 2024 at 2:42?PM James Pustejovsky <jepusto at gmail.com> wrote:\n>\n> The NAs for",
+      "thread_id": "thread-7204d4ed976e",
+      "thread_depth": 0,
+      "month": "2024-04"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-7204d4ed976e",
+      "subject": "[R-meta]  Conceptual Question: test of moderators CHE RVE vs 3LMA",
+      "message_count": 1,
+      "participants": [
+        "Noah Schroeder"
+      ],
+      "started": "2024-04-30T15:10:36-07:00",
+      "last_reply": "2024-04-30T15:10:36-07:00",
+      "root_message_id": "msg-7204d4ed976e"
+    }
+  ]
+}

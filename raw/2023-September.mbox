@@ -1,0 +1,4127 @@
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep  1 09:47:49 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 1 Sep 2023 07:47:49 +0000
+Subject: [R-meta] 
+ Restricted cubic spline behaviour in moderator variable
+In-Reply-To: <946DBDD5-EBA9-4D5D-80C8-8664769191D6@latrobe.edu.au>
+References: <8AAD0B6F-58F5-4D04-B9DB-811F3AA265B7@latrobe.edu.au>
+ <7ef9b34a3531461e9abde3e6fd6659da@maastrichtuniversity.nl>
+ <946DBDD5-EBA9-4D5D-80C8-8664769191D6@latrobe.edu.au>
+Message-ID: <de2fe0e6b2d04da4a6a5057e7e6feb8f@maastrichtuniversity.nl>
+
+My preference is to set the knot positions manually anyway. That way, one is always going to use the same positions in all calls of rcs(), rcspline.eval(), and so on. And one can then avoid that knots are set at values like 51.64118 (I would just round this to 52).
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Mick Girdwood [mailto:M.Girdwood at latrobe.edu.au]
+>Sent: Thursday, 31 August, 2023 15:12
+>To: Viechtbauer, Wolfgang (NP)
+>Cc: R Special Interest Group for Meta-Analysis
+>Subject: Re: Restricted cubic spline behaviour in moderator variable
+>
+>Dear Wolfgang,
+>
+>Thank you for your quick reply. You are right this is to do with the NA values,
+>thank you. Those subtle NA differences ever so slightly affected knot position.
+>That wouldn?t be an issue but as you point out, we are then using a different
+>knot when using ?attr(rcs(model.matrix(res.rcs)[,2], 4), "parms")
+>
+>That alone didn?t fully explain my very aberrant plot that I saw. I tried playing
+>around with subtle changes to knot positions (e.g. moving + - 1) and that to the
+>naked eye actually made almost no change. The differences in the plots were
+>because:
+>
+>predict(model1, ?newmods=rcspline.eval(seq(1,100, length = 100), knots,
+>inclx=TRUE))) was using knot positions that were slightly different position to
+>those that were parameterised in the model (because of how I incorrectly attained
+>them), but in the predict/plot calculation this then resulted in stranger
+>predicted points. Hence strange tail.
+>
+>I guess I didn?t think of this, as when manually providing the knots, and then
+>using the same predict and plot before, there obviously wasn?t any difference as
+>they were based on exactly the same knot positions.
+>
+>Thanks for your help here, I was going to resort to manually providing knots as
+>per Harrell, 2015 recommendations (which is what rcs does?), but this will save
+>some hassle.
+>
+>Thanks
+>Mick
+>
+>On 31 Aug 2023, at 18:21, Viechtbauer, Wolfgang (NP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+>Dear Mick,
+>
+>This might have to do with missing values. In the example on the metafor website
+>(https://www.metafor-project.org/doku.php/tips:non_linear_meta_regression), both
+>of these lead to the exact same results:
+>
+>res.rcs <- rma(yi, vi, mods = ~ rcs(xi, 4), data=dat)
+>res.rcs
+>
+>knots <- attr(rcs(model.matrix(res.rcs)[,2], 4), "parms")
+>knots
+>
+>res.rcs <- rma(yi, vi, mods = ~ rcs(xi, knots), data=dat)
+>res.rcs
+>
+>But let's make some of the yi values missing:
+>
+>dat$yi[1:10] <- NA
+>
+>Then rerunning the code above will lead to somewhat different results.
+>
+>This happens because:
+>
+>rcs(dat$xi, 4)
+>
+>is actually based on the entire dataset, while
+>
+>attr(rcs(model.matrix(res.rcs)[,2], 4), "parms")
+>
+>uses only the rows actually included in the analysis (i.e., removing the first 10
+>rows).
+>
+>If you use:
+>
+>knots <- attr(rcs(dat$xi, 4), "parms")
+>
+>then
+>
+>res.rcs <- rma(yi, vi, mods = ~ rcs(xi, knots), data=dat)
+>res.rcs
+>
+>will give the same results again.
+>
+>I have changed the code in the example to use 'knots <- attr(rcs(dat$xi, 4),
+>"parms")' as this is more accurate as to what is happening (even though it makes
+>no difference in the example on the website since there are no missing values).
+>Also, I've expanded the first footnote which gives a hint in this direction.
+>
+>It would be nice if you could confirm that this solves the issue. If not, we will
+>have to go digging deeper.
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>Behalf Of Mick Girdwood via R-sig-meta-analysis
+>>Sent: Thursday, 31 August, 2023 4:17
+>>To: Gabriel Cotlier via R-sig-meta-analysis
+>>Cc: Mick Girdwood
+>>Subject: [R-meta] Restricted cubic spline behaviour in moderator variable
+>>
+>>Hi everyone,
+>>
+>>I am fitting an rma.mv model with a restricted cubic spline moderator. I have
+>>followed the helpful examples from the metafor website, as well as looking
+>>through this mailing list for previous examples. All of that went well. I have
+>>however run into an interesting issue.
+>>
+>>I guess this relates less to meta-analysis as such and more specifically to the
+>>rcs fitting/package. Here is my model:
+>>
+>>model1 <- rma.mv(yi, V,
+>> mods = ~rcs(timepoint, 4),
+>> data = data,
+>> random = list(~ timepoint|cohort),
+>> struct = c("CAR?))
+>>
+>>I have been comparing the model fit for different moderator structures using
+>>heuristics (AIC, BIC etc) as well as visually looking at predicted plots. The
+>fit
+>>of this example seemed quite strange, with the tail of the spline at the last
+>>knot angling well away from any data points. I was curious and went and
+>extracted
+>>the knot positions with:
+>>
+>>knots <- attr(rcs(model.matrix(model1)[,2], 4), "parms?)
+>>(e.g. in my example: 3.00000, 6.00000, 12.00000, 51.64118)
+>>
+>>I then refit another model, but specifying these exact same knot positions
+>>
+>>model2 <- rma.mv(yi, V,
+>> mods = ~rcs(timepoint, c(3.00000, 6.00000, 12.00000,
+>>51.64118)),
+>> data = data,
+>> random = list(~ timepoint|cohort),
+>> struct = c("CAR?))
+>>
+>>This time the fit is completely different (not subtle, they are two completely
+>>different angles on the 3rd spline/last knot) - i.e. in model 2 the tail of the
+>>spline is perhaps what would be ?expected' of the data. What is going on here?
+>To
+>>my mind I am fitting the same model with the same knot positions (as I used the
+>>knot positions from the first model to fit the second), but have just specified
+>>them differently, why are they behaving differently? Is there some other
+>>parameter of rcs that I am not using/missing/misunderstanding? I tried reading
+>>into the help and source for rcs but didn?t notice anything. I?m guessing this
+>>wouldn?t be metafor related... I tried testing what the attributes of the two
+>>different rcs calls looked like but they were identical too, so I don?t
+>>understand how it can fit them so differently? I also tried fitting the same
+>>model with splines::ns and the fit was identical to model2. Any ideas what is
+>>happening with model1?
+>>
+>>Sorry if this question is perhaps slightly off topic.
+>>Thank you for your help as always.
+>>
+>>Mick Girdwood
+>>La Trobe University | Australia
+>
+>La Trobe University | TEQSA PRV12132 - Australian University | CRICOS Provider
+>00115M
+
+From w||m@_ch@r|ott@the|||g @end|ng |rom m@||box@tu-dre@den@de  Sat Sep  2 11:28:57 2023
+From: w||m@_ch@r|ott@the|||g @end|ng |rom m@||box@tu-dre@den@de (Wilma Charlott Theilig)
+Date: Sat, 2 Sep 2023 09:28:57 +0000
+Subject: [R-meta] Checking for Multi-Collinearity with continuous and
+ categorial predictors
+Message-ID: <bff619e24cca49f5b252c35725dfc2dd@mailbox.tu-dresden.de>
+
+Hi all,
+
+I wanted to ask if it is possible to check both continuous and categorical predictors for multi-collinearity at the same time (in one analysis, so to speak) and how I can implement this in R.
+
+If anyone can help me in this regard, I would be very pleased!
+
+
+Kind regards
+
+Wilma
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sat Sep  2 13:16:07 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Sat, 2 Sep 2023 11:16:07 +0000
+Subject: [R-meta] Checking for Multi-Collinearity with continuous and
+ categorial predictors
+In-Reply-To: <bff619e24cca49f5b252c35725dfc2dd@mailbox.tu-dresden.de>
+References: <bff619e24cca49f5b252c35725dfc2dd@mailbox.tu-dresden.de>
+Message-ID: <998dddc25fae41af98122a0ee460b030@maastrichtuniversity.nl>
+
+Dear Wilma,
+
+You mean in a meta-regression analysis? You can do this with metafor::vif(). After fitting a meta-regression model, you can use the vif() function to obtain variance inflation factors to indicate the degree of multicollinearity of the predictors. The predictors can be both continuous and categorical, so this works just fine.
+
+See here for the documentation (and examples):
+
+https://wviechtb.github.io/metafor/reference/vif.html
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Wilma Charlott Theilig via R-sig-meta-analysis
+>Sent: Saturday, 02 September, 2023 11:29
+>To: r-sig-meta-analysis at r-project.org
+>Cc: Wilma Charlott Theilig
+>Subject: [R-meta] Checking for Multi-Collinearity with continuous and categorial
+>predictors
+>
+>Hi all,
+>
+>I wanted to ask if it is possible to check both continuous and categorical
+>predictors for multi-collinearity at the same time (in one analysis, so to speak)
+>and how I can implement this in R.
+>
+>If anyone can help me in this regard, I would be very pleased!
+>
+>Kind regards
+>
+>Wilma
+
+
+From w||m@_ch@r|ott@the|||g @end|ng |rom m@||box@tu-dre@den@de  Tue Sep  5 06:31:52 2023
+From: w||m@_ch@r|ott@the|||g @end|ng |rom m@||box@tu-dre@den@de (Wilma Charlott Theilig)
+Date: Tue, 5 Sep 2023 04:31:52 +0000
+Subject: [R-meta] Checking for Multi-Collinearity with continuous and
+ categorial predictors
+In-Reply-To: <998dddc25fae41af98122a0ee460b030@maastrichtuniversity.nl>
+References: <bff619e24cca49f5b252c35725dfc2dd@mailbox.tu-dresden.de>,
+ <998dddc25fae41af98122a0ee460b030@maastrichtuniversity.nl>
+Message-ID: <f1f4f68f1921492cab4b72e257dd7b89@mailbox.tu-dresden.de>
+
+
+Dear Wolfgang,
+
+first of all, thank you for your reply!
+
+If I follow your description, I get the following error:
+
+
+Error in x$terms %||% attr(x, "terms") %||% stop("no terms component nor attribute") :
+
+  no terms component nor attribute
+
+In addition: Warning message:
+
+In vif.default(res2) : No intercept: vifs may not be sensible.
+
+
+Is there a way to fix this?
+
+I would really appreciate your help!
+
+Thank you so much in advance.
+
+
+Best,
+
+Wilma
+
+
+
+
+
+________________________________
+Von: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Gesendet: Samstag, 2. September 2023 13:16:07
+An: R Special Interest Group for Meta-Analysis
+Cc: Theilig, Wilma Charlott
+Betreff: RE: Checking for Multi-Collinearity with continuous and categorial predictors
+
+Dear Wilma,
+
+You mean in a meta-regression analysis? You can do this with metafor::vif(). After fitting a meta-regression model, you can use the vif() function to obtain variance inflation factors to indicate the degree of multicollinearity of the predictors. The predictors can be both continuous and categorical, so this works just fine.
+
+See here for the documentation (and examples):
+
+https://wviechtb.github.io/metafor/reference/vif.html
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Wilma Charlott Theilig via R-sig-meta-analysis
+>Sent: Saturday, 02 September, 2023 11:29
+>To: r-sig-meta-analysis at r-project.org
+>Cc: Wilma Charlott Theilig
+>Subject: [R-meta] Checking for Multi-Collinearity with continuous and categorial
+>predictors
+>
+>Hi all,
+>
+>I wanted to ask if it is possible to check both continuous and categorical
+>predictors for multi-collinearity at the same time (in one analysis, so to speak)
+>and how I can implement this in R.
+>
+>If anyone can help me in this regard, I would be very pleased!
+>
+>Kind regards
+>
+>Wilma
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Sep  5 08:52:21 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 5 Sep 2023 06:52:21 +0000
+Subject: [R-meta] Checking for Multi-Collinearity with continuous and
+ categorial predictors
+In-Reply-To: <f1f4f68f1921492cab4b72e257dd7b89@mailbox.tu-dresden.de>
+References: <bff619e24cca49f5b252c35725dfc2dd@mailbox.tu-dresden.de>,
+ <998dddc25fae41af98122a0ee460b030@maastrichtuniversity.nl>
+ <f1f4f68f1921492cab4b72e257dd7b89@mailbox.tu-dresden.de>
+Message-ID: <9e67c6e9ccf7463599f5660792022aef@maastrichtuniversity.nl>
+
+Dear Wilma,
+
+In general, always provide a fully reproducible example to illustrate a problem. For example, like this:
+
+library(metafor)
+library(car)
+
+dat <- dat.bangertdrowns2004
+res <- rma(yi, vi, mods = ~ length + wic + feedback + info + pers + imag + meta, data=dat)
+vif(res)
+
+So the problem arises because you are loading the 'car' package *after* you have loaded metafor and it also has a vif() function. The vif() function from metafor is then 'masked', so calling vif() calls car::vif() and not metafor::vif(). But you can always explicitly tell R which vif() function to call, like this:
+
+metafor::vif(res)
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Wilma Charlott Theilig [mailto:wilma_charlott.theilig at mailbox.tu-
+>dresden.de]
+>Sent: Tuesday, 05 September, 2023 6:32
+>To: Viechtbauer, Wolfgang (NP); R Special Interest Group for Meta-Analysis
+>Subject: AW: Checking for Multi-Collinearity with continuous and categorial
+>predictors
+>
+>Dear Wolfgang,
+>first of all, thank you for your reply!
+>If I follow your description, I?get the following error:
+>
+>Error in x$terms %||% attr(x, "terms") %||% stop("no terms component nor
+>attribute") :
+>? no terms component nor attribute
+>In addition: Warning message:
+>In vif.default(res2) : No intercept: vifs may not be sensible.
+>
+>Is there a way to fix this?
+>I would really appreciate your help!
+>Thank you so much in advance.
+>
+>Best,
+>Wilma
+>________________________________________
+>Von: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+>Gesendet: Samstag, 2. September 2023 13:16:07
+>An: R Special Interest Group for Meta-Analysis
+>Cc: Theilig, Wilma Charlott
+>Betreff: RE: Checking for Multi-Collinearity with continuous and categorial
+>predictors
+>
+>Dear Wilma,
+>
+>You mean in a meta-regression analysis? You can do this with metafor::vif().
+>After fitting a meta-regression model, you can use the vif() function to obtain
+>variance inflation factors to indicate the degree of multicollinearity of the
+>predictors. The predictors can be both continuous and categorical, so this works
+>just fine.
+>
+>See here for the documentation (and examples):
+>
+>https://wviechtb.github.io/metafor/reference/vif.html
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>Behalf Of Wilma Charlott Theilig via R-sig-meta-analysis
+>>Sent: Saturday, 02 September, 2023 11:29
+>>To: r-sig-meta-analysis at r-project.org
+>>Cc: Wilma Charlott Theilig
+>>Subject: [R-meta] Checking for Multi-Collinearity with continuous and categorial
+>>predictors
+>>
+>>Hi all,
+>>
+>>I wanted to ask if it is possible to check both continuous and categorical
+>>predictors for multi-collinearity at the same time (in one analysis, so to
+>speak)
+>>and how I can implement this in R.
+>>
+>>If anyone can help me in this regard, I would be very pleased!
+>>
+>>Kind regards
+>>
+>>Wilma
+
+
+From 64zone @end|ng |rom gm@||@com  Wed Sep  6 17:17:01 2023
+From: 64zone @end|ng |rom gm@||@com (Liu Sicong)
+Date: Wed, 6 Sep 2023 15:17:01 +0000
+Subject: [R-meta] increase axis text size in funnel plot
+Message-ID: <IA1PR12MB604345CEF0D6A9E69173BAFEAAEFA@IA1PR12MB6043.namprd12.prod.outlook.com>
+
+Dear All,
+
+I have run into some difficulties when making a figure consisting of multiple funnel plots, while trying to minimize figure post-processing. It would be great to hear any suggestions for the questions below:
+
+  *   1. How to specifically adjust the size of the axis text and tick labels? I hope to find an argument like ?size? in ggplot to achieve it.
+  *   2. How to specifically increase the size of the funnel plot legend?
+  *   3. Is there a way to create a composite figure in a way similar to ?ggarrange? in ggplot when having multiple funnel plots?
+
+Thank you in advance!
+
+Best regards,
+Sicong (Zone)
+
+
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Wed Sep  6 18:04:05 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Wed, 6 Sep 2023 17:04:05 +0100
+Subject: [R-meta] increase axis text size in funnel plot
+In-Reply-To: <IA1PR12MB604345CEF0D6A9E69173BAFEAAEFA@IA1PR12MB6043.namprd12.prod.outlook.com>
+References: <IA1PR12MB604345CEF0D6A9E69173BAFEAAEFA@IA1PR12MB6043.namprd12.prod.outlook.com>
+Message-ID: <55f6f825-fbcd-c042-f92c-989d7640c469@dewey.myzen.co.uk>
+
+Dear Sicong
+
+There are many, many packages on CRAN which generate forest plots, some 
+as standalone facilities and some as part of genral meta-analysis 
+software, so unless you give us more detail about which package you are 
+using and what happened when you tried we are unlikely to be able to be 
+of much help.
+
+Michael
+
+On 06/09/2023 16:17, Liu Sicong via R-sig-meta-analysis wrote:
+> Dear All,
+> 
+> I have run into some difficulties when making a figure consisting of multiple funnel plots, while trying to minimize figure post-processing. It would be great to hear any suggestions for the questions below:
+> 
+>    *   1. How to specifically adjust the size of the axis text and tick labels? I hope to find an argument like ?size? in ggplot to achieve it.
+>    *   2. How to specifically increase the size of the funnel plot legend?
+>    *   3. Is there a way to create a composite figure in a way similar to ?ggarrange? in ggplot when having multiple funnel plots?
+> 
+> Thank you in advance!
+> 
+> Best regards,
+> Sicong (Zone)
+> 
+> 
+> 
+> 	[[alternative HTML version deleted]]
+> 
+> 
+> 
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From 64zone @end|ng |rom gm@||@com  Wed Sep  6 18:09:10 2023
+From: 64zone @end|ng |rom gm@||@com (Liu Sicong)
+Date: Wed, 6 Sep 2023 16:09:10 +0000
+Subject: [R-meta] increase axis text size in funnel plot
+In-Reply-To: <55f6f825-fbcd-c042-f92c-989d7640c469@dewey.myzen.co.uk>
+References: <IA1PR12MB604345CEF0D6A9E69173BAFEAAEFA@IA1PR12MB6043.namprd12.prod.outlook.com>
+ <55f6f825-fbcd-c042-f92c-989d7640c469@dewey.myzen.co.uk>
+Message-ID: <IA1PR12MB60430511E0062AB2BB33CBD0AAEFA@IA1PR12MB6043.namprd12.prod.outlook.com>
+
+Dear Michael,
+
+My apologies for missing important details. I was using metofor and please see my current codes below for getting the composite figure:
+
+jpeg("../figure/funnel.jpeg", width = 1600, height = 1920, units = "px", quality = 100)
+par(mfrow=c(3,1))
+metafor::funnel(rma(d, vi =  dv_LOR2g, method = "REML", data = aggr_btwES_pt), xlab = "Effect Size (d)", level = c(90, 95, 99), shade=c("white", "gray55", "gray75"), legend = F, addtau2 = T, cex = 1,  at = c(-5, 0, 5))
+metafor::funnel(rma(d, vi =  dv_LOR2g, method = "REML", data = aggr_btwES_hc), xlab = "Effect Size (d)", level = c(90, 95, 99), shade=c("white", "gray55", "gray75"), legend = F, addtau2 = T, cex = 1)
+metafor::funnel(rma(d, vi =  dv_LOR2g, method = "REML", data = aggr_btwES), xlab = "Effect Size (d)", level = c(90, 95, 99), shade=c("white", "gray55", "gray75"), legend = F, addtau2 = T, cex = 1)
+dev.off()
+
+Thank you!
+
+Cheers,
+Sicong (Zone)
+-------------
+
+
+From: Michael Dewey <lists at dewey.myzen.co.uk>
+Date: Wednesday, September 6, 2023 at 12:04 PM
+To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>
+Cc: Liu Sicong <64zone at gmail.com>
+Subject: Re: [R-meta] increase axis text size in funnel plot
+Dear Sicong
+
+There are many, many packages on CRAN which generate forest plots, some
+as standalone facilities and some as part of genral meta-analysis
+software, so unless you give us more detail about which package you are
+using and what happened when you tried we are unlikely to be able to be
+of much help.
+
+Michael
+
+On 06/09/2023 16:17, Liu Sicong via R-sig-meta-analysis wrote:
+> Dear All,
+>
+> I have run into some difficulties when making a figure consisting of multiple funnel plots, while trying to minimize figure post-processing. It would be great to hear any suggestions for the questions below:
+>
+>    *   1. How to specifically adjust the size of the axis text and tick labels? I hope to find an argument like ?size? in ggplot to achieve it.
+>    *   2. How to specifically increase the size of the funnel plot legend?
+>    *   3. Is there a way to create a composite figure in a way similar to ?ggarrange? in ggplot when having multiple funnel plots?
+>
+> Thank you in advance!
+>
+> Best regards,
+> Sicong (Zone)
+>
+>
+>
+>        [[alternative HTML version deleted]]
+>
+>
+>
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+--
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep  8 13:55:37 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 8 Sep 2023 11:55:37 +0000
+Subject: [R-meta] increase axis text size in funnel plot
+In-Reply-To: <IA1PR12MB60430511E0062AB2BB33CBD0AAEFA@IA1PR12MB6043.namprd12.prod.outlook.com>
+References: <IA1PR12MB604345CEF0D6A9E69173BAFEAAEFA@IA1PR12MB6043.namprd12.prod.outlook.com>
+ <55f6f825-fbcd-c042-f92c-989d7640c469@dewey.myzen.co.uk>
+ <IA1PR12MB60430511E0062AB2BB33CBD0AAEFA@IA1PR12MB6043.namprd12.prod.outlook.com>
+Message-ID: <1d6f206620474e6db06f20574718c09a@maastrichtuniversity.nl>
+
+Dear Sicong,
+
+To adjust the size of the axis text and tick labels, use 'cex.axis' and 'cex.lab'.
+
+For example:
+
+dat <- escalc(measure="RR", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)
+res <- rma(yi, vi, data=dat)
+
+funnel(res)
+funnel(res, cex=2)
+funnel(res, cex=2, cex.axis=1.5, cex.lab=1.5)
+
+To adjust the legend size, you will need the development version of metafor:
+
+https://wviechtb.github.io/metafor/#installation
+
+Then the 'legend' argument allows more flexibility. For example:
+
+funnel(res, legend=TRUE)
+funnel(res, legend=list(cex=2))
+
+'cex' can even take on three different values, the first for the text, the second for the boxes, the third for the points. Like this:
+
+funnel(res, cex=2, legend=list(cex=c(2,3,1)))
+
+And to create 'composite figures', you can use:
+
+par(mfrow=c(2,2))
+funnel(res)
+funnel(res, cex=2, cex.axis=1.5, cex.lab=1.5)
+funnel(res, legend=TRUE)
+funnel(res, cex=2, legend=list(cex=c(2,3,1)))
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Liu Sicong via R-sig-meta-analysis
+>Sent: Wednesday, 06 September, 2023 18:09
+>To: Michael Dewey; R Special Interest Group for Meta-Analysis
+>Cc: Liu Sicong
+>Subject: Re: [R-meta] increase axis text size in funnel plot
+>
+>Dear Michael,
+>
+>My apologies for missing important details. I was using metofor and please see my
+>current codes below for getting the composite figure:
+>
+>jpeg("../figure/funnel.jpeg", width = 1600, height = 1920, units = "px", quality
+>= 100)
+>par(mfrow=c(3,1))
+>metafor::funnel(rma(d, vi =  dv_LOR2g, method = "REML", data = aggr_btwES_pt),
+>xlab = "Effect Size (d)", level = c(90, 95, 99), shade=c("white", "gray55",
+>"gray75"), legend = F, addtau2 = T, cex = 1,  at = c(-5, 0, 5))
+>metafor::funnel(rma(d, vi =  dv_LOR2g, method = "REML", data = aggr_btwES_hc),
+>xlab = "Effect Size (d)", level = c(90, 95, 99), shade=c("white", "gray55",
+>"gray75"), legend = F, addtau2 = T, cex = 1)
+>metafor::funnel(rma(d, vi =  dv_LOR2g, method = "REML", data = aggr_btwES), xlab
+>= "Effect Size (d)", level = c(90, 95, 99), shade=c("white", "gray55", "gray75"),
+>legend = F, addtau2 = T, cex = 1)
+>dev.off()
+>
+>Thank you!
+>
+>Cheers,
+>Sicong (Zone)
+>-------------
+>
+>From: Michael Dewey <lists at dewey.myzen.co.uk>
+>Date: Wednesday, September 6, 2023 at 12:04 PM
+>To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+>project.org>
+>Cc: Liu Sicong <64zone at gmail.com>
+>Subject: Re: [R-meta] increase axis text size in funnel plot
+>Dear Sicong
+>
+>There are many, many packages on CRAN which generate forest plots, some
+>as standalone facilities and some as part of genral meta-analysis
+>software, so unless you give us more detail about which package you are
+>using and what happened when you tried we are unlikely to be able to be
+>of much help.
+>
+>Michael
+>
+>On 06/09/2023 16:17, Liu Sicong via R-sig-meta-analysis wrote:
+>> Dear All,
+>>
+>> I have run into some difficulties when making a figure consisting of multiple
+>funnel plots, while trying to minimize figure post-processing. It would be great
+>to hear any suggestions for the questions below:
+>>
+>>    *   1. How to specifically adjust the size of the axis text and tick labels?
+>I hope to find an argument like ?size? in ggplot to achieve it.
+>>    *   2. How to specifically increase the size of the funnel plot legend?
+>>    *   3. Is there a way to create a composite figure in a way similar to
+>?ggarrange? in ggplot when having multiple funnel plots?
+>>
+>> Thank you in advance!
+>>
+>> Best regards,
+>> Sicong (Zone)
+
+From yh342 @end|ng |rom n@u@edu  Mon Sep 11 05:32:26 2023
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Sun, 10 Sep 2023 20:32:26 -0700
+Subject: [R-meta] Specifying variable names in metafor::vec2mat()
+Message-ID: <CA+dzWjr6BDUj7ofn46XNa+xnHW5sJyxjKDjoCuLXWMtBijCq6w@mail.gmail.com>
+
+Hello Everyone,
+
+I'm using the metafor::vec2mat() as shown in the toy example below.
+However, I wonder how I should specify the order of the variables' names
+defined in "dimnames=" when converting the vector of coefficients to a
+correlation matrix using metafor::vec2mat()?
+
+Is there generally a rule or a technique to order the variables' names
+correctly in "vec2mat()", especially if there are many variable names?
+
+Thanks,
+Yuhang
+
+# EXAMPLE:
+tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat.craft2003)
+V <- tmp$V
+dat <- tmp$dat
+
+res <- rma.mv(yi~ var1.var2 - 1, V,
+              random = ~  var1.var2| study, struct = "UN",
+              data=dat)
+
+vec2mat(coef(res), dimnames= ??????)
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Sep 12 10:06:42 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 12 Sep 2023 08:06:42 +0000
+Subject: [R-meta] Specifying variable names in metafor::vec2mat()
+In-Reply-To: <CA+dzWjr6BDUj7ofn46XNa+xnHW5sJyxjKDjoCuLXWMtBijCq6w@mail.gmail.com>
+References: <CA+dzWjr6BDUj7ofn46XNa+xnHW5sJyxjKDjoCuLXWMtBijCq6w@mail.gmail.com>
+Message-ID: <fabf255439c243dfaa5684086f64111b@maastrichtuniversity.nl>
+
+Dear Yuhang,
+
+Since coef(res) is of length 6, vec2mat() will put these values (i.e., the estimated average correlations) into a 4x4 (correlation) matrix. Given the ordering of the values in coef(res), the appropriate dimension names would be something like this:
+
+vec2mat(coef(res), dimnames=c("acog","asom","conf","perf"))
+
+However, there is no general rule for this, as it depends on the ordering of the values in coef(res).
+
+I have tried to make various functions in metafor behave in a consistent manner when it comes to ordering certain elements, but in this case, it is really up to the user to check that adding dimension names even makes sense for the resulting matrix. For example:
+
+vec2mat(sample(coef(res)))
+
+is perfectly fine in principle (albeit a bit weird), but it no longer makes sense to say that all values in the first column/row pertain to the correlations between one of the four variables and the other three variables (unless you get lucky) and so on.
+
+But say the coefficients had been ordered like this:
+
+coef(res)[c(3,5,6,1,2,4)]
+
+Then the appropriate dimension names would be:
+
+vec2mat(coef(res)[c(3,5,6,1,2,4)], dimnames=c("perf","acog","asom","conf"))
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Yuhang Hu via R-sig-meta-analysis
+>Sent: Monday, 11 September, 2023 5:32
+>To: R meta
+>Cc: Yuhang Hu
+>Subject: [R-meta] Specifying variable names in metafor::vec2mat()
+>
+>Hello Everyone,
+>
+>I'm using the metafor::vec2mat() as shown in the toy example below.
+>However, I wonder how I should specify the order of the variables' names
+>defined in "dimnames=" when converting the vector of coefficients to a
+>correlation matrix using metafor::vec2mat()?
+>
+>Is there generally a rule or a technique to order the variables' names
+>correctly in "vec2mat()", especially if there are many variable names?
+>
+>Thanks,
+>Yuhang
+>
+># EXAMPLE:
+>tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat.craft2003)
+>V <- tmp$V
+>dat <- tmp$dat
+>
+>res <- rma.mv(yi~ var1.var2 - 1, V,
+>              random = ~  var1.var2| study, struct = "UN",
+>              data=dat)
+>
+>vec2mat(coef(res), dimnames= ??????)
+
+
+From yh342 @end|ng |rom n@u@edu  Tue Sep 12 17:35:31 2023
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Tue, 12 Sep 2023 08:35:31 -0700
+Subject: [R-meta] Specifying variable names in metafor::vec2mat()
+In-Reply-To: <fabf255439c243dfaa5684086f64111b@maastrichtuniversity.nl>
+References: <CA+dzWjr6BDUj7ofn46XNa+xnHW5sJyxjKDjoCuLXWMtBijCq6w@mail.gmail.com>
+ <fabf255439c243dfaa5684086f64111b@maastrichtuniversity.nl>
+Message-ID: <CA+dzWjqymcTNpm9wB9TZxd5ah1ejGKLEhsVxhWt2nKttiw6jQg@mail.gmail.com>
+
+Thank you, Wolfgang. When you say "it depends on the ordering of the values
+in coef(res)", could you please elaborate on how exactly the user should
+follow that ordering when specifying the "dimnames=" esp. when the number
+of variables is larger?
+
+For example, below, I have 8 variables with their names being `c("L2R",
+"L2DA", "L2DF", "L2V", "L2G", "L2P", "L2M", "L2L")`. But I wonder how to
+order them correctly in "dimnames="?
+
+In fact, I think I'm getting the order for 7 of them right `c("L2DA",
+"L2DF", "L2G", "L2L", "L2M", "L2P", "L2V")` but don't know where to put
+"L2R" in that mix?
+
+dat <- read.csv("https://raw.githubusercontent.com/ilzl/i/master/j.csv")
+
+dat1 <- escalc("COR", ri = ri, ni = N, data = dat)
+
+dat2 <-
+transform(dat1,var1.var2=apply(dat1[c("var1","var2")],1,paste0,collapse="."))
+
+res <- rma(yi~var1.var2+0, 1, data=dat2)
+
+vec2mat(coef(res), dimnames = ????)
+
+Many thanks for your expertise,
+Yuhang
+
+On Tue, Sep 12, 2023 at 1:06?AM Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+> Dear Yuhang,
+>
+> Since coef(res) is of length 6, vec2mat() will put these values (i.e., the
+> estimated average correlations) into a 4x4 (correlation) matrix. Given the
+> ordering of the values in coef(res), the appropriate dimension names would
+> be something like this:
+>
+> vec2mat(coef(res), dimnames=c("acog","asom","conf","perf"))
+>
+> However, there is no general rule for this, as it depends on the ordering
+> of the values in coef(res).
+>
+> I have tried to make various functions in metafor behave in a consistent
+> manner when it comes to ordering certain elements, but in this case, it is
+> really up to the user to check that adding dimension names even makes sense
+> for the resulting matrix. For example:
+>
+> vec2mat(sample(coef(res)))
+>
+> is perfectly fine in principle (albeit a bit weird), but it no longer
+> makes sense to say that all values in the first column/row pertain to the
+> correlations between one of the four variables and the other three
+> variables (unless you get lucky) and so on.
+>
+> But say the coefficients had been ordered like this:
+>
+> coef(res)[c(3,5,6,1,2,4)]
+>
+> Then the appropriate dimension names would be:
+>
+> vec2mat(coef(res)[c(3,5,6,1,2,4)], dimnames=c("perf","acog","asom","conf"))
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On
+> >Behalf Of Yuhang Hu via R-sig-meta-analysis
+> >Sent: Monday, 11 September, 2023 5:32
+> >To: R meta
+> >Cc: Yuhang Hu
+> >Subject: [R-meta] Specifying variable names in metafor::vec2mat()
+> >
+> >Hello Everyone,
+> >
+> >I'm using the metafor::vec2mat() as shown in the toy example below.
+> >However, I wonder how I should specify the order of the variables' names
+> >defined in "dimnames=" when converting the vector of coefficients to a
+> >correlation matrix using metafor::vec2mat()?
+> >
+> >Is there generally a rule or a technique to order the variables' names
+> >correctly in "vec2mat()", especially if there are many variable names?
+> >
+> >Thanks,
+> >Yuhang
+> >
+> ># EXAMPLE:
+> >tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat.craft2003)
+> >V <- tmp$V
+> >dat <- tmp$dat
+> >
+> >res <- rma.mv(yi~ var1.var2 - 1, V,
+> >              random = ~  var1.var2| study, struct = "UN",
+> >              data=dat)
+> >
+> >vec2mat(coef(res), dimnames= ??????)
+>
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Sep 12 18:20:06 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Tue, 12 Sep 2023 16:20:06 +0000
+Subject: [R-meta] Specifying variable names in metafor::vec2mat()
+In-Reply-To: <CA+dzWjqymcTNpm9wB9TZxd5ah1ejGKLEhsVxhWt2nKttiw6jQg@mail.gmail.com>
+References: <CA+dzWjr6BDUj7ofn46XNa+xnHW5sJyxjKDjoCuLXWMtBijCq6w@mail.gmail.com>
+ <fabf255439c243dfaa5684086f64111b@maastrichtuniversity.nl>
+ <CA+dzWjqymcTNpm9wB9TZxd5ah1ejGKLEhsVxhWt2nKttiw6jQg@mail.gmail.com>
+Message-ID: <1661611e6b07461786310968f8c561c4@maastrichtuniversity.nl>
+
+Given the ordering of the coefficients in coef(res), this won't be possible. Look at:
+
+print(res, num=TRUE) 
+
+Note that coefficients 1-6 and 18 all pertain to the correlation between L2DA and the other 7 variables. These should all be together in the same column, but
+
+vec2mat(coef(res))
+
+doesn't know that and so coefficient 18 ends up in the wrong place. This is what I tried to explain in my previous post. First, you need to ensure that the ordering of the coefficients is such that filling them in (columnwise) into the matrix makes sense.
+
+So you first need to rearrange the coefficients so that the first set pertains to L2DA (there are 7 of those), then the second set contains the remaining coefficients that pertain to say variable L2DF (there are 6 of those), and so on. Within each set, the order of the variables also needs to be consistent, so if you start with L2DA.L2DF, L2DA.L2G, L2DA.L2L, ..., in the first set, then the second set must start with L2DF.L2G, L2DF.L2L, ..., and so on.
+
+Once you understand this, then setting the appropriate dimension names is obvious.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Yuhang Hu [mailto:yh342 at nau.edu]
+>Sent: Tuesday, 12 September, 2023 17:36
+>To: Viechtbauer, Wolfgang (NP)
+>Cc: R Special Interest Group for Meta-Analysis
+>Subject: Re: [R-meta] Specifying variable names in metafor::vec2mat()
+>
+>Thank you, Wolfgang.?When you say "it depends on the ordering of the values in
+>coef(res)", could you please elaborate on how exactly the user should follow that
+>ordering when specifying the "dimnames=" esp. when the number of variables is
+>larger?
+>
+>For example, below, I have 8 variables with their names being `c("L2R", "L2DA",
+>"L2DF", "L2V", "L2G", "L2P", "L2M", "L2L")`. But I wonder how to order them
+>correctly in "dimnames="?
+>
+>In fact, I think I'm getting the order for 7 of them right `c("L2DA", "L2DF",
+>"L2G", "L2L", "L2M", "L2P", "L2V")` but don't know where to put "L2R" in that
+>mix?
+>
+>dat <- read.csv("https://raw.githubusercontent.com/ilzl/i/master/j.csv")
+>
+>dat1 <- escalc("COR", ri = ri, ni = N, data = dat)
+>
+>dat2 <-
+>transform(dat1,var1.var2=apply(dat1[c("var1","var2")],1,paste0,collapse="."))
+>
+>res <- rma(yi~var1.var2+0, 1, data=dat2)
+>
+>vec2mat(coef(res), dimnames = ????)
+>Many thanks for your expertise,
+>Yuhang
+>
+>On Tue, Sep 12, 2023 at 1:06?AM Viechtbauer, Wolfgang (NP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>Dear Yuhang,
+>
+>Since coef(res) is of length 6, vec2mat() will put these values (i.e., the
+>estimated average correlations) into a 4x4 (correlation) matrix. Given the
+>ordering of the values in coef(res), the appropriate dimension names would be
+>something like this:
+>
+>vec2mat(coef(res), dimnames=c("acog","asom","conf","perf"))
+>
+>However, there is no general rule for this, as it depends on the ordering of the
+>values in coef(res).
+>
+>I have tried to make various functions in metafor behave in a consistent manner
+>when it comes to ordering certain elements, but in this case, it is really up to
+>the user to check that adding dimension names even makes sense for the resulting
+>matrix. For example:
+>
+>vec2mat(sample(coef(res)))
+>
+>is perfectly fine in principle (albeit a bit weird), but it no longer makes sense
+>to say that all values in the first column/row pertain to the correlations
+>between one of the four variables and the other three variables (unless you get
+>lucky) and so on.
+>
+>But say the coefficients had been ordered like this:
+>
+>coef(res)[c(3,5,6,1,2,4)]
+>
+>Then the appropriate dimension names would be:
+>
+>vec2mat(coef(res)[c(3,5,6,1,2,4)], dimnames=c("perf","acog","asom","conf"))
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>Behalf Of Yuhang Hu via R-sig-meta-analysis
+>>Sent: Monday, 11 September, 2023 5:32
+>>To: R meta
+>>Cc: Yuhang Hu
+>>Subject: [R-meta] Specifying variable names in metafor::vec2mat()
+>>
+>>Hello Everyone,
+>>
+>>I'm using the metafor::vec2mat() as shown in the toy example below.
+>>However, I wonder how I should specify the order of the variables' names
+>>defined in "dimnames=" when converting the vector of coefficients to a
+>>correlation matrix using metafor::vec2mat()?
+>>
+>>Is there generally a rule or a technique to order the variables' names
+>>correctly in "vec2mat()", especially if there are many variable names?
+>>
+>>Thanks,
+>>Yuhang
+>>
+>># EXAMPLE:
+>>tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat.craft2003)
+>>V <- tmp$V
+>>dat <- tmp$dat
+>>
+>>res <- rma.mv(yi~ var1.var2 - 1, V,
+>>? ? ? ? ? ? ? random = ~? var1.var2| study, struct = "UN",
+>>? ? ? ? ? ? ? data=dat)
+>>
+>>vec2mat(coef(res), dimnames= ??????)
+
+From k|etduchuynh @end|ng |rom gm@||@com  Tue Sep 12 21:55:39 2023
+From: k|etduchuynh @end|ng |rom gm@||@com (Kiet Huynh)
+Date: Tue, 12 Sep 2023 14:55:39 -0500
+Subject: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+Message-ID: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+
+Hello colleagues,
+
+I?m conducting a meta-analysis of the association between LGBTQ+ discrimination and mental health. Both are continuous variables, and I am analyzing correlation coefficients. I?m interested in looking at moderators (continuous) of the relationship between these two variables. One such moderator is social support (continuous). I am considering two approaches for running the moderator analysis:
+
+1) Many of the studies used the same MSPSS social support scale. I plan to use the mean value of the MSPSS as a continuous moderator variable of the discrimination-mental health relationship.
+
+2) Most studies, however, use different measures of social support. I plan to use the min-max normalization method to put all the social support measure on the same scale, and then use that normalized mean as the moderator variable of the discrimination-mental health relationship. For an example use of min-max normalization method, see Endendijk et al. (2020). However, the Endendijk et al. (2020) study uses the min-max normalization method for the outcome and not for a moderator. The formula for the min-max normalization method is:
+
+x? = (x - min)/(max - min)
+x? is the normalized mean, x is the mean of the sample, min is the minimum possible value of the scale, and max is the maximum possible value of the scale.
+
+The benefit to the second approach is that I can include more studies in this moderator analysis, and not just the studies using the same measure of social support. 
+
+My question is whether both approaches are valid methods for testing moderator analysis? Are there any issues with using the of min-max normalization method for moderator analysis?
+
+Thank you,
+
+- KH
+
+Reference:
+
+Endendijk, J. J., van Baar, A. L., & Dekovi?, M. (2020). He is a stud, she is a slut! A meta-analysis on the continued existence of sexual double standards. Personality and Social Psychology Review, 24(2), 163?190. https://doi.org/10.1177/1088868319891310
+
+----
+
+Kiet Huynh, PhD (he/him) 
+(hear?pronunciation <https://www.name-coach.com/kiet-huynh-94be0772-1bfd-4ece-afba-14699186f2b9>)
+Assistant Professor
+Department of Psychology
+
+Terrill Hall Rm # 336
+University of North Texas
+Denton, TX 76203
+Kiet.Huynh at unt.edu <mailto:Kiet.Huynh at unt.edu>
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Sep 13 10:25:50 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 13 Sep 2023 08:25:50 +0000
+Subject: [R-meta] Score Normalization for Moderator Analysis in
+ Meta-Analysis
+In-Reply-To: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+References: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+Message-ID: <c27c7629b33b453fa8a82b444e363165@maastrichtuniversity.nl>
+
+Dear Kiet,
+
+I don't mind cross-posting, but when doing so, please indicate this in posts, so in case answers are provided elsewhere, duplicate efforts can be avoided. For reference, this question was also posted here:
+
+https://stats.stackexchange.com/questions/626306/score-normalization-for-moderator-analysis-in-meta-analysis
+
+What you describe under 2 is the 'proportion/percentage of maximum possible' (POMP) score method, which is nicely discussed in this article:
+
+Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units and the circumstance for POMP. Multivariate Behavioral Research, 34(3), 315-346. https://doi.org/10.1207/S15327906MBR3403_2
+
+This approach assumes that the observed values on one scale are linear transformations of the observed values on other scales. Of course that is never quite true, but can hold as a rough approximation. In fact, this is also the assumption underlying various effect size / outcome measures (e.g., standardized mean differences, correlation coefficients), so it is an implicit assumption in many meta-analyses anyway (except that you are now also applying this assumption to the moderator variable). There was a thread related to this in April:
+
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004529.html
+
+When this assumption is not correct (with respect to the variables involved in computing the correlations or with respect to the moderator variable), then this becomes one of the sources of (residual) heterogeneity. Of course, we have random/mixed-effects models to account for (residual) heterogeneity, so this is not the end of the world. But if scales are measuring entirely different constructs, then we should be more worried if we lump them together.
+
+If you have enough studies, then you can also code the type of scale used to measure social support (e.g., MSPSS versus other or even more fine-grained if you have enough studies) and include this in your moderator analysis and allow it to interact with the POMP score mean of the social support scale. That way, you can examine if the relationship between social support and the strength of the association between LGBTQ+ discrimination and mental health differs depending on the scale used.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Kiet Huynh via R-sig-meta-analysis
+>Sent: Tuesday, 12 September, 2023 21:56
+>To: R meta
+>Cc: Kiet Huynh
+>Subject: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>
+>Hello colleagues,
+>
+>I?m conducting a meta-analysis of the association between LGBTQ+ discrimination
+>and mental health. Both are continuous variables, and I am analyzing correlation
+>coefficients. I?m interested in looking at moderators (continuous) of the
+>relationship between these two variables. One such moderator is social support
+>(continuous). I am considering two approaches for running the moderator analysis:
+>
+>1) Many of the studies used the same MSPSS social support scale. I plan to use
+>the mean value of the MSPSS as a continuous moderator variable of the
+>discrimination-mental health relationship.
+>
+>2) Most studies, however, use different measures of social support. I plan to use
+>the min-max normalization method to put all the social support measure on the
+>same scale, and then use that normalized mean as the moderator variable of the
+>discrimination-mental health relationship. For an example use of min-max
+>normalization method, see Endendijk et al. (2020). However, the Endendijk et al.
+>(2020) study uses the min-max normalization method for the outcome and not for a
+>moderator. The formula for the min-max normalization method is:
+>
+>x? = (x - min)/(max - min)
+>x? is the normalized mean, x is the mean of the sample, min is the minimum
+>possible value of the scale, and max is the maximum possible value of the scale.
+>
+>The benefit to the second approach is that I can include more studies in this
+>moderator analysis, and not just the studies using the same measure of social
+>support.
+>
+>My question is whether both approaches are valid methods for testing moderator
+>analysis? Are there any issues with using the of min-max normalization method for
+>moderator analysis?
+>
+>Thank you,
+>
+>- KH
+>
+>Reference:
+>
+>Endendijk, J. J., van Baar, A. L., & Dekovi?, M. (2020). He is a stud, she is a
+>slut! A meta-analysis on the continued existence of sexual double standards.
+>Personality and Social Psychology Review, 24(2), 163?190.
+>https://doi.org/10.1177/1088868319891310
+>
+>----
+>
+>Kiet Huynh, PhD (he/him)
+>(hear?pronunciation <https://www.name-coach.com/kiet-huynh-94be0772-1bfd-4ece-
+>afba-14699186f2b9>)
+>Assistant Professor
+>Department of Psychology
+>
+>Terrill Hall Rm # 336
+>University of North Texas
+>Denton, TX 76203
+>Kiet.Huynh at unt.edu <mailto:Kiet.Huynh at unt.edu>
+
+From E|m@r@Sch|ueter @end|ng |rom @ow|@un|-g|e@@en@de  Thu Sep 14 09:49:45 2023
+From: E|m@r@Sch|ueter @end|ng |rom @ow|@un|-g|e@@en@de (=?Windows-1252?Q?Schl=FCter=2C_Elmar?=)
+Date: Thu, 14 Sep 2023 07:49:45 +0000
+Subject: [R-meta] Meta-analysis of within-subject experimental designs with
+ multiple treatment factors?
+Message-ID: <593ce872abf247c1b1a15cd4a7ef410e@sowi.uni-giessen.de>
+
+Dear Listmembers,
+
+
+
+I am planning to conduct a meta-analysis based on data from a series of factorial survey studies. The factorial survey studies I'd like to analyze correspond to within-subject experimental designs with multiple treatment factors. However, there seem to be very few, if any, meta-analyses using data from factorial survey studies or related designs. I thus lack examples corresponding to the design I need to ask some questions about below. So here's a brief description of my data in general terms:
+
+
+
+A factorial survey, also known as a vignette study or factorial vignette design, is a research method used to study how individuals make judgments or decisions in complex situations by presenting them with a series of hypothetical scenarios (vignettes) that vary systematically across multiple factors or attributes. For example, respondents might be asked how likely they would vote for a candidate of a political party who is
+
+
+
+- male vs. female, (factor 1)
+
+- has a leftwing vs. rightwing orientation (factor 2)
+
+- and ?is perceived to be very empathic/somewhat empathic/not empathic (factor 3).
+
+
+
+This results in a 2 x 2 x 3 factorial design with 12 different vignettes.
+
+
+
+Let?s assume that in the original data, the factor levels were measured using dummy variables. The results are unstandardised regression slopes plus standard errors. Accordingly, I'd like to meta-analyse 4 unstandardised regression slopes:
+
+
+
+- the slope of the dummy variable for factor A (the average effect of ?male? vs. ?female?),
+
+- the slope of the dummy variable for factor B (the average effect of "rightwing" vs. leftwing orientation), plus
+
+- the two slopes of the two dummy variables for factor C (?somewhat empathic? vs ?very empathic? and ?not empathic? vs ?very empathic?).
+
+
+
+With one dependent variable, all studies were conducted as full or fractional factorial within-subjects designs. Therefore, I believe it would be best to account for any potential non-independence in the data, given that each respondent rated multiple (up to 12) vignettes. What I find a bit challenging here is that there is not just one average effect to examine, but four in total. Furthermore, these four average slopes result from three orthogonal factors. I (think I) have been able to combine clubSandwich and metafor to examine this data - but I would be very happy to hear if you think my approach is adequate, or if there are alternative ways to analyse this data?
+
+
+
+Here's an illustration/sample of the data ? restricted to 5 studies only, the ?real? dataset will comprise of approx. 20 studies. Notice that I arranged all coefficient values in one column:
+
+
+
+
+
+Data (df) for illustration:
+
+
+study
+
+
+coeff_name
+
+
+coeff_value
+
+
+v
+
+
+coeff_index
+
+
+study_1
+
+
+cgenderMale
+
+
+-0.07
+
+
+0.000113
+
+
+1
+
+
+study_1
+
+
+cRightwing
+
+
+0.17
+
+
+0.000344
+
+
+2
+
+
+study_1
+
+
+cSomewhatEmpathic
+
+
+-0.08
+
+
+0.000160
+
+
+3
+
+
+study_1
+
+
+cNotEmpathic
+
+
+-0.12
+
+
+0.000171
+
+
+4
+
+
+study_2
+
+
+cgenderMale
+
+
+-0.08
+
+
+0.000179
+
+
+5
+
+
+study_2
+
+
+cRightwing
+
+
+0.18
+
+
+0.000504
+
+
+6
+
+
+study_2
+
+
+cSomewhatEmpathic
+
+
+-0.06
+
+
+0.000309
+
+
+7
+
+
+study_2
+
+
+cNotEmpathic
+
+
+-0.14
+
+
+0.000435
+
+
+8
+
+
+study_3
+
+
+cgenderMale
+
+
+-0.06
+
+
+0.000097
+
+
+9
+
+
+study_3
+
+
+cRightwing
+
+
+0.16
+
+
+0.000319
+
+
+10
+
+
+study_3
+
+
+cSomewhatEmpathic
+
+
+-0.07
+
+
+0.000150
+
+
+11
+
+
+study_3
+
+
+cNotEmpathic
+
+
+-0.11
+
+
+0.000152
+
+
+12
+
+
+study_4
+
+
+cgenderMale
+
+
+-0.03
+
+
+0.000107
+
+
+13
+
+
+study_4
+
+
+cRightwing
+
+
+0.15
+
+
+0.000452
+
+
+14
+
+
+study_4
+
+
+cSomewhatEmpathic
+
+
+-0.05
+
+
+0.000198
+
+
+15
+
+
+study_4
+
+
+cNotEmpathic
+
+
+-0.10
+
+
+0.000196
+
+
+16
+
+
+study_5
+
+
+cgenderMale
+
+
+-0.04
+
+
+0.000123
+
+
+17
+
+
+study_5
+
+
+cRightwing
+
+
+0.15
+
+
+0.000366
+
+
+18
+
+
+study_5
+
+
+cSomewhatEmpathic
+
+
+-0.11
+
+
+0.000193
+
+
+19
+
+
+study_5
+
+
+cNotEmpathic
+
+
+-0.18
+
+
+0.000205
+
+
+20
+
+
+
+
+And here's the code I used:
+
+
+library(metafor)
+
+library(clubSandwich)
+
+# Create sampling variance covariance matrix
+
+V_mat <- impute_covariance_matrix(Testdata$v, cluster = df$study, r = 0.6)
+
+
+
+# model in metafor
+
+mod <- rma.mv(coeff_value ~ 0 + coeff_name, V = V_mat,  #coeff_name contains all coefficients as factor levels
+
+              random = ~ 1 | study / coeff_index,   #coefficients are nested in studies
+
+              data = df)
+
+
+
+# clustered SEs and CIs
+
+conf_int(mod, vcov = "CR2")
+
+
+
+And here are the results:
+
+Coef.
+
+
+Estimate
+
+
+SE
+
+
+d.f.
+
+
+Lower_95%CI
+
+
+Upper_95%CI
+
+
+coeff_namecgenderMale
+
+
+-0.0553
+
+
+0.00924
+
+
+3.99
+
+
+-0.081
+
+
+-0.0296
+
+
+coeff_namecRightwing
+
+
+0.1623
+
+
+0.0057
+
+
+3.97
+
+
+0.146
+
+
+0.1782
+
+
+coeff_namecSomewhatEmpathic
+
+
+-0.0739
+
+
+0.01044
+
+
+3.97
+
+
+-0.103
+
+
+-0.0448
+
+
+coeff_namecNotEmpathic
+
+
+-0.1289
+
+
+0.01465
+
+
+3.92
+
+
+-0.17
+
+
+-0.0879
+
+
+
+
+The code seems to works. But as I outlined at the beginning, it is not clear to if one might arrange the data in long format with all coefficients of interest in one column as I did. I thus highly appreciate your advice and any comments ?
+
+
+
+Best,
+
+Elmar Schlueter
+
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Sep 14 10:06:14 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 14 Sep 2023 08:06:14 +0000
+Subject: [R-meta] 
+ Meta-analysis of within-subject experimental designs with
+ multiple treatment factors?
+In-Reply-To: <593ce872abf247c1b1a15cd4a7ef410e@sowi.uni-giessen.de>
+References: <593ce872abf247c1b1a15cd4a7ef410e@sowi.uni-giessen.de>
+Message-ID: <34b3bf067f744d65b5059ae15a4b8b3e@maastrichtuniversity.nl>
+
+Dear Elmar,
+
+Would you be so kind and repost your question in plain text format? By posting in HTML format, your post became quite mangled; this is what it looks like:
+
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-September/004892.html
+
+Thanks!
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Schl?ter, Elmar via R-sig-meta-analysis
+>Sent: Thursday, 14 September, 2023 9:50
+>To: r-sig-meta-analysis at r-project.org
+>Cc: Schl?ter, Elmar
+>Subject: [R-meta] Meta-analysis of within-subject experimental designs with
+>multiple treatment factors?
+>
+>Dear Listmembers,
+>
+>I am planning to conduct a meta-analysis based on data from a series of factorial
+>survey studies. The factorial survey studies I'd like to analyze correspond to
+>within-subject experimental designs with multiple treatment factors. However,
+>there seem to be very few, if any, meta-analyses using data from factorial survey
+>studies or related designs. I thus lack examples corresponding to the design I
+>need to ask some questions about below. So here's a brief description of my data
+>in general terms:
+
+[...]
+
+From E|m@r@Sch|ueter @end|ng |rom @ow|@un|-g|e@@en@de  Thu Sep 14 11:54:49 2023
+From: E|m@r@Sch|ueter @end|ng |rom @ow|@un|-g|e@@en@de (=?iso-8859-1?Q?Schl=FCter=2C_Elmar?=)
+Date: Thu, 14 Sep 2023 09:54:49 +0000
+Subject: [R-meta] Meta-analysis of within-subject experimental designs with
+ multiple treatment factors?
+Message-ID: <275331692d3844cbbd4bd7280329d852@sowi.uni-giessen.de>
+
+Dear Listmembers,
+
+here is a repost of my earlier mail that I unfortunately posted in html-format... I hope this time the data example is readable:
+
+---
+
+I am planning to conduct a meta-analysis based on data from a series of factorial survey studies. The factorial survey studies I'd like to analyze correspond to within-subject experimental designs with multiple treatment factors. However, there seem to be very few, if any, meta-analyses using data from factorial survey studies or related designs. I thus lack examples corresponding to the design I need to ask some questions about below. So here's a brief description of my data in general terms:
+
+A factorial survey, also known as a vignette study or factorial vignette design, is a research method used to study how individuals make judgments or decisions in complex situations by presenting them with a series of hypothetical scenarios (vignettes) that vary systematically across multiple factors or attributes. For example, respondents might be asked how likely they would vote for a candidate of a political party who is
+
+- male vs. female, (factor 1)
+
+- has a leftwing vs. rightwing orientation (factor 2)
+
+- and behaves very empathic/somewhat empathic/not empathic (factor 3).
+
+This results in a 2 x 2 x 3 factorial design with 12 different vignettes.
+
+In the original data, the factor levels were measured using dummy variables. The results are unstandardised regression slopes plus standard errors. Accordingly, I'd like to meta-analyse 4 unstandardised regression slopes:
+
+- the slope of the dummy variable for factor A (the average effect of male vs. female), fA_slope
+
+- the slope of the dummy variable for factor B (the average effect of rightwing vs. leftwing orientation), fB_slope
+
+- the two slopes of the two dummy variables for factor C (somewhat empathic vs very empathic and not empathic vs very empathic), fC_slope1 & fC_slope2
+
+Using one dependent variable, all studies were conducted as full or fractional factorial within-subjects designs. Therefore, I believe it would be best to account for any potential non-independence in the data, given that each respondent rated multiple (up to 12) vignettes. What I find a bit challenging is that there is not just one average effect to examine, but four in total. Furthermore, these four average slopes result from three orthogonal factors. I (think I) have been able to combine clubSandwich and metafor to examine these data - but I would be very happy to hear if you think my approach is adequate, or if there are alternative ways to analyse data from such a research design?
+
+Here's an illustration/sample of the data   restricted to 5 studies only, the  real  dataset will comprise of approx. 20 studies. Notice that I arranged all coefficient values in one column:
+
+Data (df) for illustration:
+
+study coeff_name     coeff_value  v       coeff_index
+
+A        fA_slope1      -0.07        0.000113    1
+A        fB_slope1      0.17         0.000344    2
+A        fC_slope1      -0.08        0.000160    3
+A        fC_slope2      -0.12        0.000171    4
+B        fA_slope1      -0.08        0.000179    5
+B        fB_slope1      0.18         0.000504    6
+B        fC_slope1      -0.06        0.000309    7
+B        fC_slope2      -0.14        0.000435    8
+C        fA_slope1      -0.06        0.000097    9
+C        fB_slope1      0.16         0.000319    10
+C        fC_slope1      -0.07        0.000150    11
+C        fC_slope2      -0.11        0.000152    12
+D        fA_slope1      -0.03        0.000107    13
+D        fB_slope1      0.15         0.000452    14
+D        fC_slope1      -0.05        0.000198    15
+D        fC_slope2      -0.10        0.000196    16
+E        fA_slope1      -0.04        0.000123    17
+E        fB_slope1      0.15         0.000366    18
+E        fC_slope1      -0.11        0.000193    19
+E        fC_slope2      -0.18        0.000205    20
+
+Here's the code I used:
+
+library(metafor)
+
+library(clubSandwich)
+
+# Create sampling variance covariance matrix
+
+V_mat <- impute_covariance_matrix(Testdata$v, cluster = df$study, r = 0.6)
+
+# model in metafor
+
+mod <- rma.mv(coeff_value ~ 0 + coeff_name, V = V_mat,  #coeff_name contains all coefficients as factor levels
+
+              random = ~ 1 | study / coeff_index,   #coefficients are nested in studies
+
+              data = df)
+
+# clustered SEs and CIs
+
+conf_int(mod, vcov = "CR2")
+
+And here are the results:
+
+Coef.                                 Estimate      SE              d.f.        Lower_95%CI Upper_95%CI
+coeff_namecfA_slope1   -0.0553     0.00924     3.99     -0.081 -0.0296
+coeff_namecfB_slope1   0.1623      0.0057       3.97      0.146 0.1782
+coeff_namecfC_slope1   -0.0739     0.01044     3.97     -0.103 -0.0448
+coeff_namecfC_slope2   -0.1289     0.01465     3.92      -0.17 -0.0879
+
+The code seems to work. But as I outlined at the beginning, it is not clear to if one might arrange the data in "long format" with all coefficients of interest in one column as I did. I thus highly appreciate your advice and any comments
+
+Best,
+Elmar
+
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Thu Sep 14 16:22:15 2023
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 14 Sep 2023 09:22:15 -0500
+Subject: [R-meta] 
+ Meta-analysis of within-subject experimental designs with
+ multiple treatment factors?
+In-Reply-To: <275331692d3844cbbd4bd7280329d852@sowi.uni-giessen.de>
+References: <275331692d3844cbbd4bd7280329d852@sowi.uni-giessen.de>
+Message-ID: <CAFUVuJz2pFK_hNLdpnaXhB=Fe5+cxHHz+pn+67kM1NYjzBsxtw@mail.gmail.com>
+
+Hi Elmar,
+
+The example code you provided checks out as far as I can see. Your approach
+seems reasonable to me, although I also see two ways that it could be
+refined:
+
+* You've assumed a constant correlation of 0.6 between the sampling errors
+of the effect size estimates from a given study. This assumption could
+potentially be refined depending on how much information you have about the
+study results. If you had access or could gain access to the raw data, you
+could calculate better estimates of the variance-covariance matrix of these
+effect estimates.
+
+* You've used what I call the "correlated-and-hierarchical effects" working
+model, which includes random effects for each individual effect and random
+effects for each study. This working model assumes that 1) the overall
+variation in each type of effect is constant across all four types (i.e.,
+between-study heterogeneity of slope_A is the same as the between-study
+heterogeneity of slope_B, likewise for slope_C1 and slope_C2) and that 2)
+there is a constant correlation between the study-specific true effects of
+each pair of effect types--that is, cor(slope_A, slope_B) is the same as
+cor(slope_A, slope_C1) and cor(slope_A, slope_C2) and cor(slope_B,
+slope_C1), etc. If you have a fair number studies, you could consider using
+a more general, multivariate working model, which would loosen both of the
+above assumptions. The syntax is just as above, but with random effects
+specified as
+random = ~ coeff_name | study, struct = "UN"
+
+James
+
+On Thu, Sep 14, 2023 at 4:55?AM Schl?ter, Elmar via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> Dear Listmembers,
+>
+> here is a repost of my earlier mail that I unfortunately posted in
+> html-format... I hope this time the data example is readable:
+>
+> ---
+>
+> I am planning to conduct a meta-analysis based on data from a series of
+> factorial survey studies. The factorial survey studies I'd like to analyze
+> correspond to within-subject experimental designs with multiple treatment
+> factors. However, there seem to be very few, if any, meta-analyses using
+> data from factorial survey studies or related designs. I thus lack examples
+> corresponding to the design I need to ask some questions about below. So
+> here's a brief description of my data in general terms:
+>
+> A factorial survey, also known as a vignette study or factorial vignette
+> design, is a research method used to study how individuals make judgments
+> or decisions in complex situations by presenting them with a series of
+> hypothetical scenarios (vignettes) that vary systematically across multiple
+> factors or attributes. For example, respondents might be asked how likely
+> they would vote for a candidate of a political party who is
+>
+> - male vs. female, (factor 1)
+>
+> - has a leftwing vs. rightwing orientation (factor 2)
+>
+> - and behaves very empathic/somewhat empathic/not empathic (factor 3).
+>
+> This results in a 2 x 2 x 3 factorial design with 12 different vignettes.
+>
+> In the original data, the factor levels were measured using dummy
+> variables. The results are unstandardised regression slopes plus standard
+> errors. Accordingly, I'd like to meta-analyse 4 unstandardised regression
+> slopes:
+>
+> - the slope of the dummy variable for factor A (the average effect of male
+> vs. female), fA_slope
+>
+> - the slope of the dummy variable for factor B (the average effect of
+> rightwing vs. leftwing orientation), fB_slope
+>
+> - the two slopes of the two dummy variables for factor C (somewhat
+> empathic vs very empathic and not empathic vs very empathic), fC_slope1 &
+> fC_slope2
+>
+> Using one dependent variable, all studies were conducted as full or
+> fractional factorial within-subjects designs. Therefore, I believe it would
+> be best to account for any potential non-independence in the data, given
+> that each respondent rated multiple (up to 12) vignettes. What I find a bit
+> challenging is that there is not just one average effect to examine, but
+> four in total. Furthermore, these four average slopes result from three
+> orthogonal factors. I (think I) have been able to combine clubSandwich and
+> metafor to examine these data - but I would be very happy to hear if you
+> think my approach is adequate, or if there are alternative ways to analyse
+> data from such a research design?
+>
+> Here's an illustration/sample of the data   restricted to 5 studies only,
+> the  real  dataset will comprise of approx. 20 studies. Notice that I
+> arranged all coefficient values in one column:
+>
+> Data (df) for illustration:
+>
+> study coeff_name     coeff_value  v       coeff_index
+>
+> A        fA_slope1      -0.07        0.000113    1
+> A        fB_slope1      0.17         0.000344    2
+> A        fC_slope1      -0.08        0.000160    3
+> A        fC_slope2      -0.12        0.000171    4
+> B        fA_slope1      -0.08        0.000179    5
+> B        fB_slope1      0.18         0.000504    6
+> B        fC_slope1      -0.06        0.000309    7
+> B        fC_slope2      -0.14        0.000435    8
+> C        fA_slope1      -0.06        0.000097    9
+> C        fB_slope1      0.16         0.000319    10
+> C        fC_slope1      -0.07        0.000150    11
+> C        fC_slope2      -0.11        0.000152    12
+> D        fA_slope1      -0.03        0.000107    13
+> D        fB_slope1      0.15         0.000452    14
+> D        fC_slope1      -0.05        0.000198    15
+> D        fC_slope2      -0.10        0.000196    16
+> E        fA_slope1      -0.04        0.000123    17
+> E        fB_slope1      0.15         0.000366    18
+> E        fC_slope1      -0.11        0.000193    19
+> E        fC_slope2      -0.18        0.000205    20
+>
+> Here's the code I used:
+>
+> library(metafor)
+>
+> library(clubSandwich)
+>
+> # Create sampling variance covariance matrix
+>
+> V_mat <- impute_covariance_matrix(Testdata$v, cluster = df$study, r = 0.6)
+>
+> # model in metafor
+>
+> mod <- rma.mv(coeff_value ~ 0 + coeff_name, V = V_mat,  #coeff_name
+> contains all coefficients as factor levels
+>
+>               random = ~ 1 | study / coeff_index,   #coefficients are
+> nested in studies
+>
+>               data = df)
+>
+> # clustered SEs and CIs
+>
+> conf_int(mod, vcov = "CR2")
+>
+> And here are the results:
+>
+> Coef.                                 Estimate      SE              d.f.
+>       Lower_95%CI Upper_95%CI
+> coeff_namecfA_slope1   -0.0553     0.00924     3.99     -0.081 -0.0296
+> coeff_namecfB_slope1   0.1623      0.0057       3.97      0.146 0.1782
+> coeff_namecfC_slope1   -0.0739     0.01044     3.97     -0.103 -0.0448
+> coeff_namecfC_slope2   -0.1289     0.01465     3.92      -0.17 -0.0879
+>
+> The code seems to work. But as I outlined at the beginning, it is not
+> clear to if one might arrange the data in "long format" with all
+> coefficients of interest in one column as I did. I thus highly appreciate
+> your advice and any comments
+>
+> Best,
+> Elmar
+>
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From k|etduchuynh @end|ng |rom gm@||@com  Thu Sep 14 17:09:45 2023
+From: k|etduchuynh @end|ng |rom gm@||@com (Kiet Huynh)
+Date: Thu, 14 Sep 2023 10:09:45 -0500
+Subject: [R-meta] Score Normalization for Moderator Analysis in
+ Meta-Analysis
+In-Reply-To: <c27c7629b33b453fa8a82b444e363165@maastrichtuniversity.nl>
+References: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+ <c27c7629b33b453fa8a82b444e363165@maastrichtuniversity.nl>
+Message-ID: <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+
+Hi Wolfgang,
+
+Thanks for the reminder about including links when cross posting.
+
+I appreciate the helpful expiation for the proportion/percentage of maximum possible' (POMP) score method for moderation analysis. Especially helpful was the tip on using the scale type to interact with the POMP score mean to determine if the relationship between social support and the strength of the association between LGBTQ+ discrimination and mental health differs depending on the scale used. Do you have a sense of how many effect sizes would be needed for that?
+
+Best,
+
+Kiet
+
+
+
+> On Sep 13, 2023, at 3:25 AM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> Dear Kiet,
+> 
+> I don't mind cross-posting, but when doing so, please indicate this in posts, so in case answers are provided elsewhere, duplicate efforts can be avoided. For reference, this question was also posted here:
+> 
+> https://stats.stackexchange.com/questions/626306/score-normalization-for-moderator-analysis-in-meta-analysis
+> 
+> What you describe under 2 is the 'proportion/percentage of maximum possible' (POMP) score method, which is nicely discussed in this article:
+> 
+> Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units and the circumstance for POMP. Multivariate Behavioral Research, 34(3), 315-346. https://doi.org/10.1207/S15327906MBR3403_2
+> 
+> This approach assumes that the observed values on one scale are linear transformations of the observed values on other scales. Of course that is never quite true, but can hold as a rough approximation. In fact, this is also the assumption underlying various effect size / outcome measures (e.g., standardized mean differences, correlation coefficients), so it is an implicit assumption in many meta-analyses anyway (except that you are now also applying this assumption to the moderator variable). There was a thread related to this in April:
+> 
+> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004529.html
+> 
+> When this assumption is not correct (with respect to the variables involved in computing the correlations or with respect to the moderator variable), then this becomes one of the sources of (residual) heterogeneity. Of course, we have random/mixed-effects models to account for (residual) heterogeneity, so this is not the end of the world. But if scales are measuring entirely different constructs, then we should be more worried if we lump them together.
+> 
+> If you have enough studies, then you can also code the type of scale used to measure social support (e.g., MSPSS versus other or even more fine-grained if you have enough studies) and include this in your moderator analysis and allow it to interact with the POMP score mean of the social support scale. That way, you can examine if the relationship between social support and the strength of the association between LGBTQ+ discrimination and mental health differs depending on the scale used.
+> 
+> Best,
+> Wolfgang
+> 
+>> -----Original Message-----
+>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>> Behalf Of Kiet Huynh via R-sig-meta-analysis
+>> Sent: Tuesday, 12 September, 2023 21:56
+>> To: R meta
+>> Cc: Kiet Huynh
+>> Subject: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>> 
+>> Hello colleagues,
+>> 
+>> I?m conducting a meta-analysis of the association between LGBTQ+ discrimination
+>> and mental health. Both are continuous variables, and I am analyzing correlation
+>> coefficients. I?m interested in looking at moderators (continuous) of the
+>> relationship between these two variables. One such moderator is social support
+>> (continuous). I am considering two approaches for running the moderator analysis:
+>> 
+>> 1) Many of the studies used the same MSPSS social support scale. I plan to use
+>> the mean value of the MSPSS as a continuous moderator variable of the
+>> discrimination-mental health relationship.
+>> 
+>> 2) Most studies, however, use different measures of social support. I plan to use
+>> the min-max normalization method to put all the social support measure on the
+>> same scale, and then use that normalized mean as the moderator variable of the
+>> discrimination-mental health relationship. For an example use of min-max
+>> normalization method, see Endendijk et al. (2020). However, the Endendijk et al.
+>> (2020) study uses the min-max normalization method for the outcome and not for a
+>> moderator. The formula for the min-max normalization method is:
+>> 
+>> x? = (x - min)/(max - min)
+>> x? is the normalized mean, x is the mean of the sample, min is the minimum
+>> possible value of the scale, and max is the maximum possible value of the scale.
+>> 
+>> The benefit to the second approach is that I can include more studies in this
+>> moderator analysis, and not just the studies using the same measure of social
+>> support.
+>> 
+>> My question is whether both approaches are valid methods for testing moderator
+>> analysis? Are there any issues with using the of min-max normalization method for
+>> moderator analysis?
+>> 
+>> Thank you,
+>> 
+>> - KH
+>> 
+>> Reference:
+>> 
+>> Endendijk, J. J., van Baar, A. L., & Dekovi?, M. (2020). He is a stud, she is a
+>> slut! A meta-analysis on the continued existence of sexual double standards.
+>> Personality and Social Psychology Review, 24(2), 163?190.
+>> https://doi.org/10.1177/1088868319891310
+>> 
+>> ----
+>> 
+>> Kiet Huynh, PhD (he/him)
+>> (hear pronunciation <https://www.name-coach.com/kiet-huynh-94be0772-1bfd-4ece-
+>> afba-14699186f2b9>)
+>> Assistant Professor
+>> Department of Psychology
+>> 
+>> Terrill Hall Rm # 336
+>> University of North Texas
+>> Denton, TX 76203
+>> Kiet.Huynh at unt.edu <mailto:Kiet.Huynh at unt.edu> <mailto:Kiet.Huynh at unt.edu>
+
+
+	[[alternative HTML version deleted]]
+
+
+From yh342 @end|ng |rom n@u@edu  Thu Sep 14 21:00:18 2023
+From: yh342 @end|ng |rom n@u@edu (Yuhang Hu)
+Date: Thu, 14 Sep 2023 12:00:18 -0700
+Subject: [R-meta] Specifying variable names in metafor::vec2mat()
+In-Reply-To: <CA+dzWjogLyvU+D1g1iWM4TGQ6G2Tz9Czcv=e5n5-7UmVpppfzg@mail.gmail.com>
+References: <CA+dzWjr6BDUj7ofn46XNa+xnHW5sJyxjKDjoCuLXWMtBijCq6w@mail.gmail.com>
+ <fabf255439c243dfaa5684086f64111b@maastrichtuniversity.nl>
+ <CA+dzWjqymcTNpm9wB9TZxd5ah1ejGKLEhsVxhWt2nKttiw6jQg@mail.gmail.com>
+ <1661611e6b07461786310968f8c561c4@maastrichtuniversity.nl>
+ <CA+dzWjogLyvU+D1g1iWM4TGQ6G2Tz9Czcv=e5n5-7UmVpppfzg@mail.gmail.com>
+Message-ID: <CA+dzWjo8rzz39zFGXC29JXOoGY-o7pCgMN49UZ7dTwmGrqCVJg@mail.gmail.com>
+
+Thank you, Wolfgang. I figured something out for `coef(res)` order. But
+should `vcov(res)` also follow/match the changes that happen in the order
+of `coef(res)`, if the user wants to eventually use both as input in
+`matreg()`?
+
+# EXAMPLE:
+dat <- dat.craft2003
+dat$var1.var2 <- apply(dat[c("var1","var2")],1,paste0,collapse=".")
+
+res <- rma(ri~var1.var2+0, 1, data=dat)
+
+rs <- coef(res)[c(3,5,6,1,2,4)] # vs.  rs <- coef(res)
+
+r_mat = vec2mat(rs, dimnames=c("perf","acog","asom","conf")) # vs.
+c("acog","asom","conf","perf")
+
+v_mat = vcov(res) ## How should this change if: rs <- coef(res)?
+
+matreg("perf", c("acog","asom"), R=r_mat, V=v_mat)
+
+Many thanks for your knowledge,
+Yuhang
+
+On Wed, Sep 13, 2023 at 1:40?PM Yuhang Hu <yh342 at nau.edu> wrote:
+
+> Thank you, Wolfgang. I figured something out for `coef(res)` order. But
+> should `vcov(res)` also follow/match the changes that happen in the order
+> of `coef(res)`, if the user wants to eventually use both as input in
+> `matreg()`?
+>
+> # EXAMPLE:
+> dat <- dat.craft2003
+> dat$var1.var2 <- apply(dat[c("var1","var2")],1,paste0,collapse=".")
+>
+> res <- rma(ri~var1.var2+0, 1, data=dat)
+>
+> rs <- coef(res)[c(3,5,6,1,2,4)] # vs.  rs <- coef(res)
+>
+> r_mat = vec2mat(rs, dimnames=c("perf","acog","asom","conf")) # vs.
+> c("acog","asom","conf","perf")
+>
+> v_mat = vcov(res) ## How should this change if: rs <- coef(res)?
+>
+> matreg(4, 2:3, R=r_mat, V=v_mat)
+>
+> Many thanks for your knowledge,
+> Yuhang
+>
+> On Tue, Sep 12, 2023 at 9:20?AM Viechtbauer, Wolfgang (NP) <
+> wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+>> Given the ordering of the coefficients in coef(res), this won't be
+>> possible. Look at:
+>>
+>> print(res, num=TRUE)
+>>
+>> Note that coefficients 1-6 and 18 all pertain to the correlation between
+>> L2DA and the other 7 variables. These should all be together in the same
+>> column, but
+>>
+>> vec2mat(coef(res))
+>>
+>> doesn't know that and so coefficient 18 ends up in the wrong place. This
+>> is what I tried to explain in my previous post. First, you need to ensure
+>> that the ordering of the coefficients is such that filling them in
+>> (columnwise) into the matrix makes sense.
+>>
+>> So you first need to rearrange the coefficients so that the first set
+>> pertains to L2DA (there are 7 of those), then the second set contains the
+>> remaining coefficients that pertain to say variable L2DF (there are 6 of
+>> those), and so on. Within each set, the order of the variables also needs
+>> to be consistent, so if you start with L2DA.L2DF, L2DA.L2G, L2DA.L2L, ...,
+>> in the first set, then the second set must start with L2DF.L2G, L2DF.L2L,
+>> ..., and so on.
+>>
+>> Once you understand this, then setting the appropriate dimension names is
+>> obvious.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> >-----Original Message-----
+>> >From: Yuhang Hu [mailto:yh342 at nau.edu]
+>> >Sent: Tuesday, 12 September, 2023 17:36
+>> >To: Viechtbauer, Wolfgang (NP)
+>> >Cc: R Special Interest Group for Meta-Analysis
+>> >Subject: Re: [R-meta] Specifying variable names in metafor::vec2mat()
+>> >
+>> >Thank you, Wolfgang. When you say "it depends on the ordering of the
+>> values in
+>> >coef(res)", could you please elaborate on how exactly the user should
+>> follow that
+>> >ordering when specifying the "dimnames=" esp. when the number of
+>> variables is
+>> >larger?
+>> >
+>> >For example, below, I have 8 variables with their names being `c("L2R",
+>> "L2DA",
+>> >"L2DF", "L2V", "L2G", "L2P", "L2M", "L2L")`. But I wonder how to order
+>> them
+>> >correctly in "dimnames="?
+>> >
+>> >In fact, I think I'm getting the order for 7 of them right `c("L2DA",
+>> "L2DF",
+>> >"L2G", "L2L", "L2M", "L2P", "L2V")` but don't know where to put "L2R" in
+>> that
+>> >mix?
+>> >
+>> >dat <- read.csv("https://raw.githubusercontent.com/ilzl/i/master/j.csv")
+>> >
+>> >dat1 <- escalc("COR", ri = ri, ni = N, data = dat)
+>> >
+>> >dat2 <-
+>>
+>> >transform(dat1,var1.var2=apply(dat1[c("var1","var2")],1,paste0,collapse="."))
+>> >
+>> >res <- rma(yi~var1.var2+0, 1, data=dat2)
+>> >
+>> >vec2mat(coef(res), dimnames = ????)
+>> >Many thanks for your expertise,
+>> >Yuhang
+>> >
+>> >On Tue, Sep 12, 2023 at 1:06?AM Viechtbauer, Wolfgang (NP)
+>> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>> >Dear Yuhang,
+>> >
+>> >Since coef(res) is of length 6, vec2mat() will put these values (i.e.,
+>> the
+>> >estimated average correlations) into a 4x4 (correlation) matrix. Given
+>> the
+>> >ordering of the values in coef(res), the appropriate dimension names
+>> would be
+>> >something like this:
+>> >
+>> >vec2mat(coef(res), dimnames=c("acog","asom","conf","perf"))
+>> >
+>> >However, there is no general rule for this, as it depends on the
+>> ordering of the
+>> >values in coef(res).
+>> >
+>> >I have tried to make various functions in metafor behave in a consistent
+>> manner
+>> >when it comes to ordering certain elements, but in this case, it is
+>> really up to
+>> >the user to check that adding dimension names even makes sense for the
+>> resulting
+>> >matrix. For example:
+>> >
+>> >vec2mat(sample(coef(res)))
+>> >
+>> >is perfectly fine in principle (albeit a bit weird), but it no longer
+>> makes sense
+>> >to say that all values in the first column/row pertain to the
+>> correlations
+>> >between one of the four variables and the other three variables (unless
+>> you get
+>> >lucky) and so on.
+>> >
+>> >But say the coefficients had been ordered like this:
+>> >
+>> >coef(res)[c(3,5,6,1,2,4)]
+>> >
+>> >Then the appropriate dimension names would be:
+>> >
+>> >vec2mat(coef(res)[c(3,5,6,1,2,4)],
+>> dimnames=c("perf","acog","asom","conf"))
+>> >
+>> >Best,
+>> >Wolfgang
+>> >
+>> >>-----Original Message-----
+>> >>From: R-sig-meta-analysis [mailto:
+>> r-sig-meta-analysis-bounces at r-project.org] On
+>> >>Behalf Of Yuhang Hu via R-sig-meta-analysis
+>> >>Sent: Monday, 11 September, 2023 5:32
+>> >>To: R meta
+>> >>Cc: Yuhang Hu
+>> >>Subject: [R-meta] Specifying variable names in metafor::vec2mat()
+>> >>
+>> >>Hello Everyone,
+>> >>
+>> >>I'm using the metafor::vec2mat() as shown in the toy example below.
+>> >>However, I wonder how I should specify the order of the variables' names
+>> >>defined in "dimnames=" when converting the vector of coefficients to a
+>> >>correlation matrix using metafor::vec2mat()?
+>> >>
+>> >>Is there generally a rule or a technique to order the variables' names
+>> >>correctly in "vec2mat()", especially if there are many variable names?
+>> >>
+>> >>Thanks,
+>> >>Yuhang
+>> >>
+>> >># EXAMPLE:
+>> >>tmp <- rcalc(ri ~ var1 + var2 | study, ni=ni, data=dat.craft2003)
+>> >>V <- tmp$V
+>> >>dat <- tmp$dat
+>> >>
+>> >>res <- rma.mv(yi~ var1.var2 - 1, V,
+>> >>              random = ~  var1.var2| study, struct = "UN",
+>> >>              data=dat)
+>> >>
+>> >>vec2mat(coef(res), dimnames= ??????)
+>>
+>
+>
+
+	[[alternative HTML version deleted]]
+
+
+From E|m@r@Sch|ueter @end|ng |rom @ow|@un|-g|e@@en@de  Fri Sep 15 09:12:45 2023
+From: E|m@r@Sch|ueter @end|ng |rom @ow|@un|-g|e@@en@de (=?utf-8?B?U2NobMO8dGVyLCBFbG1hcg==?=)
+Date: Fri, 15 Sep 2023 07:12:45 +0000
+Subject: [R-meta] 
+ Meta-analysis of within-subject experimental designs with
+ multiple treatment factors?
+In-Reply-To: <CAFUVuJz2pFK_hNLdpnaXhB=Fe5+cxHHz+pn+67kM1NYjzBsxtw@mail.gmail.com>
+References: <275331692d3844cbbd4bd7280329d852@sowi.uni-giessen.de>,
+ <CAFUVuJz2pFK_hNLdpnaXhB=Fe5+cxHHz+pn+67kM1NYjzBsxtw@mail.gmail.com>
+Message-ID: <05c3cd4f5e4c44b7a94c416b0fd3e4ad@sowi.uni-giessen.de>
+
+Dear James,
+
+
+I would just like to say "thank you" for your quick and helpful reply - I will be happy to try and adapt my models accordingly.
+
+
+Best,
+
+Elmar
+
+________________________________
+Von: James Pustejovsky <jepusto at gmail.com>
+Gesendet: Donnerstag, 14. September 2023 16:22:15
+An: R Special Interest Group for Meta-Analysis
+Cc: Schl?ter, Elmar
+Betreff: Re: [R-meta] Meta-analysis of within-subject experimental designs with multiple treatment factors?
+
+Hi Elmar,
+
+The example code you provided checks out as far as I can see. Your approach seems reasonable to me, although I also see two ways that it could be refined:
+
+* You've assumed a constant correlation of 0.6 between the sampling errors of the effect size estimates from a given study. This assumption could potentially be refined depending on how much information you have about the study results. If you had access or could gain access to the raw data, you could calculate better estimates of the variance-covariance matrix of these effect estimates.
+
+* You've used what I call the "correlated-and-hierarchical effects" working model, which includes random effects for each individual effect and random effects for each study. This working model assumes that 1) the overall variation in each type of effect is constant across all four types (i.e., between-study heterogeneity of slope_A is the same as the between-study heterogeneity of slope_B, likewise for slope_C1 and slope_C2) and that 2) there is a constant correlation between the study-specific true effects of each pair of effect types--that is, cor(slope_A, slope_B) is the same as cor(slope_A, slope_C1) and cor(slope_A, slope_C2) and cor(slope_B, slope_C1), etc. If you have a fair number studies, you could consider using a more general, multivariate working model, which would loosen both of the above assumptions. The syntax is just as above, but with random effects specified as
+random = ~ coeff_name | study, struct = "UN"
+
+James
+
+On Thu, Sep 14, 2023 at 4:55?AM Schl?ter, Elmar via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>> wrote:
+Dear Listmembers,
+
+here is a repost of my earlier mail that I unfortunately posted in html-format... I hope this time the data example is readable:
+
+---
+
+I am planning to conduct a meta-analysis based on data from a series of factorial survey studies. The factorial survey studies I'd like to analyze correspond to within-subject experimental designs with multiple treatment factors. However, there seem to be very few, if any, meta-analyses using data from factorial survey studies or related designs. I thus lack examples corresponding to the design I need to ask some questions about below. So here's a brief description of my data in general terms:
+
+A factorial survey, also known as a vignette study or factorial vignette design, is a research method used to study how individuals make judgments or decisions in complex situations by presenting them with a series of hypothetical scenarios (vignettes) that vary systematically across multiple factors or attributes. For example, respondents might be asked how likely they would vote for a candidate of a political party who is
+
+- male vs. female, (factor 1)
+
+- has a leftwing vs. rightwing orientation (factor 2)
+
+- and behaves very empathic/somewhat empathic/not empathic (factor 3).
+
+This results in a 2 x 2 x 3 factorial design with 12 different vignettes.
+
+In the original data, the factor levels were measured using dummy variables. The results are unstandardised regression slopes plus standard errors. Accordingly, I'd like to meta-analyse 4 unstandardised regression slopes:
+
+- the slope of the dummy variable for factor A (the average effect of male vs. female), fA_slope
+
+- the slope of the dummy variable for factor B (the average effect of rightwing vs. leftwing orientation), fB_slope
+
+- the two slopes of the two dummy variables for factor C (somewhat empathic vs very empathic and not empathic vs very empathic), fC_slope1 & fC_slope2
+
+Using one dependent variable, all studies were conducted as full or fractional factorial within-subjects designs. Therefore, I believe it would be best to account for any potential non-independence in the data, given that each respondent rated multiple (up to 12) vignettes. What I find a bit challenging is that there is not just one average effect to examine, but four in total. Furthermore, these four average slopes result from three orthogonal factors. I (think I) have been able to combine clubSandwich and metafor to examine these data - but I would be very happy to hear if you think my approach is adequate, or if there are alternative ways to analyse data from such a research design?
+
+Here's an illustration/sample of the data   restricted to 5 studies only, the  real  dataset will comprise of approx. 20 studies. Notice that I arranged all coefficient values in one column:
+
+Data (df) for illustration:
+
+study coeff_name     coeff_value  v       coeff_index
+
+A        fA_slope1      -0.07        0.000113    1
+A        fB_slope1      0.17         0.000344    2
+A        fC_slope1      -0.08        0.000160    3
+A        fC_slope2      -0.12        0.000171    4
+B        fA_slope1      -0.08        0.000179    5
+B        fB_slope1      0.18         0.000504    6
+B        fC_slope1      -0.06        0.000309    7
+B        fC_slope2      -0.14        0.000435    8
+C        fA_slope1      -0.06        0.000097    9
+C        fB_slope1      0.16         0.000319    10
+C        fC_slope1      -0.07        0.000150    11
+C        fC_slope2      -0.11        0.000152    12
+D        fA_slope1      -0.03        0.000107    13
+D        fB_slope1      0.15         0.000452    14
+D        fC_slope1      -0.05        0.000198    15
+D        fC_slope2      -0.10        0.000196    16
+E        fA_slope1      -0.04        0.000123    17
+E        fB_slope1      0.15         0.000366    18
+E        fC_slope1      -0.11        0.000193    19
+E        fC_slope2      -0.18        0.000205    20
+
+Here's the code I used:
+
+library(metafor)
+
+library(clubSandwich)
+
+# Create sampling variance covariance matrix
+
+V_mat <- impute_covariance_matrix(Testdata$v, cluster = df$study, r = 0.6)
+
+# model in metafor
+
+mod <- rma.mv<http://rma.mv>(coeff_value ~ 0 + coeff_name, V = V_mat,  #coeff_name contains all coefficients as factor levels
+
+              random = ~ 1 | study / coeff_index,   #coefficients are nested in studies
+
+              data = df)
+
+# clustered SEs and CIs
+
+conf_int(mod, vcov = "CR2")
+
+And here are the results:
+
+Coef.                                 Estimate      SE              d.f.        Lower_95%CI Upper_95%CI
+coeff_namecfA_slope1   -0.0553     0.00924     3.99     -0.081 -0.0296
+coeff_namecfB_slope1   0.1623      0.0057       3.97      0.146 0.1782
+coeff_namecfC_slope1   -0.0739     0.01044     3.97     -0.103 -0.0448
+coeff_namecfC_slope2   -0.1289     0.01465     3.92      -0.17 -0.0879
+
+The code seems to work. But as I outlined at the beginning, it is not clear to if one might arrange the data in "long format" with all coefficients of interest in one column as I did. I thus highly appreciate your advice and any comments
+
+Best,
+Elmar
+
+
+        [[alternative HTML version deleted]]
+
+_______________________________________________
+R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org<mailto:R-sig-meta-analysis at r-project.org>
+To manage your subscription to this mailing list, go to:
+https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Thu Sep 21 15:27:40 2023
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 21 Sep 2023 14:27:40 +0100
+Subject: [R-meta] Updates to the CRAN Task View on MetaAnalysis
+Message-ID: <e1416f90-4631-a40b-60ef-454b2b68347d@dewey.myzen.co.uk>
+
+I post sporadically about this to report on progress and give general 
+updates.
+
+Since the last update the underlying technology has been changed and we 
+now have a co-maintainer of the ask View, the Sage of Maastricht, 
+Wolfgang Viechtbauer.
+
+The number of packages has grown and we seem to be approaching 200 as an 
+asymptote from below.
+
+It would be very helpful if you are a package author if you could add a 
+NEWS file to your package to make it easier to see if an update is a bug 
+fix or a major enhancement.
+
+-- 
+Michael
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Sep 28 10:36:07 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 28 Sep 2023 08:36:07 +0000
+Subject: [R-meta] New version of the metafor package (4.4-0) released on CRAN
+Message-ID: <cce68dc45b8e46c487f40d3daf14b2fb@maastrichtuniversity.nl>
+
+Hi all,
+
+It might be of intererest to some of you that a new version of the metafor package has been released on CRAN. Some of the more important/interesting updates to the package include:
+
+  * The older (convoluted) way of setting some package options has been replaced by two functions, getmfopt() and setmfopt(), for getting and setting package options. This new approach makes use of the standard way of setting options in R (see help(options)). Also, some of the options that can be set in this way are now more flexible.
+
+  * The fsn() function can now carry out a fail-safe N calculation based on a random-effects model (when using 'type="General"'). This is a generalization of the Orwin and Rosenberg methods, which is an interesting methodological development in itself.
+
+  * The theming of all plots (based on the foreground and background colors of the plotting device) has been further improved. Within RStudio, plot colors can now also be automatically set based on the theme (with setmfopt(theme="auto")).
+
+  * The various forest() functions now have an additional argument called 'tabfig', which makes it easier to exactly align the numbers in the annotations on the right-hand side.
+
+  * The addpoly.default() and addpoly.rma.predict() functions gain a 'constarea' argument, for the option to draw the polygons with a constant area. This idea arose from a discussion on Mastodon - https://scholar.social/@wviechtb/111131706271083360 - about drawing so-called 'diamond plots' (see https://psyarxiv.com/fzh6c for more details about such plots). The idea is that, by default, the eyes of the person looking at a plot are automatically drawn to the polygons that have a wider confidence interval (which occupy a larger area on the plot), which is actually the opposite of what you want to happen (since estimates with wider confidence intervals are less precise). By making the area of the polygons constant (which requires reducing their height according to the interval widths), this undesired effect can be compensated to some extent.
+
+  * Two new measures have been added to escalc(), namely "R2" and "ZR2", for meta-analyzing coefficients of determination (but read the caveats mentioned under help(escalc) with respect to these measures).
+
+  * For measures "PCOR", "ZPCOR", "SPCOR", and "ZSPCOR", argument 'mi' in escalc() now refers to the total number of predictors in the regression models (i.e., also counting the focal predictor of interest). This is a non-backwards compatible change (which I really try to avoid), but in this case this was important for consistency with other measures/equations. The change is also very minor, since 'mi' always appears in equations as a value that is subtracted from 'ni' (the sample size) and since the latter is (hopefully) large relative to 'mi', the impact of this change should be very minor.
+
+  * The suite of automated package tests now also includes automated visual comparison tests of plots. Therefore, any changes I make to the package that unintentionally break a particular plotting function are now automatically detected.
+
+The full changelog of this (and all prior versions) can be found here:
+
+https://wviechtb.github.io/metafor/news/index.html
+
+Best,
+Wolfgang
+
+-- 
+Wolfgang Viechtbauer, PhD, Statistician | Department of Psychiatry and    
+Neuropsychology | Maastricht University | PO Box 616 (VIJV1) | 6200 MD    
+Maastricht, The Netherlands | +31(43)3884170 | https://www.wvbauer.com    
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep 29 10:34:18 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 29 Sep 2023 08:34:18 +0000
+Subject: [R-meta] New version of the metafor package (4.4-0) released on
+ CRAN
+In-Reply-To: <cce68dc45b8e46c487f40d3daf14b2fb@maastrichtuniversity.nl>
+References: <cce68dc45b8e46c487f40d3daf14b2fb@maastrichtuniversity.nl>
+Message-ID: <4f687fbc06054084aacd8739d7f08bd7@maastrichtuniversity.nl>
+
+A quick follow-up to this:
+
+As some of you may know, I run a (semi-)weekly live stream on R and statistics:
+
+https://www.wvbauer.com/doku.php/live_streams
+
+For the 100th stream, I will do a special session on the updates in this version of the metafor package. As part of this, I also would like to give some pointers on how to draw nice forest plots with the forest() and addpoly() functions in metafor.
+
+This session will take place on Oct 19th, starting at 6pm CEST. As explained under the link above, there is no sign-up or registration; once the stream goes live, just go to the link (https://www.twitch.tv/wviechtb) and start watching.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis
+>Sent: Thursday, 28 September, 2023 10:36
+>To: r-sig-meta-analysis at r-project.org
+>Cc: Viechtbauer, Wolfgang (NP)
+>Subject: [R-meta] New version of the metafor package (4.4-0) released on CRAN
+>
+>Hi all,
+>
+>It might be of intererest to some of you that a new version of the metafor
+>package has been released on CRAN. Some of the more important/interesting updates
+>to the package include:
+>
+>  * The older (convoluted) way of setting some package options has been replaced
+>by two functions, getmfopt() and setmfopt(), for getting and setting package
+>options. This new approach makes use of the standard way of setting options in R
+>(see help(options)). Also, some of the options that can be set in this way are
+>now more flexible.
+>
+>  * The fsn() function can now carry out a fail-safe N calculation based on a
+>random-effects model (when using 'type="General"'). This is a generalization of
+>the Orwin and Rosenberg methods, which is an interesting methodological
+>development in itself.
+>
+>  * The theming of all plots (based on the foreground and background colors of
+>the plotting device) has been further improved. Within RStudio, plot colors can
+>now also be automatically set based on the theme (with setmfopt(theme="auto")).
+>
+>  * The various forest() functions now have an additional argument called
+>'tabfig', which makes it easier to exactly align the numbers in the annotations
+>on the right-hand side.
+>
+>  * The addpoly.default() and addpoly.rma.predict() functions gain a 'constarea'
+>argument, for the option to draw the polygons with a constant area. This idea
+>arose from a discussion on Mastodon -
+>https://scholar.social/@wviechtb/111131706271083360 - about drawing so-called
+>'diamond plots' (see https://psyarxiv.com/fzh6c for more details about such
+>plots). The idea is that, by default, the eyes of the person looking at a plot
+>are automatically drawn to the polygons that have a wider confidence interval
+>(which occupy a larger area on the plot), which is actually the opposite of what
+>you want to happen (since estimates with wider confidence intervals are less
+>precise). By making the area of the polygons constant (which requires reducing
+>their height according to the interval widths), this undesired effect can be
+>compensated to some extent.
+>
+>  * Two new measures have been added to escalc(), namely "R2" and "ZR2", for
+>meta-analyzing coefficients of determination (but read the caveats mentioned
+>under help(escalc) with respect to these measures).
+>
+>  * For measures "PCOR", "ZPCOR", "SPCOR", and "ZSPCOR", argument 'mi' in
+>escalc() now refers to the total number of predictors in the regression models
+>(i.e., also counting the focal predictor of interest). This is a non-backwards
+>compatible change (which I really try to avoid), but in this case this was
+>important for consistency with other measures/equations. The change is also very
+>minor, since 'mi' always appears in equations as a value that is subtracted from
+>'ni' (the sample size) and since the latter is (hopefully) large relative to
+>'mi', the impact of this change should be very minor.
+>
+>  * The suite of automated package tests now also includes automated visual
+>comparison tests of plots. Therefore, any changes I make to the package that
+>unintentionally break a particular plotting function are now automatically
+>detected.
+>
+>The full changelog of this (and all prior versions) can be found here:
+>
+>https://wviechtb.github.io/metafor/news/index.html
+>
+>Best,
+>Wolfgang
+>
+>--
+>Wolfgang Viechtbauer, PhD, Statistician | Department of Psychiatry and
+>Neuropsychology | Maastricht University | PO Box 616 (VIJV1) | 6200 MD
+>Maastricht, The Netherlands | +31(43)3884170 | https://www.wvbauer.com
+
+
+From brend@n @end|ng |rom brend@n@-b|t@@com  Fri Sep 29 12:00:07 2023
+From: brend@n @end|ng |rom brend@n@-b|t@@com (Brendan Pearl)
+Date: Fri, 29 Sep 2023 10:00:07 +0000
+Subject: [R-meta] Difference between subset (in a loop) and mods in metafor
+ rma.mv
+Message-ID: <fIfSRRMzFrWRvOdZVkqSukE2VgluGEjoXbdErjGGvI0d_ov_LBuvb5UxW9d3EzQrqY5w56On_-HG1VIMltaPHFmh9Idxn1fdZz42m0NQwGE=@brendans-bits.com>
+
+I am trying to understand the difference using the 'subset' and 'mods' options in rma.mv.
+
+I have run two analyses using rma.mv on the same dataset that has a three level structure (articles nested within larger studies) and get different results.
+
+In the first example I have given below, is looping over rma.mv and passing a different predictor to the subset option a univariate meta-analysis? And in the second example, is passing the predictor to the mods option running a multivariable meta-analysis?
+
+Study <- c("A","A","B","C","C","D","E","F","F","G")
+Article <- c("1","2","3","4","5","6","7","8","9","10")
+Predictor <- c("x","x","x","y","y","y","x","x","y","y")
+yi <- c(-.2,-.3,-.8,.5,.6,.4,-.1,-.8,.3,.8)
+vi <- c(.01,.01,.01,.01,.01,.01,.01,.01,.01,.01)
+
+dat <- data.frame(Study,Article,Predictor,yi,vi)
+
+#FIRST EXAMPLE#Subset analyses
+# gives me
+
+#1   x OR = -0.49 [-0.84, -0.13]
+#2   y    OR = 0.51 [0.31, 0.72]
+
+df_subset <- data.frame(val=as.character(),subset_result=as.character())
+
+for (val in unique(dat$Predictor)){
+
+res_univariate <- rma.mv(yi=yi,
+V=vi,
+data=dat,
+random = ~1 | Study/Article,
+subset = Predictor == val,
+method = "REML"
+)
+
+result <- capture.output(cat(
+"OR = ",
+format(round(res_univariate$beta, 2),nsmall = 2),
+" [",
+format(round(res_univariate$ci.lb, 2),nsmall = 2),
+", ",
+format(round(res_univariate$ci.ub, 2),nsmall = 2),
+"]",
+sep=""
+)
+)
+
+df_subset[nrow(df_subset) +1,] = c(
+val,
+result
+)
+
+}
+
+#SECOND EXAMPLE
+#Mod analysis
+#gives me:
+
+#                      estimate   ci.lb    ci.ub
+
+#factor(Predictor)x   -0.4825    -0.7246  -0.2404
+#factor(Predictor)y    0.5807     0.3386   0.8229
+
+df_mod <- data.frame(val=as.character(),mod_result=as.character())
+
+res_multivariate <- rma.mv(yi=yi,
+V=vi,
+data=dat,
+random = ~1 | Study/Article,
+mods = ~ factor(Predictor)-1,
+method = "REML"
+)
+summary(res_multivariate)
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep 29 12:56:11 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 29 Sep 2023 10:56:11 +0000
+Subject: [R-meta] 
+ Difference between subset (in a loop) and mods in metafor rma.mv
+In-Reply-To: <fIfSRRMzFrWRvOdZVkqSukE2VgluGEjoXbdErjGGvI0d_ov_LBuvb5UxW9d3EzQrqY5w56On_-HG1VIMltaPHFmh9Idxn1fdZz42m0NQwGE=@brendans-bits.com>
+References: <fIfSRRMzFrWRvOdZVkqSukE2VgluGEjoXbdErjGGvI0d_ov_LBuvb5UxW9d3EzQrqY5w56On_-HG1VIMltaPHFmh9Idxn1fdZz42m0NQwGE=@brendans-bits.com>
+Message-ID: <1908b21094dc425abfff388192da4226@maastrichtuniversity.nl>
+
+Dear Brendan,
+
+Both approaches fit multilevel models. The difference arises because of two reasons:
+
+1) When using the full dataset and using 'Predictor' as a moderator, then it is possible for information to be shared/borrowed from both levels of the moderator within studies. 
+
+2) When subsetting based on 'Predictor', you allow the variance components to differ across the two levels of the moderator. This is essentially what is discussed here:
+
+https://www.metafor-project.org/doku.php/tips:comp_two_independent_estimates
+
+but in the context of a simpler model.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Brendan Pearl via R-sig-meta-analysis
+>Sent: Friday, 29 September, 2023 12:00
+>To: r-sig-meta-analysis at r-project.org
+>Cc: Brendan Pearl
+>Subject: [R-meta] Difference between subset (in a loop) and mods in metafor
+>rma.mv
+>
+>I am trying to understand the difference using the 'subset' and 'mods' options in
+>rma.mv.
+>
+>I have run two analyses using rma.mv on the same dataset that has a three level
+>structure (articles nested within larger studies) and get different results.
+>
+>In the first example I have given below, is looping over rma.mv and passing a
+>different predictor to the subset option a univariate meta-analysis? And in the
+>second example, is passing the predictor to the mods option running a
+>multivariable meta-analysis?
+>
+>Study <- c("A","A","B","C","C","D","E","F","F","G")
+>Article <- c("1","2","3","4","5","6","7","8","9","10")
+>Predictor <- c("x","x","x","y","y","y","x","x","y","y")
+>yi <- c(-.2,-.3,-.8,.5,.6,.4,-.1,-.8,.3,.8)
+>vi <- c(.01,.01,.01,.01,.01,.01,.01,.01,.01,.01)
+>
+>dat <- data.frame(Study,Article,Predictor,yi,vi)
+>
+>#FIRST EXAMPLE#Subset analyses
+># gives me
+>
+>#1   x OR = -0.49 [-0.84, -0.13]
+>#2   y    OR = 0.51 [0.31, 0.72]
+>
+>df_subset <- data.frame(val=as.character(),subset_result=as.character())
+>
+>for (val in unique(dat$Predictor)){
+>
+>res_univariate <- rma.mv(yi=yi,
+>V=vi,
+>data=dat,
+>random = ~1 | Study/Article,
+>subset = Predictor == val,
+>method = "REML"
+>)
+>
+>result <- capture.output(cat(
+>"OR = ",
+>format(round(res_univariate$beta, 2),nsmall = 2),
+>" [",
+>format(round(res_univariate$ci.lb, 2),nsmall = 2),
+>", ",
+>format(round(res_univariate$ci.ub, 2),nsmall = 2),
+>"]",
+>sep=""
+>)
+>)
+>
+>df_subset[nrow(df_subset) +1,] = c(
+>val,
+>result
+>)
+>
+>}
+>
+>#SECOND EXAMPLE
+>#Mod analysis
+>#gives me:
+>
+>#                      estimate   ci.lb    ci.ub
+>
+>#factor(Predictor)x   -0.4825    -0.7246  -0.2404
+>#factor(Predictor)y    0.5807     0.3386   0.8229
+>
+>df_mod <- data.frame(val=as.character(),mod_result=as.character())
+>
+>res_multivariate <- rma.mv(yi=yi,
+>V=vi,
+>data=dat,
+>random = ~1 | Study/Article,
+>mods = ~ factor(Predictor)-1,
+>method = "REML"
+>)
+>summary(res_multivariate)
+
+
+From brend@n @end|ng |rom brend@n@-b|t@@com  Fri Sep 29 13:55:37 2023
+From: brend@n @end|ng |rom brend@n@-b|t@@com (Brendan Pearl)
+Date: Fri, 29 Sep 2023 11:55:37 +0000
+Subject: [R-meta] 
+ Difference between subset (in a loop) and mods in metafor rma.mv
+In-Reply-To: <1908b21094dc425abfff388192da4226@maastrichtuniversity.nl>
+References: <fIfSRRMzFrWRvOdZVkqSukE2VgluGEjoXbdErjGGvI0d_ov_LBuvb5UxW9d3EzQrqY5w56On_-HG1VIMltaPHFmh9Idxn1fdZz42m0NQwGE=@brendans-bits.com>
+ <1908b21094dc425abfff388192da4226@maastrichtuniversity.nl>
+Message-ID: <tc8X6hrFLoNOy1LEPHIXrMrEGMevf5P9OGfemrjCqxyCSwJKatZPVnMPKbDuNVWTcLoYtVXQ9fwOSbDJPUeTKK6VAqC7Oeo2JtePLPl26nE=@brendans-bits.com>
+
+
+Thankyou Wolfgang,
+
+Just for my understanding: "When using the full dataset and using 'Predictor' as a moderator, then it is possible for information to be shared/borrowed from both levels of the moderator within studies." - is this what occurs in a multivariable/multivariate meta-analysis?
+
+Regards,
+Brendan.
+
+------- Original Message -------
+On Friday, September 29th, 2023 at 8:56 PM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+
+
+> Dear Brendan,
+> 
+> Both approaches fit multilevel models. The difference arises because of two reasons:
+> 
+> 1) When using the full dataset and using 'Predictor' as a moderator, then it is possible for information to be shared/borrowed from both levels of the moderator within studies.
+> 
+> 2) When subsetting based on 'Predictor', you allow the variance components to differ across the two levels of the moderator. This is essentially what is discussed here:
+> 
+> https://www.metafor-project.org/doku.php/tips:comp_two_independent_estimates
+> 
+> but in the context of a simpler model.
+> 
+> Best,
+> Wolfgang
+> 
+> > -----Original Message-----
+> > From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+> > Behalf Of Brendan Pearl via R-sig-meta-analysis
+> > Sent: Friday, 29 September, 2023 12:00
+> > To: r-sig-meta-analysis at r-project.org
+> > Cc: Brendan Pearl
+> > Subject: [R-meta] Difference between subset (in a loop) and mods in metafor
+> > rma.mv
+> > 
+> > I am trying to understand the difference using the 'subset' and 'mods' options in
+> > rma.mv.
+> > 
+> > I have run two analyses using rma.mv on the same dataset that has a three level
+> > structure (articles nested within larger studies) and get different results.
+> > 
+> > In the first example I have given below, is looping over rma.mv and passing a
+> > different predictor to the subset option a univariate meta-analysis? And in the
+> > second example, is passing the predictor to the mods option running a
+> > multivariable meta-analysis?
+> > 
+> > Study <- c("A","A","B","C","C","D","E","F","F","G")
+> > Article <- c("1","2","3","4","5","6","7","8","9","10")
+> > Predictor <- c("x","x","x","y","y","y","x","x","y","y")
+> > yi <- c(-.2,-.3,-.8,.5,.6,.4,-.1,-.8,.3,.8)
+> > vi <- c(.01,.01,.01,.01,.01,.01,.01,.01,.01,.01)
+> > 
+> > dat <- data.frame(Study,Article,Predictor,yi,vi)
+> > 
+> > #FIRST EXAMPLE#Subset analyses
+> > # gives me
+> > 
+> > #1 x OR = -0.49 [-0.84, -0.13]
+> > #2 y OR = 0.51 [0.31, 0.72]
+> > 
+> > df_subset <- data.frame(val=as.character(),subset_result=as.character())
+> > 
+> > for (val in unique(dat$Predictor)){
+> > 
+> > res_univariate <- rma.mv(yi=yi,
+> > V=vi,
+> > data=dat,
+> > random = ~1 | Study/Article,
+> > subset = Predictor == val,
+> > method = "REML"
+> > )
+> > 
+> > result <- capture.output(cat(
+> > "OR = ",
+> > format(round(res_univariate$beta, 2),nsmall = 2),
+> > " [",
+> > format(round(res_univariate$ci.lb, 2),nsmall = 2),
+> > ", ",
+> > format(round(res_univariate$ci.ub, 2),nsmall = 2),
+> > "]",
+> > sep=""
+> > )
+> > )
+> > 
+> > df_subset[nrow(df_subset) +1,] = c(
+> > val,
+> > result
+> > )
+> > 
+> > }
+> > 
+> > #SECOND EXAMPLE
+> > #Mod analysis
+> > #gives me:
+> > 
+> > # estimate ci.lb ci.ub
+> > 
+> > #factor(Predictor)x -0.4825 -0.7246 -0.2404
+> > #factor(Predictor)y 0.5807 0.3386 0.8229
+> > 
+> > df_mod <- data.frame(val=as.character(),mod_result=as.character())
+> > 
+> > res_multivariate <- rma.mv(yi=yi,
+> > V=vi,
+> > data=dat,
+> > random = ~1 | Study/Article,
+> > mods = ~ factor(Predictor)-1,
+> > method = "REML"
+> > )
+> > summary(res_multivariate)
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep 29 18:24:47 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 29 Sep 2023 16:24:47 +0000
+Subject: [R-meta] 
+ Difference between subset (in a loop) and mods in metafor rma.mv
+In-Reply-To: <tc8X6hrFLoNOy1LEPHIXrMrEGMevf5P9OGfemrjCqxyCSwJKatZPVnMPKbDuNVWTcLoYtVXQ9fwOSbDJPUeTKK6VAqC7Oeo2JtePLPl26nE=@brendans-bits.com>
+References: <fIfSRRMzFrWRvOdZVkqSukE2VgluGEjoXbdErjGGvI0d_ov_LBuvb5UxW9d3EzQrqY5w56On_-HG1VIMltaPHFmh9Idxn1fdZz42m0NQwGE=@brendans-bits.com>
+ <1908b21094dc425abfff388192da4226@maastrichtuniversity.nl>
+ <tc8X6hrFLoNOy1LEPHIXrMrEGMevf5P9OGfemrjCqxyCSwJKatZPVnMPKbDuNVWTcLoYtVXQ9fwOSbDJPUeTKK6VAqC7Oeo2JtePLPl26nE=@brendans-bits.com>
+Message-ID: <f65c04da38814f108a9c3b54d6a0231d@maastrichtuniversity.nl>
+
+Yes. For some relevant literature, see for example:
+
+Riley, R. D., Abrams, K. R., Lambert, P. C., Sutton, A. J., & Thompson, J. R. (2007). An evaluation of bivariate random-effects meta-analysis for the joint synthesis of two correlated outcomes. Statistics in Medicine, 26(1), 78-97. https://doi.org/10.1002/sim.2524
+
+Jackson, D., White, I. R., Price, M., Copas, J., & Riley, R. D. (2017). Borrowing of strength and study weights in multivariate and network meta-analysis. Statistical Methods in Medical Research, 26(6), 2853-2868. https://doi.org/10.1177/0962280215611702
+
+Copas, J. B., Jackson, D., White, I. R., & Riley, R. D. (2018). The role of secondary outcomes in multivariate meta-analysis. Journal of the Royal Statistical Society, Series C, 67(5), 1177-1205. https://doi.org/10.1111/rssc.12274
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Brendan Pearl via R-sig-meta-analysis
+>Sent: Friday, 29 September, 2023 13:56
+>To: R Special Interest Group for Meta-Analysis
+>Cc: Brendan Pearl
+>Subject: Re: [R-meta] Difference between subset (in a loop) and mods in metafor
+>rma.mv
+>
+>Thankyou Wolfgang,
+>
+>Just for my understanding: "When using the full dataset and using 'Predictor' as
+>a moderator, then it is possible for information to be shared/borrowed from both
+>levels of the moderator within studies." - is this what occurs in a
+>multivariable/multivariate meta-analysis?
+>
+>Regards,
+>Brendan.
+>
+>------- Original Message -------
+>On Friday, September 29th, 2023 at 8:56 PM, Viechtbauer, Wolfgang (NP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+>> Dear Brendan,
+>>
+>> Both approaches fit multilevel models. The difference arises because of two
+>reasons:
+>>
+>> 1) When using the full dataset and using 'Predictor' as a moderator, then it is
+>possible for information to be shared/borrowed from both levels of the moderator
+>within studies.
+>>
+>> 2) When subsetting based on 'Predictor', you allow the variance components to
+>differ across the two levels of the moderator. This is essentially what is
+>discussed here:
+>>
+>> https://www.metafor-project.org/doku.php/tips:comp_two_independent_estimates
+>>
+>> but in the context of a simpler model.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> > -----Original Message-----
+>> > From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]
+>On
+>> > Behalf Of Brendan Pearl via R-sig-meta-analysis
+>> > Sent: Friday, 29 September, 2023 12:00
+>> > To: r-sig-meta-analysis at r-project.org
+>> > Cc: Brendan Pearl
+>> > Subject: [R-meta] Difference between subset (in a loop) and mods in metafor
+>> > rma.mv
+>> >
+>> > I am trying to understand the difference using the 'subset' and 'mods'
+>options in
+>> > rma.mv.
+>> >
+>> > I have run two analyses using rma.mv on the same dataset that has a three
+>level
+>> > structure (articles nested within larger studies) and get different results.
+>> >
+>> > In the first example I have given below, is looping over rma.mv and passing a
+>> > different predictor to the subset option a univariate meta-analysis? And in
+>the
+>> > second example, is passing the predictor to the mods option running a
+>> > multivariable meta-analysis?
+>> >
+>> > Study <- c("A","A","B","C","C","D","E","F","F","G")
+>> > Article <- c("1","2","3","4","5","6","7","8","9","10")
+>> > Predictor <- c("x","x","x","y","y","y","x","x","y","y")
+>> > yi <- c(-.2,-.3,-.8,.5,.6,.4,-.1,-.8,.3,.8)
+>> > vi <- c(.01,.01,.01,.01,.01,.01,.01,.01,.01,.01)
+>> >
+>> > dat <- data.frame(Study,Article,Predictor,yi,vi)
+>> >
+>> > #FIRST EXAMPLE#Subset analyses
+>> > # gives me
+>> >
+>> > #1 x OR = -0.49 [-0.84, -0.13]
+>> > #2 y OR = 0.51 [0.31, 0.72]
+>> >
+>> > df_subset <- data.frame(val=as.character(),subset_result=as.character())
+>> >
+>> > for (val in unique(dat$Predictor)){
+>> >
+>> > res_univariate <- rma.mv(yi=yi,
+>> > V=vi,
+>> > data=dat,
+>> > random = ~1 | Study/Article,
+>> > subset = Predictor == val,
+>> > method = "REML"
+>> > )
+>> >
+>> > result <- capture.output(cat(
+>> > "OR = ",
+>> > format(round(res_univariate$beta, 2),nsmall = 2),
+>> > " [",
+>> > format(round(res_univariate$ci.lb, 2),nsmall = 2),
+>> > ", ",
+>> > format(round(res_univariate$ci.ub, 2),nsmall = 2),
+>> > "]",
+>> > sep=""
+>> > )
+>> > )
+>> >
+>> > df_subset[nrow(df_subset) +1,] = c(
+>> > val,
+>> > result
+>> > )
+>> >
+>> > }
+>> >
+>> > #SECOND EXAMPLE
+>> > #Mod analysis
+>> > #gives me:
+>> >
+>> > # estimate ci.lb ci.ub
+>> >
+>> > #factor(Predictor)x -0.4825 -0.7246 -0.2404
+>> > #factor(Predictor)y 0.5807 0.3386 0.8229
+>> >
+>> > df_mod <- data.frame(val=as.character(),mod_result=as.character())
+>> >
+>> > res_multivariate <- rma.mv(yi=yi,
+>> > V=vi,
+>> > data=dat,
+>> > random = ~1 | Study/Article,
+>> > mods = ~ factor(Predictor)-1,
+>> > method = "REML"
+>> > )
+>> > summary(res_multivariate)
+
+
+From rnorouz|@n @end|ng |rom gm@||@com  Fri Sep 29 19:04:50 2023
+From: rnorouz|@n @end|ng |rom gm@||@com (Reza Norouzian)
+Date: Fri, 29 Sep 2023 12:04:50 -0500
+Subject: [R-meta] 
+ Difference between subset (in a loop) and mods in metafor rma.mv
+In-Reply-To: <f65c04da38814f108a9c3b54d6a0231d@maastrichtuniversity.nl>
+References: <fIfSRRMzFrWRvOdZVkqSukE2VgluGEjoXbdErjGGvI0d_ov_LBuvb5UxW9d3EzQrqY5w56On_-HG1VIMltaPHFmh9Idxn1fdZz42m0NQwGE=@brendans-bits.com>
+ <1908b21094dc425abfff388192da4226@maastrichtuniversity.nl>
+ <tc8X6hrFLoNOy1LEPHIXrMrEGMevf5P9OGfemrjCqxyCSwJKatZPVnMPKbDuNVWTcLoYtVXQ9fwOSbDJPUeTKK6VAqC7Oeo2JtePLPl26nE=@brendans-bits.com>
+ <f65c04da38814f108a9c3b54d6a0231d@maastrichtuniversity.nl>
+Message-ID: <CAKt3tzk0JS3Oz7b3f1LZiih=vdS7xgE0W=9i6m_toADztPvMWw@mail.gmail.com>
+
+Also, Brenden, if you want to replicate the results from when you subset
+the data (i.e., not allowing the borrowing of info.) with a single model,
+then you can do:
+
+rma.mv(yi~Predictor+0, vi, random = list(~Predictor | Study, ~Predictor |
+Article),
+       struct = c("DIAG","DIAG"), data=dat)
+
+which for your toy dataset, where predictor's categories have no
+heterogeneity at the Article level, may be reduced to:
+
+rma.mv(yi~Predictor+0, vi, random = ~Predictor | Study,
+       struct = "DIAG", data=dat)
+
+This topic has come up on the list a number of times, you may want to scan
+through the listserv's archives for related examples (e.g.,
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-June/004074.html).
+
+Reza
+
+
+On Fri, Sep 29, 2023 at 11:25?AM Viechtbauer, Wolfgang (NP) via
+R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+
+> Yes. For some relevant literature, see for example:
+>
+> Riley, R. D., Abrams, K. R., Lambert, P. C., Sutton, A. J., & Thompson, J.
+> R. (2007). An evaluation of bivariate random-effects meta-analysis for the
+> joint synthesis of two correlated outcomes. Statistics in Medicine, 26(1),
+> 78-97. https://doi.org/10.1002/sim.2524
+>
+> Jackson, D., White, I. R., Price, M., Copas, J., & Riley, R. D. (2017).
+> Borrowing of strength and study weights in multivariate and network
+> meta-analysis. Statistical Methods in Medical Research, 26(6), 2853-2868.
+> https://doi.org/10.1177/0962280215611702
+>
+> Copas, J. B., Jackson, D., White, I. R., & Riley, R. D. (2018). The role
+> of secondary outcomes in multivariate meta-analysis. Journal of the Royal
+> Statistical Society, Series C, 67(5), 1177-1205.
+> https://doi.org/10.1111/rssc.12274
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org] On
+> >Behalf Of Brendan Pearl via R-sig-meta-analysis
+> >Sent: Friday, 29 September, 2023 13:56
+> >To: R Special Interest Group for Meta-Analysis
+> >Cc: Brendan Pearl
+> >Subject: Re: [R-meta] Difference between subset (in a loop) and mods in
+> metafor
+> >rma.mv
+> >
+> >Thankyou Wolfgang,
+> >
+> >Just for my understanding: "When using the full dataset and using
+> 'Predictor' as
+> >a moderator, then it is possible for information to be shared/borrowed
+> from both
+> >levels of the moderator within studies." - is this what occurs in a
+> >multivariable/multivariate meta-analysis?
+> >
+> >Regards,
+> >Brendan.
+> >
+> >------- Original Message -------
+> >On Friday, September 29th, 2023 at 8:56 PM, Viechtbauer, Wolfgang (NP)
+> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >
+> >> Dear Brendan,
+> >>
+> >> Both approaches fit multilevel models. The difference arises because of
+> two
+> >reasons:
+> >>
+> >> 1) When using the full dataset and using 'Predictor' as a moderator,
+> then it is
+> >possible for information to be shared/borrowed from both levels of the
+> moderator
+> >within studies.
+> >>
+> >> 2) When subsetting based on 'Predictor', you allow the variance
+> components to
+> >differ across the two levels of the moderator. This is essentially what is
+> >discussed here:
+> >>
+> >>
+> https://www.metafor-project.org/doku.php/tips:comp_two_independent_estimates
+> >>
+> >> but in the context of a simpler model.
+> >>
+> >> Best,
+> >> Wolfgang
+> >>
+> >> > -----Original Message-----
+> >> > From: R-sig-meta-analysis [mailto:
+> r-sig-meta-analysis-bounces at r-project.org]
+> >On
+> >> > Behalf Of Brendan Pearl via R-sig-meta-analysis
+> >> > Sent: Friday, 29 September, 2023 12:00
+> >> > To: r-sig-meta-analysis at r-project.org
+> >> > Cc: Brendan Pearl
+> >> > Subject: [R-meta] Difference between subset (in a loop) and mods in
+> metafor
+> >> > rma.mv
+> >> >
+> >> > I am trying to understand the difference using the 'subset' and 'mods'
+> >options in
+> >> > rma.mv.
+> >> >
+> >> > I have run two analyses using rma.mv on the same dataset that has a
+> three
+> >level
+> >> > structure (articles nested within larger studies) and get different
+> results.
+> >> >
+> >> > In the first example I have given below, is looping over rma.mv and
+> passing a
+> >> > different predictor to the subset option a univariate meta-analysis?
+> And in
+> >the
+> >> > second example, is passing the predictor to the mods option running a
+> >> > multivariable meta-analysis?
+> >> >
+> >> > Study <- c("A","A","B","C","C","D","E","F","F","G")
+> >> > Article <- c("1","2","3","4","5","6","7","8","9","10")
+> >> > Predictor <- c("x","x","x","y","y","y","x","x","y","y")
+> >> > yi <- c(-.2,-.3,-.8,.5,.6,.4,-.1,-.8,.3,.8)
+> >> > vi <- c(.01,.01,.01,.01,.01,.01,.01,.01,.01,.01)
+> >> >
+> >> > dat <- data.frame(Study,Article,Predictor,yi,vi)
+> >> >
+> >> > #FIRST EXAMPLE#Subset analyses
+> >> > # gives me
+> >> >
+> >> > #1 x OR = -0.49 [-0.84, -0.13]
+> >> > #2 y OR = 0.51 [0.31, 0.72]
+> >> >
+> >> > df_subset <-
+> data.frame(val=as.character(),subset_result=as.character())
+> >> >
+> >> > for (val in unique(dat$Predictor)){
+> >> >
+> >> > res_univariate <- rma.mv(yi=yi,
+> >> > V=vi,
+> >> > data=dat,
+> >> > random = ~1 | Study/Article,
+> >> > subset = Predictor == val,
+> >> > method = "REML"
+> >> > )
+> >> >
+> >> > result <- capture.output(cat(
+> >> > "OR = ",
+> >> > format(round(res_univariate$beta, 2),nsmall = 2),
+> >> > " [",
+> >> > format(round(res_univariate$ci.lb, 2),nsmall = 2),
+> >> > ", ",
+> >> > format(round(res_univariate$ci.ub, 2),nsmall = 2),
+> >> > "]",
+> >> > sep=""
+> >> > )
+> >> > )
+> >> >
+> >> > df_subset[nrow(df_subset) +1,] = c(
+> >> > val,
+> >> > result
+> >> > )
+> >> >
+> >> > }
+> >> >
+> >> > #SECOND EXAMPLE
+> >> > #Mod analysis
+> >> > #gives me:
+> >> >
+> >> > # estimate ci.lb ci.ub
+> >> >
+> >> > #factor(Predictor)x -0.4825 -0.7246 -0.2404
+> >> > #factor(Predictor)y 0.5807 0.3386 0.8229
+> >> >
+> >> > df_mod <- data.frame(val=as.character(),mod_result=as.character())
+> >> >
+> >> > res_multivariate <- rma.mv(yi=yi,
+> >> > V=vi,
+> >> > data=dat,
+> >> > random = ~1 | Study/Article,
+> >> > mods = ~ factor(Predictor)-1,
+> >> > method = "REML"
+> >> > )
+> >> > summary(res_multivariate)
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From brend@n @end|ng |rom brend@n@-b|t@@com  Fri Sep 29 23:26:19 2023
+From: brend@n @end|ng |rom brend@n@-b|t@@com (Brendan Pearl)
+Date: Fri, 29 Sep 2023 21:26:19 +0000
+Subject: [R-meta] 
+ Difference between subset (in a loop) and mods in metafor rma.mv
+In-Reply-To: <CAKt3tzk0JS3Oz7b3f1LZiih=vdS7xgE0W=9i6m_toADztPvMWw@mail.gmail.com>
+References: <fIfSRRMzFrWRvOdZVkqSukE2VgluGEjoXbdErjGGvI0d_ov_LBuvb5UxW9d3EzQrqY5w56On_-HG1VIMltaPHFmh9Idxn1fdZz42m0NQwGE=@brendans-bits.com>
+ <1908b21094dc425abfff388192da4226@maastrichtuniversity.nl>
+ <tc8X6hrFLoNOy1LEPHIXrMrEGMevf5P9OGfemrjCqxyCSwJKatZPVnMPKbDuNVWTcLoYtVXQ9fwOSbDJPUeTKK6VAqC7Oeo2JtePLPl26nE=@brendans-bits.com>
+ <f65c04da38814f108a9c3b54d6a0231d@maastrichtuniversity.nl>
+ <CAKt3tzk0JS3Oz7b3f1LZiih=vdS7xgE0W=9i6m_toADztPvMWw@mail.gmail.com>
+Message-ID: <tgaty4O6YhQwy62Vwe6KLS2lydnEIqu0N5m-m2JJ7SbsWf8GlQKrLv6gcenhzzriufnWK-HHl8wfhwVDie9Ya_DOe3cRgvWJ2iRAB5WSsBY=@brendans-bits.com>
+
+
+Thankyou both.
+
+------- Original Message -------
+On Saturday, September 30th, 2023 at 3:04 AM, Reza Norouzian via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+
+
+> Also, Brenden, if you want to replicate the results from when you subset
+> the data (i.e., not allowing the borrowing of info.) with a single model,
+> then you can do:
+> 
+> rma.mv(yi~Predictor+0, vi, random = list(~Predictor | Study, ~Predictor |
+> Article),
+> struct = c("DIAG","DIAG"), data=dat)
+> 
+> which for your toy dataset, where predictor's categories have no
+> heterogeneity at the Article level, may be reduced to:
+> 
+> rma.mv(yi~Predictor+0, vi, random = ~Predictor | Study,
+> struct = "DIAG", data=dat)
+> 
+> This topic has come up on the list a number of times, you may want to scan
+> through the listserv's archives for related examples (e.g.,
+> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-June/004074.html).
+> 
+> Reza
+> 
+> 
+> On Fri, Sep 29, 2023 at 11:25?AM Viechtbauer, Wolfgang (NP) via
+> R-sig-meta-analysis r-sig-meta-analysis at r-project.org wrote:
+> 
+> > Yes. For some relevant literature, see for example:
+> > 
+> > Riley, R. D., Abrams, K. R., Lambert, P. C., Sutton, A. J., & Thompson, J.
+> > R. (2007). An evaluation of bivariate random-effects meta-analysis for the
+> > joint synthesis of two correlated outcomes. Statistics in Medicine, 26(1),
+> > 78-97. https://doi.org/10.1002/sim.2524
+> > 
+> > Jackson, D., White, I. R., Price, M., Copas, J., & Riley, R. D. (2017).
+> > Borrowing of strength and study weights in multivariate and network
+> > meta-analysis. Statistical Methods in Medical Research, 26(6), 2853-2868.
+> > https://doi.org/10.1177/0962280215611702
+> > 
+> > Copas, J. B., Jackson, D., White, I. R., & Riley, R. D. (2018). The role
+> > of secondary outcomes in multivariate meta-analysis. Journal of the Royal
+> > Statistical Society, Series C, 67(5), 1177-1205.
+> > https://doi.org/10.1111/rssc.12274
+> > 
+> > Best,
+> > Wolfgang
+> > 
+> > > -----Original Message-----
+> > > From: R-sig-meta-analysis [mailto:
+> > > r-sig-meta-analysis-bounces at r-project.org] On
+> > > Behalf Of Brendan Pearl via R-sig-meta-analysis
+> > > Sent: Friday, 29 September, 2023 13:56
+> > > To: R Special Interest Group for Meta-Analysis
+> > > Cc: Brendan Pearl
+> > > Subject: Re: [R-meta] Difference between subset (in a loop) and mods in
+> > > metafor
+> > > rma.mv
+> > > 
+> > > Thankyou Wolfgang,
+> > > 
+> > > Just for my understanding: "When using the full dataset and using
+> > > 'Predictor' as
+> > > a moderator, then it is possible for information to be shared/borrowed
+> > > from both
+> > > levels of the moderator within studies." - is this what occurs in a
+> > > multivariable/multivariate meta-analysis?
+> > > 
+> > > Regards,
+> > > Brendan.
+> > > 
+> > > ------- Original Message -------
+> > > On Friday, September 29th, 2023 at 8:56 PM, Viechtbauer, Wolfgang (NP)
+> > > wolfgang.viechtbauer at maastrichtuniversity.nl wrote:
+> > > 
+> > > > Dear Brendan,
+> > > > 
+> > > > Both approaches fit multilevel models. The difference arises because of
+> > > > two
+> > > > reasons:
+> > > > 
+> > > > 1) When using the full dataset and using 'Predictor' as a moderator,
+> > > > then it is
+> > > > possible for information to be shared/borrowed from both levels of the
+> > > > moderator
+> > > > within studies.
+> > > > 
+> > > > 2) When subsetting based on 'Predictor', you allow the variance
+> > > > components to
+> > > > differ across the two levels of the moderator. This is essentially what is
+> > > > discussed here:
+> > 
+> > https://www.metafor-project.org/doku.php/tips:comp_two_independent_estimates
+> > 
+> > > > but in the context of a simpler model.
+> > > > 
+> > > > Best,
+> > > > Wolfgang
+> > > > 
+> > > > > -----Original Message-----
+> > > > > From: R-sig-meta-analysis [mailto:
+> > > > > r-sig-meta-analysis-bounces at r-project.org]
+> > > > > On
+> > > > > Behalf Of Brendan Pearl via R-sig-meta-analysis
+> > > > > Sent: Friday, 29 September, 2023 12:00
+> > > > > To: r-sig-meta-analysis at r-project.org
+> > > > > Cc: Brendan Pearl
+> > > > > Subject: [R-meta] Difference between subset (in a loop) and mods in
+> > > > > metafor
+> > > > > rma.mv
+> > > > > 
+> > > > > I am trying to understand the difference using the 'subset' and 'mods'
+> > > > > options in
+> > > > > rma.mv.
+> > > > > 
+> > > > > I have run two analyses using rma.mv on the same dataset that has a
+> > > > > three
+> > > > > level
+> > > > > structure (articles nested within larger studies) and get different
+> > > > > results.
+> > > > > 
+> > > > > In the first example I have given below, is looping over rma.mv and
+> > > > > passing a
+> > > > > different predictor to the subset option a univariate meta-analysis?
+> > > > > And in
+> > > > > the
+> > > > > second example, is passing the predictor to the mods option running a
+> > > > > multivariable meta-analysis?
+> > > > > 
+> > > > > Study <- c("A","A","B","C","C","D","E","F","F","G")
+> > > > > Article <- c("1","2","3","4","5","6","7","8","9","10")
+> > > > > Predictor <- c("x","x","x","y","y","y","x","x","y","y")
+> > > > > yi <- c(-.2,-.3,-.8,.5,.6,.4,-.1,-.8,.3,.8)
+> > > > > vi <- c(.01,.01,.01,.01,.01,.01,.01,.01,.01,.01)
+> > > > > 
+> > > > > dat <- data.frame(Study,Article,Predictor,yi,vi)
+> > > > > 
+> > > > > #FIRST EXAMPLE#Subset analyses
+> > > > > # gives me
+> > > > > 
+> > > > > #1 x OR = -0.49 [-0.84, -0.13]
+> > > > > #2 y OR = 0.51 [0.31, 0.72]
+> > > > > 
+> > > > > df_subset <-
+> > > > > data.frame(val=as.character(),subset_result=as.character())
+> > > > > 
+> > > > > for (val in unique(dat$Predictor)){
+> > > > > 
+> > > > > res_univariate <- rma.mv(yi=yi,
+> > > > > V=vi,
+> > > > > data=dat,
+> > > > > random = ~1 | Study/Article,
+> > > > > subset = Predictor == val,
+> > > > > method = "REML"
+> > > > > )
+> > > > > 
+> > > > > result <- capture.output(cat(
+> > > > > "OR = ",
+> > > > > format(round(res_univariate$beta, 2),nsmall = 2),
+> > > > > " [",
+> > > > > format(round(res_univariate$ci.lb, 2),nsmall = 2),
+> > > > > ", ",
+> > > > > format(round(res_univariate$ci.ub, 2),nsmall = 2),
+> > > > > "]",
+> > > > > sep=""
+> > > > > )
+> > > > > )
+> > > > > 
+> > > > > df_subset[nrow(df_subset) +1,] = c(
+> > > > > val,
+> > > > > result
+> > > > > )
+> > > > > 
+> > > > > }
+> > > > > 
+> > > > > #SECOND EXAMPLE
+> > > > > #Mod analysis
+> > > > > #gives me:
+> > > > > 
+> > > > > # estimate ci.lb ci.ub
+> > > > > 
+> > > > > #factor(Predictor)x -0.4825 -0.7246 -0.2404
+> > > > > #factor(Predictor)y 0.5807 0.3386 0.8229
+> > > > > 
+> > > > > df_mod <- data.frame(val=as.character(),mod_result=as.character())
+> > > > > 
+> > > > > res_multivariate <- rma.mv(yi=yi,
+> > > > > V=vi,
+> > > > > data=dat,
+> > > > > random = ~1 | Study/Article,
+> > > > > mods = ~ factor(Predictor)-1,
+> > > > > method = "REML"
+> > > > > )
+> > > > > summary(res_multivariate)
+> > 
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> > To manage your subscription to this mailing list, go to:
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> 
+> [[alternative HTML version deleted]]
+> 
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep 29 13:27:56 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 29 Sep 2023 11:27:56 +0000
+Subject: [R-meta] Score Normalization for Moderator Analysis in
+ Meta-Analysis
+In-Reply-To: <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+References: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+ <c27c7629b33b453fa8a82b444e363165@maastrichtuniversity.nl>
+ <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+Message-ID: <6cbdec2681be423b90b376b000fca274-193@maastrichtuniversity.nl>
+
+I just noticed that the last question has remained unanswered: 
+
+Depends on what you mean by "need". To run such an analysis, assuming 'scale' is just a two-level factor and you want to run a model with '~ factor(scale) * pompmean', then you will need five effect sizes, two for the first and three for the second level of 'scale'. That will give you just enough information to fit such a model and estimate the amount of residual heterogeneity.
+
+But I assume that this is not what you mean by "need". If you meant something along the lines of 'having enough power', then I cannot give you an answer to that question, because it is like asking: "I want to run a study - how many subjects do I need?" (although turns out that the answer to that question is: "three patients" -- https://www.youtube.com/watch?v=Hz1fyhVOjr4). To give an informed answer to that question, one would have to do a power analysis:
+
+Hedges, L. V., & Pigott, T. D. (2004). The power of statistical tests for moderators in meta-analysis. Psychological Methods, 9(4), 426-445. 
+
+If you meant something along the lines of 'so that reviewers are not going to complain that my sample size is too small', then one could refer to rules of thumb like what you can find in the Cochrane Handbook:
+
+https://training.cochrane.org/handbook/current/chapter-10#section-10-11-5-1
+
+"It is very unlikely that an investigation of heterogeneity will produce useful findings unless there is a substantial number of studies. Typical advice for undertaking simple regression analyses: that at least ten observations (i.e. ten studies in a meta-analysis) should be available for each characteristic modelled. However, even this will be too few when the covariates are unevenly distributed across studies."
+
+To be clear, this is an entirely arbitrary rule (and one also finds suggestions like '5 studies per characteristic'). Also, what exactly 'for each characteristic modelled' means is not entirely clear, but say we interpret this as 'per model coefficient'. The model above has 4 model coefficients (including the intercept), so then we would need at least 40 effect sizes.
+
+To be fair, this rule does relate somewhat to the issue of overfitting, since more complex models require more data points to avoid overfitting. But even then, one would have to articulate more precisely what exactly one is concerned about.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Kiet Huynh [mailto:kietduchuynh at gmail.com]
+>Sent: Thursday, 14 September, 2023 17:10
+>To: Viechtbauer, Wolfgang (NP)
+>Cc: R Special Interest Group for Meta-Analysis
+>Subject: Re: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>
+>Hi Wolfgang,
+>
+>Thanks for the reminder about including links when cross posting.
+>
+>I appreciate the helpful expiation for the proportion/percentage of maximum
+>possible' (POMP) score method for moderation analysis. Especially helpful was the
+>tip on using the scale type to interact with the POMP score mean to determine if
+>the relationship between social support and the strength of the association
+>between LGBTQ+ discrimination and mental health differs depending on the scale
+>used. Do you have a sense of how many effect sizes would be needed for that?
+>
+>Best,
+>
+>Kiet
+>
+>On Sep 13, 2023, at 3:25 AM, Viechtbauer, Wolfgang (NP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+>Dear Kiet,
+>
+>I don't mind cross-posting, but when doing so, please indicate this in posts, so
+>in case answers are provided elsewhere, duplicate efforts can be avoided. For
+>reference, this question was also posted here:
+>
+>https://stats.stackexchange.com/questions/626306/score-normalization-for-
+>moderator-analysis-in-meta-analysis
+>
+>What you describe under 2 is the 'proportion/percentage of maximum possible'
+>(POMP) score method, which is nicely discussed in this article:
+>
+>Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units
+>and the circumstance for POMP. Multivariate Behavioral Research, 34(3), 315-
+>346.?https://doi.org/10.1207/S15327906MBR3403_2
+>
+>This approach assumes that the observed values on one scale are linear
+>transformations of the observed values on other scales. Of course that is never
+>quite true, but can hold as a rough approximation. In fact, this is also the
+>assumption underlying various effect size / outcome measures (e.g., standardized
+>mean differences, correlation coefficients), so it is an implicit assumption in
+>many meta-analyses anyway (except that you are now also applying this assumption
+>to the moderator variable). There was a thread related to this in April:
+>
+>https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004529.html
+>
+>When this assumption is not correct (with respect to the variables involved in
+>computing the correlations or with respect to the moderator variable), then this
+>becomes one of the sources of (residual) heterogeneity. Of course, we have
+>random/mixed-effects models to account for (residual) heterogeneity, so this is
+>not the end of the world. But if scales are measuring entirely different
+>constructs, then we should be more worried if we lump them together.
+>
+>If you have enough studies, then you can also code the type of scale used to
+>measure social support (e.g., MSPSS versus other or even more fine-grained if you
+>have enough studies) and include this in your moderator analysis and allow it to
+>interact with the POMP score mean of the social support scale. That way, you can
+>examine if the relationship between social support and the strength of the
+>association between LGBTQ+ discrimination and mental health differs depending on
+>the scale used.
+>
+>Best,
+>Wolfgang
+>
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Kiet Huynh via R-sig-meta-analysis
+>Sent: Tuesday, 12 September, 2023 21:56
+>To: R meta
+>Cc: Kiet Huynh
+>Subject: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>
+>Hello colleagues,
+>
+>I?m conducting a meta-analysis of the association between LGBTQ+ discrimination
+>and mental health. Both are continuous variables, and I am analyzing correlation
+>coefficients. I?m interested in looking at moderators (continuous) of the
+>relationship between these two variables. One such moderator is social support
+>(continuous). I am considering two approaches for running the moderator analysis:
+>
+>1) Many of the studies used the same MSPSS social support scale. I plan to use
+>the mean value of the MSPSS as a continuous moderator variable of the
+>discrimination-mental health relationship.
+>
+>2) Most studies, however, use different measures of social support. I plan to use
+>the min-max normalization method to put all the social support measure on the
+>same scale, and then use that normalized mean as the moderator variable of the
+>discrimination-mental health relationship. For an example use of min-max
+>normalization method, see Endendijk et al. (2020). However, the Endendijk et al.
+>(2020) study uses the min-max normalization method for the outcome and not for a
+>moderator. The formula for the min-max normalization method is:
+>
+>x? = (x - min)/(max - min)
+>x? is the normalized mean, x is the mean of the sample, min is the minimum
+>possible value of the scale, and max is the maximum possible value of the scale.
+>
+>The benefit to the second approach is that I can include more studies in this
+>moderator analysis, and not just the studies using the same measure of social
+>support.
+>
+>My question is whether both approaches are valid methods for testing moderator
+>analysis? Are there any issues with using the of min-max normalization method for
+>moderator analysis?
+>
+>Thank you,
+>
+>- KH
+>
+>Reference:
+>
+>Endendijk, J. J., van Baar, A. L., & Dekovi?, M. (2020). He is a stud, she is a
+>slut! A meta-analysis on the continued existence of sexual double standards.
+>Personality and Social Psychology Review, 24(2), 163?190.
+>https://doi.org/10.1177/1088868319891310
+>
+>----
+>
+>Kiet Huynh, PhD (he/him)
+>(hear?pronunciation <https://www.name-coach.com/kiet-huynh-94be0772-1bfd-4ece-
+>afba-14699186f2b9>)
+>Assistant Professor
+>Department of Psychology
+>
+>Terrill Hall Rm # 336
+>University of North Texas
+>Denton, TX 76203
+>Kiet.Huynh at unt.edu?<mailto:Kiet.Huynh at unt.edu>
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep 29 13:27:56 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 29 Sep 2023 11:27:56 +0000
+Subject: [R-meta] Score Normalization for Moderator Analysis in
+ Meta-Analysis
+In-Reply-To: <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+References: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+ <c27c7629b33b453fa8a82b444e363165@maastrichtuniversity.nl>
+ <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+Message-ID: <6cbdec2681be423b90b376b000fca274-5863@maastrichtuniversity.nl>
+
+I just noticed that the last question has remained unanswered: 
+
+Depends on what you mean by "need". To run such an analysis, assuming 'scale' is just a two-level factor and you want to run a model with '~ factor(scale) * pompmean', then you will need five effect sizes, two for the first and three for the second level of 'scale'. That will give you just enough information to fit such a model and estimate the amount of residual heterogeneity.
+
+But I assume that this is not what you mean by "need". If you meant something along the lines of 'having enough power', then I cannot give you an answer to that question, because it is like asking: "I want to run a study - how many subjects do I need?" (although turns out that the answer to that question is: "three patients" -- https://www.youtube.com/watch?v=Hz1fyhVOjr4). To give an informed answer to that question, one would have to do a power analysis:
+
+Hedges, L. V., & Pigott, T. D. (2004). The power of statistical tests for moderators in meta-analysis. Psychological Methods, 9(4), 426-445. 
+
+If you meant something along the lines of 'so that reviewers are not going to complain that my sample size is too small', then one could refer to rules of thumb like what you can find in the Cochrane Handbook:
+
+https://training.cochrane.org/handbook/current/chapter-10#section-10-11-5-1
+
+"It is very unlikely that an investigation of heterogeneity will produce useful findings unless there is a substantial number of studies. Typical advice for undertaking simple regression analyses: that at least ten observations (i.e. ten studies in a meta-analysis) should be available for each characteristic modelled. However, even this will be too few when the covariates are unevenly distributed across studies."
+
+To be clear, this is an entirely arbitrary rule (and one also finds suggestions like '5 studies per characteristic'). Also, what exactly 'for each characteristic modelled' means is not entirely clear, but say we interpret this as 'per model coefficient'. The model above has 4 model coefficients (including the intercept), so then we would need at least 40 effect sizes.
+
+To be fair, this rule does relate somewhat to the issue of overfitting, since more complex models require more data points to avoid overfitting. But even then, one would have to articulate more precisely what exactly one is concerned about.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Kiet Huynh [mailto:kietduchuynh at gmail.com]
+>Sent: Thursday, 14 September, 2023 17:10
+>To: Viechtbauer, Wolfgang (NP)
+>Cc: R Special Interest Group for Meta-Analysis
+>Subject: Re: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>
+>Hi Wolfgang,
+>
+>Thanks for the reminder about including links when cross posting.
+>
+>I appreciate the helpful expiation for the proportion/percentage of maximum
+>possible' (POMP) score method for moderation analysis. Especially helpful was the
+>tip on using the scale type to interact with the POMP score mean to determine if
+>the relationship between social support and the strength of the association
+>between LGBTQ+ discrimination and mental health differs depending on the scale
+>used. Do you have a sense of how many effect sizes would be needed for that?
+>
+>Best,
+>
+>Kiet
+>
+>On Sep 13, 2023, at 3:25 AM, Viechtbauer, Wolfgang (NP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+>Dear Kiet,
+>
+>I don't mind cross-posting, but when doing so, please indicate this in posts, so
+>in case answers are provided elsewhere, duplicate efforts can be avoided. For
+>reference, this question was also posted here:
+>
+>https://stats.stackexchange.com/questions/626306/score-normalization-for-
+>moderator-analysis-in-meta-analysis
+>
+>What you describe under 2 is the 'proportion/percentage of maximum possible'
+>(POMP) score method, which is nicely discussed in this article:
+>
+>Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units
+>and the circumstance for POMP. Multivariate Behavioral Research, 34(3), 315-
+>346.?https://doi.org/10.1207/S15327906MBR3403_2
+>
+>This approach assumes that the observed values on one scale are linear
+>transformations of the observed values on other scales. Of course that is never
+>quite true, but can hold as a rough approximation. In fact, this is also the
+>assumption underlying various effect size / outcome measures (e.g., standardized
+>mean differences, correlation coefficients), so it is an implicit assumption in
+>many meta-analyses anyway (except that you are now also applying this assumption
+>to the moderator variable). There was a thread related to this in April:
+>
+>https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004529.html
+>
+>When this assumption is not correct (with respect to the variables involved in
+>computing the correlations or with respect to the moderator variable), then this
+>becomes one of the sources of (residual) heterogeneity. Of course, we have
+>random/mixed-effects models to account for (residual) heterogeneity, so this is
+>not the end of the world. But if scales are measuring entirely different
+>constructs, then we should be more worried if we lump them together.
+>
+>If you have enough studies, then you can also code the type of scale used to
+>measure social support (e.g., MSPSS versus other or even more fine-grained if you
+>have enough studies) and include this in your moderator analysis and allow it to
+>interact with the POMP score mean of the social support scale. That way, you can
+>examine if the relationship between social support and the strength of the
+>association between LGBTQ+ discrimination and mental health differs depending on
+>the scale used.
+>
+>Best,
+>Wolfgang
+>
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Kiet Huynh via R-sig-meta-analysis
+>Sent: Tuesday, 12 September, 2023 21:56
+>To: R meta
+>Cc: Kiet Huynh
+>Subject: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>
+>Hello colleagues,
+>
+>I?m conducting a meta-analysis of the association between LGBTQ+ discrimination
+>and mental health. Both are continuous variables, and I am analyzing correlation
+>coefficients. I?m interested in looking at moderators (continuous) of the
+>relationship between these two variables. One such moderator is social support
+>(continuous). I am considering two approaches for running the moderator analysis:
+>
+>1) Many of the studies used the same MSPSS social support scale. I plan to use
+>the mean value of the MSPSS as a continuous moderator variable of the
+>discrimination-mental health relationship.
+>
+>2) Most studies, however, use different measures of social support. I plan to use
+>the min-max normalization method to put all the social support measure on the
+>same scale, and then use that normalized mean as the moderator variable of the
+>discrimination-mental health relationship. For an example use of min-max
+>normalization method, see Endendijk et al. (2020). However, the Endendijk et al.
+>(2020) study uses the min-max normalization method for the outcome and not for a
+>moderator. The formula for the min-max normalization method is:
+>
+>x? = (x - min)/(max - min)
+>x? is the normalized mean, x is the mean of the sample, min is the minimum
+>possible value of the scale, and max is the maximum possible value of the scale.
+>
+>The benefit to the second approach is that I can include more studies in this
+>moderator analysis, and not just the studies using the same measure of social
+>support.
+>
+>My question is whether both approaches are valid methods for testing moderator
+>analysis? Are there any issues with using the of min-max normalization method for
+>moderator analysis?
+>
+>Thank you,
+>
+>- KH
+>
+>Reference:
+>
+>Endendijk, J. J., van Baar, A. L., & Dekovi?, M. (2020). He is a stud, she is a
+>slut! A meta-analysis on the continued existence of sexual double standards.
+>Personality and Social Psychology Review, 24(2), 163?190.
+>https://doi.org/10.1177/1088868319891310
+>
+>----
+>
+>Kiet Huynh, PhD (he/him)
+>(hear?pronunciation <https://www.name-coach.com/kiet-huynh-94be0772-1bfd-4ece-
+>afba-14699186f2b9>)
+>Assistant Professor
+>Department of Psychology
+>
+>Terrill Hall Rm # 336
+>University of North Texas
+>Denton, TX 76203
+>Kiet.Huynh at unt.edu?<mailto:Kiet.Huynh at unt.edu>
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep 29 13:27:56 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 29 Sep 2023 11:27:56 +0000
+Subject: [R-meta] Score Normalization for Moderator Analysis in
+ Meta-Analysis
+In-Reply-To: <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+References: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+ <c27c7629b33b453fa8a82b444e363165@maastrichtuniversity.nl>
+ <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+Message-ID: <6cbdec2681be423b90b376b000fca274-7248@maastrichtuniversity.nl>
+
+I just noticed that the last question has remained unanswered: 
+
+Depends on what you mean by "need". To run such an analysis, assuming 'scale' is just a two-level factor and you want to run a model with '~ factor(scale) * pompmean', then you will need five effect sizes, two for the first and three for the second level of 'scale'. That will give you just enough information to fit such a model and estimate the amount of residual heterogeneity.
+
+But I assume that this is not what you mean by "need". If you meant something along the lines of 'having enough power', then I cannot give you an answer to that question, because it is like asking: "I want to run a study - how many subjects do I need?" (although turns out that the answer to that question is: "three patients" -- https://www.youtube.com/watch?v=Hz1fyhVOjr4). To give an informed answer to that question, one would have to do a power analysis:
+
+Hedges, L. V., & Pigott, T. D. (2004). The power of statistical tests for moderators in meta-analysis. Psychological Methods, 9(4), 426-445. 
+
+If you meant something along the lines of 'so that reviewers are not going to complain that my sample size is too small', then one could refer to rules of thumb like what you can find in the Cochrane Handbook:
+
+https://training.cochrane.org/handbook/current/chapter-10#section-10-11-5-1
+
+"It is very unlikely that an investigation of heterogeneity will produce useful findings unless there is a substantial number of studies. Typical advice for undertaking simple regression analyses: that at least ten observations (i.e. ten studies in a meta-analysis) should be available for each characteristic modelled. However, even this will be too few when the covariates are unevenly distributed across studies."
+
+To be clear, this is an entirely arbitrary rule (and one also finds suggestions like '5 studies per characteristic'). Also, what exactly 'for each characteristic modelled' means is not entirely clear, but say we interpret this as 'per model coefficient'. The model above has 4 model coefficients (including the intercept), so then we would need at least 40 effect sizes.
+
+To be fair, this rule does relate somewhat to the issue of overfitting, since more complex models require more data points to avoid overfitting. But even then, one would have to articulate more precisely what exactly one is concerned about.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Kiet Huynh [mailto:kietduchuynh at gmail.com]
+>Sent: Thursday, 14 September, 2023 17:10
+>To: Viechtbauer, Wolfgang (NP)
+>Cc: R Special Interest Group for Meta-Analysis
+>Subject: Re: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>
+>Hi Wolfgang,
+>
+>Thanks for the reminder about including links when cross posting.
+>
+>I appreciate the helpful expiation for the proportion/percentage of maximum
+>possible' (POMP) score method for moderation analysis. Especially helpful was the
+>tip on using the scale type to interact with the POMP score mean to determine if
+>the relationship between social support and the strength of the association
+>between LGBTQ+ discrimination and mental health differs depending on the scale
+>used. Do you have a sense of how many effect sizes would be needed for that?
+>
+>Best,
+>
+>Kiet
+>
+>On Sep 13, 2023, at 3:25 AM, Viechtbauer, Wolfgang (NP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+>Dear Kiet,
+>
+>I don't mind cross-posting, but when doing so, please indicate this in posts, so
+>in case answers are provided elsewhere, duplicate efforts can be avoided. For
+>reference, this question was also posted here:
+>
+>https://stats.stackexchange.com/questions/626306/score-normalization-for-
+>moderator-analysis-in-meta-analysis
+>
+>What you describe under 2 is the 'proportion/percentage of maximum possible'
+>(POMP) score method, which is nicely discussed in this article:
+>
+>Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units
+>and the circumstance for POMP. Multivariate Behavioral Research, 34(3), 315-
+>346.?https://doi.org/10.1207/S15327906MBR3403_2
+>
+>This approach assumes that the observed values on one scale are linear
+>transformations of the observed values on other scales. Of course that is never
+>quite true, but can hold as a rough approximation. In fact, this is also the
+>assumption underlying various effect size / outcome measures (e.g., standardized
+>mean differences, correlation coefficients), so it is an implicit assumption in
+>many meta-analyses anyway (except that you are now also applying this assumption
+>to the moderator variable). There was a thread related to this in April:
+>
+>https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004529.html
+>
+>When this assumption is not correct (with respect to the variables involved in
+>computing the correlations or with respect to the moderator variable), then this
+>becomes one of the sources of (residual) heterogeneity. Of course, we have
+>random/mixed-effects models to account for (residual) heterogeneity, so this is
+>not the end of the world. But if scales are measuring entirely different
+>constructs, then we should be more worried if we lump them together.
+>
+>If you have enough studies, then you can also code the type of scale used to
+>measure social support (e.g., MSPSS versus other or even more fine-grained if you
+>have enough studies) and include this in your moderator analysis and allow it to
+>interact with the POMP score mean of the social support scale. That way, you can
+>examine if the relationship between social support and the strength of the
+>association between LGBTQ+ discrimination and mental health differs depending on
+>the scale used.
+>
+>Best,
+>Wolfgang
+>
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Kiet Huynh via R-sig-meta-analysis
+>Sent: Tuesday, 12 September, 2023 21:56
+>To: R meta
+>Cc: Kiet Huynh
+>Subject: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>
+>Hello colleagues,
+>
+>I?m conducting a meta-analysis of the association between LGBTQ+ discrimination
+>and mental health. Both are continuous variables, and I am analyzing correlation
+>coefficients. I?m interested in looking at moderators (continuous) of the
+>relationship between these two variables. One such moderator is social support
+>(continuous). I am considering two approaches for running the moderator analysis:
+>
+>1) Many of the studies used the same MSPSS social support scale. I plan to use
+>the mean value of the MSPSS as a continuous moderator variable of the
+>discrimination-mental health relationship.
+>
+>2) Most studies, however, use different measures of social support. I plan to use
+>the min-max normalization method to put all the social support measure on the
+>same scale, and then use that normalized mean as the moderator variable of the
+>discrimination-mental health relationship. For an example use of min-max
+>normalization method, see Endendijk et al. (2020). However, the Endendijk et al.
+>(2020) study uses the min-max normalization method for the outcome and not for a
+>moderator. The formula for the min-max normalization method is:
+>
+>x? = (x - min)/(max - min)
+>x? is the normalized mean, x is the mean of the sample, min is the minimum
+>possible value of the scale, and max is the maximum possible value of the scale.
+>
+>The benefit to the second approach is that I can include more studies in this
+>moderator analysis, and not just the studies using the same measure of social
+>support.
+>
+>My question is whether both approaches are valid methods for testing moderator
+>analysis? Are there any issues with using the of min-max normalization method for
+>moderator analysis?
+>
+>Thank you,
+>
+>- KH
+>
+>Reference:
+>
+>Endendijk, J. J., van Baar, A. L., & Dekovi?, M. (2020). He is a stud, she is a
+>slut! A meta-analysis on the continued existence of sexual double standards.
+>Personality and Social Psychology Review, 24(2), 163?190.
+>https://doi.org/10.1177/1088868319891310
+>
+>----
+>
+>Kiet Huynh, PhD (he/him)
+>(hear?pronunciation <https://www.name-coach.com/kiet-huynh-94be0772-1bfd-4ece-
+>afba-14699186f2b9>)
+>Assistant Professor
+>Department of Psychology
+>
+>Terrill Hall Rm # 336
+>University of North Texas
+>Denton, TX 76203
+>Kiet.Huynh at unt.edu?<mailto:Kiet.Huynh at unt.edu>
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sat Sep 30 09:54:56 2023
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Sat, 30 Sep 2023 07:54:56 +0000
+Subject: [R-meta] Score Normalization for Moderator Analysis in
+ Meta-Analysis
+In-Reply-To: <6cbdec2681be423b90b376b000fca274-193@maastrichtuniversity.nl>
+References: <E37A066C-6E1F-4738-9908-89DD6A69A749@gmail.com>
+ <c27c7629b33b453fa8a82b444e363165@maastrichtuniversity.nl>
+ <B46EA6C3-631C-4BD0-881A-2419D810109D@gmail.com>
+ <6cbdec2681be423b90b376b000fca274-193@maastrichtuniversity.nl>
+Message-ID: <346097644d1948109efb15d3be9ac150@maastrichtuniversity.nl>
+
+Uhhh, no idea what happened here, but apparently the mailing list server thought that reply was so important to send it out three times ... Apologies for the spam.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis
+>Sent: Friday, 29 September, 2023 13:28
+>To: Kiet Huynh
+>Cc: Viechtbauer, Wolfgang (NP); R Special Interest Group for Meta-Analysis
+>Subject: Re: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis
+>
+>I just noticed that the last question has remained unanswered:
+>
+>Depends on what you mean by "need". To run such an analysis, assuming 'scale' is
+>just a two-level factor and you want to run a model with '~ factor(scale) *
+>pompmean', then you will need five effect sizes, two for the first and three for
+>the second level of 'scale'. That will give you just enough information to fit
+>such a model and estimate the amount of residual heterogeneity.
+>
+>But I assume that this is not what you mean by "need". If you meant something
+>along the lines of 'having enough power', then I cannot give you an answer to
+>that question, because it is like asking: "I want to run a study - how many
+>subjects do I need?" (although turns out that the answer to that question is:
+>"three patients" -- https://www.youtube.com/watch?v=Hz1fyhVOjr4). To give an
+>informed answer to that question, one would have to do a power analysis:
+>
+>Hedges, L. V., & Pigott, T. D. (2004). The power of statistical tests for
+>moderators in meta-analysis. Psychological Methods, 9(4), 426-445.
+>
+>If you meant something along the lines of 'so that reviewers are not going to
+>complain that my sample size is too small', then one could refer to rules of
+>thumb like what you can find in the Cochrane Handbook:
+>
+>https://training.cochrane.org/handbook/current/chapter-10#section-10-11-5-1
+>
+>"It is very unlikely that an investigation of heterogeneity will produce useful
+>findings unless there is a substantial number of studies. Typical advice for
+>undertaking simple regression analyses: that at least ten observations (i.e. ten
+>studies in a meta-analysis) should be available for each characteristic modelled.
+>However, even this will be too few when the covariates are unevenly distributed
+>across studies."
+>
+>To be clear, this is an entirely arbitrary rule (and one also finds suggestions
+>like '5 studies per characteristic'). Also, what exactly 'for each characteristic
+>modelled' means is not entirely clear, but say we interpret this as 'per model
+>coefficient'. The model above has 4 model coefficients (including the intercept),
+>so then we would need at least 40 effect sizes.
+>
+>To be fair, this rule does relate somewhat to the issue of overfitting, since
+>more complex models require more data points to avoid overfitting. But even then,
+>one would have to articulate more precisely what exactly one is concerned about.
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: Kiet Huynh [mailto:kietduchuynh at gmail.com]
+>>Sent: Thursday, 14 September, 2023 17:10
+>>To: Viechtbauer, Wolfgang (NP)
+>>Cc: R Special Interest Group for Meta-Analysis
+>>Subject: Re: [R-meta] Score Normalization for Moderator Analysis in Meta-
+>Analysis
+>>
+>>Hi Wolfgang,
+>>
+>>Thanks for the reminder about including links when cross posting.
+>>
+>>I appreciate the helpful expiation for the proportion/percentage of maximum
+>>possible' (POMP) score method for moderation analysis. Especially helpful was
+>the
+>>tip on using the scale type to interact with the POMP score mean to determine if
+>>the relationship between social support and the strength of the association
+>>between LGBTQ+ discrimination and mental health differs depending on the scale
+>>used. Do you have a sense of how many effect sizes would be needed for that?
+>>
+>>Best,
+>>
+>>Kiet
+

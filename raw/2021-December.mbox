@@ -1,0 +1,3847 @@
+From |@w|@wt @end|ng |rom gm@||@com  Thu Dec  2 21:28:47 2021
+From: |@w|@wt @end|ng |rom gm@||@com (Timothy MacKenzie)
+Date: Thu, 2 Dec 2021 14:28:47 -0600
+Subject: [R-meta] Specifying V in nested subgroup analysis (rma.mv +
+ clubSandwich)
+Message-ID: <CADreqixytBEmy0ipbrWgiOTiNiEpt+Ta3BegceRuCwj1K56P3Q@mail.gmail.com>
+
+Dear Meta SIG Members,
+
+I'm running a nested subgroup analysis. That is:
+
+1. Studies are subgrouped by "study_type" into standard vs. alternative.
+2. Each previously made subgroup is further subgrouped by "reporting"
+into subscale vs. composite (see data example below).
+
+Effect sizes in each study are correlated (due to the individual study
+designs) but my question is: given the "nested subgroup nature" of my
+model, how should I specify the V (subgroup=NULL, or
+subgroup=study_type, or subgroup=reporting)?
+
+Thanks,
+Tim M
+
+(V <- with(dat1, impute_covariance_matrix(vi, study, r=.6,subgroup=NULL)))
+
+g<-rma.mv(yi ~ 0 + study_type:reporting, V, random = list(~study_type
+| study, ~interaction(study_type,reporting) | obs), struct =
+c("DIAG","DIAG"), data = dat1)
+
+m="
+study subscale  reporting  obs include yi   vi         study_type
+1        A      subscale   1   yes     1.94 0.33503768 standard
+1        A      subscale   2   yes     1.06 0.01076604 standard
+2        A      subscale   3   yes     2.41 0.23767389 standard
+2        A      subscale   4   yes     2.34 0.37539841 standard
+3        A&C    composite  5   yes     3.09 0.31349510 standard
+3        A&C    composite  6   yes     3.99 0.01349510 standard
+4        A&B    composite  7   yes     2.90 0.91349510 standard
+4        A&B    composite  8   yes     3.01 0.99349510 standard
+5        G&H    composite  9   yes     1.01 0.99910197 alternative
+5        G&H    composite  10  yes     2.10 0.97910095 alternative
+6        E&G    composite  11  yes     0.11 0.27912095 alternative
+6        E&G    composite  12  yes     3.12 0.87910095 alternative
+7        E      subscale   13  yes     0.08 0.21670360 alternative
+7        G      subscale   14  yes     1.00 0.91597190 alternative
+8        F      subscale   15  yes     1.08 0.81670360 alternative
+8        E      subscale   16  yes     0.99 0.91297170 alternative"
+dat1 <- read.table(text=m,h=T)
+
+
+From cm|o500 @end|ng |rom york@@c@uk  Fri Dec  3 14:29:17 2021
+From: cm|o500 @end|ng |rom york@@c@uk (=?UTF-8?Q?C=C3=A1tia_Ferreira_De_Oliveira?=)
+Date: Fri, 3 Dec 2021 13:29:17 +0000
+Subject: [R-meta] including uninformative levels
+Message-ID: <CACw+TffnGJG01ezJ9mE2+8TTipqYVgsC-R4xL503TxLMfxE=JA@mail.gmail.com>
+
+Hello,
+
+I hope you are well.
+Is there any benefit/disadvantage of including levels in your model that
+only have information coming from a single study? I always remove the
+intercept and do not include it in the follow-up comparisons between levels
+but wonder if there's a consequence to doing it this way since this one
+study will potentially introduce more heterogeneity and does not add much
+empirical value for this particular analysis.
+
+Best wishes,
+
+Catia
+
+-- 
+C?tia Margarida Ferreira de Oliveira
+Psychology PhD Student
+Department of Psychology, Room A105
+University of York, YO10 5DD
+Twitter: @CatiaMOliveira
+pronouns: she, her
+
+	[[alternative HTML version deleted]]
+
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Fri Dec  3 18:11:27 2021
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Fri, 3 Dec 2021 17:11:27 +0000
+Subject: [R-meta] including uninformative levels
+In-Reply-To: <CACw+TffnGJG01ezJ9mE2+8TTipqYVgsC-R4xL503TxLMfxE=JA@mail.gmail.com>
+References: <CACw+TffnGJG01ezJ9mE2+8TTipqYVgsC-R4xL503TxLMfxE=JA@mail.gmail.com>
+Message-ID: <bb04492b-b4c4-1d8d-aa7b-c56f61cd7716@dewey.myzen.co.uk>
+
+Dear C?tia
+
+In general, in regression, if you have a level in one of the factors 
+which is represented by a single observation then that observation will 
+be perfectly fitted and that observation will have high leverage.
+
+In a random-effects model since it should contribute to the between 
+study variation then it would affect all the estimates since the weights 
+are dependent on the estimate of tau^2.
+
+Michael
+
+On 03/12/2021 13:29, C?tia Ferreira De Oliveira wrote:
+> Hello,
+> 
+> I hope you are well.
+> Is there any benefit/disadvantage of including levels in your model that
+> only have information coming from a single study? I always remove the
+> intercept and do not include it in the follow-up comparisons between levels
+> but wonder if there's a consequence to doing it this way since this one
+> study will potentially introduce more heterogeneity and does not add much
+> empirical value for this particular analysis.
+> 
+> Best wishes,
+> 
+> Catia
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From cm|o500 @end|ng |rom york@@c@uk  Fri Dec  3 18:13:41 2021
+From: cm|o500 @end|ng |rom york@@c@uk (=?UTF-8?Q?C=C3=A1tia_Ferreira_De_Oliveira?=)
+Date: Fri, 3 Dec 2021 17:13:41 +0000
+Subject: [R-meta] including uninformative levels
+In-Reply-To: <bb04492b-b4c4-1d8d-aa7b-c56f61cd7716@dewey.myzen.co.uk>
+References: <CACw+TffnGJG01ezJ9mE2+8TTipqYVgsC-R4xL503TxLMfxE=JA@mail.gmail.com>
+ <bb04492b-b4c4-1d8d-aa7b-c56f61cd7716@dewey.myzen.co.uk>
+Message-ID: <CACw+TfcuDW=cCBGGHyOscsafqO5fsXgZuUV4Pgf3xnMAiyQSKg@mail.gmail.com>
+
+Thank you for your response. So it would be better to just remove that for
+that level then.
+
+Best wishes,
+
+Catia
+
+On Fri, 3 Dec 2021 at 17:11, Michael Dewey <lists at dewey.myzen.co.uk> wrote:
+
+> Dear C?tia
+>
+> In general, in regression, if you have a level in one of the factors
+> which is represented by a single observation then that observation will
+> be perfectly fitted and that observation will have high leverage.
+>
+> In a random-effects model since it should contribute to the between
+> study variation then it would affect all the estimates since the weights
+> are dependent on the estimate of tau^2.
+>
+> Michael
+>
+> On 03/12/2021 13:29, C?tia Ferreira De Oliveira wrote:
+> > Hello,
+> >
+> > I hope you are well.
+> > Is there any benefit/disadvantage of including levels in your model that
+> > only have information coming from a single study? I always remove the
+> > intercept and do not include it in the follow-up comparisons between
+> levels
+> > but wonder if there's a consequence to doing it this way since this one
+> > study will potentially introduce more heterogeneity and does not add much
+> > empirical value for this particular analysis.
+> >
+> > Best wishes,
+> >
+> > Catia
+> >
+>
+> --
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+>
+
+
+-- 
+C?tia Margarida Ferreira de Oliveira
+Psychology PhD Student
+Department of Psychology, Room A105
+University of York, YO10 5DD
+Twitter: @CatiaMOliveira
+pronouns: she, her
+
+	[[alternative HTML version deleted]]
+
+
+From @te|@noureve@z @end|ng |rom gm@||@com  Sun Dec  5 03:54:34 2021
+From: @te|@noureve@z @end|ng |rom gm@||@com (Stefanou Revesz)
+Date: Sat, 4 Dec 2021 20:54:34 -0600
+Subject: [R-meta] metafor::matreg() and its workflow
+Message-ID: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+
+Dear Wolfgang,
+
+In the latest version of metafor, I realized there are a couple of new
+functions specifically made for correlations (that's awesome!).
+
+I understand the use of rclac() which provides the V for rma.mv(). But
+I'm a bit unclear why we get the vcov() from the rma.mv() fit and then
+input it to matreg().
+
+My questions are:
+
+1- What role does matreg() play and why not just using rma.mv()?
+3- What if our rma.mv() fit has multiple (interactive) moderators,
+what should be passed as R and vcov() to matreg()?
+3- Is rtoz =TRUE necessary in this workflow?
+
+Thank you,
+Stefanou
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Sun Dec  5 18:12:45 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Sun, 5 Dec 2021 17:12:45 +0000
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+Message-ID: <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+
+Dear Stefanou,
+
+See below for my responses.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>Sent: Sunday, 05 December, 2021 3:55
+>To: R meta; Viechtbauer, Wolfgang (SP)
+>Subject: metafor::matreg() and its workflow
+>
+>Dear Wolfgang,
+>
+>In the latest version of metafor, I realized there are a couple of new
+>functions specifically made for correlations (that's awesome!).
+>
+>I understand the use of rclac() which provides the V for rma.mv(). But
+>I'm a bit unclear why we get the vcov() from the rma.mv() fit and then
+>input it to matreg().
+>
+>My questions are:
+>
+>1- What role does matreg() play and why not just using rma.mv()?
+
+matreg() is for fitting regression models based on variance-covariance and correlation matrices. Such a matrix can be obtained by conducting a meta-analysis (e.g., using rma.mv()). This all takes us into methodology that is sometimes described as MASEM (meta-analytic structural equation modeling). Maybe start with this chapter:
+
+Becker, B. J., & Aloe, A. (2019). Model-based meta-analysis and related approaches. In H. Cooper, L. V. Hedges, & J. C. Valentine (Eds.), The handbook of research synthesis and meta-analysis (3rd ed., pp. 339-363). New York: Russell Sage Foundation.
+
+to go along with:
+
+https://wviechtb.github.io/metafor/reference/matreg.html
+
+and
+
+https://wviechtb.github.io/meta_analysis_books/cooper2019.html#16)_Model-Based_Meta-Analysis_and_Related_Approaches
+
+>3- What if our rma.mv() fit has multiple (interactive) moderators,
+>what should be passed as R and vcov() to matreg()?
+
+I can't really answer this question without further details. But I would suggest to first read up on the methdology itself.
+
+>3- Is rtoz =TRUE necessary in this workflow?
+
+I assume you mean argument 'ztor' in matreg(). Whether to use this depends on whether you have a matrix of r-to-z transformed correlation coefficients or a matrix of raw correlation coefficients. Whether one should or should not use transformed correlations in a meta-analysis that could yield such a matrix is a lengthy and endless debate, so I am not going to touch on "necessary" without a ten-foot pole.
+
+>Thank you,
+>Stefanou
+
+From @te|@noureve@z @end|ng |rom gm@||@com  Mon Dec  6 05:26:01 2021
+From: @te|@noureve@z @end|ng |rom gm@||@com (Stefanou Revesz)
+Date: Sun, 5 Dec 2021 22:26:01 -0600
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+Message-ID: <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+
+Dear Wolfgang,
+
+Many thanks. I read all three resources. Regarding:
+
+"What if our rma.mv() fit has multiple (interactive) moderators, what
+should be passed as R and vcov() to matreg()?"
+
+I meant, as a general matter, if our dataset (e.g.,`dat.craft2003`),
+say, had an additional continuous moderator (Xwb) varying within and
+between studies (see below), then how could such a moderator affect
+the result of rcalc() or rma.mv() or matreg()?
+
+Apparently, the `dat` object returned by rcalc() doesn't return the
+full dataset so to use moderators like Xwb from `dat` in the
+subsequent rma.mv() call. Also, in your Rmarkdown doc (previous
+email), you use a subgroup analysis to deal with a study-level,
+categorical moderator (sport) which makes me wonder how we can deal
+with Xwb or when multiple moderators exist in the data?
+
+Thanks,
+Stefanou
+
+set.seed(0)
+dat <- dat.craft2003
+dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+
+On Sun, Dec 5, 2021 at 11:12 AM Viechtbauer, Wolfgang (SP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+> Dear Stefanou,
+>
+> See below for my responses.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >Sent: Sunday, 05 December, 2021 3:55
+> >To: R meta; Viechtbauer, Wolfgang (SP)
+> >Subject: metafor::matreg() and its workflow
+> >
+> >Dear Wolfgang,
+> >
+> >In the latest version of metafor, I realized there are a couple of new
+> >functions specifically made for correlations (that's awesome!).
+> >
+> >I understand the use of rclac() which provides the V for rma.mv(). But
+> >I'm a bit unclear why we get the vcov() from the rma.mv() fit and then
+> >input it to matreg().
+> >
+> >My questions are:
+> >
+> >1- What role does matreg() play and why not just using rma.mv()?
+>
+> matreg() is for fitting regression models based on variance-covariance and correlation matrices. Such a matrix can be obtained by conducting a meta-analysis (e.g., using rma.mv()). This all takes us into methodology that is sometimes described as MASEM (meta-analytic structural equation modeling). Maybe start with this chapter:
+>
+> Becker, B. J., & Aloe, A. (2019). Model-based meta-analysis and related approaches. In H. Cooper, L. V. Hedges, & J. C. Valentine (Eds.), The handbook of research synthesis and meta-analysis (3rd ed., pp. 339-363). New York: Russell Sage Foundation.
+>
+> to go along with:
+>
+> https://wviechtb.github.io/metafor/reference/matreg.html
+>
+> and
+>
+> https://wviechtb.github.io/meta_analysis_books/cooper2019.html#16)_Model-Based_Meta-Analysis_and_Related_Approaches
+>
+> >3- What if our rma.mv() fit has multiple (interactive) moderators,
+> >what should be passed as R and vcov() to matreg()?
+>
+> I can't really answer this question without further details. But I would suggest to first read up on the methdology itself.
+>
+> >3- Is rtoz =TRUE necessary in this workflow?
+>
+> I assume you mean argument 'ztor' in matreg(). Whether to use this depends on whether you have a matrix of r-to-z transformed correlation coefficients or a matrix of raw correlation coefficients. Whether one should or should not use transformed correlations in a meta-analysis that could yield such a matrix is a lengthy and endless debate, so I am not going to touch on "necessary" without a ten-foot pole.
+>
+> >Thank you,
+> >Stefanou
+
+
+From m@w|ert@em@ @end|ng |rom rug@n|  Tue Dec  7 14:20:57 2021
+From: m@w|ert@em@ @end|ng |rom rug@n| (Wiertsema, M.)
+Date: Tue, 7 Dec 2021 14:20:57 +0100
+Subject: [R-meta] Error in weight effect in rma
+Message-ID: <CAPTeNy5ayv6DSsirKH_DnkUCQ4toifUgq6wBgYueub40LeY8JQ@mail.gmail.com>
+
+Hi everyone,
+
+I am currently working on a meta-analysis on the longitudinal
+association between bullying (predictor) and social status (outcome).
+
+Because we have multiple effects within one study, we used the
+random-effects model for the forest plots. I have plotted the forest
+plot, with effects based on Fisher's z, with the following code:
+# random-effects model
+ram2 <- rma.mv(yi, vi, random = ~ 1 | Sampleshort/Effectsize,
+data=dat2, slab=paste(Effectsize, AuthorsR, YEAR, Country, plotn,
+TypebullyingR, AgeBullyR, sep="; "), method="REML")
+print(ram2, digits=3)
+
+#check profile plots
+
+par(mfrow=c(2,1))
+profile(ram2, sigma2=1)
+profile(ram2, sigma2=2)
+
+#forest plots
+forest(ram2, xlim=c(-0.85, 1.20), at=(c(-0.3, -0.2, -0.1, 0, 0.1, 0.2,
+0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)),
+       rows=c(1:31),
+       xlab="Fisher's Z", mlab="")
+
+### add text with Q-value, dfs, and p-value
+text(-0.85, -1, pos=4, cex=1, bquote(paste("Multilevel RE Model for
+All Studies (Q = ",
+                                           .(formatC(ram2$QE,
+digits=2, format="f")), ", df = ",
+                                           .(ram2$k - ram2$p),
+                                           ", p = ",
+.(formatC(ram2$QEp, digits=2, format="f")),
+                                           ")")))
+
+
+### switch to bold font
+par(font=2)
+
+### add column headings to the plot
+text((-0.43), 32.5, "Effect number, Study, Country, Sample size, Type
+of bullying, & Age bully")
+text((1.015), 32.5, "Fisher's z correlations [95% CI]")
+
+
+So far, so good.
+
+However, when interpreting the forest plot we noticed something strange:
+There are a couple of effect sizes, from two different samples, which
+we expected to have a greater weight based on their CI and based on
+the fact that those were the only effect sizes based on a sample. I
+included the forest plot as an appendix, I hope you can see it.
+
+For effect number 49 and 56, it would make sense to have a greater
+weight based on their CI's, [0.45-0.57] and [0.36-0.44] respectively,
+thus relatively small. For effect number 50 and 51, which are both
+based on the same sample, the CI's are [0.24-0.36] and [0.34-0.46], so
+the same interval as effect number 49 and even larger than effect
+number 56. However, those two effects have a bigger weight compared to
+effect number 49 and 46.
+
+Additionally, the Cooks distance plot does recognize effect number 49
+as an outlier, but based on the weight of that effect size in the
+forest plot you would not expect that.
+
+Am I missing something or is something weird going on in my code?
+
+Please let me know if anything is unclear.
+Many thanks in advance!
+
+Best,
+Maria
+
+-- 
+PhD student
+University of Groningen, Faculty of Behavioural and Social Sciences
+Grote Rozenstraat 38, 9712 TJ Groningen
+email: m.wiertsema at rug.nl | phone: 050 - 363 3182
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: Weight error_png
+Type: application/octet-stream
+Size: 426779 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20211207/b36ef1c4/attachment-0001.obj>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Tue Dec  7 15:30:05 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Tue, 7 Dec 2021 14:30:05 +0000
+Subject: [R-meta] Error in weight effect in rma
+In-Reply-To: <CAPTeNy5ayv6DSsirKH_DnkUCQ4toifUgq6wBgYueub40LeY8JQ@mail.gmail.com>
+References: <CAPTeNy5ayv6DSsirKH_DnkUCQ4toifUgq6wBgYueub40LeY8JQ@mail.gmail.com>
+Message-ID: <a5752afd9bca48ad837583f6f69eff16@UM-MAIL3214.unimaas.nl>
+
+Hi Maria,
+
+The point sizes are based only on the diagonal of the weight matrix. However, in such models, the weighting is more complex as described here:
+
+https://www.metafor-project.org/doku.php/tips:weights_in_rma.mv_models
+
+which covers this specific model (for other types of rma.mv() models, the weighting structure/matrix is of course different). So you might want to examine the 'row-sum weights' and you could even use them to specify the point sizes (via the psize argument) if you like.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Wiertsema, M.
+>Sent: Tuesday, 07 December, 2021 14:21
+>To: r-sig-meta-analysis at r-project.org
+>Subject: [R-meta] Error in weight effect in rma
+>
+>Hi everyone,
+>
+>I am currently working on a meta-analysis on the longitudinal
+>association between bullying (predictor) and social status (outcome).
+>
+>Because we have multiple effects within one study, we used the
+>random-effects model for the forest plots. I have plotted the forest
+>plot, with effects based on Fisher's z, with the following code:
+># random-effects model
+>ram2 <- rma.mv(yi, vi, random = ~ 1 | Sampleshort/Effectsize,
+>data=dat2, slab=paste(Effectsize, AuthorsR, YEAR, Country, plotn,
+>TypebullyingR, AgeBullyR, sep="; "), method="REML")
+>print(ram2, digits=3)
+>
+>#check profile plots
+>
+>par(mfrow=c(2,1))
+>profile(ram2, sigma2=1)
+>profile(ram2, sigma2=2)
+>
+>#forest plots
+>forest(ram2, xlim=c(-0.85, 1.20), at=(c(-0.3, -0.2, -0.1, 0, 0.1, 0.2,
+>0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)),
+>       rows=c(1:31),
+>       xlab="Fisher's Z", mlab="")
+>
+>### add text with Q-value, dfs, and p-value
+>text(-0.85, -1, pos=4, cex=1, bquote(paste("Multilevel RE Model for
+>All Studies (Q = ",
+>                                           .(formatC(ram2$QE,
+>digits=2, format="f")), ", df = ",
+>                                           .(ram2$k - ram2$p),
+>                                           ", p = ",
+>.(formatC(ram2$QEp, digits=2, format="f")),
+>                                           ")")))
+>
+>### switch to bold font
+>par(font=2)
+>
+>### add column headings to the plot
+>text((-0.43), 32.5, "Effect number, Study, Country, Sample size, Type
+>of bullying, & Age bully")
+>text((1.015), 32.5, "Fisher's z correlations [95% CI]")
+>
+>So far, so good.
+>
+>However, when interpreting the forest plot we noticed something strange:
+>There are a couple of effect sizes, from two different samples, which
+>we expected to have a greater weight based on their CI and based on
+>the fact that those were the only effect sizes based on a sample. I
+>included the forest plot as an appendix, I hope you can see it.
+>
+>For effect number 49 and 56, it would make sense to have a greater
+>weight based on their CI's, [0.45-0.57] and [0.36-0.44] respectively,
+>thus relatively small. For effect number 50 and 51, which are both
+>based on the same sample, the CI's are [0.24-0.36] and [0.34-0.46], so
+>the same interval as effect number 49 and even larger than effect
+>number 56. However, those two effects have a bigger weight compared to
+>effect number 49 and 46.
+>
+>Additionally, the Cooks distance plot does recognize effect number 49
+>as an outlier, but based on the weight of that effect size in the
+>forest plot you would not expect that.
+>
+>Am I missing something or is something weird going on in my code?
+>
+>Please let me know if anything is unclear.
+>Many thanks in advance!
+>
+>Best,
+>Maria
+>
+>--
+>PhD student
+>University of Groningen, Faculty of Behavioural and Social Sciences
+>Grote Rozenstraat 38, 9712 TJ Groningen
+>email: m.wiertsema at rug.nl | phone: 050 - 363 3182
+
+From @te|@noureve@z @end|ng |rom gm@||@com  Tue Dec  7 23:40:58 2021
+From: @te|@noureve@z @end|ng |rom gm@||@com (Stefanou Revesz)
+Date: Tue, 7 Dec 2021 16:40:58 -0600
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+Message-ID: <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+
+Hi Wolfgang,
+
+Once again, thank you for the chapter and the two useful resources.
+For concreteness, are the last two lines OK to use or other solutions
+exist?
+
+Many thanks,
+Stefanou
+
+set.seed(0)
+dat <- dat.craft2003
+dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+
+tmp <- rcalc(ri ~ var1 + var2| study, ni=ni, data=dat)
+V <- tmp$V
+dat$var1.var2 <- tmp$dat$var1.var2
+
+dat$var1.var2 <- factor(dat$var1.var2,
+                        levels=c("acog.perf", "asom.perf",
+"conf.perf", "acog.asom", "acog.conf", "asom.conf"))
+
+res <- rma.mv(ri~ 0+var1.var2+sport+Xwb, V, random = ~ var1.var2 |
+study, struct="UN", data=dat)
+
+R <- vec2mat(coef(res)[1:6]) # Is this OK?
+
+matreg(1, 2:4, R=R, V=vcov(res)[1:6,1:6]) # Is this OK?
+
+On Sun, Dec 5, 2021 at 10:26 PM Stefanou Revesz
+<stefanourevesz at gmail.com> wrote:
+>
+> Dear Wolfgang,
+>
+> Many thanks. I read all three resources. Regarding:
+>
+> "What if our rma.mv() fit has multiple (interactive) moderators, what
+> should be passed as R and vcov() to matreg()?"
+>
+> I meant, as a general matter, if our dataset (e.g.,`dat.craft2003`),
+> say, had an additional continuous moderator (Xwb) varying within and
+> between studies (see below), then how could such a moderator affect
+> the result of rcalc() or rma.mv() or matreg()?
+>
+> Apparently, the `dat` object returned by rcalc() doesn't return the
+> full dataset so to use moderators like Xwb from `dat` in the
+> subsequent rma.mv() call. Also, in your Rmarkdown doc (previous
+> email), you use a subgroup analysis to deal with a study-level,
+> categorical moderator (sport) which makes me wonder how we can deal
+> with Xwb or when multiple moderators exist in the data?
+>
+> Thanks,
+> Stefanou
+>
+> set.seed(0)
+> dat <- dat.craft2003
+> dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+>
+> On Sun, Dec 5, 2021 at 11:12 AM Viechtbauer, Wolfgang (SP)
+> <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >
+> > Dear Stefanou,
+> >
+> > See below for my responses.
+> >
+> > Best,
+> > Wolfgang
+> >
+> > >-----Original Message-----
+> > >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> > >Sent: Sunday, 05 December, 2021 3:55
+> > >To: R meta; Viechtbauer, Wolfgang (SP)
+> > >Subject: metafor::matreg() and its workflow
+> > >
+> > >Dear Wolfgang,
+> > >
+> > >In the latest version of metafor, I realized there are a couple of new
+> > >functions specifically made for correlations (that's awesome!).
+> > >
+> > >I understand the use of rclac() which provides the V for rma.mv(). But
+> > >I'm a bit unclear why we get the vcov() from the rma.mv() fit and then
+> > >input it to matreg().
+> > >
+> > >My questions are:
+> > >
+> > >1- What role does matreg() play and why not just using rma.mv()?
+> >
+> > matreg() is for fitting regression models based on variance-covariance and correlation matrices. Such a matrix can be obtained by conducting a meta-analysis (e.g., using rma.mv()). This all takes us into methodology that is sometimes described as MASEM (meta-analytic structural equation modeling). Maybe start with this chapter:
+> >
+> > Becker, B. J., & Aloe, A. (2019). Model-based meta-analysis and related approaches. In H. Cooper, L. V. Hedges, & J. C. Valentine (Eds.), The handbook of research synthesis and meta-analysis (3rd ed., pp. 339-363). New York: Russell Sage Foundation.
+> >
+> > to go along with:
+> >
+> > https://wviechtb.github.io/metafor/reference/matreg.html
+> >
+> > and
+> >
+> > https://wviechtb.github.io/meta_analysis_books/cooper2019.html#16)_Model-Based_Meta-Analysis_and_Related_Approaches
+> >
+> > >3- What if our rma.mv() fit has multiple (interactive) moderators,
+> > >what should be passed as R and vcov() to matreg()?
+> >
+> > I can't really answer this question without further details. But I would suggest to first read up on the methdology itself.
+> >
+> > >3- Is rtoz =TRUE necessary in this workflow?
+> >
+> > I assume you mean argument 'ztor' in matreg(). Whether to use this depends on whether you have a matrix of r-to-z transformed correlation coefficients or a matrix of raw correlation coefficients. Whether one should or should not use transformed correlations in a meta-analysis that could yield such a matrix is a lengthy and endless debate, so I am not going to touch on "necessary" without a ten-foot pole.
+> >
+> > >Thank you,
+> > >Stefanou
+
+
+From jepu@to @end|ng |rom gm@||@com  Wed Dec  8 05:03:29 2021
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Tue, 7 Dec 2021 22:03:29 -0600
+Subject: [R-meta] Specifying V in nested subgroup analysis (rma.mv +
+ clubSandwich)
+In-Reply-To: <CADreqixytBEmy0ipbrWgiOTiNiEpt+Ta3BegceRuCwj1K56P3Q@mail.gmail.com>
+References: <CADreqixytBEmy0ipbrWgiOTiNiEpt+Ta3BegceRuCwj1K56P3Q@mail.gmail.com>
+Message-ID: <CAFUVuJzuPNzV+JdBVwGus-bcdNigPkix17bBCgxDCyX6jQKKKQ@mail.gmail.com>
+
+Hi Tim,
+
+If the predictor study_type is a study-level variable, then setting
+subgroup = study_type will have no effect and should produce results
+identical to using subgroup = NULL.
+
+If you want to estimate average effect sizes for each reporting
+category based only on the direct evidence (estimates from composite
+scales contribute to the average for composite scales, estimates from
+subscales contribute to the average for subscales), then set subgroup
+= reporting.
+
+On the other hand, if you set subgroup = NULL, then the average
+effects for composite scales will be influenced a little bit by the
+effect size estimates from subscales that co-occur in the same study
+with estimates from composite scales, and the average effects for
+subscales will be influenced a little bit by the effect size estimates
+from composite scales that co-occur in the same study with estimates
+from subscales.
+
+
+James
+
+On Thu, Dec 2, 2021 at 2:29 PM Timothy MacKenzie <fswfswt at gmail.com> wrote:
+>
+> Dear Meta SIG Members,
+>
+> I'm running a nested subgroup analysis. That is:
+>
+> 1. Studies are subgrouped by "study_type" into standard vs. alternative.
+> 2. Each previously made subgroup is further subgrouped by "reporting"
+> into subscale vs. composite (see data example below).
+>
+> Effect sizes in each study are correlated (due to the individual study
+> designs) but my question is: given the "nested subgroup nature" of my
+> model, how should I specify the V (subgroup=NULL, or
+> subgroup=study_type, or subgroup=reporting)?
+>
+> Thanks,
+> Tim M
+>
+> (V <- with(dat1, impute_covariance_matrix(vi, study, r=.6,subgroup=NULL)))
+>
+> g<-rma.mv(yi ~ 0 + study_type:reporting, V, random = list(~study_type
+> | study, ~interaction(study_type,reporting) | obs), struct =
+> c("DIAG","DIAG"), data = dat1)
+>
+> m="
+> study subscale  reporting  obs include yi   vi         study_type
+> 1        A      subscale   1   yes     1.94 0.33503768 standard
+> 1        A      subscale   2   yes     1.06 0.01076604 standard
+> 2        A      subscale   3   yes     2.41 0.23767389 standard
+> 2        A      subscale   4   yes     2.34 0.37539841 standard
+> 3        A&C    composite  5   yes     3.09 0.31349510 standard
+> 3        A&C    composite  6   yes     3.99 0.01349510 standard
+> 4        A&B    composite  7   yes     2.90 0.91349510 standard
+> 4        A&B    composite  8   yes     3.01 0.99349510 standard
+> 5        G&H    composite  9   yes     1.01 0.99910197 alternative
+> 5        G&H    composite  10  yes     2.10 0.97910095 alternative
+> 6        E&G    composite  11  yes     0.11 0.27912095 alternative
+> 6        E&G    composite  12  yes     3.12 0.87910095 alternative
+> 7        E      subscale   13  yes     0.08 0.21670360 alternative
+> 7        G      subscale   14  yes     1.00 0.91597190 alternative
+> 8        F      subscale   15  yes     1.08 0.81670360 alternative
+> 8        E      subscale   16  yes     0.99 0.91297170 alternative"
+> dat1 <- read.table(text=m,h=T)
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From |@w|@wt @end|ng |rom gm@||@com  Wed Dec  8 05:42:56 2021
+From: |@w|@wt @end|ng |rom gm@||@com (Timothy MacKenzie)
+Date: Tue, 7 Dec 2021 22:42:56 -0600
+Subject: [R-meta] Specifying V in nested subgroup analysis (rma.mv +
+ clubSandwich)
+In-Reply-To: <CAFUVuJzuPNzV+JdBVwGus-bcdNigPkix17bBCgxDCyX6jQKKKQ@mail.gmail.com>
+References: <CADreqixytBEmy0ipbrWgiOTiNiEpt+Ta3BegceRuCwj1K56P3Q@mail.gmail.com>
+ <CAFUVuJzuPNzV+JdBVwGus-bcdNigPkix17bBCgxDCyX6jQKKKQ@mail.gmail.com>
+Message-ID: <CADreqiyGy69j6p=ASaZyO5rpP8fkGXvQxCoxWjrWqhuJ2g80+Q@mail.gmail.com>
+
+Dear James,
+
+Thanks for your reply. I wanted my single model (gg) to be equivalent
+to gg1 and gg2 (below). But if you use: print(gg, digits = 7);
+print(gg1, digits = 7) ;  print(gg2, digits = 7), you realize the
+variance components don't quite match.
+
+Now, if you change the first random term in gg1 and gg2 from: ~1 |
+study to: ~study_type | study, we get a better match.
+
+Also, James, neither reporting levels nor study_type levels co-occur
+in any study.
+
+Thanks,
+Tim M
+
+gg1=rma.mv(yi ~ 0+reporting, V, random = list(~1 | study, ~ reporting | obs),
+           struct = c("DIAG","DIAG"),
+           subset = study_type=="alternative", data = dat1)
+
+gg2=rma.mv(yi ~ 0+reporting, V, random = list(~1 | study, ~ reporting | obs),
+            struct = c("DIAG","DIAG"),
+            subset = include=="yes" & study_type=="standard", data = dat1)
+
+On Tue, Dec 7, 2021 at 10:03 PM James Pustejovsky <jepusto at gmail.com> wrote:
+>
+> Hi Tim,
+>
+> If the predictor study_type is a study-level variable, then setting
+> subgroup = study_type will have no effect and should produce results
+> identical to using subgroup = NULL.
+>
+> If you want to estimate average effect sizes for each reporting
+> category based only on the direct evidence (estimates from composite
+> scales contribute to the average for composite scales, estimates from
+> subscales contribute to the average for subscales), then set subgroup
+> = reporting.
+>
+> On the other hand, if you set subgroup = NULL, then the average
+> effects for composite scales will be influenced a little bit by the
+> effect size estimates from subscales that co-occur in the same study
+> with estimates from composite scales, and the average effects for
+> subscales will be influenced a little bit by the effect size estimates
+> from composite scales that co-occur in the same study with estimates
+> from subscales.
+>
+>
+> James
+>
+> On Thu, Dec 2, 2021 at 2:29 PM Timothy MacKenzie <fswfswt at gmail.com> wrote:
+> >
+> > Dear Meta SIG Members,
+> >
+> > I'm running a nested subgroup analysis. That is:
+> >
+> > 1. Studies are subgrouped by "study_type" into standard vs. alternative.
+> > 2. Each previously made subgroup is further subgrouped by "reporting"
+> > into subscale vs. composite (see data example below).
+> >
+> > Effect sizes in each study are correlated (due to the individual study
+> > designs) but my question is: given the "nested subgroup nature" of my
+> > model, how should I specify the V (subgroup=NULL, or
+> > subgroup=study_type, or subgroup=reporting)?
+> >
+> > Thanks,
+> > Tim M
+> >
+> > (V <- with(dat1, impute_covariance_matrix(vi, study, r=.6,subgroup=NULL)))
+> >
+> > g<-rma.mv(yi ~ 0 + study_type:reporting, V, random = list(~study_type
+> > | study, ~interaction(study_type,reporting) | obs), struct =
+> > c("DIAG","DIAG"), data = dat1)
+> >
+> > m="
+> > study subscale  reporting  obs include yi   vi         study_type
+> > 1        A      subscale   1   yes     1.94 0.33503768 standard
+> > 1        A      subscale   2   yes     1.06 0.01076604 standard
+> > 2        A      subscale   3   yes     2.41 0.23767389 standard
+> > 2        A      subscale   4   yes     2.34 0.37539841 standard
+> > 3        A&C    composite  5   yes     3.09 0.31349510 standard
+> > 3        A&C    composite  6   yes     3.99 0.01349510 standard
+> > 4        A&B    composite  7   yes     2.90 0.91349510 standard
+> > 4        A&B    composite  8   yes     3.01 0.99349510 standard
+> > 5        G&H    composite  9   yes     1.01 0.99910197 alternative
+> > 5        G&H    composite  10  yes     2.10 0.97910095 alternative
+> > 6        E&G    composite  11  yes     0.11 0.27912095 alternative
+> > 6        E&G    composite  12  yes     3.12 0.87910095 alternative
+> > 7        E      subscale   13  yes     0.08 0.21670360 alternative
+> > 7        G      subscale   14  yes     1.00 0.91597190 alternative
+> > 8        F      subscale   15  yes     1.08 0.81670360 alternative
+> > 8        E      subscale   16  yes     0.99 0.91297170 alternative"
+> > dat1 <- read.table(text=m,h=T)
+> >
+> > _______________________________________________
+> > R-sig-meta-analysis mailing list
+> > R-sig-meta-analysis at r-project.org
+> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From P@u||n@@Sted@|| @end|ng |rom mon@@h@edu  Thu Dec  9 05:54:33 2021
+From: P@u||n@@Sted@|| @end|ng |rom mon@@h@edu (Paulina Stedall)
+Date: Thu, 9 Dec 2021 15:54:33 +1100
+Subject: [R-meta] Meta-analysis dependency - escalc aggregate in Metafor -
+ multiple cluster variables
+Message-ID: <CAAd_zEn=Eb0QXwXXgS-qoW8o4MkgUURYuVfrs_J1L8=NQreMhQ@mail.gmail.com>
+
+Hi everyone,
+
+I'm currently working on a meta-analysis using Metafor and am seeking
+assistance to address dependence in the data.
+
+In more simple cases (e.g., one study with two patient subgroups), we have
+calculated SMD and variance per subgroup, followed by aggregating these two
+estimates into one combined effect size. We have taken a similar approach
+for scenarios in which two studies report on outcomes for the same cohort
+at two timepoints (taking into account the autocorrelation) and for studies
+reporting on the same outcome using multiple measures (taking into account
+the correlation between the measures). Our question relates to more complex
+scenarios that involve dependence across multiple clustering variables. For
+example:
+
+The following studies assessed an outcome in two subgroups:
+
+Study 1: assessed Y in group 1 and 2 using measure A at 11 years
+
+Study 2: assessed Y in group 1 and 2 using measure B at 11 years
+
+Study 3: assessed Y in group 1 and 2 using measure B at 12 years
+
+Study 4: assessed Y in group 1 and 2 using measure B at 13 years
+
+Study 5: assessed Y in group 1 and 2 using measure B at 14 years
+
+
+
+This means we want to aggregate effect sizes from both groups (struct=?ID),
+across 4 time points (struct=?CAR?), and from measure A and B (at time
+point 1 only; struct=?CS?).
+
+
+
+Could we do this in separate steps, by first aggregating the ES from both
+groups, then measure A and B at 11 years, and then across time points? Or
+should we aggregate over subgroups first and subsequently use
+struct=?CS+CAR? to account for two clustering variables simultaneously? The
+latter is probably preferred, but the following code results in an error.
+
+
+
+dat <- escalc(measure="SMD", m1i=M_target, sd1i=SD_target, n1i=N_target,
+
+                        m2i=M_control, sd2i=SD_control, n2i=N_control,
+data=data)
+
+class(dat)
+
+dat
+
+
+
+   Subgroup Timepoint Study Cohort Measure M_target SD_target N_target
+M_control SD_control N_control      yi     vi
+
+1         1        11     1      1       1    -0.13      0.90       57
+     0.07       0.60        49 -0.2558 0.0383
+
+2         2        11     1      1       1     0.10      0.85       53
+     0.07       0.60        49  0.0402 0.0393
+
+3         2        11     2      1       2     8.63      2.96       32
+     9.36       3.02        36 -0.2412 0.0595
+
+4         1        11     2      1       2     7.36      3.27       33
+     9.36       3.02        36 -0.6294 0.0610
+
+5         2        12     3      1       2     8.37      3.51       38
+     9.96       2.79        48 -0.5038 0.0486
+
+6         1        12     3      1       2     7.67      3.56       46
+     9.96       2.79        48 -0.7120 0.0453
+
+7         2        13     4      1       2     8.26      2.81       38
+     9.94       2.76        50 -0.5987 0.0484
+
+8         1        13     4      1       2     7.86      2.87       49
+     9.94       2.76        50 -0.7332 0.0431
+
+9         2        14     5      1       2     9.17      3.07       29
+     9.94       3.05        34 -0.2486 0.0644
+
+10        1        14     5      1       2     7.90      3.63       31
+     9.94       3.05        34 -0.6037 0.0645
+
+
+
+#step 1: aggregate subgroup 1 and 2
+
+agg_subgroup <- aggregate(dat, cluster=Study, struct="ID")
+
+agg_subgroup
+
+
+
+#combined aggregation for time and measure >> doesn't work!
+
+agg <- aggregate(agg_subgroup, cluster=Cohort, struct="CS+CAR", rho=0.6,
+phi=0.8, time=Timepoint)
+
+agg
+
+
+
+Error in aggregate.escalc(agg_subgroup, cluster = Cohort, struct = "CS+CAR",  :
+
+  Cannot aggregate estimates with a non-positive-definite 'V' matrix.
+
+In addition: Warning message:
+
+'V' appears to be not positive definite in cluster 1.
+
+
+Thank you in advance.
+
+
+Kind regards,
+
+
+Paulina
+
+
+
+-- 
+*PAULINA STEDALL*
+Doctor of Psychology (Clinical Neuropsychology) Candidate
+Provisional Psychologist, MCRI Student
+BPsy (Hons); Assoc MAPS
+email: paulina.stedall at monash.edu
+
+Turner Institute for Brain and Mental Health
+School of Psychological Sciences
+Monash University
+
+	[[alternative HTML version deleted]]
+
+
+From t|n@@dudenhoe||er @end|ng |rom gm@||@com  Thu Dec  9 13:32:35 2021
+From: t|n@@dudenhoe||er @end|ng |rom gm@||@com (T D)
+Date: Thu, 9 Dec 2021 13:32:35 +0100
+Subject: [R-meta] Removing the intercept in rma.mv after non-significant
+ QM/F test
+Message-ID: <AB14F328-66FD-425A-A966-84350934CEA1@gmail.com>
+
+Dear all,
+
+I have a question regarding the rma.mv function.
+
+Some QM tests (test of moderation) are not significant. However, I continued to investigate both levels of the moderator regardless by removing the intercept (i.e with placing a -1 at the end)
+How sensible is this and what kind of conclusions can I draw when both levels (after removing the intercept) produce significant results. I understand I can?t draw any overall conclusions for the a priori hypotheses, considering the test of moderation was not significant - but generally, I wonder, whether it is ?ok? to report this - or whether it is simply wrong to continue with any analysis if the QM test is not significant.
+
+Many thanks for clarifying.
+
+Kind regards,
+Tina Dudenh?ffer
+
+From ||@t@ @end|ng |rom dewey@myzen@co@uk  Thu Dec  9 16:59:16 2021
+From: ||@t@ @end|ng |rom dewey@myzen@co@uk (Michael Dewey)
+Date: Thu, 9 Dec 2021 15:59:16 +0000
+Subject: [R-meta] Removing the intercept in rma.mv after non-significant
+ QM/F test
+In-Reply-To: <AB14F328-66FD-425A-A966-84350934CEA1@gmail.com>
+References: <AB14F328-66FD-425A-A966-84350934CEA1@gmail.com>
+Message-ID: <7f6495c1-f4ea-737e-1b8a-94a8afe9bc88@dewey.myzen.co.uk>
+
+Dear Tina
+
+When you leave the intercept in you are testing whether the two levels 
+differ. When you take it out you are separately testing for each whether 
+its coefficient differs from zero. Those are clearly not the same.
+
+Michel
+
+
+On 09/12/2021 12:32, T D wrote:
+> Dear all,
+> 
+> I have a question regarding the rma.mv function.
+> 
+> Some QM tests (test of moderation) are not significant. However, I continued to investigate both levels of the moderator regardless by removing the intercept (i.e with placing a -1 at the end)
+> How sensible is this and what kind of conclusions can I draw when both levels (after removing the intercept) produce significant results. I understand I can?t draw any overall conclusions for the a priori hypotheses, considering the test of moderation was not significant - but generally, I wonder, whether it is ?ok? to report this - or whether it is simply wrong to continue with any analysis if the QM test is not significant.
+> 
+> Many thanks for clarifying.
+> 
+> Kind regards,
+> Tina Dudenh?ffer
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+
+-- 
+Michael
+http://www.dewey.myzen.co.uk/home.html
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Dec  9 18:09:15 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 9 Dec 2021 17:09:15 +0000
+Subject: [R-meta] Removing the intercept in rma.mv after non-significant
+ QM/F test
+In-Reply-To: <7f6495c1-f4ea-737e-1b8a-94a8afe9bc88@dewey.myzen.co.uk>
+References: <AB14F328-66FD-425A-A966-84350934CEA1@gmail.com>
+ <7f6495c1-f4ea-737e-1b8a-94a8afe9bc88@dewey.myzen.co.uk>
+Message-ID: <a75ae7861e254b0d95c0fece02480c8f@UM-MAIL3214.unimaas.nl>
+
+Indeed!
+
+@Tina: Also see this write-up:
+
+https://www.metafor-project.org/doku.php/tips:models_with_or_without_intercept
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>Behalf Of Michael Dewey
+>Sent: Thursday, 09 December, 2021 16:59
+>To: T D; r-sig-meta-analysis at r-project.org
+>Subject: Re: [R-meta] Removing the intercept in rma.mv after non-significant QM/F
+>test
+>
+>Dear Tina
+>
+>When you leave the intercept in you are testing whether the two levels
+>differ. When you take it out you are separately testing for each whether
+>its coefficient differs from zero. Those are clearly not the same.
+>
+>Michel
+>
+>On 09/12/2021 12:32, T D wrote:
+>> Dear all,
+>>
+>> I have a question regarding the rma.mv function.
+>>
+>> Some QM tests (test of moderation) are not significant. However, I continued to
+>investigate both levels of the moderator regardless by removing the intercept
+>(i.e with placing a -1 at the end)
+>> How sensible is this and what kind of conclusions can I draw when both levels
+>(after removing the intercept) produce significant results. I understand I can?t
+>draw any overall conclusions for the a priori hypotheses, considering the test of
+>moderation was not significant - but generally, I wonder, whether it is ?ok? to
+>report this - or whether it is simply wrong to continue with any analysis if the
+>QM test is not significant.
+>>
+>> Many thanks for clarifying.
+>>
+>> Kind regards,
+>> Tina Dudenh?ffer
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Dec  9 18:17:16 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 9 Dec 2021 17:17:16 +0000
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+Message-ID: <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+
+>-----Original Message-----
+>From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>Sent: Tuesday, 07 December, 2021 23:41
+>To: Viechtbauer, Wolfgang (SP)
+>Cc: R meta
+>Subject: Re: metafor::matreg() and its workflow
+>
+>Hi Wolfgang,
+>
+>Once again, thank you for the chapter and the two useful resources.
+>For concreteness, are the last two lines OK to use or other solutions
+>exist?
+>
+>Many thanks,
+>Stefanou
+>
+>set.seed(0)
+>dat <- dat.craft2003
+>dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+>
+>tmp <- rcalc(ri ~ var1 + var2| study, ni=ni, data=dat)
+>V <- tmp$V
+>dat$var1.var2 <- tmp$dat$var1.var2
+>
+>dat$var1.var2 <- factor(dat$var1.var2,
+>                        levels=c("acog.perf", "asom.perf",
+>"conf.perf", "acog.asom", "acog.conf", "asom.conf"))
+>
+>res <- rma.mv(ri~ 0+var1.var2+sport+Xwb, V, random = ~ var1.var2 |
+>study, struct="UN", data=dat)
+>
+>R <- vec2mat(coef(res)[1:6]) # Is this OK?
+
+The first 6 coefficients are the estimated pooled correlations when 'sport' is I and when Xwb is 0. If this is what you want, then this is ok.
+
+>matreg(1, 2:4, R=R, V=vcov(res)[1:6,1:6]) # Is this OK?
+
+If the above is ok, then this is ok.
+
+Best,
+Wolfgang
+
+From @te|@noureve@z @end|ng |rom gm@||@com  Thu Dec  9 18:39:44 2021
+From: @te|@noureve@z @end|ng |rom gm@||@com (Stefanou Revesz)
+Date: Thu, 9 Dec 2021 11:39:44 -0600
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+Message-ID: <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+
+Thanks Wolfgang,
+
+But is what I have done a methodologically reasonable way to do this,
+or a more reasonable way exists.
+
+It's great that vcov() or random effects var-covariance matrix can be
+obtained from an rma.mv() fit and then used in a secondary SEM
+framework.
+
+But it seems to me that moderators used in rma.mv() get in the way,
+and I often have several of them.
+
+So, is there any literature on this or a strategy to get around the
+problem of moderators in the rma.mv() fit?
+
+Thank you for your guidance,
+Stefanou
+
+
+On Thu, Dec 9, 2021 at 11:17 AM Viechtbauer, Wolfgang (SP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+> >-----Original Message-----
+> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >Sent: Tuesday, 07 December, 2021 23:41
+> >To: Viechtbauer, Wolfgang (SP)
+> >Cc: R meta
+> >Subject: Re: metafor::matreg() and its workflow
+> >
+> >Hi Wolfgang,
+> >
+> >Once again, thank you for the chapter and the two useful resources.
+> >For concreteness, are the last two lines OK to use or other solutions
+> >exist?
+> >
+> >Many thanks,
+> >Stefanou
+> >
+> >set.seed(0)
+> >dat <- dat.craft2003
+> >dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+> >
+> >tmp <- rcalc(ri ~ var1 + var2| study, ni=ni, data=dat)
+> >V <- tmp$V
+> >dat$var1.var2 <- tmp$dat$var1.var2
+> >
+> >dat$var1.var2 <- factor(dat$var1.var2,
+> >                        levels=c("acog.perf", "asom.perf",
+> >"conf.perf", "acog.asom", "acog.conf", "asom.conf"))
+> >
+> >res <- rma.mv(ri~ 0+var1.var2+sport+Xwb, V, random = ~ var1.var2 |
+> >study, struct="UN", data=dat)
+> >
+> >R <- vec2mat(coef(res)[1:6]) # Is this OK?
+>
+> The first 6 coefficients are the estimated pooled correlations when 'sport' is I and when Xwb is 0. If this is what you want, then this is ok.
+>
+> >matreg(1, 2:4, R=R, V=vcov(res)[1:6,1:6]) # Is this OK?
+>
+> If the above is ok, then this is ok.
+>
+> Best,
+> Wolfgang
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Dec  9 19:24:41 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 9 Dec 2021 18:24:41 +0000
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+ <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+Message-ID: <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+
+I don't know what it is you are really trying to accomplish. One can stick moderators into the rma.mv() model, sure. So one can 'control' for them, or in other words, the estimated correlation matrix will then be a conditional estimate given a certain set of values for the moderators. That can be further passed on to matreg(). But I don't know if this is what you want to do, so I cannot say whether this is methodologically reasonable or whether a more reasonable exists -- to accomplish what? And what exactly is the problem of moderators in the rma.mv() fit?
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>Sent: Thursday, 09 December, 2021 18:40
+>To: Viechtbauer, Wolfgang (SP)
+>Cc: R meta
+>Subject: Re: metafor::matreg() and its workflow
+>
+>Thanks Wolfgang,
+>
+>But is what I have done a methodologically reasonable way to do this,
+>or a more reasonable way exists.
+>
+>It's great that vcov() or random effects var-covariance matrix can be
+>obtained from an rma.mv() fit and then used in a secondary SEM
+>framework.
+>
+>But it seems to me that moderators used in rma.mv() get in the way,
+>and I often have several of them.
+>
+>So, is there any literature on this or a strategy to get around the
+>problem of moderators in the rma.mv() fit?
+>
+>Thank you for your guidance,
+>Stefanou
+>
+>On Thu, Dec 9, 2021 at 11:17 AM Viechtbauer, Wolfgang (SP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>>
+>> >-----Original Message-----
+>> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >Sent: Tuesday, 07 December, 2021 23:41
+>> >To: Viechtbauer, Wolfgang (SP)
+>> >Cc: R meta
+>> >Subject: Re: metafor::matreg() and its workflow
+>> >
+>> >Hi Wolfgang,
+>> >
+>> >Once again, thank you for the chapter and the two useful resources.
+>> >For concreteness, are the last two lines OK to use or other solutions
+>> >exist?
+>> >
+>> >Many thanks,
+>> >Stefanou
+>> >
+>> >set.seed(0)
+>> >dat <- dat.craft2003
+>> >dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+>> >
+>> >tmp <- rcalc(ri ~ var1 + var2| study, ni=ni, data=dat)
+>> >V <- tmp$V
+>> >dat$var1.var2 <- tmp$dat$var1.var2
+>> >
+>> >dat$var1.var2 <- factor(dat$var1.var2,
+>> >                        levels=c("acog.perf", "asom.perf",
+>> >"conf.perf", "acog.asom", "acog.conf", "asom.conf"))
+>> >
+>> >res <- rma.mv(ri~ 0+var1.var2+sport+Xwb, V, random = ~ var1.var2 |
+>> >study, struct="UN", data=dat)
+>> >
+>> >R <- vec2mat(coef(res)[1:6]) # Is this OK?
+>>
+>> The first 6 coefficients are the estimated pooled correlations when 'sport' is
+>I and when Xwb is 0. If this is what you want, then this is ok.
+>>
+>> >matreg(1, 2:4, R=R, V=vcov(res)[1:6,1:6]) # Is this OK?
+>>
+>> If the above is ok, then this is ok.
+>>
+>> Best,
+>> Wolfgang
+
+From @te|@noureve@z @end|ng |rom gm@||@com  Thu Dec  9 23:22:40 2021
+From: @te|@noureve@z @end|ng |rom gm@||@com (Stefanou Revesz)
+Date: Thu, 9 Dec 2021 16:22:40 -0600
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+ <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+ <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+Message-ID: <CA+Tgogpo=kU4Lpbw3UDOmpEGmje04hhBf_1Xq=smfjV7e9Os_A@mail.gmail.com>
+
+Dear Wolfgang,
+
+I see, so conditioning (using predict() ) is the way to go even if
+there is a large set of conditions.
+
+Related to the above, if instead of vcov(), one intends to use G and H
+matrices (latent regression), would that also require conditioning on
+the levels of fixed effects?
+
+The other challenge that I expect to encounter (I'm preparing to do a
+meta-analysis exploring anxiety and achievement) is that correlations
+reported in each study may not reflect the same pair of variables
+across the studies. Thus, this prevents me from having a "var1.var2"
+like variable in my model which also means I can't proceed to mateg().
+I believe, in that case, I can do only an exploratory study of
+correlations (with rma.mv() ) rather than a model based one (with
+matreg() ).
+
+Thank you,
+Stefanou
+
+
+On Thu, Dec 9, 2021 at 12:24 PM Viechtbauer, Wolfgang (SP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+> I don't know what it is you are really trying to accomplish. One can stick moderators into the rma.mv() model, sure. So one can 'control' for them, or in other words, the estimated correlation matrix will then be a conditional estimate given a certain set of values for the moderators. That can be further passed on to matreg(). But I don't know if this is what you want to do, so I cannot say whether this is methodologically reasonable or whether a more reasonable exists -- to accomplish what? And what exactly is the problem of moderators in the rma.mv() fit?
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >Sent: Thursday, 09 December, 2021 18:40
+> >To: Viechtbauer, Wolfgang (SP)
+> >Cc: R meta
+> >Subject: Re: metafor::matreg() and its workflow
+> >
+> >Thanks Wolfgang,
+> >
+> >But is what I have done a methodologically reasonable way to do this,
+> >or a more reasonable way exists.
+> >
+> >It's great that vcov() or random effects var-covariance matrix can be
+> >obtained from an rma.mv() fit and then used in a secondary SEM
+> >framework.
+> >
+> >But it seems to me that moderators used in rma.mv() get in the way,
+> >and I often have several of them.
+> >
+> >So, is there any literature on this or a strategy to get around the
+> >problem of moderators in the rma.mv() fit?
+> >
+> >Thank you for your guidance,
+> >Stefanou
+> >
+> >On Thu, Dec 9, 2021 at 11:17 AM Viechtbauer, Wolfgang (SP)
+> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >>
+> >> >-----Original Message-----
+> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >> >Sent: Tuesday, 07 December, 2021 23:41
+> >> >To: Viechtbauer, Wolfgang (SP)
+> >> >Cc: R meta
+> >> >Subject: Re: metafor::matreg() and its workflow
+> >> >
+> >> >Hi Wolfgang,
+> >> >
+> >> >Once again, thank you for the chapter and the two useful resources.
+> >> >For concreteness, are the last two lines OK to use or other solutions
+> >> >exist?
+> >> >
+> >> >Many thanks,
+> >> >Stefanou
+> >> >
+> >> >set.seed(0)
+> >> >dat <- dat.craft2003
+> >> >dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+> >> >
+> >> >tmp <- rcalc(ri ~ var1 + var2| study, ni=ni, data=dat)
+> >> >V <- tmp$V
+> >> >dat$var1.var2 <- tmp$dat$var1.var2
+> >> >
+> >> >dat$var1.var2 <- factor(dat$var1.var2,
+> >> >                        levels=c("acog.perf", "asom.perf",
+> >> >"conf.perf", "acog.asom", "acog.conf", "asom.conf"))
+> >> >
+> >> >res <- rma.mv(ri~ 0+var1.var2+sport+Xwb, V, random = ~ var1.var2 |
+> >> >study, struct="UN", data=dat)
+> >> >
+> >> >R <- vec2mat(coef(res)[1:6]) # Is this OK?
+> >>
+> >> The first 6 coefficients are the estimated pooled correlations when 'sport' is
+> >I and when Xwb is 0. If this is what you want, then this is ok.
+> >>
+> >> >matreg(1, 2:4, R=R, V=vcov(res)[1:6,1:6]) # Is this OK?
+> >>
+> >> If the above is ok, then this is ok.
+> >>
+> >> Best,
+> >> Wolfgang
+
+
+From thom@@@@w@nton @end|ng |rom @ydney@edu@@u  Fri Dec 10 02:50:50 2021
+From: thom@@@@w@nton @end|ng |rom @ydney@edu@@u (Thomas Swanton)
+Date: Fri, 10 Dec 2021 01:50:50 +0000
+Subject: [R-meta] 
+ Extracting pooled rma.mv model summary statistics after
+ multiple imputation
+In-Reply-To: <3ac7190e5e3c4d198e0a4316fe7aecec@UM-MAIL3214.unimaas.nl>
+References: <SY2PR01MB26994C845D4210800E927C31DAB89@SY2PR01MB2699.ausprd01.prod.outlook.com>
+ <2114eda2c44e42148096712fedb0cc13@UM-MAIL3214.unimaas.nl>
+ <SY2PR01MB2699802DD42B67CDEA2412F4DA939@SY2PR01MB2699.ausprd01.prod.outlook.com>
+ <3ac7190e5e3c4d198e0a4316fe7aecec@UM-MAIL3214.unimaas.nl>
+Message-ID: <SY2PR01MB2699E8D86E1EF3232832DBDCDA719@SY2PR01MB2699.ausprd01.prod.outlook.com>
+
+Hi Wolfgang,
+
+Thanks again for your helpful response.
+
+If I may, I have another question ? how can I calculate the pooled variance inflation factors for each moderator to test for collinearity (again, after using mice for multiple imputation)?
+
+Many thanks,
+Tom
+
+
+From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+Sent: Sunday, 14 November 2021 1:58 AM
+To: Thomas Swanton <thomas.swanton at sydney.edu.au>; r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>
+Subject: RE: Extracting pooled rma.mv model summary statistics after multiple imputation 
+?
+Hi Thomas,
+
+Thanks for the example. This leads to an error though in this step:
+
+> pool <- summary(pool(fit))
+Error in h(simpleError(msg, call)) :???????????????????????????????????????????????????????????????????????????????????? 
+? error in evaluating the argument 'object' in selecting a method for function 'summary': the condition has length > 1
+
+To be precise, by default, you will just get a bunch of warnings, but I use:
+
+Sys.setenv("_R_CHECK_LENGTH_1_CONDITION_"="true")
+
+which ends up switching the warnings here to errors.
+
+The problem really comes from:
+> pool(fit)
+Error in if (x$ddf > 0) qt(level/2, df = x$ddf, lower.tail = FALSE) else NA :??????????????????????????????????????????? 
+? the condition has length > 1 
+
+And this error comes from a bug in 'broom' which is used by 'mice'. The problem is in tidy.rma(), namely this line:
+
+https://protect-au.mimecast.com/s/GOuDCjZ1N7inN41D0uW2cOp?domain=github.com
+
+crit <- if (x$ddf > 0) qt(level/2, df=x$ddf, lower.tail=FALSE) else NA
+
+In rma.mv() models with test="t", x$ddf is a vector, not a single value, and hence we get an if() conditions that has length > 1. I will report this to the broom authors.
+
+As for your actual question, see this:
+
+https://protect-au.mimecast.com/s/Py6MCk81N9tOGy3AvsVz45E?domain=stat.ethz.ch
+
+So you could do:
+
+round(apply(sapply(fit$analyses, \(x) x$sigma2), 1, mean), 4)
+format.pval(median(sapply(fit$analyses, \(x) x$QEp)))
+format.pval(median(sapply(fit$analyses, \(x) x$QMp)))
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Thomas Swanton [mailto:thomas.swanton at sydney.edu.au]
+>Sent: Thursday, 11 November, 2021 1:18
+>To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+>Subject: Re: Extracting pooled rma.mv model summary statistics after multiple
+>imputation
+>
+>Dear Wolfgang,
+>
+>Thank you for your reply, and my apologies for the delayed response - I was on
+>leave for a few weeks.
+>
+>Below I provide a minimal and fully reproducible example using the Bangert-Drowns
+>et al. sample data following your blog post at https://www.metafor-
+>project.org/doku.php/tips:multiple_imputation_with_mice_and_metafor
+>
+>I am conducting a three-level mixed-effects meta-regression with multiple effect
+>sizes (level 2; defined in the below example by "id") nested within studies
+>(level 3; defined in the below example by "author").
+>
+>Where I am stuck is: how do I get the portion of the output about variance
+>components, heterogeneity, and the test for moderators after using multiple
+>imputation? The pooling gives me the model results (estimate, std error, t
+>statistic, df, p-value), but how do I pool the portion of output that is normally
+>above "Model Results"?
+>
+>In the last line of the code (fit$analyses[1]), I can access this for each
+>imputed dataset, but I am unsure how to access the pooled summary statistics.
+>
+>I hope this clarifies where I am stuck. I would be very grateful for your advice.
+>
+>Many thanks,
+>
+>Tom Swanton
+>PhD Candidate
+>School of Psychology, The University of Sydney
+>
+># load packages
+>
+>library(metafor)
+>library(mice)
+>
+># use data from meta-analysis by Bangert-Drowns et al. (2004)
+>
+>dat <- dat.bangertdrowns2004
+>
+># keep variables needed for analysis
+>
+>dat <- dat[c("id", "author", "yi", "vi", "length", "wic", "feedback", "info",
+>"pers", "imag", "meta")]
+>
+># turn dummy variables into factors
+>
+>dat$wic <- factor(dat$wic)
+>dat$feedback <- factor(dat$feedback)
+>dat$info? <- factor(dat$info)
+>dat$pers? <- factor(dat$pers)
+>dat$imag? <- factor(dat$imag)
+>dat$meta? <- factor(dat$meta)
+>
+># set up predictor matrix for imputations
+>
+>predMatrix <- make.predictorMatrix(dat)
+>predMatrix[,"id"] <- 0 # don't use effect size id for imputing
+>predMatrix[,"author"] <- 0 # don't use author for imputing
+>predMatrix[,"vi"] <- 0 # don't use vi for imputing
+>predMatrix["id",] <- 0 # don't impute id (no NA's)
+>predMatrix["author",] <- 0 # don't impute author (no NA's)
+>predMatrix["yi",] <- 0 # don't impute yi (no NA's)
+>predMatrix["vi",] <- 0 # don't impute vi (no NA's)
+>predMatrix
+>
+># specify imputation method
+>
+>impMethod <- make.method(dat)
+>impMethod
+>
+># generate multiple imputations
+>
+>imp <- mice(dat, print=FALSE, m=20, predictorMatrix=predMatrix, method=impMethod,
+>seed=1234)
+>
+># fit model of interest to each of the 20 imputed datasets
+>
+>fit <- with(imp,
+>??????????? rma.mv(yi = yi,
+>?????????????????? V = vi,
+>?????????????????? slab = author,
+>?????????????????? random = ~ 1 | author/id,
+>?????????????????? test = "t",
+>?????????????????? method = "REML",
+>?????????????????? mods = ~ length + wic + feedback + info + pers + imag + meta))
+>
+># pool and round results
+>
+>pool <- summary(pool(fit))
+>pool[-1] <- round(pool[-1], digits=4)
+>pool
+>
+># view output from first imputed dataset
+>
+>fit$analyses[1]
+>
+>From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+>Sent: Saturday, 16 October 2021 12:18 AM
+>To: Thomas Swanton <thomas.swanton at sydney.edu.au>; r-sig-meta-analysis at r-
+>project.org <r-sig-meta-analysis at r-project.org>
+>Subject: RE: Extracting pooled rma.mv model summary statistics after multiple
+>imputation
+>
+>Hi Tom,
+>
+>Could you provide a minimal and fully reproducible example (see: https://protect-
+>au.mimecast.com/s/-pXHCnx1jni7Z8PPPu9Oavy?domain=stat.ethz.ch) that can be used
+>to discuss this? Right now, it's not entirely clear to me where exactly you are
+>stuck.
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>Behalf Of Thomas Swanton
+>>Sent: Friday, 15 October, 2021 2:02
+>>To: r-sig-meta-analysis at r-project.org
+>>Subject: [R-meta] Extracting pooled rma.mv model summary statistics after
+>>multiple imputation
+>>
+>>Dear colleagues,
+>>
+>>Is anyone able to help me understand how to extract pooled rma.mv model summary
+>>statistics after applying multiple imputation using mice please?
+>>
+>>I am conducting a three-level mixed effects multiple meta-regression using the
+>>rma.mv function in metafor, and have applied multiple imputation using mice
+>>following the instructions available here: https://www.metafor-
+>>project.org/doku.php/tips:multiple_imputation_with_mice_and_metafor
+>>
+>>I have the table of pooled model coefficients as in the worked example, but I
+>>haven't been able to work out how to extract pooled model summary statistics
+>>(e.g., tau-squared, Q statistic).
+>>
+>>Are you able to help me understand how to pool them across all the imputed
+>>datasets please?
+>>
+>>Many thanks,
+>>Tom
+>>
+>>Thomas Swanton, PhD Candidate
+>>School of Psychology, The University of Sydney, Australia
+>>thomas.swanton at sydney.edu.au
+>>
+>>Tom Swanton?| PhD Candidate and Research
+>> Assistant
+>>
+>>The University of Sydney
+>>
+>>Faculty of Science, School of Psychology, Brain & Mind Centre, Gambling
+>Treatment
+>>& Research Clinic
+>>
+>>Rm 204, Level 2, 94 Mallett St, Camperdown | NSW | 2050
+>>
+>>+61 432 891 501
+>>
+>>thomas.swanton at sydney.edu.au?|?sydney.edu.au
+>>
+>>Twitter:?@TomSwanton?|
+>> ResearchGate:?researchgate.net/profile/Thomas-Swanton
+>>
+>>Editorial Assistant,?International Gambling Studies
+>>
+>>We acknowledge the tradition of custodianship and law of the Country on which
+>the
+>>University
+>> of Sydney campuses stand. We pay our respects to those who have cared and
+>>continue to care for Country.
+
+
+From t|n@@dudenhoe||er @end|ng |rom gm@||@com  Fri Dec 10 08:32:20 2021
+From: t|n@@dudenhoe||er @end|ng |rom gm@||@com (T D)
+Date: Fri, 10 Dec 2021 08:32:20 +0100
+Subject: [R-meta] Removing the intercept in rma.mv after non-significant
+ QM/F test
+In-Reply-To: <7f6495c1-f4ea-737e-1b8a-94a8afe9bc88@dewey.myzen.co.uk>
+References: <AB14F328-66FD-425A-A966-84350934CEA1@gmail.com>
+ <7f6495c1-f4ea-737e-1b8a-94a8afe9bc88@dewey.myzen.co.uk>
+Message-ID: <35C7B56A-05D3-4C50-9056-ECDEE465DDA8@gmail.com>
+
+Hi Michael,
+
+Yes, that?s clear - I was rather wondering how to report this but Wolfgang forwarded a link.
+
+All clear now.
+
+Many thanks,
+Tina
+
+> On 9 Dec 2021, at 16:59, Michael Dewey <lists at dewey.myzen.co.uk> wrote:
+> 
+> Dear Tina
+> 
+> When you leave the intercept in you are testing whether the two levels differ. When you take it out you are separately testing for each whether its coefficient differs from zero. Those are clearly not the same.
+> 
+> Michel
+> 
+> 
+> On 09/12/2021 12:32, T D wrote:
+>> Dear all,
+>> I have a question regarding the rma.mv function.
+>> Some QM tests (test of moderation) are not significant. However, I continued to investigate both levels of the moderator regardless by removing the intercept (i.e with placing a -1 at the end)
+>> How sensible is this and what kind of conclusions can I draw when both levels (after removing the intercept) produce significant results. I understand I can?t draw any overall conclusions for the a priori hypotheses, considering the test of moderation was not significant - but generally, I wonder, whether it is ?ok? to report this - or whether it is simply wrong to continue with any analysis if the QM test is not significant.
+>> Many thanks for clarifying.
+>> Kind regards,
+>> Tina Dudenh?ffer
+>> _______________________________________________
+>> R-sig-meta-analysis mailing list
+>> R-sig-meta-analysis at r-project.org
+>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> 
+> -- 
+> Michael
+> http://www.dewey.myzen.co.uk/home.html
+
+
+From cm|o500 @end|ng |rom york@@c@uk  Sat Dec 11 20:58:13 2021
+From: cm|o500 @end|ng |rom york@@c@uk (=?UTF-8?Q?C=C3=A1tia_Ferreira_De_Oliveira?=)
+Date: Sat, 11 Dec 2021 19:58:13 +0000
+Subject: [R-meta] RVE: degrees of freedom < 4
+Message-ID: <CACw+Tfd5oN4ZD8fGWJ=zSrfo_Db85j3CRmrwfQ3=z0chSyK1pA@mail.gmail.com>
+
+Hello,
+
+I hope you are all doing well and that you will get a nice break during the
+festive season.
+Following from Tanner-Smith and colleagues' article entitled "Handling
+Complex Meta-analytic Data Structures Using Robust Variance Estimates: a
+Tutorial in R" where they focus on the issue of having a very number of
+degrees of freedom (<4), they make the case that we should not trust the
+p-values as they are not reliable. I assume the same can be said for the
+remaining information as this small number often reflects a lack of power
+or influential points, i.e. we wouldn't trust the estimates either, correct?
+
+Thank you!
+
+Best wishes,
+
+Catia
+
+	[[alternative HTML version deleted]]
+
+
+From yykj|y|@u|p|@n @end|ng |rom gm@||@com  Mon Dec 13 15:08:18 2021
+From: yykj|y|@u|p|@n @end|ng |rom gm@||@com (Yingkai)
+Date: Mon, 13 Dec 2021 22:08:18 +0800
+Subject: [R-meta] Effect Sizes From Pretest-Posttest-Control Group Designs
+ and effect sizes from Pretest-Posttest designs
+Message-ID: <CAN4zT8F4R2OkYpAQ6K3m1+OZLK3jHo0VtB4O7vFeGQsz=hO_cw@mail.gmail.com>
+
+Hi Dr. Wolfgang and all,
+    I am wondering whether one can combine effect sizes from
+pretest-posttest-control Group designs and effect sizes from
+pretest-posttest designs(no control group) in a meta-analysis?
+I know that one should not combine effect sizes from
+pretest-posttest-control Group designs and effect sizes from between-group
+designs in a meta-analysis.
+
+Best,
+-- 
+Yingkai, Associate Professor.
+Southwest University, ChongQing, CHINA.
+
+*If you receive this email outside your office hours, please do not feel
+obligated to respond immediately.*
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Dec 13 15:36:14 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 13 Dec 2021 14:36:14 +0000
+Subject: [R-meta] 
+ Effect Sizes From Pretest-Posttest-Control Group Designs
+ and effect sizes from Pretest-Posttest designs
+In-Reply-To: <CAN4zT8F4R2OkYpAQ6K3m1+OZLK3jHo0VtB4O7vFeGQsz=hO_cw@mail.gmail.com>
+References: <CAN4zT8F4R2OkYpAQ6K3m1+OZLK3jHo0VtB4O7vFeGQsz=hO_cw@mail.gmail.com>
+Message-ID: <03244eaf88b04c75a7a4392096618edc@UM-MAIL3214.unimaas.nl>
+
+Dear Yingkai,
+
+I don't think there is a single answer here. Of course one can do this -- whether one should in any particular case depends on the circumstances. And not sure why combining effect sizes from pretest-posttest-control group designs and effect sizes from between-group designs is out of the question. In any case, a canonical reference here is:
+
+Morris, S. B., & DeShon, R. P. (2002). Combining effect size estimates in meta-analysis with repeated measures and independent-groups designs. Psychological Methods, 7(1), 105-125. https://doi.org/10.1037/1082-989x.7.1.105
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Yingkai [mailto:yykjiyisuipian at gmail.com]
+>Sent: Monday, 13 December, 2021 15:08
+>To: r-sig-meta-analysis at r-project.org
+>Cc: Viechtbauer, Wolfgang (SP)
+>Subject: Effect Sizes From Pretest-Posttest-Control Group Designs and effect
+>sizes from Pretest-Posttest designs
+>
+>Hi Dr. Wolfgang and all,
+>? ? I am wondering whether one can combine effect sizes from pretest-posttest-
+>control Group designs and effect sizes from pretest-posttest designs(no control
+>group) in a meta-analysis?
+>I know that one should not combine?effect sizes from pretest-posttest-control
+>Group designs and effect sizes from between-group designs in a meta-analysis.
+>
+>Best,
+>--
+>Yingkai, Associate Professor.
+>Southwest University, ChongQing, CHINA.
+
+From jepu@to @end|ng |rom gm@||@com  Mon Dec 13 15:37:47 2021
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Mon, 13 Dec 2021 08:37:47 -0600
+Subject: [R-meta] RVE: degrees of freedom < 4
+In-Reply-To: <CACw+Tfd5oN4ZD8fGWJ=zSrfo_Db85j3CRmrwfQ3=z0chSyK1pA@mail.gmail.com>
+References: <CACw+Tfd5oN4ZD8fGWJ=zSrfo_Db85j3CRmrwfQ3=z0chSyK1pA@mail.gmail.com>
+Message-ID: <CAFUVuJyk3H0Q0+oZxKRMirMosH+eU9DQxez1UCfrbcUjSHf2KA@mail.gmail.com>
+
+Hi Catia,
+
+The issue is with drawing inferences. When the degrees of freedom are
+low (less than 4, say), the point estimates and the sampling variance
+estimates should still be unbiased (or close to unbiased, for the
+sampling variances). However, with low degrees of freedom, the
+sampling variance estimate will be very noisy. Therefore, we don't
+have a good way to judge the *uncertainty* in the point estimate.
+
+James
+
+On Sat, Dec 11, 2021 at 1:59 PM C?tia Ferreira De Oliveira
+<cmfo500 at york.ac.uk> wrote:
+>
+> Hello,
+>
+> I hope you are all doing well and that you will get a nice break during the
+> festive season.
+> Following from Tanner-Smith and colleagues' article entitled "Handling
+> Complex Meta-analytic Data Structures Using Robust Variance Estimates: a
+> Tutorial in R" where they focus on the issue of having a very number of
+> degrees of freedom (<4), they make the case that we should not trust the
+> p-values as they are not reliable. I assume the same can be said for the
+> remaining information as this small number often reflects a lack of power
+> or influential points, i.e. we wouldn't trust the estimates either, correct?
+>
+> Thank you!
+>
+> Best wishes,
+>
+> Catia
+>
+>         [[alternative HTML version deleted]]
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From yykj|y|@u|p|@n @end|ng |rom gm@||@com  Mon Dec 13 15:37:57 2021
+From: yykj|y|@u|p|@n @end|ng |rom gm@||@com (Yingkai)
+Date: Mon, 13 Dec 2021 22:37:57 +0800
+Subject: [R-meta] 
+ Effect Sizes From Pretest-Posttest-Control Group Designs
+ and effect sizes from Pretest-Posttest designs
+In-Reply-To: <03244eaf88b04c75a7a4392096618edc@UM-MAIL3214.unimaas.nl>
+References: <CAN4zT8F4R2OkYpAQ6K3m1+OZLK3jHo0VtB4O7vFeGQsz=hO_cw@mail.gmail.com>
+ <03244eaf88b04c75a7a4392096618edc@UM-MAIL3214.unimaas.nl>
+Message-ID: <CAN4zT8EjHk_2SygcZXi73zA8jeLXhXkzv9rMz-VY=V30v6uDug@mail.gmail.com>
+
+Thanks a lot!
+
+Viechtbauer, Wolfgang (SP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl>?2021?12?13?
+????10:36???
+
+> Dear Yingkai,
+>
+> I don't think there is a single answer here. Of course one can do this --
+> whether one should in any particular case depends on the circumstances. And
+> not sure why combining effect sizes from pretest-posttest-control group
+> designs and effect sizes from between-group designs is out of the question.
+> In any case, a canonical reference here is:
+>
+> Morris, S. B., & DeShon, R. P. (2002). Combining effect size estimates in
+> meta-analysis with repeated measures and independent-groups designs.
+> Psychological Methods, 7(1), 105-125.
+> https://doi.org/10.1037/1082-989x.7.1.105
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Yingkai [mailto:yykjiyisuipian at gmail.com]
+> >Sent: Monday, 13 December, 2021 15:08
+> >To: r-sig-meta-analysis at r-project.org
+> >Cc: Viechtbauer, Wolfgang (SP)
+> >Subject: Effect Sizes From Pretest-Posttest-Control Group Designs and
+> effect
+> >sizes from Pretest-Posttest designs
+> >
+> >Hi Dr. Wolfgang and all,
+> >    I am wondering whether one can combine effect sizes from
+> pretest-posttest-
+> >control Group designs and effect sizes from pretest-posttest designs(no
+> control
+> >group) in a meta-analysis?
+> >I know that one should not combine effect sizes from
+> pretest-posttest-control
+> >Group designs and effect sizes from between-group designs in a
+> meta-analysis.
+> >
+> >Best,
+> >--
+> >Yingkai, Associate Professor.
+> >Southwest University, ChongQing, CHINA.
+>
+-- 
+Yingkai, Associate Professor.
+Southwest University, ChongQing, CHINA.
+
+*If you receive this email outside your office hours, please do not feel
+obligated to respond immediately.*
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Dec 13 19:53:03 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 13 Dec 2021 18:53:03 +0000
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <CA+Tgogpo=kU4Lpbw3UDOmpEGmje04hhBf_1Xq=smfjV7e9Os_A@mail.gmail.com>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+ <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+ <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogpo=kU4Lpbw3UDOmpEGmje04hhBf_1Xq=smfjV7e9Os_A@mail.gmail.com>
+Message-ID: <334bfd580bc0466bab94e05960ca679c@UM-MAIL3214.unimaas.nl>
+
+There is an upcoming talk by Suzanne Jak on MASEM at this seminar series:
+
+https://www.srmasig.org/seminar/
+
+Might be of interest.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>Sent: Thursday, 09 December, 2021 23:23
+>To: Viechtbauer, Wolfgang (SP)
+>Cc: R meta
+>Subject: Re: metafor::matreg() and its workflow
+>
+>Dear Wolfgang,
+>
+>I see, so conditioning (using predict() ) is the way to go even if
+>there is a large set of conditions.
+>
+>Related to the above, if instead of vcov(), one intends to use G and H
+>matrices (latent regression), would that also require conditioning on
+>the levels of fixed effects?
+>
+>The other challenge that I expect to encounter (I'm preparing to do a
+>meta-analysis exploring anxiety and achievement) is that correlations
+>reported in each study may not reflect the same pair of variables
+>across the studies. Thus, this prevents me from having a "var1.var2"
+>like variable in my model which also means I can't proceed to mateg().
+>I believe, in that case, I can do only an exploratory study of
+>correlations (with rma.mv() ) rather than a model based one (with
+>matreg() ).
+>
+>Thank you,
+>Stefanou
+>
+>
+>On Thu, Dec 9, 2021 at 12:24 PM Viechtbauer, Wolfgang (SP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>>
+>> I don't know what it is you are really trying to accomplish. One can stick
+>moderators into the rma.mv() model, sure. So one can 'control' for them, or in
+>other words, the estimated correlation matrix will then be a conditional estimate
+>given a certain set of values for the moderators. That can be further passed on
+>to matreg(). But I don't know if this is what you want to do, so I cannot say
+>whether this is methodologically reasonable or whether a more reasonable exists -
+>- to accomplish what? And what exactly is the problem of moderators in the
+>rma.mv() fit?
+>>
+>> Best,
+>> Wolfgang
+>>
+>> >-----Original Message-----
+>> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >Sent: Thursday, 09 December, 2021 18:40
+>> >To: Viechtbauer, Wolfgang (SP)
+>> >Cc: R meta
+>> >Subject: Re: metafor::matreg() and its workflow
+>> >
+>> >Thanks Wolfgang,
+>> >
+>> >But is what I have done a methodologically reasonable way to do this,
+>> >or a more reasonable way exists.
+>> >
+>> >It's great that vcov() or random effects var-covariance matrix can be
+>> >obtained from an rma.mv() fit and then used in a secondary SEM
+>> >framework.
+>> >
+>> >But it seems to me that moderators used in rma.mv() get in the way,
+>> >and I often have several of them.
+>> >
+>> >So, is there any literature on this or a strategy to get around the
+>> >problem of moderators in the rma.mv() fit?
+>> >
+>> >Thank you for your guidance,
+>> >Stefanou
+>> >
+>> >On Thu, Dec 9, 2021 at 11:17 AM Viechtbauer, Wolfgang (SP)
+>> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>> >>
+>> >> >-----Original Message-----
+>> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >> >Sent: Tuesday, 07 December, 2021 23:41
+>> >> >To: Viechtbauer, Wolfgang (SP)
+>> >> >Cc: R meta
+>> >> >Subject: Re: metafor::matreg() and its workflow
+>> >> >
+>> >> >Hi Wolfgang,
+>> >> >
+>> >> >Once again, thank you for the chapter and the two useful resources.
+>> >> >For concreteness, are the last two lines OK to use or other solutions
+>> >> >exist?
+>> >> >
+>> >> >Many thanks,
+>> >> >Stefanou
+>> >> >
+>> >> >set.seed(0)
+>> >> >dat <- dat.craft2003
+>> >> >dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+>> >> >
+>> >> >tmp <- rcalc(ri ~ var1 + var2| study, ni=ni, data=dat)
+>> >> >V <- tmp$V
+>> >> >dat$var1.var2 <- tmp$dat$var1.var2
+>> >> >
+>> >> >dat$var1.var2 <- factor(dat$var1.var2,
+>> >> >                        levels=c("acog.perf", "asom.perf",
+>> >> >"conf.perf", "acog.asom", "acog.conf", "asom.conf"))
+>> >> >
+>> >> >res <- rma.mv(ri~ 0+var1.var2+sport+Xwb, V, random = ~ var1.var2 |
+>> >> >study, struct="UN", data=dat)
+>> >> >
+>> >> >R <- vec2mat(coef(res)[1:6]) # Is this OK?
+>> >>
+>> >> The first 6 coefficients are the estimated pooled correlations when 'sport'
+>is
+>> >I and when Xwb is 0. If this is what you want, then this is ok.
+>> >>
+>> >> >matreg(1, 2:4, R=R, V=vcov(res)[1:6,1:6]) # Is this OK?
+>> >>
+>> >> If the above is ok, then this is ok.
+>> >>
+>> >> Best,
+>> >> Wolfgang
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Dec 13 19:56:18 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 13 Dec 2021 18:56:18 +0000
+Subject: [R-meta] 
+ Extracting pooled rma.mv model summary statistics after
+ multiple imputation
+In-Reply-To: <SY2PR01MB2699E8D86E1EF3232832DBDCDA719@SY2PR01MB2699.ausprd01.prod.outlook.com>
+References: <SY2PR01MB26994C845D4210800E927C31DAB89@SY2PR01MB2699.ausprd01.prod.outlook.com>
+ <2114eda2c44e42148096712fedb0cc13@UM-MAIL3214.unimaas.nl>
+ <SY2PR01MB2699802DD42B67CDEA2412F4DA939@SY2PR01MB2699.ausprd01.prod.outlook.com>
+ <3ac7190e5e3c4d198e0a4316fe7aecec@UM-MAIL3214.unimaas.nl>
+ <SY2PR01MB2699E8D86E1EF3232832DBDCDA719@SY2PR01MB2699.ausprd01.prod.outlook.com>
+Message-ID: <20cbd86cf4a645d58dcb5e2ae21db564@UM-MAIL3214.unimaas.nl>
+
+Hi Tom,
+
+I don't know if people ever pool VIFs. But I suppose one could just their average across models.
+
+vif() in metafor provides the VIFs. Just use lapply() to get those across fit$analyses elements and then average per moderator.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Thomas Swanton [mailto:thomas.swanton at sydney.edu.au]
+>Sent: Friday, 10 December, 2021 2:51
+>To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+>Subject: Re: Extracting pooled rma.mv model summary statistics after multiple
+>imputation
+>
+>Hi Wolfgang,
+>
+>Thanks again for your helpful response.
+>
+>If I may, I have another question - how can I calculate the pooled variance
+>inflation factors for each moderator to test for collinearity (again, after using
+>mice for multiple imputation)?
+>
+>Many thanks,
+>Tom
+>
+>
+>From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+>Sent: Sunday, 14 November 2021 1:58 AM
+>To: Thomas Swanton <thomas.swanton at sydney.edu.au>; r-sig-meta-analysis at r-
+>project.org <r-sig-meta-analysis at r-project.org>
+>Subject: RE: Extracting pooled rma.mv model summary statistics after multiple
+>imputation
+>
+>Hi Thomas,
+>
+>Thanks for the example. This leads to an error though in this step:
+>
+>> pool <- summary(pool(fit))
+>Error in h(simpleError(msg, call))
+>:
+>
+>? error in evaluating the argument 'object' in selecting a method for function
+>'summary': the condition has length > 1
+>
+>To be precise, by default, you will just get a bunch of warnings, but I use:
+>
+>Sys.setenv("_R_CHECK_LENGTH_1_CONDITION_"="true")
+>
+>which ends up switching the warnings here to errors.
+>
+>The problem really comes from:
+>> pool(fit)
+>Error in if (x$ddf > 0) qt(level/2, df = x$ddf, lower.tail = FALSE) else NA
+>:
+>? the condition has length > 1
+>
+>And this error comes from a bug in 'broom' which is used by 'mice'. The problem
+>is in tidy.rma(), namely this line:
+>
+>https://protect-au.mimecast.com/s/GOuDCjZ1N7inN41D0uW2cOp?domain=github.com
+>
+>crit <- if (x$ddf > 0) qt(level/2, df=x$ddf, lower.tail=FALSE) else NA
+>
+>In rma.mv() models with test="t", x$ddf is a vector, not a single value, and
+>hence we get an if() conditions that has length > 1. I will report this to the
+>broom authors.
+>
+>As for your actual question, see this:
+>
+>https://protect-au.mimecast.com/s/Py6MCk81N9tOGy3AvsVz45E?domain=stat.ethz.ch
+>
+>So you could do:
+>
+>round(apply(sapply(fit$analyses, \(x) x$sigma2), 1, mean), 4)
+>format.pval(median(sapply(fit$analyses, \(x) x$QEp)))
+>format.pval(median(sapply(fit$analyses, \(x) x$QMp)))
+>
+>Best,
+>Wolfgang
+>
+>>-----Original Message-----
+>>From: Thomas Swanton [mailto:thomas.swanton at sydney.edu.au]
+>>Sent: Thursday, 11 November, 2021 1:18
+>>To: Viechtbauer, Wolfgang (SP); r-sig-meta-analysis at r-project.org
+>>Subject: Re: Extracting pooled rma.mv model summary statistics after multiple
+>>imputation
+>>
+>>Dear Wolfgang,
+>>
+>>Thank you for your reply, and my apologies for the delayed response - I was on
+>>leave for a few weeks.
+>>
+>>Below I provide a minimal and fully reproducible example using the Bangert-
+>Drowns
+>>et al. sample data following your blog post at https://www.metafor-
+>>project.org/doku.php/tips:multiple_imputation_with_mice_and_metafor
+>>
+>>I am conducting a three-level mixed-effects meta-regression with multiple effect
+>>sizes (level 2; defined in the below example by "id") nested within studies
+>>(level 3; defined in the below example by "author").
+>>
+>>Where I am stuck is: how do I get the portion of the output about variance
+>>components, heterogeneity, and the test for moderators after using multiple
+>>imputation? The pooling gives me the model results (estimate, std error, t
+>>statistic, df, p-value), but how do I pool the portion of output that is
+>normally
+>>above "Model Results"?
+>>
+>>In the last line of the code (fit$analyses[1]), I can access this for each
+>>imputed dataset, but I am unsure how to access the pooled summary statistics.
+>>
+>>I hope this clarifies where I am stuck. I would be very grateful for your
+>advice.
+>>
+>>Many thanks,
+>>
+>>Tom Swanton
+>>PhD Candidate
+>>School of Psychology, The University of Sydney
+>>
+>># load packages
+>>
+>>library(metafor)
+>>library(mice)
+>>
+>># use data from meta-analysis by Bangert-Drowns et al. (2004)
+>>
+>>dat <- dat.bangertdrowns2004
+>>
+>># keep variables needed for analysis
+>>
+>>dat <- dat[c("id", "author", "yi", "vi", "length", "wic", "feedback", "info",
+>>"pers", "imag", "meta")]
+>>
+>># turn dummy variables into factors
+>>
+>>dat$wic <- factor(dat$wic)
+>>dat$feedback <- factor(dat$feedback)
+>>dat$info? <- factor(dat$info)
+>>dat$pers? <- factor(dat$pers)
+>>dat$imag? <- factor(dat$imag)
+>>dat$meta? <- factor(dat$meta)
+>>
+>># set up predictor matrix for imputations
+>>
+>>predMatrix <- make.predictorMatrix(dat)
+>>predMatrix[,"id"] <- 0 # don't use effect size id for imputing
+>>predMatrix[,"author"] <- 0 # don't use author for imputing
+>>predMatrix[,"vi"] <- 0 # don't use vi for imputing
+>>predMatrix["id",] <- 0 # don't impute id (no NA's)
+>>predMatrix["author",] <- 0 # don't impute author (no NA's)
+>>predMatrix["yi",] <- 0 # don't impute yi (no NA's)
+>>predMatrix["vi",] <- 0 # don't impute vi (no NA's)
+>>predMatrix
+>>
+>># specify imputation method
+>>
+>>impMethod <- make.method(dat)
+>>impMethod
+>>
+>># generate multiple imputations
+>>
+>>imp <- mice(dat, print=FALSE, m=20, predictorMatrix=predMatrix,
+>method=impMethod,
+>>seed=1234)
+>>
+>># fit model of interest to each of the 20 imputed datasets
+>>
+>>fit <- with(imp,
+>>??????????? rma.mv(yi = yi,
+>>?????????????????? V = vi,
+>>?????????????????? slab = author,
+>>?????????????????? random = ~ 1 | author/id,
+>>?????????????????? test = "t",
+>>?????????????????? method = "REML",
+>>?????????????????? mods = ~ length + wic + feedback + info + pers + imag +
+>meta))
+>>
+>># pool and round results
+>>
+>>pool <- summary(pool(fit))
+>>pool[-1] <- round(pool[-1], digits=4)
+>>pool
+>>
+>># view output from first imputed dataset
+>>
+>>fit$analyses[1]
+>>
+>>From: Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+>>Sent: Saturday, 16 October 2021 12:18 AM
+>>To: Thomas Swanton <thomas.swanton at sydney.edu.au>; r-sig-meta-analysis at r-
+>>project.org <r-sig-meta-analysis at r-project.org>
+>>Subject: RE: Extracting pooled rma.mv model summary statistics after multiple
+>>imputation
+>>
+>>Hi Tom,
+>>
+>>Could you provide a minimal and fully reproducible example (see:
+>https://protect-
+>>au.mimecast.com/s/-pXHCnx1jni7Z8PPPu9Oavy?domain=stat.ethz.ch) that can be used
+>>to discuss this? Right now, it's not entirely clear to me where exactly you are
+>>stuck.
+>>
+>>Best,
+>>Wolfgang
+>>
+>>>-----Original Message-----
+>>>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On
+>>>Behalf Of Thomas Swanton
+>>>Sent: Friday, 15 October, 2021 2:02
+>>>To: r-sig-meta-analysis at r-project.org
+>>>Subject: [R-meta] Extracting pooled rma.mv model summary statistics after
+>>>multiple imputation
+>>>
+>>>Dear colleagues,
+>>>
+>>>Is anyone able to help me understand how to extract pooled rma.mv model summary
+>>>statistics after applying multiple imputation using mice please?
+>>>
+>>>I am conducting a three-level mixed effects multiple meta-regression using the
+>>>rma.mv function in metafor, and have applied multiple imputation using mice
+>>>following the instructions available here: https://www.metafor-
+>>>project.org/doku.php/tips:multiple_imputation_with_mice_and_metafor
+>>>
+>>>I have the table of pooled model coefficients as in the worked example, but I
+>>>haven't been able to work out how to extract pooled model summary statistics
+>>>(e.g., tau-squared, Q statistic).
+>>>
+>>>Are you able to help me understand how to pool them across all the imputed
+>>>datasets please?
+>>>
+>>>Many thanks,
+>>>Tom
+>>>
+>>>Thomas Swanton, PhD Candidate
+>>>School of Psychology, The University of Sydney, Australia
+>>>thomas.swanton at sydney.edu.au
+>>>
+>>>Tom Swanton?| PhD Candidate and Research
+>>> Assistant
+>>>
+>>>The University of Sydney
+>>>
+>>>Faculty of Science, School of Psychology, Brain & Mind Centre, Gambling
+>>Treatment
+>>>& Research Clinic
+>>>
+>>>Rm 204, Level 2, 94 Mallett St, Camperdown | NSW | 2050
+>>>
+>>>+61 432 891 501
+>>>
+>>>thomas.swanton at sydney.edu.au?|?sydney.edu.au
+>>>
+>>>Twitter:?@TomSwanton?|
+>>> ResearchGate:?researchgate.net/profile/Thomas-Swanton
+>>>
+>>>Editorial Assistant,?International Gambling Studies
+>>>
+>>>We acknowledge the tradition of custodianship and law of the Country on which
+>>the
+>>>University
+>>> of Sydney campuses stand. We pay our respects to those who have cared and
+>>>continue to care for Country.
+
+
+From @te|@noureve@z @end|ng |rom gm@||@com  Mon Dec 13 21:19:37 2021
+From: @te|@noureve@z @end|ng |rom gm@||@com (Stefanou Revesz)
+Date: Mon, 13 Dec 2021 14:19:37 -0600
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <334bfd580bc0466bab94e05960ca679c@UM-MAIL3214.unimaas.nl>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+ <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+ <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogpo=kU4Lpbw3UDOmpEGmje04hhBf_1Xq=smfjV7e9Os_A@mail.gmail.com>
+ <334bfd580bc0466bab94e05960ca679c@UM-MAIL3214.unimaas.nl>
+Message-ID: <CA+Tgogq0_Gkqqp+KN5zUuVitD3VafUigJkws+vJnLo8g8pcDrQ@mail.gmail.com>
+
+Thank you so much! One clarification question. matreg() is not
+effect-size specific, correct? I mean you may have meta-analyzed any
+type effect size (SMD, ROM, OR, ...) and then subject the vcov() or G
+or H matrices of those meta-analyses to matreg(), correct?
+
+Thanks again,
+Stefanou
+
+On Mon, Dec 13, 2021 at 12:53 PM Viechtbauer, Wolfgang (SP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+> There is an upcoming talk by Suzanne Jak on MASEM at this seminar series:
+>
+> https://www.srmasig.org/seminar/
+>
+> Might be of interest.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >Sent: Thursday, 09 December, 2021 23:23
+> >To: Viechtbauer, Wolfgang (SP)
+> >Cc: R meta
+> >Subject: Re: metafor::matreg() and its workflow
+> >
+> >Dear Wolfgang,
+> >
+> >I see, so conditioning (using predict() ) is the way to go even if
+> >there is a large set of conditions.
+> >
+> >Related to the above, if instead of vcov(), one intends to use G and H
+> >matrices (latent regression), would that also require conditioning on
+> >the levels of fixed effects?
+> >
+> >The other challenge that I expect to encounter (I'm preparing to do a
+> >meta-analysis exploring anxiety and achievement) is that correlations
+> >reported in each study may not reflect the same pair of variables
+> >across the studies. Thus, this prevents me from having a "var1.var2"
+> >like variable in my model which also means I can't proceed to mateg().
+> >I believe, in that case, I can do only an exploratory study of
+> >correlations (with rma.mv() ) rather than a model based one (with
+> >matreg() ).
+> >
+> >Thank you,
+> >Stefanou
+> >
+> >
+> >On Thu, Dec 9, 2021 at 12:24 PM Viechtbauer, Wolfgang (SP)
+> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >>
+> >> I don't know what it is you are really trying to accomplish. One can stick
+> >moderators into the rma.mv() model, sure. So one can 'control' for them, or in
+> >other words, the estimated correlation matrix will then be a conditional estimate
+> >given a certain set of values for the moderators. That can be further passed on
+> >to matreg(). But I don't know if this is what you want to do, so I cannot say
+> >whether this is methodologically reasonable or whether a more reasonable exists -
+> >- to accomplish what? And what exactly is the problem of moderators in the
+> >rma.mv() fit?
+> >>
+> >> Best,
+> >> Wolfgang
+> >>
+> >> >-----Original Message-----
+> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >> >Sent: Thursday, 09 December, 2021 18:40
+> >> >To: Viechtbauer, Wolfgang (SP)
+> >> >Cc: R meta
+> >> >Subject: Re: metafor::matreg() and its workflow
+> >> >
+> >> >Thanks Wolfgang,
+> >> >
+> >> >But is what I have done a methodologically reasonable way to do this,
+> >> >or a more reasonable way exists.
+> >> >
+> >> >It's great that vcov() or random effects var-covariance matrix can be
+> >> >obtained from an rma.mv() fit and then used in a secondary SEM
+> >> >framework.
+> >> >
+> >> >But it seems to me that moderators used in rma.mv() get in the way,
+> >> >and I often have several of them.
+> >> >
+> >> >So, is there any literature on this or a strategy to get around the
+> >> >problem of moderators in the rma.mv() fit?
+> >> >
+> >> >Thank you for your guidance,
+> >> >Stefanou
+> >> >
+> >> >On Thu, Dec 9, 2021 at 11:17 AM Viechtbauer, Wolfgang (SP)
+> >> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >> >>
+> >> >> >-----Original Message-----
+> >> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >> >> >Sent: Tuesday, 07 December, 2021 23:41
+> >> >> >To: Viechtbauer, Wolfgang (SP)
+> >> >> >Cc: R meta
+> >> >> >Subject: Re: metafor::matreg() and its workflow
+> >> >> >
+> >> >> >Hi Wolfgang,
+> >> >> >
+> >> >> >Once again, thank you for the chapter and the two useful resources.
+> >> >> >For concreteness, are the last two lines OK to use or other solutions
+> >> >> >exist?
+> >> >> >
+> >> >> >Many thanks,
+> >> >> >Stefanou
+> >> >> >
+> >> >> >set.seed(0)
+> >> >> >dat <- dat.craft2003
+> >> >> >dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+> >> >> >
+> >> >> >tmp <- rcalc(ri ~ var1 + var2| study, ni=ni, data=dat)
+> >> >> >V <- tmp$V
+> >> >> >dat$var1.var2 <- tmp$dat$var1.var2
+> >> >> >
+> >> >> >dat$var1.var2 <- factor(dat$var1.var2,
+> >> >> >                        levels=c("acog.perf", "asom.perf",
+> >> >> >"conf.perf", "acog.asom", "acog.conf", "asom.conf"))
+> >> >> >
+> >> >> >res <- rma.mv(ri~ 0+var1.var2+sport+Xwb, V, random = ~ var1.var2 |
+> >> >> >study, struct="UN", data=dat)
+> >> >> >
+> >> >> >R <- vec2mat(coef(res)[1:6]) # Is this OK?
+> >> >>
+> >> >> The first 6 coefficients are the estimated pooled correlations when 'sport'
+> >is
+> >> >I and when Xwb is 0. If this is what you want, then this is ok.
+> >> >>
+> >> >> >matreg(1, 2:4, R=R, V=vcov(res)[1:6,1:6]) # Is this OK?
+> >> >>
+> >> >> If the above is ok, then this is ok.
+> >> >>
+> >> >> Best,
+> >> >> Wolfgang
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Mon Dec 13 21:59:36 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Mon, 13 Dec 2021 20:59:36 +0000
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <CA+Tgogq0_Gkqqp+KN5zUuVitD3VafUigJkws+vJnLo8g8pcDrQ@mail.gmail.com>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+ <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+ <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogpo=kU4Lpbw3UDOmpEGmje04hhBf_1Xq=smfjV7e9Os_A@mail.gmail.com>
+ <334bfd580bc0466bab94e05960ca679c@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogq0_Gkqqp+KN5zUuVitD3VafUigJkws+vJnLo8g8pcDrQ@mail.gmail.com>
+Message-ID: <0ba03c17d63f4a2898dbe21a9fa13342@UM-MAIL3214.unimaas.nl>
+
+Here is an example using G as input to matreg():
+
+https://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002#regression_of_true_log_odds
+
+(you will need the devel version of metafor for the cvvc="varcov" part).
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>Sent: Monday, 13 December, 2021 21:20
+>To: Viechtbauer, Wolfgang (SP)
+>Cc: R meta
+>Subject: Re: metafor::matreg() and its workflow
+>
+>Thank you so much! One clarification question. matreg() is not
+>effect-size specific, correct? I mean you may have meta-analyzed any
+>type effect size (SMD, ROM, OR, ...) and then subject the vcov() or G
+>or H matrices of those meta-analyses to matreg(), correct?
+>
+>Thanks again,
+>Stefanou
+>
+>On Mon, Dec 13, 2021 at 12:53 PM Viechtbauer, Wolfgang (SP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>>
+>> There is an upcoming talk by Suzanne Jak on MASEM at this seminar series:
+>>
+>> https://www.srmasig.org/seminar/
+>>
+>> Might be of interest.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> >-----Original Message-----
+>> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >Sent: Thursday, 09 December, 2021 23:23
+>> >To: Viechtbauer, Wolfgang (SP)
+>> >Cc: R meta
+>> >Subject: Re: metafor::matreg() and its workflow
+>> >
+>> >Dear Wolfgang,
+>> >
+>> >I see, so conditioning (using predict() ) is the way to go even if
+>> >there is a large set of conditions.
+>> >
+>> >Related to the above, if instead of vcov(), one intends to use G and H
+>> >matrices (latent regression), would that also require conditioning on
+>> >the levels of fixed effects?
+>> >
+>> >The other challenge that I expect to encounter (I'm preparing to do a
+>> >meta-analysis exploring anxiety and achievement) is that correlations
+>> >reported in each study may not reflect the same pair of variables
+>> >across the studies. Thus, this prevents me from having a "var1.var2"
+>> >like variable in my model which also means I can't proceed to mateg().
+>> >I believe, in that case, I can do only an exploratory study of
+>> >correlations (with rma.mv() ) rather than a model based one (with
+>> >matreg() ).
+>> >
+>> >Thank you,
+>> >Stefanou
+>> >
+>> >
+>> >On Thu, Dec 9, 2021 at 12:24 PM Viechtbauer, Wolfgang (SP)
+>> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>> >>
+>> >> I don't know what it is you are really trying to accomplish. One can stick
+>> >moderators into the rma.mv() model, sure. So one can 'control' for them, or in
+>> >other words, the estimated correlation matrix will then be a conditional
+>estimate
+>> >given a certain set of values for the moderators. That can be further passed
+>on
+>> >to matreg(). But I don't know if this is what you want to do, so I cannot say
+>> >whether this is methodologically reasonable or whether a more reasonable
+>exists -
+>> >- to accomplish what? And what exactly is the problem of moderators in the
+>> >rma.mv() fit?
+>> >>
+>> >> Best,
+>> >> Wolfgang
+>> >>
+>> >> >-----Original Message-----
+>> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >> >Sent: Thursday, 09 December, 2021 18:40
+>> >> >To: Viechtbauer, Wolfgang (SP)
+>> >> >Cc: R meta
+>> >> >Subject: Re: metafor::matreg() and its workflow
+>> >> >
+>> >> >Thanks Wolfgang,
+>> >> >
+>> >> >But is what I have done a methodologically reasonable way to do this,
+>> >> >or a more reasonable way exists.
+>> >> >
+>> >> >It's great that vcov() or random effects var-covariance matrix can be
+>> >> >obtained from an rma.mv() fit and then used in a secondary SEM
+>> >> >framework.
+>> >> >
+>> >> >But it seems to me that moderators used in rma.mv() get in the way,
+>> >> >and I often have several of them.
+>> >> >
+>> >> >So, is there any literature on this or a strategy to get around the
+>> >> >problem of moderators in the rma.mv() fit?
+>> >> >
+>> >> >Thank you for your guidance,
+>> >> >Stefanou
+>> >> >
+>> >> >On Thu, Dec 9, 2021 at 11:17 AM Viechtbauer, Wolfgang (SP)
+>> >> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>> >> >>
+>> >> >> >-----Original Message-----
+>> >> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >> >> >Sent: Tuesday, 07 December, 2021 23:41
+>> >> >> >To: Viechtbauer, Wolfgang (SP)
+>> >> >> >Cc: R meta
+>> >> >> >Subject: Re: metafor::matreg() and its workflow
+>> >> >> >
+>> >> >> >Hi Wolfgang,
+>> >> >> >
+>> >> >> >Once again, thank you for the chapter and the two useful resources.
+>> >> >> >For concreteness, are the last two lines OK to use or other solutions
+>> >> >> >exist?
+>> >> >> >
+>> >> >> >Many thanks,
+>> >> >> >Stefanou
+>> >> >> >
+>> >> >> >set.seed(0)
+>> >> >> >dat <- dat.craft2003
+>> >> >> >dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+>> >> >> >
+>> >> >> >tmp <- rcalc(ri ~ var1 + var2| study, ni=ni, data=dat)
+>> >> >> >V <- tmp$V
+>> >> >> >dat$var1.var2 <- tmp$dat$var1.var2
+>> >> >> >
+>> >> >> >dat$var1.var2 <- factor(dat$var1.var2,
+>> >> >> >                        levels=c("acog.perf", "asom.perf",
+>> >> >> >"conf.perf", "acog.asom", "acog.conf", "asom.conf"))
+>> >> >> >
+>> >> >> >res <- rma.mv(ri~ 0+var1.var2+sport+Xwb, V, random = ~ var1.var2 |
+>> >> >> >study, struct="UN", data=dat)
+>> >> >> >
+>> >> >> >R <- vec2mat(coef(res)[1:6]) # Is this OK?
+>> >> >>
+>> >> >> The first 6 coefficients are the estimated pooled correlations when
+>'sport'
+>> >is
+>> >> >I and when Xwb is 0. If this is what you want, then this is ok.
+>> >> >>
+>> >> >> >matreg(1, 2:4, R=R, V=vcov(res)[1:6,1:6]) # Is this OK?
+>> >> >>
+>> >> >> If the above is ok, then this is ok.
+>> >> >>
+>> >> >> Best,
+>> >> >> Wolfgang
+
+From @te|@noureve@z @end|ng |rom gm@||@com  Mon Dec 13 22:15:29 2021
+From: @te|@noureve@z @end|ng |rom gm@||@com (Stefanou Revesz)
+Date: Mon, 13 Dec 2021 15:15:29 -0600
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <0ba03c17d63f4a2898dbe21a9fa13342@UM-MAIL3214.unimaas.nl>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+ <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+ <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogpo=kU4Lpbw3UDOmpEGmje04hhBf_1Xq=smfjV7e9Os_A@mail.gmail.com>
+ <334bfd580bc0466bab94e05960ca679c@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogq0_Gkqqp+KN5zUuVitD3VafUigJkws+vJnLo8g8pcDrQ@mail.gmail.com>
+ <0ba03c17d63f4a2898dbe21a9fa13342@UM-MAIL3214.unimaas.nl>
+Message-ID: <CA+Tgogo4Yuarc-iLTYix010eNWq1kPGks165PWv5WthJtyCosA@mail.gmail.com>
+
+Super helpful! For some reason, the devel version doesn't get
+installed on my machine (must be an R issue; mine's a version 4.0).
+
+At some point, one might say which regression is more useful, the one
+on the means from the fixed effects or the one on the true effects
+from the random effects!
+
+rma.mv(yi ~ 0 + outcome*group, V, random = ~ 0 + outcome*group |
+study, struct = "GEN")
+
+Thank you so very much!
+Stefanou
+
+On Mon, Dec 13, 2021 at 2:59 PM Viechtbauer, Wolfgang (SP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+> Here is an example using G as input to matreg():
+>
+> https://www.metafor-project.org/doku.php/analyses:vanhouwelingen2002#regression_of_true_log_odds
+>
+> (you will need the devel version of metafor for the cvvc="varcov" part).
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >Sent: Monday, 13 December, 2021 21:20
+> >To: Viechtbauer, Wolfgang (SP)
+> >Cc: R meta
+> >Subject: Re: metafor::matreg() and its workflow
+> >
+> >Thank you so much! One clarification question. matreg() is not
+> >effect-size specific, correct? I mean you may have meta-analyzed any
+> >type effect size (SMD, ROM, OR, ...) and then subject the vcov() or G
+> >or H matrices of those meta-analyses to matreg(), correct?
+> >
+> >Thanks again,
+> >Stefanou
+> >
+> >On Mon, Dec 13, 2021 at 12:53 PM Viechtbauer, Wolfgang (SP)
+> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >>
+> >> There is an upcoming talk by Suzanne Jak on MASEM at this seminar series:
+> >>
+> >> https://www.srmasig.org/seminar/
+> >>
+> >> Might be of interest.
+> >>
+> >> Best,
+> >> Wolfgang
+> >>
+> >> >-----Original Message-----
+> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >> >Sent: Thursday, 09 December, 2021 23:23
+> >> >To: Viechtbauer, Wolfgang (SP)
+> >> >Cc: R meta
+> >> >Subject: Re: metafor::matreg() and its workflow
+> >> >
+> >> >Dear Wolfgang,
+> >> >
+> >> >I see, so conditioning (using predict() ) is the way to go even if
+> >> >there is a large set of conditions.
+> >> >
+> >> >Related to the above, if instead of vcov(), one intends to use G and H
+> >> >matrices (latent regression), would that also require conditioning on
+> >> >the levels of fixed effects?
+> >> >
+> >> >The other challenge that I expect to encounter (I'm preparing to do a
+> >> >meta-analysis exploring anxiety and achievement) is that correlations
+> >> >reported in each study may not reflect the same pair of variables
+> >> >across the studies. Thus, this prevents me from having a "var1.var2"
+> >> >like variable in my model which also means I can't proceed to mateg().
+> >> >I believe, in that case, I can do only an exploratory study of
+> >> >correlations (with rma.mv() ) rather than a model based one (with
+> >> >matreg() ).
+> >> >
+> >> >Thank you,
+> >> >Stefanou
+> >> >
+> >> >
+> >> >On Thu, Dec 9, 2021 at 12:24 PM Viechtbauer, Wolfgang (SP)
+> >> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >> >>
+> >> >> I don't know what it is you are really trying to accomplish. One can stick
+> >> >moderators into the rma.mv() model, sure. So one can 'control' for them, or in
+> >> >other words, the estimated correlation matrix will then be a conditional
+> >estimate
+> >> >given a certain set of values for the moderators. That can be further passed
+> >on
+> >> >to matreg(). But I don't know if this is what you want to do, so I cannot say
+> >> >whether this is methodologically reasonable or whether a more reasonable
+> >exists -
+> >> >- to accomplish what? And what exactly is the problem of moderators in the
+> >> >rma.mv() fit?
+> >> >>
+> >> >> Best,
+> >> >> Wolfgang
+> >> >>
+> >> >> >-----Original Message-----
+> >> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >> >> >Sent: Thursday, 09 December, 2021 18:40
+> >> >> >To: Viechtbauer, Wolfgang (SP)
+> >> >> >Cc: R meta
+> >> >> >Subject: Re: metafor::matreg() and its workflow
+> >> >> >
+> >> >> >Thanks Wolfgang,
+> >> >> >
+> >> >> >But is what I have done a methodologically reasonable way to do this,
+> >> >> >or a more reasonable way exists.
+> >> >> >
+> >> >> >It's great that vcov() or random effects var-covariance matrix can be
+> >> >> >obtained from an rma.mv() fit and then used in a secondary SEM
+> >> >> >framework.
+> >> >> >
+> >> >> >But it seems to me that moderators used in rma.mv() get in the way,
+> >> >> >and I often have several of them.
+> >> >> >
+> >> >> >So, is there any literature on this or a strategy to get around the
+> >> >> >problem of moderators in the rma.mv() fit?
+> >> >> >
+> >> >> >Thank you for your guidance,
+> >> >> >Stefanou
+> >> >> >
+> >> >> >On Thu, Dec 9, 2021 at 11:17 AM Viechtbauer, Wolfgang (SP)
+> >> >> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >> >> >>
+> >> >> >> >-----Original Message-----
+> >> >> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >> >> >> >Sent: Tuesday, 07 December, 2021 23:41
+> >> >> >> >To: Viechtbauer, Wolfgang (SP)
+> >> >> >> >Cc: R meta
+> >> >> >> >Subject: Re: metafor::matreg() and its workflow
+> >> >> >> >
+> >> >> >> >Hi Wolfgang,
+> >> >> >> >
+> >> >> >> >Once again, thank you for the chapter and the two useful resources.
+> >> >> >> >For concreteness, are the last two lines OK to use or other solutions
+> >> >> >> >exist?
+> >> >> >> >
+> >> >> >> >Many thanks,
+> >> >> >> >Stefanou
+> >> >> >> >
+> >> >> >> >set.seed(0)
+> >> >> >> >dat <- dat.craft2003
+> >> >> >> >dat$Xwb <- rnorm(nrow(dat),rnorm(nrow(dat),9,4),2)
+> >> >> >> >
+> >> >> >> >tmp <- rcalc(ri ~ var1 + var2| study, ni=ni, data=dat)
+> >> >> >> >V <- tmp$V
+> >> >> >> >dat$var1.var2 <- tmp$dat$var1.var2
+> >> >> >> >
+> >> >> >> >dat$var1.var2 <- factor(dat$var1.var2,
+> >> >> >> >                        levels=c("acog.perf", "asom.perf",
+> >> >> >> >"conf.perf", "acog.asom", "acog.conf", "asom.conf"))
+> >> >> >> >
+> >> >> >> >res <- rma.mv(ri~ 0+var1.var2+sport+Xwb, V, random = ~ var1.var2 |
+> >> >> >> >study, struct="UN", data=dat)
+> >> >> >> >
+> >> >> >> >R <- vec2mat(coef(res)[1:6]) # Is this OK?
+> >> >> >>
+> >> >> >> The first 6 coefficients are the estimated pooled correlations when
+> >'sport'
+> >> >is
+> >> >> >I and when Xwb is 0. If this is what you want, then this is ok.
+> >> >> >>
+> >> >> >> >matreg(1, 2:4, R=R, V=vcov(res)[1:6,1:6]) # Is this OK?
+> >> >> >>
+> >> >> >> If the above is ok, then this is ok.
+> >> >> >>
+> >> >> >> Best,
+> >> >> >> Wolfgang
+
+
+From yykj|y|@u|p|@n @end|ng |rom gm@||@com  Tue Dec 14 08:36:17 2021
+From: yykj|y|@u|p|@n @end|ng |rom gm@||@com (Yingkai)
+Date: Tue, 14 Dec 2021 15:36:17 +0800
+Subject: [R-meta] 
+ Effect Sizes From Pretest-Posttest-Control Group Designs
+ and effect sizes from Pretest-Posttest designs
+In-Reply-To: <CAN4zT8EjHk_2SygcZXi73zA8jeLXhXkzv9rMz-VY=V30v6uDug@mail.gmail.com>
+References: <CAN4zT8F4R2OkYpAQ6K3m1+OZLK3jHo0VtB4O7vFeGQsz=hO_cw@mail.gmail.com>
+ <03244eaf88b04c75a7a4392096618edc@UM-MAIL3214.unimaas.nl>
+ <CAN4zT8EjHk_2SygcZXi73zA8jeLXhXkzv9rMz-VY=V30v6uDug@mail.gmail.com>
+Message-ID: <CAN4zT8ERaSKxSTf_cqTbCKQHTKUhtc_K6R1xFBQMWuk7WerQGA@mail.gmail.com>
+
+Dear Dr. Wolfgang and all,
+
+
+After reading Morris and DeShon, 2002, I have some new questions.
+
+
+
+Morris provided an example of a meta-analysis based on raw-score and
+change-score effect sizes (Table 3), however, this is an example of
+independent-groups posttest design and single-group pretest?posttest
+design. What about independent-groups pretest?posttest design? Can we
+transform the effect size of independent-groups pretest?posttest design to
+effect size of independent-groups posttest design or to effect size of
+single-group pretest?posttest design? If we can, should we use equation 11
+or 12 in Morris et al., 2002? The effect size of Independent-groups
+pretest?posttest design is d (IG) or d (RM)?
+
+
+
+Sorry for the interruption, just feel very confused about this.
+
+Yingkai <yykjiyisuipian at gmail.com> ?2021?12?13??? 22:37???
+
+> Thanks a lot!
+>
+> Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl>?2021?12?13?
+> ????10:36???
+>
+>> Dear Yingkai,
+>>
+>> I don't think there is a single answer here. Of course one can do this --
+>> whether one should in any particular case depends on the circumstances. And
+>> not sure why combining effect sizes from pretest-posttest-control group
+>> designs and effect sizes from between-group designs is out of the question.
+>> In any case, a canonical reference here is:
+>>
+>> Morris, S. B., & DeShon, R. P. (2002). Combining effect size estimates in
+>> meta-analysis with repeated measures and independent-groups designs.
+>> Psychological Methods, 7(1), 105-125.
+>> https://doi.org/10.1037/1082-989x.7.1.105
+>>
+>> Best,
+>> Wolfgang
+>>
+>> >-----Original Message-----
+>> >From: Yingkai [mailto:yykjiyisuipian at gmail.com]
+>> >Sent: Monday, 13 December, 2021 15:08
+>> >To: r-sig-meta-analysis at r-project.org
+>> >Cc: Viechtbauer, Wolfgang (SP)
+>> >Subject: Effect Sizes From Pretest-Posttest-Control Group Designs and
+>> effect
+>> >sizes from Pretest-Posttest designs
+>> >
+>> >Hi Dr. Wolfgang and all,
+>> >    I am wondering whether one can combine effect sizes from
+>> pretest-posttest-
+>> >control Group designs and effect sizes from pretest-posttest designs(no
+>> control
+>> >group) in a meta-analysis?
+>> >I know that one should not combine effect sizes from
+>> pretest-posttest-control
+>> >Group designs and effect sizes from between-group designs in a
+>> meta-analysis.
+>> >
+>> >Best,
+>> >--
+>> >Yingkai, Associate Professor.
+>> >Southwest University, ChongQing, CHINA.
+>>
+> --
+> Yingkai, Associate Professor.
+> Southwest University, ChongQing, CHINA.
+>
+> *If you receive this email outside your office hours, please do not feel
+> obligated to respond immediately.*
+>
+>
+>
+
+-- 
+Yingkai, Associate Professor.
+Southwest University, ChongQing, CHINA.
+
+*If you receive this email outside your office hours, please do not feel
+obligated to respond immediately.*
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Dec 16 16:37:12 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 16 Dec 2021 15:37:12 +0000
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <CA+Tgogo4Yuarc-iLTYix010eNWq1kPGks165PWv5WthJtyCosA@mail.gmail.com>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+ <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+ <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogpo=kU4Lpbw3UDOmpEGmje04hhBf_1Xq=smfjV7e9Os_A@mail.gmail.com>
+ <334bfd580bc0466bab94e05960ca679c@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogq0_Gkqqp+KN5zUuVitD3VafUigJkws+vJnLo8g8pcDrQ@mail.gmail.com>
+ <0ba03c17d63f4a2898dbe21a9fa13342@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogo4Yuarc-iLTYix010eNWq1kPGks165PWv5WthJtyCosA@mail.gmail.com>
+Message-ID: <b05f812bc4b74cb6870d6f62495ad0fa@UM-MAIL3214.unimaas.nl>
+
+Hi Stefanou,
+
+They address very different questions, so I would say neither is more useful than the other.
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>Sent: Monday, 13 December, 2021 22:15
+>To: Viechtbauer, Wolfgang (SP)
+>Cc: R meta
+>Subject: Re: metafor::matreg() and its workflow
+>
+>Super helpful! For some reason, the devel version doesn't get
+>installed on my machine (must be an R issue; mine's a version 4.0).
+>
+>At some point, one might say which regression is more useful, the one
+>on the means from the fixed effects or the one on the true effects
+>from the random effects!
+>
+>rma.mv(yi ~ 0 + outcome*group, V, random = ~ 0 + outcome*group |
+>study, struct = "GEN")
+>
+>Thank you so very much!
+>Stefanou
+>
+>On Mon, Dec 13, 2021 at 2:59 PM Viechtbauer, Wolfgang (SP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>>
+>> Here is an example using G as input to matreg():
+>>
+>> https://www.metafor-
+>project.org/doku.php/analyses:vanhouwelingen2002#regression_of_true_log_odds
+>>
+>> (you will need the devel version of metafor for the cvvc="varcov" part).
+>>
+>> Best,
+>> Wolfgang
+>>
+>> >-----Original Message-----
+>> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >Sent: Monday, 13 December, 2021 21:20
+>> >To: Viechtbauer, Wolfgang (SP)
+>> >Cc: R meta
+>> >Subject: Re: metafor::matreg() and its workflow
+>> >
+>> >Thank you so much! One clarification question. matreg() is not
+>> >effect-size specific, correct? I mean you may have meta-analyzed any
+>> >type effect size (SMD, ROM, OR, ...) and then subject the vcov() or G
+>> >or H matrices of those meta-analyses to matreg(), correct?
+>> >
+>> >Thanks again,
+>> >Stefanou
+>> >
+>> >On Mon, Dec 13, 2021 at 12:53 PM Viechtbauer, Wolfgang (SP)
+>> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>> >>
+>> >> There is an upcoming talk by Suzanne Jak on MASEM at this seminar series:
+>> >>
+>> >> https://www.srmasig.org/seminar/
+>> >>
+>> >> Might be of interest.
+>> >>
+>> >> Best,
+>> >> Wolfgang
+>> >>
+>> >> >-----Original Message-----
+>> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >> >Sent: Thursday, 09 December, 2021 23:23
+>> >> >To: Viechtbauer, Wolfgang (SP)
+>> >> >Cc: R meta
+>> >> >Subject: Re: metafor::matreg() and its workflow
+>> >> >
+>> >> >Dear Wolfgang,
+>> >> >
+>> >> >I see, so conditioning (using predict() ) is the way to go even if
+>> >> >there is a large set of conditions.
+>> >> >
+>> >> >Related to the above, if instead of vcov(), one intends to use G and H
+>> >> >matrices (latent regression), would that also require conditioning on
+>> >> >the levels of fixed effects?
+>> >> >
+>> >> >The other challenge that I expect to encounter (I'm preparing to do a
+>> >> >meta-analysis exploring anxiety and achievement) is that correlations
+>> >> >reported in each study may not reflect the same pair of variables
+>> >> >across the studies. Thus, this prevents me from having a "var1.var2"
+>> >> >like variable in my model which also means I can't proceed to mateg().
+>> >> >I believe, in that case, I can do only an exploratory study of
+>> >> >correlations (with rma.mv() ) rather than a model based one (with
+>> >> >matreg() ).
+>> >> >
+>> >> >Thank you,
+>> >> >Stefanou
+
+From @te|@noureve@z @end|ng |rom gm@||@com  Thu Dec 16 17:37:10 2021
+From: @te|@noureve@z @end|ng |rom gm@||@com (Stefanou Revesz)
+Date: Thu, 16 Dec 2021 10:37:10 -0600
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <b05f812bc4b74cb6870d6f62495ad0fa@UM-MAIL3214.unimaas.nl>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+ <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+ <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogpo=kU4Lpbw3UDOmpEGmje04hhBf_1Xq=smfjV7e9Os_A@mail.gmail.com>
+ <334bfd580bc0466bab94e05960ca679c@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogq0_Gkqqp+KN5zUuVitD3VafUigJkws+vJnLo8g8pcDrQ@mail.gmail.com>
+ <0ba03c17d63f4a2898dbe21a9fa13342@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogo4Yuarc-iLTYix010eNWq1kPGks165PWv5WthJtyCosA@mail.gmail.com>
+ <b05f812bc4b74cb6870d6f62495ad0fa@UM-MAIL3214.unimaas.nl>
+Message-ID: <CA+TgogqTPHFW1Js4FEbUrXZSuyhvrjTN5bgwvVXjfEiHq39G=w@mail.gmail.com>
+
+Thanks Wolfgang! My understanding is that:
+
+1- res$G would tell us how slopes (for continuous moderators) or
+categories (assuming having used 0 + cat_mod in the random part) vary
+and covary with one another. As a further step, we can turn such a
+var-covar matrix and obtain regression weights out of it by taking one
+of them as the dependent variable and one or more of them as the
+independent variable(s). That is, this is equivalent to SEM analysis
+(i.e., regression with the latent factors).
+
+2- vcov(res) tells us how the means of latent factors vary and covary
+with one another. As a further step, we can turn such a var-covar
+matrix and obtain regression weights out of it by taking one of them
+as the dependent variable and one or more of them as the independent
+variable(s). That is, this is equivalent to a path analysis (i.e.,
+regression with mean of latent factors).
+
+Is this why you noted "They address very different questions"?
+
+Many thanks,
+Stefanou
+
+On Thu, Dec 16, 2021 at 9:37 AM Viechtbauer, Wolfgang (SP)
+<wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>
+> Hi Stefanou,
+>
+> They address very different questions, so I would say neither is more useful than the other.
+>
+> Best,
+> Wolfgang
+>
+> >-----Original Message-----
+> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >Sent: Monday, 13 December, 2021 22:15
+> >To: Viechtbauer, Wolfgang (SP)
+> >Cc: R meta
+> >Subject: Re: metafor::matreg() and its workflow
+> >
+> >Super helpful! For some reason, the devel version doesn't get
+> >installed on my machine (must be an R issue; mine's a version 4.0).
+> >
+> >At some point, one might say which regression is more useful, the one
+> >on the means from the fixed effects or the one on the true effects
+> >from the random effects!
+> >
+> >rma.mv(yi ~ 0 + outcome*group, V, random = ~ 0 + outcome*group |
+> >study, struct = "GEN")
+> >
+> >Thank you so very much!
+> >Stefanou
+> >
+> >On Mon, Dec 13, 2021 at 2:59 PM Viechtbauer, Wolfgang (SP)
+> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >>
+> >> Here is an example using G as input to matreg():
+> >>
+> >> https://www.metafor-
+> >project.org/doku.php/analyses:vanhouwelingen2002#regression_of_true_log_odds
+> >>
+> >> (you will need the devel version of metafor for the cvvc="varcov" part).
+> >>
+> >> Best,
+> >> Wolfgang
+> >>
+> >> >-----Original Message-----
+> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >> >Sent: Monday, 13 December, 2021 21:20
+> >> >To: Viechtbauer, Wolfgang (SP)
+> >> >Cc: R meta
+> >> >Subject: Re: metafor::matreg() and its workflow
+> >> >
+> >> >Thank you so much! One clarification question. matreg() is not
+> >> >effect-size specific, correct? I mean you may have meta-analyzed any
+> >> >type effect size (SMD, ROM, OR, ...) and then subject the vcov() or G
+> >> >or H matrices of those meta-analyses to matreg(), correct?
+> >> >
+> >> >Thanks again,
+> >> >Stefanou
+> >> >
+> >> >On Mon, Dec 13, 2021 at 12:53 PM Viechtbauer, Wolfgang (SP)
+> >> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> >> >>
+> >> >> There is an upcoming talk by Suzanne Jak on MASEM at this seminar series:
+> >> >>
+> >> >> https://www.srmasig.org/seminar/
+> >> >>
+> >> >> Might be of interest.
+> >> >>
+> >> >> Best,
+> >> >> Wolfgang
+> >> >>
+> >> >> >-----Original Message-----
+> >> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+> >> >> >Sent: Thursday, 09 December, 2021 23:23
+> >> >> >To: Viechtbauer, Wolfgang (SP)
+> >> >> >Cc: R meta
+> >> >> >Subject: Re: metafor::matreg() and its workflow
+> >> >> >
+> >> >> >Dear Wolfgang,
+> >> >> >
+> >> >> >I see, so conditioning (using predict() ) is the way to go even if
+> >> >> >there is a large set of conditions.
+> >> >> >
+> >> >> >Related to the above, if instead of vcov(), one intends to use G and H
+> >> >> >matrices (latent regression), would that also require conditioning on
+> >> >> >the levels of fixed effects?
+> >> >> >
+> >> >> >The other challenge that I expect to encounter (I'm preparing to do a
+> >> >> >meta-analysis exploring anxiety and achievement) is that correlations
+> >> >> >reported in each study may not reflect the same pair of variables
+> >> >> >across the studies. Thus, this prevents me from having a "var1.var2"
+> >> >> >like variable in my model which also means I can't proceed to mateg().
+> >> >> >I believe, in that case, I can do only an exploratory study of
+> >> >> >correlations (with rma.mv() ) rather than a model based one (with
+> >> >> >matreg() ).
+> >> >> >
+> >> >> >Thank you,
+> >> >> >Stefanou
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Dec 16 17:52:54 2021
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (SP))
+Date: Thu, 16 Dec 2021 16:52:54 +0000
+Subject: [R-meta] metafor::matreg() and its workflow
+In-Reply-To: <CA+TgogqTPHFW1Js4FEbUrXZSuyhvrjTN5bgwvVXjfEiHq39G=w@mail.gmail.com>
+References: <CA+TgogoM-pE-GHhD-9VK92E2ao8T9h7jRM3xSCmEAiFQ87UTMA@mail.gmail.com>
+ <0cebcc6780304db4adc6e4e0672220f5@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqmQXHWPvsxT3SVcX7C0gozKhf2PeX311WJnGVY_eWgNw@mail.gmail.com>
+ <CA+TgogqTp2oOrMvFCFH+_NR698h1RcHDiamQcY3SrrR3AOnyLA@mail.gmail.com>
+ <c5c4e7e5b42e4bfaa55a2a3cb3b8d9ce@UM-MAIL3214.unimaas.nl>
+ <CA+TgogpgmZqbesH5yu78zRseBuv750sEK3gcU94TYJ1rSsrSVw@mail.gmail.com>
+ <09a22ca79da642e8835fed81f5794e83@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogpo=kU4Lpbw3UDOmpEGmje04hhBf_1Xq=smfjV7e9Os_A@mail.gmail.com>
+ <334bfd580bc0466bab94e05960ca679c@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogq0_Gkqqp+KN5zUuVitD3VafUigJkws+vJnLo8g8pcDrQ@mail.gmail.com>
+ <0ba03c17d63f4a2898dbe21a9fa13342@UM-MAIL3214.unimaas.nl>
+ <CA+Tgogo4Yuarc-iLTYix010eNWq1kPGks165PWv5WthJtyCosA@mail.gmail.com>
+ <b05f812bc4b74cb6870d6f62495ad0fa@UM-MAIL3214.unimaas.nl>
+ <CA+TgogqTPHFW1Js4FEbUrXZSuyhvrjTN5bgwvVXjfEiHq39G=w@mail.gmail.com>
+Message-ID: <6a6bc50dd59e4110b3ca315d6b8f7ad3@UM-MAIL3214.unimaas.nl>
+
+The main input to matreg() is a correlation or covariance matrix via argument 'R'. Where did you see an example where vcov() is used as input to the 'R' argument?
+
+The input to 'R' might come from a meta-analysis of correlation coefficients. This is the idea behind MASEM.
+
+The input to 'R' might also come from the correlations (or covariances) among a set of random effects. This is discussed in van Houwelingen et al. (2002).
+
+Best,
+Wolfgang
+
+>-----Original Message-----
+>From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>Sent: Thursday, 16 December, 2021 17:37
+>To: Viechtbauer, Wolfgang (SP)
+>Cc: R meta
+>Subject: Re: metafor::matreg() and its workflow
+>
+>Thanks Wolfgang! My understanding is that:
+>
+>1- res$G would tell us how slopes (for continuous moderators) or
+>categories (assuming having used 0 + cat_mod in the random part) vary
+>and covary with one another. As a further step, we can turn such a
+>var-covar matrix and obtain regression weights out of it by taking one
+>of them as the dependent variable and one or more of them as the
+>independent variable(s). That is, this is equivalent to SEM analysis
+>(i.e., regression with the latent factors).
+>
+>2- vcov(res) tells us how the means of latent factors vary and covary
+>with one another. As a further step, we can turn such a var-covar
+>matrix and obtain regression weights out of it by taking one of them
+>as the dependent variable and one or more of them as the independent
+>variable(s). That is, this is equivalent to a path analysis (i.e.,
+>regression with mean of latent factors).
+>
+>Is this why you noted "They address very different questions"?
+>
+>Many thanks,
+>Stefanou
+>
+>On Thu, Dec 16, 2021 at 9:37 AM Viechtbauer, Wolfgang (SP)
+><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>>
+>> Hi Stefanou,
+>>
+>> They address very different questions, so I would say neither is more useful
+>than the other.
+>>
+>> Best,
+>> Wolfgang
+>>
+>> >-----Original Message-----
+>> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >Sent: Monday, 13 December, 2021 22:15
+>> >To: Viechtbauer, Wolfgang (SP)
+>> >Cc: R meta
+>> >Subject: Re: metafor::matreg() and its workflow
+>> >
+>> >Super helpful! For some reason, the devel version doesn't get
+>> >installed on my machine (must be an R issue; mine's a version 4.0).
+>> >
+>> >At some point, one might say which regression is more useful, the one
+>> >on the means from the fixed effects or the one on the true effects
+>> >from the random effects!
+>> >
+>> >rma.mv(yi ~ 0 + outcome*group, V, random = ~ 0 + outcome*group |
+>> >study, struct = "GEN")
+>> >
+>> >Thank you so very much!
+>> >Stefanou
+>> >
+>> >On Mon, Dec 13, 2021 at 2:59 PM Viechtbauer, Wolfgang (SP)
+>> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>> >>
+>> >> Here is an example using G as input to matreg():
+>> >>
+>> >> https://www.metafor-
+>> >project.org/doku.php/analyses:vanhouwelingen2002#regression_of_true_log_odds
+>> >>
+>> >> (you will need the devel version of metafor for the cvvc="varcov" part).
+>> >>
+>> >> Best,
+>> >> Wolfgang
+>> >>
+>> >> >-----Original Message-----
+>> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >> >Sent: Monday, 13 December, 2021 21:20
+>> >> >To: Viechtbauer, Wolfgang (SP)
+>> >> >Cc: R meta
+>> >> >Subject: Re: metafor::matreg() and its workflow
+>> >> >
+>> >> >Thank you so much! One clarification question. matreg() is not
+>> >> >effect-size specific, correct? I mean you may have meta-analyzed any
+>> >> >type effect size (SMD, ROM, OR, ...) and then subject the vcov() or G
+>> >> >or H matrices of those meta-analyses to matreg(), correct?
+>> >> >
+>> >> >Thanks again,
+>> >> >Stefanou
+>> >> >
+>> >> >On Mon, Dec 13, 2021 at 12:53 PM Viechtbauer, Wolfgang (SP)
+>> >> ><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+>> >> >>
+>> >> >> There is an upcoming talk by Suzanne Jak on MASEM at this seminar series:
+>> >> >>
+>> >> >> https://www.srmasig.org/seminar/
+>> >> >>
+>> >> >> Might be of interest.
+>> >> >>
+>> >> >> Best,
+>> >> >> Wolfgang
+>> >> >>
+>> >> >> >-----Original Message-----
+>> >> >> >From: Stefanou Revesz [mailto:stefanourevesz at gmail.com]
+>> >> >> >Sent: Thursday, 09 December, 2021 23:23
+>> >> >> >To: Viechtbauer, Wolfgang (SP)
+>> >> >> >Cc: R meta
+>> >> >> >Subject: Re: metafor::matreg() and its workflow
+>> >> >> >
+>> >> >> >Dear Wolfgang,
+>> >> >> >
+>> >> >> >I see, so conditioning (using predict() ) is the way to go even if
+>> >> >> >there is a large set of conditions.
+>> >> >> >
+>> >> >> >Related to the above, if instead of vcov(), one intends to use G and H
+>> >> >> >matrices (latent regression), would that also require conditioning on
+>> >> >> >the levels of fixed effects?
+>> >> >> >
+>> >> >> >The other challenge that I expect to encounter (I'm preparing to do a
+>> >> >> >meta-analysis exploring anxiety and achievement) is that correlations
+>> >> >> >reported in each study may not reflect the same pair of variables
+>> >> >> >across the studies. Thus, this prevents me from having a "var1.var2"
+>> >> >> >like variable in my model which also means I can't proceed to mateg().
+>> >> >> >I believe, in that case, I can do only an exploratory study of
+>> >> >> >correlations (with rma.mv() ) rather than a model based one (with
+>> >> >> >matreg() ).
+>> >> >> >
+>> >> >> >Thank you,
+>> >> >> >Stefanou
+
+From |@keyh@n|h@ @end|ng |rom gm@||@com  Fri Dec 17 03:50:25 2021
+From: |@keyh@n|h@ @end|ng |rom gm@||@com (Farzad Keyhan)
+Date: Thu, 16 Dec 2021 20:50:25 -0600
+Subject: [R-meta] Moderators: Center then separate or vice versa
+Message-ID: <CAEvy2r0MjdHPcj2LwSpgF9_=TKGLk8XcW=r_eQ27__R59CqWCw@mail.gmail.com>
+
+Hello All,
+
+(1) I want to center my continuous *time* moderator (*time* -->
+*time_c*) so as to make my intercept meaningful.
+
+(2) Because *time* varies both within and between studies, I want to
+separate the within (*time_within*) and between part of time
+(*time_between*).
+
+I was wondering if I could do both these steps together? If yes,
+should I first do (1) and then do (2) or vice versa?
+
+Have a blessed weekend,
+Fred
+
+
+From |@keyh@n|h@ @end|ng |rom gm@||@com  Sun Dec 19 07:56:38 2021
+From: |@keyh@n|h@ @end|ng |rom gm@||@com (Farzad Keyhan)
+Date: Sun, 19 Dec 2021 00:56:38 -0600
+Subject: [R-meta] Moderators: controlling for within and between effects
+In-Reply-To: <CAEvy2r0MjdHPcj2LwSpgF9_=TKGLk8XcW=r_eQ27__R59CqWCw@mail.gmail.com>
+References: <CAEvy2r0MjdHPcj2LwSpgF9_=TKGLk8XcW=r_eQ27__R59CqWCw@mail.gmail.com>
+Message-ID: <CAEvy2r3+u9p+nqowjW8NFbSqm9nifVzjbwK9=3JoYzxOj9b0-Q@mail.gmail.com>
+
+Dear All,
+
+I'm doing a meta on the factors influencing the effect of professional
+development (pd).
+
+Each effect estimate in each study may come from: (A) questionnaires
+with different number of items [`items`], (B) different amount of pd
+training in hours [`training_hr`], and (C) different amounts of time
+elapsed up to the point each effect was measured at in weeks
+[`time_wk`].
+
+For each focal, study-level, categorical moderator (e.g., format of
+the pd [`pd_format`]), I want to control for A, B, and C across
+studies.
+
+Because A, B, and C can vary both within and between studies, I wonder
+whether I should control for both their within and between
+contributions (fit1) or not (fit2)?
+
+fit1 <- rma.mv(yi ~ 0 + pd_format + time_wk_whn + time_wk_btw +
+items_whn + items_btw + training_hr_whn + training_hr_btw, random =
+~1|study/obs)
+
+fit2 <- rma.mv(yi ~ 0 + pd_format + time_wk + items + training_hr,
+random = ~1|study/obs)
+
+Thank you,
+Fred
+
+
+From th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com  Tue Dec 21 12:29:26 2021
+From: th@r@k@@@pr|y@d@r@h@n@ @end|ng |rom gm@||@com (Tharaka S. Priyadarshana)
+Date: Tue, 21 Dec 2021 19:29:26 +0800
+Subject: [R-meta] Effect size calculation
+Message-ID: <CADWK9ccyhvHF_EpOYuY=ffyzH4aDo-x_n25Xetrjj2OYMrvRew@mail.gmail.com>
+
+Dear all,
+
+I recently came across this paper (kindly see the attached pdf), and I am a
+bit confused about how these authors have measured the effect size for the
+MA. They have measured Pearson?s correlation coefficient in two different
+ways (see section 2.3, page 3).
+
+(i). Hedges? g has been transformed to a Pearson?s correlation coefficient.
+(ii). Or, Pearson?s r has been calculated from F, t, or ?2 data.
+
+Is this a correct way of measuring the effect size? if yes, how this can be
+done??
+Then, can we really pool the effect sizes calculated from these two
+methods for the final analysis???
+
+Thank you,
+Tharaka
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20211221/10d150d7/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: 1-s2.0-S0167880921005260-main.pdf
+Type: application/pdf
+Size: 1143948 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20211221/10d150d7/attachment-0001.pdf>
+
+From jepu@to @end|ng |rom gm@||@com  Thu Dec 23 00:12:29 2021
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 22 Dec 2021 17:12:29 -0600
+Subject: [R-meta] Effect size calculation
+In-Reply-To: <CADWK9ccyhvHF_EpOYuY=ffyzH4aDo-x_n25Xetrjj2OYMrvRew@mail.gmail.com>
+References: <CADWK9ccyhvHF_EpOYuY=ffyzH4aDo-x_n25Xetrjj2OYMrvRew@mail.gmail.com>
+Message-ID: <CAFUVuJy5Y+1S2qhnjzqHXGqV1RAXYtby4Rn5PQuG3Dh5tZ5+TQ@mail.gmail.com>
+
+Hi Tharaka,
+
+There are formulas in the literature for converting between a
+standardized mean difference (of which Hedges' g is an estimate) and
+the Pearson correlation, as well as from other test statistics (F, t,
+X^2); See Jacobs & Viechtbauer (2017) and Pustejovsky (2014). However,
+the formulas are only valid under specific distributional assumptions
+about the variables involved (e.g., that a continuous predictor has
+been artificially dichotomized, and that interest is in the
+correlation between the continuous predictor) and the outcome. For the
+study you attached, it's not at all clear why the authors would use
+the Pearson correlation coefficient as the effect size measure. If I
+understand correctly, they are interested in the effects of
+contrasting treatment conditions (AES vs. control) so the assumptions
+for converting from SMD to r would not really make sense here.
+
+James
+
+Jacobs, P., & Viechtbauer, W. (2017). Estimation of the biserial
+correlation and its sampling variance for use in meta?analysis.
+Research synthesis methods, 8(2), 161-180.
+Pustejovsky, J. E. (2014). Converting from d to r to z when the design
+uses extreme groups, dichotomization, or experimental control.
+Psychological methods, 19(1), 92.
+
+On Tue, Dec 21, 2021 at 5:32 AM Tharaka S. Priyadarshana
+<tharakas.priyadarshana at gmail.com> wrote:
+>
+> Dear all,
+>
+> I recently came across this paper (kindly see the attached pdf), and I am a bit confused about how these authors have measured the effect size for the MA. They have measured Pearson?s correlation coefficient in two different ways (see section 2.3, page 3).
+>
+> (i). Hedges? g has been transformed to a Pearson?s correlation coefficient.
+> (ii). Or, Pearson?s r has been calculated from F, t, or ?2 data.
+>
+> Is this a correct way of measuring the effect size? if yes, how this can be done??
+> Then, can we really pool the effect sizes calculated from these two methods for the final analysis???
+>
+> Thank you,
+> Tharaka
+>
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list
+> R-sig-meta-analysis at r-project.org
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From |@w|@wt @end|ng |rom gm@||@com  Sat Dec 25 16:55:28 2021
+From: |@w|@wt @end|ng |rom gm@||@com (Timothy MacKenzie)
+Date: Sat, 25 Dec 2021 09:55:28 -0600
+Subject: [R-meta] Output of clubSandwich::Wald_test(...,tidy=TRUE)
+Message-ID: <CADreqiwBtaX7pCz8QuAOojGZQO7e+LgmYyCGfC8gNfOtSd+aMA@mail.gmail.com>
+
+Dear Colleagues,
+
+I'm new to clubSandwich's Wald_test(). I have three questions about
+the output (none of which are documented).
+
+First, when I convert the output to `as.data.frame()`, a new column
+called `delta` consisting of 1s shows in the output, what is that?
+
+Second, is there a reason the estimates (say for hypothesis A - B)
+don't show in the output (other packages always do that)?
+
+Third, is there a way to add the CIs for the estimates (say for
+hypothesis A - B) to the output (other packages always do that)?
+
+Thank you for your help,
+Tim M
+
+
+From cm|o500 @end|ng |rom york@@c@uk  Mon Dec 27 20:11:44 2021
+From: cm|o500 @end|ng |rom york@@c@uk (=?UTF-8?Q?C=C3=A1tia_Ferreira_De_Oliveira?=)
+Date: Mon, 27 Dec 2021 19:11:44 +0000
+Subject: [R-meta] multilevel models and bias assessment
+Message-ID: <CACw+TfcHfXHPEgNrf7SZPVtqgJvSQS5XYnOD6Uo8BpHpkR-wgA@mail.gmail.com>
+
+Dear all,
+
+I hope you are well.
+Given that we should not conduct Egger's regression on effect sizes with
+dependency, would it be more adequate to aggregate all effect sizes coming
+from the same study or is it OK to just combine effect sizes when they come
+from the same participants? I know the latter ignores the nested nature of
+the data, so I just wanted to check whether it is adequate to do so just
+for bias assessment.
+
+Best wishes,
+
+Catia
+
+-- 
+C?tia Margarida Ferreira de Oliveira
+Psychology PhD Student
+Department of Psychology, Room A105
+University of York, YO10 5DD
+Twitter: @CatiaMOliveira
+pronouns: she, her
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Thu Dec 30 23:36:05 2021
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Thu, 30 Dec 2021 16:36:05 -0600
+Subject: [R-meta] Effect size calculation
+In-Reply-To: <CADWK9ccsFqx_TNWTuWAL=hFYaW+5zhN-VPGGSOjUsem929bL1w@mail.gmail.com>
+References: <CADWK9ccyhvHF_EpOYuY=ffyzH4aDo-x_n25Xetrjj2OYMrvRew@mail.gmail.com>
+ <CAFUVuJy5Y+1S2qhnjzqHXGqV1RAXYtby4Rn5PQuG3Dh5tZ5+TQ@mail.gmail.com>
+ <CADWK9ccsFqx_TNWTuWAL=hFYaW+5zhN-VPGGSOjUsem929bL1w@mail.gmail.com>
+Message-ID: <CAFUVuJy1zrCf2bYEi3WqHYAWgxjAZ_twd_JtutGtTVZ_fkenYQ@mail.gmail.com>
+
+Hi Tharaka,
+
+Please keep the listserv cc'd. Responses below.
+
+James
+
+On Thu, Dec 23, 2021 at 5:40 AM Tharaka S. Priyadarshana
+<tharakas.priyadarshana at gmail.com> wrote:
+>
+> Dear Prof. James,
+>
+> Thank you so much for your response, it is really helpful.
+>
+> May I ask you two more questions related to this, please?
+> In my meta-analysis, I measured Pearson?s correlation coefficient between species richness (X) and landscape heterogeneity (Y).
+> I measured this for 59 studies directly from the raw data.
+> I also have a few more studies (9) that I could not get the raw data, but those papers have presented the standardized regression coefficients from multiple regression models. (1) In this case, can I use those standardized regression coefficients as an estimate for Pearson?s correlation coefficient between X and Y?
+> If yes, could you please let me know a reference that I can cite, please?
+>
+
+Generally, standardized regression coefficients are not equivalent to
+bi-variate Pearson correlations. The degree of discrepancy depends on
+which predictor variables are included in the regression model and how
+much variation in the outcome is explained by those predictors. If the
+regressions include strong predictors, then the standardized
+regression coefficient can be quite different from the Pearson
+correlation.
+
+If you have access to raw data from many studies, could you estimate
+regressions using equivalent (or at least similar) predictors to those
+used in these nine studies? That might help to get a sense of how big
+a difference there is between the standardized regression coefficient
+and the Pearson correlation.
+
+> (2) Then, I also have a few more studies (6) that I was able to measure "(semi-)partial correlation coefficient" as described here by Prof. Wolfgang, https://wviechtb.github.io/metadat/reference/dat.aloe2013.html
+> In this case, can I use those "(semi-)partial correlation coefficients" as an estimate for Pearson?s correlation coefficient between X and Y?
+>
+
+The answer is more or less the same as for standardized regression
+coefficients. The difference between the semi-partial correlation and
+the bivariate correlation depends on the other predictors that are
+partialed out. This also holds for semi-partial correlations based on
+different sets of predictors--the semi-partial between X and Y
+controlling for Z1 is not equivalent to the semi-partial between X and
+Y controlling for Z1 and Z2 (or for Z1, Z2, and Z3). To handle this, I
+think Aloe and Becker have recommended coding which sets of predictors
+are partialed out of each semi-partial r and using these codes as
+moderators in the meta-analysis. Perhaps you could do something
+similar in your synthesis?
+
+> Thank you once again for your kind help.
+>
+> With best wishes,
+> Tharaka
+>
+>
+>
+>
+>
+>
+> On Thu, Dec 23, 2021 at 7:12 AM James Pustejovsky <jepusto at gmail.com> wrote:
+>>
+>> Hi Tharaka,
+>>
+>> There are formulas in the literature for converting between a
+>> standardized mean difference (of which Hedges' g is an estimate) and
+>> the Pearson correlation, as well as from other test statistics (F, t,
+>> X^2); See Jacobs & Viechtbauer (2017) and Pustejovsky (2014). However,
+>> the formulas are only valid under specific distributional assumptions
+>> about the variables involved (e.g., that a continuous predictor has
+>> been artificially dichotomized, and that interest is in the
+>> correlation between the continuous predictor) and the outcome. For the
+>> study you attached, it's not at all clear why the authors would use
+>> the Pearson correlation coefficient as the effect size measure. If I
+>> understand correctly, they are interested in the effects of
+>> contrasting treatment conditions (AES vs. control) so the assumptions
+>> for converting from SMD to r would not really make sense here.
+>>
+>> James
+>>
+>> Jacobs, P., & Viechtbauer, W. (2017). Estimation of the biserial
+>> correlation and its sampling variance for use in meta?analysis.
+>> Research synthesis methods, 8(2), 161-180.
+>> Pustejovsky, J. E. (2014). Converting from d to r to z when the design
+>> uses extreme groups, dichotomization, or experimental control.
+>> Psychological methods, 19(1), 92.
+>>
+>> On Tue, Dec 21, 2021 at 5:32 AM Tharaka S. Priyadarshana
+>> <tharakas.priyadarshana at gmail.com> wrote:
+>> >
+>> > Dear all,
+>> >
+>> > I recently came across this paper (kindly see the attached pdf), and I am a bit confused about how these authors have measured the effect size for the MA. They have measured Pearson?s correlation coefficient in two different ways (see section 2.3, page 3).
+>> >
+>> > (i). Hedges? g has been transformed to a Pearson?s correlation coefficient.
+>> > (ii). Or, Pearson?s r has been calculated from F, t, or ?2 data.
+>> >
+>> > Is this a correct way of measuring the effect size? if yes, how this can be done??
+>> > Then, can we really pool the effect sizes calculated from these two methods for the final analysis???
+>> >
+>> > Thank you,
+>> > Tharaka
+>> >
+>> >
+>> > _______________________________________________
+>> > R-sig-meta-analysis mailing list
+>> > R-sig-meta-analysis at r-project.org
+>> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+
+
+From |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de  Fri Dec 31 14:10:56 2021
+From: |uk@@z@@t@@|e|ow|cz @end|ng |rom un|-o@n@brueck@de (Lukasz Stasielowicz)
+Date: Fri, 31 Dec 2021 14:10:56 +0100
+Subject: [R-meta] multilevel models and bias assessment
+In-Reply-To: <mailman.3705.7.1640689201.62258.r-sig-meta-analysis@r-project.org>
+References: <mailman.3705.7.1640689201.62258.r-sig-meta-analysis@r-project.org>
+Message-ID: <d5eda3ae-c112-6793-1854-716322930437@uni-osnabrueck.de>
+
+Dear Catia,
+
+one could conduct a modified Egger's regression test by accounting for 
+the dependency (e.g. StudyID/EffectID and respective variance-covariance 
+matrix) and using a precision estimate as moderator variable, e.g.
+
+
+model <- rma.mv(Effects, Vmatrix, mods = ~ Precision,random = ~ 1 | 
+StudyID/EffectID, data = data)
+
+
+Please note that the choice of the precision estimate depends on the 
+effect size (e.g., r, d): "A complication with Egger?s regression is 
+that for certain effect size metrics, the standard error is naturally
+correlated with the effect size estimate even in the ab-
+sence of selective reporting or other sources of asym-
+metry. Different variants of Egger?s regression have
+been developed to reduce the correlation by using alter-
+native measures of precision, specifically for log odds
+ratios (Macaskill, Walter, & Irwig, 2001; Moreno et
+al., 2009; Peters et al., 2006), raw proportions (Hunter
+et al., 2014), hazard ratios (Debray, Moons, & Riley,
+2018), and standardized mean differences (Pustejovsky
+& Rodgers, 2019)."
+
+If you are using correlation coefficients then see this reply from Wolfgang:
+https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2020-May/002086.html
+
+For recommendations about other effect sizes you can use the references 
+in the cited article:
+Rodgers, M. A., & Pustejovsky, J. E. (2021). Evaluating meta-analytic 
+methods to detect selective reporting in the presence of dependent 
+effect sizes. Psychological Methods, 26(2), 141?160. 
+https://doi.org/10.1037/met0000300
+
+
+Best wishes,
+Lukasz
+-- 
+Lukasz Stasielowicz
+Osnabr?ck University
+Institute for Psychology
+Research methods, psychological assessment, and evaluation
+Seminarstra?e 20
+49074 Osnabr?ck (Germany)
+
+Am 28.12.2021 um 12:00 schrieb r-sig-meta-analysis-request at r-project.org:
+> Send R-sig-meta-analysis mailing list submissions to
+> 	r-sig-meta-analysis at r-project.org
+> 
+> To subscribe or unsubscribe via the World Wide Web, visit
+> 	https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+> or, via email, send a message with subject or body 'help' to
+> 	r-sig-meta-analysis-request at r-project.org
+> 
+> You can reach the person managing the list at
+> 	r-sig-meta-analysis-owner at r-project.org
+> 
+> When replying, please edit your Subject line so it is more specific
+> than "Re: Contents of R-sig-meta-analysis digest..."
+> 
+> 
+> Today's Topics:
+> 
+>     1. multilevel models and bias assessment
+>        (=?UTF-8?Q?C=C3=A1tia_Ferreira_De_Oliveira?=)
+> 
+> ----------------------------------------------------------------------
+> 
+> Message: 1
+> Date: Mon, 27 Dec 2021 19:11:44 +0000
+> From: =?UTF-8?Q?C=C3=A1tia_Ferreira_De_Oliveira?= <cmfo500 at york.ac.uk>
+> To: R meta <r-sig-meta-analysis at r-project.org>
+> Subject: [R-meta] multilevel models and bias assessment
+> Message-ID:
+> 	<CACw+TfcHfXHPEgNrf7SZPVtqgJvSQS5XYnOD6Uo8BpHpkR-wgA at mail.gmail.com>
+> Content-Type: text/plain; charset="utf-8"
+> 
+> Dear all,
+> 
+> I hope you are well.
+> Given that we should not conduct Egger's regression on effect sizes with
+> dependency, would it be more adequate to aggregate all effect sizes coming
+> from the same study or is it OK to just combine effect sizes when they come
+> from the same participants? I know the latter ignores the nested nature of
+> the data, so I just wanted to check whether it is adequate to do so just
+> for bias assessment.
+> 
+> Best wishes,
+> 
+> Catia
+>
+
+

@@ -1,0 +1,546 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2023-08",
+  "messages": [
+    {
+      "id": "msg-f4cdc33b3610",
+      "message_id": "<CA+dzWjp1xS_+zU2gYv2YeR04zM4qdK3U9KXy9dBJmFRShyaO6g@mail.gmail.com>",
+      "from_name": "Yuhang Hu",
+      "from_email_hash": "b0634bac76ff7996231a855de79b1199f6ae3db82e807c9f518efb38e239b00e",
+      "date": "2023-08-04T11:12:01+08:00",
+      "subject": "[R-meta] Using rcalc() in metafor",
+      "subject_clean": "[R-meta] Using rcalc() in metafor",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hello All (re-posting this in case, it slipped through the cracks),\n\nIn my data below, I have numerous NAs for the correlations reported for a\nset of 8 variables of interest across my studies. Two questions:\n\n1- rma.mv() says that my V is non-positive definite. To what extent can I\nignore this and if not ignorable, what other options do I have?\n\n2- How can I convert back the 'coef(res)' and 'vcov(res)' from the \"rtoz\"\nscale to the original \"r\" scale ?\n\nThanks,\nYuhang\n\n# Data and code: #\n\ndat <- read.csv(\"https://raw.githubusercontent.com/ilzl/i/master/j.csv\")\n\ntmp <- rcalc(ri ~ var1 + var2 | Study, ni=N, data=dat, rtoz = TRUE)\nV <- tmp$V\ndat <- tmp$dat\n\nres <- rma.mv(yi~ var1.var2 - 1, V,\n               random = ~var1.var2 | Study,\n               data=dat, control = list(nearpd=TRUE), sparse = TRUE) |>\n  robust(cluster = Study, clubSandwich = TRUE)\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hello All (re-posting this in case, it slipped through the cracks),\n\nIn my data below, I have numerous NAs for the correlations reported for a\nset of 8 variables of interest across my studies. Two que",
+      "thread_id": "thread-f4cdc33b3610",
+      "thread_depth": 0,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-41631103e1a6",
+      "message_id": "<3e3b0e91-c2ee-1d5e-5767-6299ec0656fd@uni-osnabrueck.de>",
+      "from_name": "Lukasz Stasielowicz",
+      "from_email_hash": "8e7698f28015f696c76c8036e33b7e8bcb33cb7948bf9a7b4b00d1a91ed2c1f0",
+      "date": "2023-08-04T13:23:52+02:00",
+      "subject": "[R-meta] Using rcalc() in metafor",
+      "subject_clean": "[R-meta] Using rcalc() in metafor",
+      "in_reply_to": "<mailman.4855.7.1691143201.7277.r-sig-meta-analysis@r-project.org>",
+      "references": [
+        "<mailman.4855.7.1691143201.7277.r-sig-meta-analysis@r-project.org>"
+      ],
+      "body_plain": "Dear Yuhang,\n\n\n1. Playing around with the imputation settings for the V matrix is one \noption, e.g.,\nimpute_covariance_matrix from the clubSandwich package\nor\nvcalc from the metafor package.\n\nThere is certainly a trade-off. The risk of getting non-positive \ndefinite matrices can be reduced by simplifying the covariance \nstructure, but it will probably lead to less realistic assumptions. \nHowever, one could conduct sensitivity analyses by using different \nimputation settings for the V matrix and checking whether the main \nfindings change substantially.\n\n\n2. The mean effect size and its confidence interval can be transformed \nusing predict:\npredict(res, transf=transf.ztor)\n\n\n\nBest,\n\nLukasz\n-- \nLukasz Stasielowicz\nOsnabr?ck University\nInstitute for Psychology\nResearch methods, psychological assessment, and evaluation\nLise-Meitner-Stra?e 3\n49076 Osnabr?ck (Germany)\nTwitter: https://twitter.com/l_stasielowicz\n\nOn 04.08.2023 12:00, r-sig-meta-analysis-request at r-project.org wrote:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. Using rcalc() in metafor (Yuhang Hu)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Fri, 4 Aug 2023 11:12:01 +0800\n> From: Yuhang Hu <yh342 at nau.edu>\n> To: R meta <r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] Using rcalc() in metafor\n> Message-ID:\n> \t<CA+dzWjp1xS_+zU2gYv2YeR04zM4qdK3U9KXy9dBJmFRShyaO6g at mail.gmail.com>\n> Content-Type: text/plain; charset=\"utf-8\"\n> \n> Hello All (re-posting this in case, it slipped through the cracks),\n> \n> In my data below, I have numerous NAs for the correlations reported for a\n> set of 8 variables of interest across my studies. Two questions:\n> \n> 1- rma.mv() says that my V is non-positive definite. To what extent can I\n> ignore this and if not ignorable, what other options do I have?\n> \n> 2- How can I convert back the 'coef(res)' and 'vcov(res)' from the \"rtoz\"\n> scale to the original \"r\" scale ?\n> \n> Thanks,\n> Yuhang\n> \n> # Data and code: #\n> \n> dat <- read.csv(\"https://raw.githubusercontent.com/ilzl/i/master/j.csv\")\n> \n> tmp <- rcalc(ri ~ var1 + var2 | Study, ni=N, data=dat, rtoz = TRUE)\n> V <- tmp$V\n> dat <- tmp$dat\n> \n> res <- rma.mv(yi~ var1.var2 - 1, V,\n>                 random = ~var1.var2 | Study,\n>                 data=dat, control = list(nearpd=TRUE), sparse = TRUE) |>\n>    robust(cluster = Study, clubSandwich = TRUE)\n> \n> \t[[alternative HTML version deleted]]\n> \n> \n> \n> \n> ------------------------------\n> \n> Subject: Digest Footer\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n> \n> ------------------------------\n> \n> End of R-sig-meta-analysis Digest, Vol 75, Issue 1\n> **************************************************",
+      "body_snippet": "Dear Yuhang,\n\n\n1. Playing around with the imputation settings for the V matrix is one \noption, e.g.,\nimpute_covariance_matrix from the clubSandwich package\nor\nvcalc from the metafor package.\n\nThere is",
+      "thread_id": "thread-41631103e1a6",
+      "thread_depth": 0,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-ad618a1c93f3",
+      "message_id": "<CA+dzWjp+UgqMpanuDchQQ8r-gtfQ1nD7t8hvMRoB+AfrFXmQDw@mail.gmail.com>",
+      "from_name": "Yuhang Hu",
+      "from_email_hash": "b0634bac76ff7996231a855de79b1199f6ae3db82e807c9f518efb38e239b00e",
+      "date": "2023-08-05T08:26:01+08:00",
+      "subject": "[R-meta] Using rcalc() in metafor",
+      "subject_clean": "[R-meta] Using rcalc() in metafor",
+      "in_reply_to": "<3e3b0e91-c2ee-1d5e-5767-6299ec0656fd@uni-osnabrueck.de>",
+      "references": [
+        "<mailman.4855.7.1691143201.7277.r-sig-meta-analysis@r-project.org>",
+        "<3e3b0e91-c2ee-1d5e-5767-6299ec0656fd@uni-osnabrueck.de>"
+      ],
+      "body_plain": "Dear  Lukasz,\n\nThanks.\nRegarding question 1, could you please elaborate, in what ways a non-positive\ndefinite V matrix can invalidate the results of my rma.mv() model?\n\nRegarding question 2, I think your answer doesn't produce the\ndesired output. Maybe, we can, instead, do:\n\ntransf.ztor(coef(summary(res))[c(\"estimate\",\"ci.lb\",\"ci.ub\")])\n\nHowever, as asked in question 2, how can I convert 'vcov(res)' from \"rtoz\"\nscale back to \"ztor\" scale?\n\nThanks,\nYuhang\n\nOn Fri, Aug 4, 2023 at 7:23?PM Lukasz Stasielowicz <\nlukasz.stasielowicz at uni-osnabrueck.de> wrote:\n\n> Dear Yuhang,\n>\n>\n> 1. Playing around with the imputation settings for the V matrix is one\n> option, e.g.,\n> impute_covariance_matrix from the clubSandwich package\n> or\n> vcalc from the metafor package.\n>\n> There is certainly a trade-off. The risk of getting non-positive\n> definite matrices can be reduced by simplifying the covariance\n> structure, but it will probably lead to less realistic assumptions.\n> However, one could conduct sensitivity analyses by using different\n> imputation settings for the V matrix and checking whether the main\n> findings change substantially.\n>\n>\n> 2. The mean effect size and its confidence interval can be transformed\n> using predict:\n> predict(res, transf=transf.ztor)\n>\n>\n>\n> Best,\n>\n> Lukasz\n> --\n> Lukasz Stasielowicz\n> Osnabr?ck University\n> Institute for Psychology\n> Research methods, psychological assessment, and evaluation\n> Lise-Meitner-Stra?e 3\n> 49076 Osnabr?ck (Germany)\n> Twitter: https://twitter.com/l_stasielowicz\n>\n> On 04.08.2023 12:00, r-sig-meta-analysis-request at r-project.org wrote:\n> > Send R-sig-meta-analysis mailing list submissions to\n> >       r-sig-meta-analysis at r-project.org\n> >\n> > To subscribe or unsubscribe via the World Wide Web, visit\n> >       https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> > or, via email, send a message with subject or body 'help' to\n> >       r-sig-meta-analysis-request at r-project.org\n> >\n> > You can reach the person managing the list at\n> >       r-sig-meta-analysis-owner at r-project.org\n> >\n> > When replying, please edit your Subject line so it is more specific\n> > than \"Re: Contents of R-sig-meta-analysis digest...\"\n> >\n> >\n> > Today's Topics:\n> >\n> >     1. Using rcalc() in metafor (Yuhang Hu)\n> >\n> > ----------------------------------------------------------------------\n> >\n> > Message: 1\n> > Date: Fri, 4 Aug 2023 11:12:01 +0800\n> > From: Yuhang Hu <yh342 at nau.edu>\n> > To: R meta <r-sig-meta-analysis at r-project.org>\n> > Subject: [R-meta] Using rcalc() in metafor\n> > Message-ID:\n> >       <\n> CA+dzWjp1xS_+zU2gYv2YeR04zM4qdK3U9KXy9dBJmFRShyaO6g at mail.gmail.com>\n> > Content-Type: text/plain; charset=\"utf-8\"\n> >\n> > Hello All (re-posting this in case, it slipped through the cracks),\n> >\n> > In my data below, I have numerous NAs for the correlations reported for a\n> > set of 8 variables of interest across my studies. Two questions:\n> >\n> > 1- rma.mv() says that my V is non-positive definite. To what extent can\n> I\n> > ignore this and if not ignorable, what other options do I have?\n> >\n> > 2- How can I convert back the 'coef(res)' and 'vcov(res)' from the \"rtoz\"\n> > scale to the original \"r\" scale ?\n> >\n> > Thanks,\n> > Yuhang\n> >\n> > # Data and code: #\n> >\n> > dat <- read.csv(\"https://raw.githubusercontent.com/ilzl/i/master/j.csv\")\n> >\n> > tmp <- rcalc(ri ~ var1 + var2 | Study, ni=N, data=dat, rtoz = TRUE)\n> > V <- tmp$V\n> > dat <- tmp$dat\n> >\n> > res <- rma.mv(yi~ var1.var2 - 1, V,\n> >                 random = ~var1.var2 | Study,\n> >                 data=dat, control = list(nearpd=TRUE), sparse = TRUE) |>\n> >    robust(cluster = Study, clubSandwich = TRUE)\n> >\n> >       [[alternative HTML version deleted]]\n> >\n> >\n> >\n> >\n> > ------------------------------\n> >\n> > Subject: Digest Footer\n> >\n> > _______________________________________________\n> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> > To manage your subscription to this mailing list, go to:\n> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> >\n> >\n> > ------------------------------\n> >\n> > End of R-sig-meta-analysis Digest, Vol 75, Issue 1\n> > **************************************************\n>\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear  Lukasz,\n\nThanks.\nRegarding question 1, could you please elaborate, in what ways a non-positive\ndefinite V matrix can invalidate the results of my rma.mv() model?\n\nRegarding question 2, I think y",
+      "thread_id": "thread-41631103e1a6",
+      "thread_depth": 1,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-8761e571c042",
+      "message_id": "<a8742d90-66f6-6786-e9ee-559b690b1bb5@uni-osnabrueck.de>",
+      "from_name": "Lukasz Stasielowicz",
+      "from_email_hash": "8e7698f28015f696c76c8036e33b7e8bcb33cb7948bf9a7b4b00d1a91ed2c1f0",
+      "date": "2023-08-07T09:51:14+02:00",
+      "subject": "[R-meta] Using rcalc() in metafor",
+      "subject_clean": "[R-meta] Using rcalc() in metafor",
+      "in_reply_to": "<mailman.4857.7.1691229601.30872.r-sig-meta-analysis@r-project.org>",
+      "references": [
+        "<mailman.4857.7.1691229601.30872.r-sig-meta-analysis@r-project.org>"
+      ],
+      "body_plain": "Dear Yuhang,\n\n1. From what I've seen in the SEM literature, a non-positive definite \nmatrix can lead to results that are not trustworthy. The algorithms can \nhave problems finding a trustworthy numerical solution. Perhaps a \nvisualization of these issues will be helpful (section Visualizing \ndefiniteness): \nhttps://gregorygundersen.com/blog/2022/02/27/positive-definite/\n\nMy experience with such issues in the meta-analytic context is very \nlimited. A few months ago, I played around with a fancy \nvariance-covariance matrix that was non-positive definite. The \nmeta-analytic results (brms package) were nonsensical (e.g., the \nmagnitude or sign of the mean effect, the amount of estimated \nvariability), so it was easy to spot a problem. However, I've seen \nseveral SEM analyses where the results might seem plausible but are \nnevertheless biased.\n\nIn some SEM-based studies, the authors report the results based on the \nnon-positive definite matrix but emphasize the limitations. One could \nalso run a sensitivity analysis with a different V matrix to check \nwhether the results change substantially. That could reduce the uncertainty.\n\nHowever, avoiding a non-positive definite matrix (e.g., playing around \nwith V imputation) is usually the preferred approach, at least in the \nSEM context.\n\n\n\n2. I'm glad to hear that you found a solution. Wolfgang has kindly added \nso many functionalities over the years, so it was naive of me to think \nthat \"predict\" yields the desired output for every model.\nFortunately, there are other functions such as transf.ztor or tanh.\n\nvcov: Hafdahl reports some formulas in the appendix (p. 201).\nI don't know whether the respective function is available in R or if one \nneeds to write the code from scratch.\nHafdahl, A. R. (2007). Combining correlation matrices: Simulation \nanalysis of improved fixed-effects methods. Journal of Educational and \nBehavioral Statistics, 32(2), 180-205.\n\n\n\nBest,\nLukasz\n-- \nLukasz Stasielowicz\nOsnabr?ck University\nInstitute for Psychology\nResearch methods, psychological assessment, and evaluation\nLise-Meitner-Stra?e 3\n49076 Osnabr?ck (Germany)\nTwitter: https://twitter.com/l_stasielowicz\n\nOn 05.08.2023 12:00, r-sig-meta-analysis-request at r-project.org wrote:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. Re: Using rcalc() in metafor (Lukasz Stasielowicz)\n>     2. Re: Using rcalc() in metafor (Yuhang Hu)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Fri, 4 Aug 2023 13:23:52 +0200\n> From: Lukasz Stasielowicz <lukasz.stasielowicz at uni-osnabrueck.de>\n> To: r-sig-meta-analysis at r-project.org\n> Cc: yh342 at nau.edu\n> Subject: Re: [R-meta] Using rcalc() in metafor\n> Message-ID: <3e3b0e91-c2ee-1d5e-5767-6299ec0656fd at uni-osnabrueck.de>\n> Content-Type: text/plain; charset=\"utf-8\"; Format=\"flowed\"\n> \n> Dear Yuhang,\n> \n> \n> 1. Playing around with the imputation settings for the V matrix is one\n> option, e.g.,\n> impute_covariance_matrix from the clubSandwich package\n> or\n> vcalc from the metafor package.\n> \n> There is certainly a trade-off. The risk of getting non-positive\n> definite matrices can be reduced by simplifying the covariance\n> structure, but it will probably lead to less realistic assumptions.\n> However, one could conduct sensitivity analyses by using different\n> imputation settings for the V matrix and checking whether the main\n> findings change substantially.\n> \n> \n> 2. The mean effect size and its confidence interval can be transformed\n> using predict:\n> predict(res, transf=transf.ztor)\n> \n> \n> \n> Best,\n> \n> Lukasz",
+      "body_snippet": "Dear Yuhang,\n\n1. From what I've seen in the SEM literature, a non-positive definite \nmatrix can lead to results that are not trustworthy. The algorithms can \nhave problems finding a trustworthy numeri",
+      "thread_id": "thread-8761e571c042",
+      "thread_depth": 0,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-e0add3fa3978",
+      "message_id": "<VI1PR0602MB343700F77E51331505B1D3B8BF11A@VI1PR0602MB3437.eurprd06.prod.outlook.com>",
+      "from_name": "Adelina Artenie",
+      "from_email_hash": "9ff2878230a453d3312ea6043803390878238021e7419fa0ce344446a33e84ff",
+      "date": "2023-08-12T10:28:07Z",
+      "subject": "[R-meta] Calculating pooled effect size",
+      "subject_clean": "[R-meta] Calculating pooled effect size",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi,\n\nThis is probably a silly question but can?t see where my error is, so it would be great to have your thoughts. I am doing a RE meta-analysis of rates and the pooled rate that I am getting does not equal the value I get from summing the individual effects multiplied by their prob. weights. I am ignoring the SE for this exercise, just looking at the pooled effect.\n\nIn this example, the pooled effect produced by R is 10.5499. If I do sum(individual rates * w.random) /sum(w.random), I get 12.45 (768.85 / 61.75). The pooled overall effect in R is consistently smaller relative to what I get when I calculate this by hand.\n\nThank you in advance.\nAdelina\n\n***\nlibrary(meta)\nlibrary(metafor)\n\nmy_dat <- data.frame(\n  ID = 1:19,\n  Rate = c(14.1, 19.4, 19.0, 12.5, 5.8, 7.2, 14.0, 11.6, 22.5, 11.1, 9.5, 1.1, 9.8, 7.9, 11.2, 28.7, 7.1, 15.5, 11.2),\n  LB = c(9.6, 14.8, 11.6, 9.7, 4.3, 4.2, 6.0, 5.6, 11.6, 8.2, 8.0, 0.8, 7.9, 7.1, 8.9, 20.6, 4.3, 13.1, 9.0),\n  UB = c(20.7, 25.5, 31.1, 16.1, 7.7, 12.1, 32.5, 24.4, 43.8, 14.9, 11.3, 1.6, 12.2, 8.7, 14.2, 40.2, 11.7, 18.3, 13.9)\n)\n\nln_rate <- log(my_dat$Rate)\nln_LB <-log(my_dat$LB)\nln_UB <-log(my_dat$UB)\n\nmy_metagen <- metagen(TE = ln_rate,\n                         lower = ln_LB,\n                         upper = ln_UB,\n                         studlab = ID,\n                         data = my_dat,\n                         sm = \"IRLN\",\n                         method.tau = \"DL\",\n                         comb.fixed = FALSE,\n                         comb.random = TRUE, backtransf = TRUE,\n                         title = \"title\",\n                         text.random = \"Overall\")\n\nsummary(my_metagen)\nweights(my_metagen)\n\nstudy_ids <- my_metagen$studlab\nweights_random <- my_metagen$w.random\nweight_table <- data.frame(Temporary_ID = study_ids, w.random = weights_random)\nprint(weight_table)\n\n\n\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi,\n\nThis is probably a silly question but can?t see where my error is, so it would be great to have your thoughts. I am doing a RE meta-analysis of rates and the pooled rate that I am getting does no",
+      "thread_id": "thread-e0add3fa3978",
+      "thread_depth": 0,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-e5c963a12421",
+      "message_id": "<f44fbc349bad43928cb49dc25c2618b2@uniklinik-freiburg.de>",
+      "from_name": "Dr. Gerta Rücker",
+      "from_email_hash": "6b766b8c4a1ffaf9083fe27818a854193e128a5125eee63d75a02a45cef86821",
+      "date": "2023-08-12T11:18:19Z",
+      "subject": "[R-meta] Calculating pooled effect size",
+      "subject_clean": "[R-meta] Calculating pooled effect size",
+      "in_reply_to": "<VI1PR0602MB343700F77E51331505B1D3B8BF11A@VI1PR0602MB3437.eurprd06.prod.outlook.com>",
+      "references": [
+        "<VI1PR0602MB343700F77E51331505B1D3B8BF11A@VI1PR0602MB3437.eurprd06.prod.outlook.com>"
+      ],
+      "body_plain": "Dear Adelina,\n\nIt seems that you ignored that the pooling goes on the log scale. The correct calculation is therefore (using the notation from your R code):\n\n> exp(sum(my_metagen$TE * weights_random)/sum(weights_random))\n[1] 10.5499\n\nwhere my_metagen$TE are the log-transformed rates and exp() backtransforms the average on the log scale back to the original scale.\n\nBest,\nGerta\n\n\n\nUNIVERSIT?TSKLINIKUM FREIBURG\nInstitute for Medical Biometry and Statistics\n\nDr. Gerta R?cker\nGuest Scientist\n\nStefan-Meier-Stra?e 26 ? 79104 Freiburg\ngerta.ruecker at uniklinik-freiburg.de\n\nhttps://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker\n\n-----Urspr?ngliche Nachricht-----\nVon: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> Im Auftrag von Adelina Artenie via R-sig-meta-analysis\nGesendet: Samstag, 12. August 2023 12:28\nAn: r-sig-meta-analysis at r-project.org\nCc: Adelina Artenie <adelina.artenie at bristol.ac.uk>\nBetreff: [R-meta] Calculating pooled effect size\n\nHi,\n\nThis is probably a silly question but can?t see where my error is, so it would be great to have your thoughts. I am doing a RE meta-analysis of rates and the pooled rate that I am getting does not equal the value I get from summing the individual effects multiplied by their prob. weights. I am ignoring the SE for this exercise, just looking at the pooled effect.\n\nIn this example, the pooled effect produced by R is 10.5499. If I do sum(individual rates * w.random) /sum(w.random), I get 12.45 (768.85 / 61.75). The pooled overall effect in R is consistently smaller relative to what I get when I calculate this by hand.\n\nThank you in advance.\nAdelina\n\n***\nlibrary(meta)\nlibrary(metafor)\n\nmy_dat <- data.frame(\n  ID = 1:19,\n  Rate = c(14.1, 19.4, 19.0, 12.5, 5.8, 7.2, 14.0, 11.6, 22.5, 11.1, 9.5, 1.1, 9.8, 7.9, 11.2, 28.7, 7.1, 15.5, 11.2),\n  LB = c(9.6, 14.8, 11.6, 9.7, 4.3, 4.2, 6.0, 5.6, 11.6, 8.2, 8.0, 0.8, 7.9, 7.1, 8.9, 20.6, 4.3, 13.1, 9.0),\n  UB = c(20.7, 25.5, 31.1, 16.1, 7.7, 12.1, 32.5, 24.4, 43.8, 14.9, 11.3, 1.6, 12.2, 8.7, 14.2, 40.2, 11.7, 18.3, 13.9)\n)\n\nln_rate <- log(my_dat$Rate)\nln_LB <-log(my_dat$LB)\nln_UB <-log(my_dat$UB)\n\nmy_metagen <- metagen(TE = ln_rate,\n                         lower = ln_LB,\n                         upper = ln_UB,\n                         studlab = ID,\n                         data = my_dat,\n                         sm = \"IRLN\",\n                         method.tau = \"DL\",\n                         comb.fixed = FALSE,\n                         comb.random = TRUE, backtransf = TRUE,\n                         title = \"title\",\n                         text.random = \"Overall\")\n\nsummary(my_metagen)\nweights(my_metagen)\n\nstudy_ids <- my_metagen$studlab\nweights_random <- my_metagen$w.random\nweight_table <- data.frame(Temporary_ID = study_ids, w.random = weights_random)\nprint(weight_table)\n\n\n\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Adelina,\n\nIt seems that you ignored that the pooling goes on the log scale. The correct calculation is therefore (using the notation from your R code):\n\n> exp(sum(my_metagen$TE * weights_random)/",
+      "thread_id": "thread-e0add3fa3978",
+      "thread_depth": 1,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-9183be4bcd64",
+      "message_id": "<MN2PR19MB38215258A5EC9FA2542A2426CF15A@MN2PR19MB3821.namprd19.prod.outlook.com>",
+      "from_name": "John Mahas",
+      "from_email_hash": "558456a64bba0cd05c92dd3bd4af5a8987eec9028aa5076809fd43cf4eb3d65e",
+      "date": "2023-08-16T19:36:04Z",
+      "subject": "[R-meta] Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results",
+      "subject_clean": "[R-meta] Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi All,\n\nI performed a random-effect summary meta-analysis where study was used as a random effect. Here, I used the rma.mv function using the Fisher's r-to-z transformed correlation coefficient effect size (see code below).\n\nCODE: results=rma.mv(yi,vi,data=datum,method=\"REML\",random=~1|Study)\n\nI can use then use the below code to create funnel and forest plots.\n\nCODE: forest(results)\nCODE: funnel(results)\n\nThe x axis for these plots would be my effect size (Fisher's r-to-z transformed correlation coefficient). My question is, what must I do in order to back transform my Fisher's r-to-z transformed correlation coefficient here in the plots so that they are displayed as the Pearson's correlation coefficient (r).\n\nThanks,\n\nJohn\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi All,\n\nI performed a random-effect summary meta-analysis where study was used as a random effect. Here, I used the rma.mv function using the Fisher's r-to-z transformed correlation coefficient effec",
+      "thread_id": "thread-9183be4bcd64",
+      "thread_depth": 0,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-090f7b24266f",
+      "message_id": "<MN2PR19MB38210A80D2E746250E6202C1CF15A@MN2PR19MB3821.namprd19.prod.outlook.com>",
+      "from_name": "John Mahas",
+      "from_email_hash": "558456a64bba0cd05c92dd3bd4af5a8987eec9028aa5076809fd43cf4eb3d65e",
+      "date": "2023-08-16T20:04:34Z",
+      "subject": "[R-meta]  Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results",
+      "subject_clean": "[R-meta]  Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results",
+      "in_reply_to": "<MN2PR19MB38215258A5EC9FA2542A2426CF15A@MN2PR19MB3821.namprd19.prod.outlook.com>",
+      "references": [
+        "<MN2PR19MB38215258A5EC9FA2542A2426CF15A@MN2PR19MB3821.namprd19.prod.outlook.com>"
+      ],
+      "body_plain": "Hi All,\n\nPlease disregard my previous message - I figured it out. I isolated my generated yi and vi from my dataset and ran the following code.\n\n#load z results\ndatum=read.csv(file.choose())\nZ=datum\n\n#transform z to r\nZ_r=transf.ztor(Z)\n\nOnce this was done, I added this data to a csv to perform my analyses with the back-transformed r instead of my original Fisher's r-to-z transformed correlation coefficient\n\n\n\n________________________________\nFrom: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of John Mahas via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>\nSent: Wednesday, August 16, 2023 2:36 PM\nTo: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>\nCc: John Mahas <jwm0055 at auburn.edu>\nSubject: [EXT] [R-meta] Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results\n\nCAUTION: Email Originated Outside of Auburn.\n\nHi All,\n\nI performed a random-effect summary meta-analysis where study was used as a random effect. Here, I used the rma.mv function using the Fisher's r-to-z transformed correlation coefficient effect size (see code below).\n\nCODE: results=rma.mv(yi,vi,data=datum,method=\"REML\",random=~1|Study)\n\nI can use then use the below code to create funnel and forest plots.\n\nCODE: forest(results)\nCODE: funnel(results)\n\nThe x axis for these plots would be my effect size (Fisher's r-to-z transformed correlation coefficient). My question is, what must I do in order to back transform my Fisher's r-to-z transformed correlation coefficient here in the plots so that they are displayed as the Pearson's correlation coefficient (r).\n\nThanks,\n\nJohn\n\n        [[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fstat.ethz.ch%2Fmailman%2Flistinfo%2Fr-sig-meta-analysis&data=05%7C01%7Cjwm0055%40auburn.edu%7C6e8d806eb6fc425e0c6008db9e901c35%7Cccb6deedbd294b388979d72780f62d3b%7C1%7C0%7C638278114034637278%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=6tPP73Ww0yRIqnF7zU7cXA1dx8jSZr4K5iLfOa9YTio%3D&reserved=0<https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis>\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi All,\n\nPlease disregard my previous message - I figured it out. I isolated my generated yi and vi from my dataset and ran the following code.\n\n#load z results\ndatum=read.csv(file.choose())\nZ=datum\n\n",
+      "thread_id": "thread-9183be4bcd64",
+      "thread_depth": 1,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-2922bf5d6c17",
+      "message_id": "<B25DFCE3-45D5-4B9C-84F9-08D0AA322FE2@uottawa.ca>",
+      "from_name": "Angela Leanne Wilson",
+      "from_email_hash": "fe319da92db20534ace5241d51c0328af35c3c5e09bc9326fde6af57efbaddb0",
+      "date": "2023-08-21T02:10:45Z",
+      "subject": "[R-meta] Meta-analysis - missing study-specific variance",
+      "subject_clean": "[R-meta] Meta-analysis - missing study-specific variance",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hello all,\n\nI am conducting a meta-analysis to summarize effect sizes from different studies that ran mediation analysis.\n\nI have extracted the standardized regression coefficients (i.e., the indirect effects from each mediation study) as the effect size. I also have the sample size for each study, however I found that only a few studies reported any error/variance estimate (probably because the authors have reported a standardized regression coefficient and thus they did not report any error/variance of the corresponding regression coefficient). In this case, it means that many studies in my meta-analysis lack study-specific variance information.\n\nMy understanding is that the study-specific variance is needed to calculate the weight for each study when calculating the average effect size across studies. May I ask if you can suggest what I need to do to estimate the study-specific variance?\n\n(Apologies I do not have any code as I cannot begin the analysis without first resolving this issue)\n\nMany thanks,\nAngela\n\nAngela Wilson (she, her/elle)\nDoctoral Candidate, Clinical Psychology\nUniversity of Ottawa\nHealthy Active Living and Obesity (HALO) Research Group\nChildren?s Hospital of Eastern Ontario (CHEO), Research Institute\nEmail: awils046 at uottawa.ca",
+      "body_snippet": "Hello all,\n\nI am conducting a meta-analysis to summarize effect sizes from different studies that ran mediation analysis.\n\nI have extracted the standardized regression coefficients (i.e., the indirect",
+      "thread_id": "thread-2922bf5d6c17",
+      "thread_depth": 0,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-1268d833ff0c",
+      "message_id": "<b1d2d6f4cb9d4e68ac3966c21cb8067c@maastrichtuniversity.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2023-08-21T07:53:41Z",
+      "subject": "[R-meta] Meta-analysis - missing study-specific variance",
+      "subject_clean": "[R-meta] Meta-analysis - missing study-specific variance",
+      "in_reply_to": "<B25DFCE3-45D5-4B9C-84F9-08D0AA322FE2@uottawa.ca>",
+      "references": [
+        "<B25DFCE3-45D5-4B9C-84F9-08D0AA322FE2@uottawa.ca>"
+      ],
+      "body_plain": "Dear Angela,\n\nYou would need the entire correlation matrix of all variables involved in a regression model to compute the sampling variance of a standardized regression coefficient of such a model. I assume that this is not available to you.\n\nI see a few alternative options:\n\n1) Do you have the p-values corresponding to these regression coefficients? If so, you could use this to compute the partial correlation coefficients and conduct the meta-analysis using those. See:\n\nhttps://wviechtb.github.io/metafor/reference/escalc.html#partial-and-semi-partial-correlations\n\n2) You could fit a model that assumes that the sampling variances of the standardized regression coefficients are inversely proportional to the sample sizes and then use robust inference methods. Making this work isn't entirely straightforward, so I wouldn't suggest to consider this approach unless 1) is not an option.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Angela Leanne Wilson via R-sig-meta-analysis\n>Sent: Monday, 21 August, 2023 4:11\n>To: r-sig-meta-analysis at r-project.org\n>Cc: Angela Leanne Wilson\n>Subject: [R-meta] Meta-analysis - missing study-specific variance\n>\n>Hello all,\n>\n>I am conducting a meta-analysis to summarize effect sizes from different studies\n>that ran mediation analysis.\n>\n>I have extracted the standardized regression coefficients (i.e., the indirect\n>effects from each mediation study) as the effect size. I also have the sample\n>size for each study, however I found that only a few studies reported any\n>error/variance estimate (probably because the authors have reported a\n>standardized regression coefficient and thus they did not report any\n>error/variance of the corresponding regression coefficient). In this case, it\n>means that many studies in my meta-analysis lack study-specific variance\n>information.\n>\n>My understanding is that the study-specific variance is needed to calculate the\n>weight for each study when calculating the average effect size across studies.\n>May I ask if you can suggest what I need to do to estimate the study-specific\n>variance?\n>\n>(Apologies I do not have any code as I cannot begin the analysis without first\n>resolving this issue)\n>\n>Many thanks,\n>Angela\n>\n>Angela Wilson (she, her/elle)\n>Doctoral Candidate, Clinical Psychology\n>University of Ottawa\n>Healthy Active Living and Obesity (HALO) Research Group\n>Children?s Hospital of Eastern Ontario (CHEO), Research Institute\n>Email: awils046 at uottawa.ca",
+      "body_snippet": "Dear Angela,\n\nYou would need the entire correlation matrix of all variables involved in a regression model to compute the sampling variance of a standardized regression coefficient of such a model. I ",
+      "thread_id": "thread-2922bf5d6c17",
+      "thread_depth": 1,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-d303783dcd5a",
+      "message_id": "<7fd2284973be4506a5033a0e5e891879@maastrichtuniversity.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2023-08-21T07:58:01Z",
+      "subject": "[R-meta]  Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results",
+      "subject_clean": "[R-meta]  Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results",
+      "in_reply_to": "<MN2PR19MB38210A80D2E746250E6202C1CF15A@MN2PR19MB3821.namprd19.prod.outlook.com>",
+      "references": [
+        "<MN2PR19MB38215258A5EC9FA2542A2426CF15A@MN2PR19MB3821.namprd19.prod.outlook.com>",
+        "<MN2PR19MB38210A80D2E746250E6202C1CF15A@MN2PR19MB3821.namprd19.prod.outlook.com>"
+      ],
+      "body_plain": "Dear John,\n\nThat would be one way of doing this, but then your analysis uses raw correlation coefficients. The forest() and funnel() functions have the 'atransf' arguments for back-transforming the x-axes.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of John Mahas via R-sig-meta-analysis\n>Sent: Wednesday, 16 August, 2023 22:05\n>To: R Special Interest Group for Meta-Analysis\n>Cc: John Mahas\n>Subject: Re: [R-meta] Back-transforming Fisher's r-to-z transformed correlation\n>coefficient to r in funnel and forest plots results\n>\n>Hi All,\n>\n>Please disregard my previous message - I figured it out. I isolated my generated\n>yi and vi from my dataset and ran the following code.\n>\n>#load z results\n>datum=read.csv(file.choose())\n>Z=datum\n>\n>#transform z to r\n>Z_r=transf.ztor(Z)\n>\n>Once this was done, I added this data to a csv to perform my analyses with the\n>back-transformed r instead of my original Fisher's r-to-z transformed correlation\n>coefficient\n>\n>________________________________\n>From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf\n>of John Mahas via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>\n>Sent: Wednesday, August 16, 2023 2:36 PM\n>To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-\n>project.org>\n>Cc: John Mahas <jwm0055 at auburn.edu>\n>Subject: [EXT] [R-meta] Back-transforming Fisher's r-to-z transformed correlation\n>coefficient to r in funnel and forest plots results\n>\n>Hi All,\n>\n>I performed a random-effect summary meta-analysis where study was used as a\n>random effect. Here, I used the rma.mv function using the Fisher's r-to-z\n>transformed correlation coefficient effect size (see code below).\n>\n>CODE: results=rma.mv(yi,vi,data=datum,method=\"REML\",random=~1|Study)\n>\n>I can use then use the below code to create funnel and forest plots.\n>\n>CODE: forest(results)\n>CODE: funnel(results)\n>\n>The x axis for these plots would be my effect size (Fisher's r-to-z transformed\n>correlation coefficient). My question is, what must I do in order to back\n>transform my Fisher's r-to-z transformed correlation coefficient here in the\n>plots so that they are displayed as the Pearson's correlation coefficient (r).\n>\n>Thanks,\n>\n>John",
+      "body_snippet": "Dear John,\n\nThat would be one way of doing this, but then your analysis uses raw correlation coefficients. The forest() and funnel() functions have the 'atransf' arguments for back-transforming the x-",
+      "thread_id": "thread-9183be4bcd64",
+      "thread_depth": 2,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-68387a0dfddf",
+      "message_id": "<D7E7E4F5-3A14-43F8-8A0E-DF910867BFF1@uottawa.ca>",
+      "from_name": "Angela Leanne Wilson",
+      "from_email_hash": "fe319da92db20534ace5241d51c0328af35c3c5e09bc9326fde6af57efbaddb0",
+      "date": "2023-08-21T19:40:40Z",
+      "subject": "[R-meta] Meta-analysis - missing study-specific variance",
+      "subject_clean": "[R-meta] Meta-analysis - missing study-specific variance",
+      "in_reply_to": "<b1d2d6f4cb9d4e68ac3966c21cb8067c@maastrichtuniversity.nl>",
+      "references": [
+        "<B25DFCE3-45D5-4B9C-84F9-08D0AA322FE2@uottawa.ca>",
+        "<b1d2d6f4cb9d4e68ac3966c21cb8067c@maastrichtuniversity.nl>"
+      ],
+      "body_plain": "Hello Wolfgang,\n\nThank you very much for this guidance. Unfortunately I do not have the entire correlation matrices, and I only have the p-values for a small portion of included studies. So it looks like Option 2 is the most viable choice. \n\nCould you please direct me to which R package I would use (and/or any resources to consult) in order to understand and perform this? I am new to using R and meta-analysis, so any guidance you could provide would be incredibly helpful. \n\nMany thanks,\nAngela \n\n\n> On Aug 21, 2023, at 3:53 AM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n> \n> Attention : courriel externe | external email\n> \n> Dear Angela,\n> \n> You would need the entire correlation matrix of all variables involved in a regression model to compute the sampling variance of a standardized regression coefficient of such a model. I assume that this is not available to you.\n> \n> I see a few alternative options:\n> \n> 1) Do you have the p-values corresponding to these regression coefficients? If so, you could use this to compute the partial correlation coefficients and conduct the meta-analysis using those. See:\n> \n> https://wviechtb.github.io/metafor/reference/escalc.html#partial-and-semi-partial-correlations\n> \n> 2) You could fit a model that assumes that the sampling variances of the standardized regression coefficients are inversely proportional to the sample sizes and then use robust inference methods. Making this work isn't entirely straightforward, so I wouldn't suggest to consider this approach unless 1) is not an option.\n> \n> Best,\n> Wolfgang\n> \n>> -----Original Message-----\n>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>> Behalf Of Angela Leanne Wilson via R-sig-meta-analysis\n>> Sent: Monday, 21 August, 2023 4:11\n>> To: r-sig-meta-analysis at r-project.org\n>> Cc: Angela Leanne Wilson\n>> Subject: [R-meta] Meta-analysis - missing study-specific variance\n>> \n>> Hello all,\n>> \n>> I am conducting a meta-analysis to summarize effect sizes from different studies\n>> that ran mediation analysis.\n>> \n>> I have extracted the standardized regression coefficients (i.e., the indirect\n>> effects from each mediation study) as the effect size. I also have the sample\n>> size for each study, however I found that only a few studies reported any\n>> error/variance estimate (probably because the authors have reported a\n>> standardized regression coefficient and thus they did not report any\n>> error/variance of the corresponding regression coefficient). In this case, it\n>> means that many studies in my meta-analysis lack study-specific variance\n>> information.\n>> \n>> My understanding is that the study-specific variance is needed to calculate the\n>> weight for each study when calculating the average effect size across studies.\n>> May I ask if you can suggest what I need to do to estimate the study-specific\n>> variance?\n>> \n>> (Apologies I do not have any code as I cannot begin the analysis without first\n>> resolving this issue)\n>> \n>> Many thanks,\n>> Angela\n>> \n>> Angela Wilson (she, her/elle)\n>> Doctoral Candidate, Clinical Psychology\n>> University of Ottawa\n>> Healthy Active Living and Obesity (HALO) Research Group\n>> Children?s Hospital of Eastern Ontario (CHEO), Research Institute\n>> Email: awils046 at uottawa.ca",
+      "body_snippet": "Hello Wolfgang,\n\nThank you very much for this guidance. Unfortunately I do not have the entire correlation matrices, and I only have the p-values for a small portion of included studies. So it looks l",
+      "thread_id": "thread-2922bf5d6c17",
+      "thread_depth": 2,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-4588ff608cee",
+      "message_id": "<0b90389c5794417c99d67e781c5bd476@maastrichtuniversity.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2023-08-21T20:19:23Z",
+      "subject": "[R-meta] Meta-analysis - missing study-specific variance",
+      "subject_clean": "[R-meta] Meta-analysis - missing study-specific variance",
+      "in_reply_to": "<D7E7E4F5-3A14-43F8-8A0E-DF910867BFF1@uottawa.ca>",
+      "references": [
+        "<B25DFCE3-45D5-4B9C-84F9-08D0AA322FE2@uottawa.ca>",
+        "<b1d2d6f4cb9d4e68ac3966c21cb8067c@maastrichtuniversity.nl>",
+        "<D7E7E4F5-3A14-43F8-8A0E-DF910867BFF1@uottawa.ca>"
+      ],
+      "body_plain": "In that case, you essentially want this (assuming that the dataset is called 'dat', the variable with the sample sizes 'ni', and the variable with the standardized regression coefficients 'beta'):\n\ndat$id1 <- dat$id2 <- 1:nrow(dat)\nV <- diag(1/dat$ni)\nrownames(V) <- dat$id1\n\nres <- rma.mv(beta, V=0, random = list(~ 1 | id1, ~ 1 | id2), R=list(id1=V), Rscale=FALSE, data=dat)\nrobust(res, cluster=id1)\n\nThe only paper I know of that, on a general/conceptual level, touches on this approach is:\n\nNakagawa, S., Noble, D. W. A., Lagisz, M., Spake, R., Viechtbauer, W., & Senior, A. M. (2023). A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations. Ecology Letters, 26(2), 232-244. https://doi.org/10.1111/ele.14144\n\nbut the context is quite a bit different. We also used a similar approach in:\n\nHaslam, N., McGrath, M. J., Viechtbauer, W., & Kuppens, P. (2020). Dimensions over categories: A meta-analysis of taxometric research. Psychological Medicine, 50(9), 1418-1432. https://doi.org/10.1017/S003329172000183X\n\nbut again with a rather different context and the paper gives little details on this method. I also touched on this approach in this post:\n\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-March/000731.html\n\nI will have to leave it at that due to lack of time.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: Angela Leanne Wilson [mailto:awils046 at uottawa.ca]\n>Sent: Monday, 21 August, 2023 21:41\n>To: Viechtbauer, Wolfgang (NP)\n>Cc: R Special Interest Group for Meta-Analysis; Angeline Tsui\n>Subject: Re: Meta-analysis - missing study-specific variance\n>\n>Hello Wolfgang,\n>\n>Thank you very much for this guidance. Unfortunately I do not have the entire\n>correlation matrices, and I only have the p-values for a small portion of\n>included studies. So it looks like Option 2 is the most viable choice.\n>\n>Could you please direct me to which R package I would use (and/or any resources\n>to consult) in order to understand and perform this? I am new to using R and\n>meta-analysis, so any guidance you could provide would be incredibly helpful.\n>\n>Many thanks,\n>Angela\n>\n>> On Aug 21, 2023, at 3:53 AM, Viechtbauer, Wolfgang (NP)\n><wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n>>\n>> Attention : courriel externe | external email\n>>\n>> Dear Angela,\n>>\n>> You would need the entire correlation matrix of all variables involved in a\n>regression model to compute the sampling variance of a standardized regression\n>coefficient of such a model. I assume that this is not available to you.\n>>\n>> I see a few alternative options:\n>>\n>> 1) Do you have the p-values corresponding to these regression coefficients? If\n>so, you could use this to compute the partial correlation coefficients and\n>conduct the meta-analysis using those. See:\n>>\n>> https://wviechtb.github.io/metafor/reference/escalc.html#partial-and-semi-\n>partial-correlations\n>>\n>> 2) You could fit a model that assumes that the sampling variances of the\n>standardized regression coefficients are inversely proportional to the sample\n>sizes and then use robust inference methods. Making this work isn't entirely\n>straightforward, so I wouldn't suggest to consider this approach unless 1) is not\n>an option.\n>>\n>> Best,\n>> Wolfgang\n>>\n>>> -----Original Message-----\n>>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]\n>On\n>>> Behalf Of Angela Leanne Wilson via R-sig-meta-analysis\n>>> Sent: Monday, 21 August, 2023 4:11\n>>> To: r-sig-meta-analysis at r-project.org\n>>> Cc: Angela Leanne Wilson\n>>> Subject: [R-meta] Meta-analysis - missing study-specific variance\n>>>\n>>> Hello all,\n>>>\n>>> I am conducting a meta-analysis to summarize effect sizes from different\n>studies\n>>> that ran mediation analysis.\n>>>\n>>> I have extracted the standardized regression coefficients (i.e., the indirect\n>>> effects from each mediation study) as the effect size. I also have the sample\n>>> size for each study, however I found that only a few studies reported any\n>>> error/variance estimate (probably because the authors have reported a\n>>> standardized regression coefficient and thus they did not report any\n>>> error/variance of the corresponding regression coefficient). In this case, it\n>>> means that many studies in my meta-analysis lack study-specific variance\n>>> information.\n>>>\n>>> My understanding is that the study-specific variance is needed to calculate\n>the\n>>> weight for each study when calculating the average effect size across studies.\n>>> May I ask if you can suggest what I need to do to estimate the study-specific\n>>> variance?\n>>>\n>>> (Apologies I do not have any code as I cannot begin the analysis without first\n>>> resolving this issue)\n>>>\n>>> Many thanks,\n>>> Angela\n>>>\n>>> Angela Wilson (she, her/elle)\n>>> Doctoral Candidate, Clinical Psychology\n>>> University of Ottawa\n>>> Healthy Active Living and Obesity (HALO) Research Group\n>>> Children?s Hospital of Eastern Ontario (CHEO), Research Institute\n>>> Email: awils046 at uottawa.ca",
+      "body_snippet": "In that case, you essentially want this (assuming that the dataset is called 'dat', the variable with the sample sizes 'ni', and the variable with the standardized regression coefficients 'beta'):\n\nda",
+      "thread_id": "thread-2922bf5d6c17",
+      "thread_depth": 3,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-84b43ac1e54c",
+      "message_id": "<MN2PR19MB3821082816588F3406029BB1CF1FA@MN2PR19MB3821.namprd19.prod.outlook.com>",
+      "from_name": "John Mahas",
+      "from_email_hash": "558456a64bba0cd05c92dd3bd4af5a8987eec9028aa5076809fd43cf4eb3d65e",
+      "date": "2023-08-22T00:12:36Z",
+      "subject": "[R-meta]  Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results",
+      "subject_clean": "[R-meta]  Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results",
+      "in_reply_to": "<7fd2284973be4506a5033a0e5e891879@maastrichtuniversity.nl>",
+      "references": [
+        "<MN2PR19MB38215258A5EC9FA2542A2426CF15A@MN2PR19MB3821.namprd19.prod.outlook.com>",
+        "<MN2PR19MB38210A80D2E746250E6202C1CF15A@MN2PR19MB3821.namprd19.prod.outlook.com>",
+        "<7fd2284973be4506a5033a0e5e891879@maastrichtuniversity.nl>"
+      ],
+      "body_plain": "Hi Wolfgang,\n\nThank you for pointing this out! I also realized that issue soon after performing the analysis. I did not know about the \"atransf\" argument, but I have incorporated this into my analysis and was able to successfully back-transform the x-axes.\n\nThanks,\n\nJohn\n\n________________________________\nFrom: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>\nSent: Monday, August 21, 2023 2:58 AM\nTo: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>\nCc: John Mahas <jwm0055 at auburn.edu>\nSubject: [EXT] RE: Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results\n\nCAUTION: Email Originated Outside of Auburn.\n\nDear John,\n\nThat would be one way of doing this, but then your analysis uses raw correlation coefficients. The forest() and funnel() functions have the 'atransf' arguments for back-transforming the x-axes.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of John Mahas via R-sig-meta-analysis\n>Sent: Wednesday, 16 August, 2023 22:05\n>To: R Special Interest Group for Meta-Analysis\n>Cc: John Mahas\n>Subject: Re: [R-meta] Back-transforming Fisher's r-to-z transformed correlation\n>coefficient to r in funnel and forest plots results\n>\n>Hi All,\n>\n>Please disregard my previous message - I figured it out. I isolated my generated\n>yi and vi from my dataset and ran the following code.\n>\n>#load z results\n>datum=read.csv(file.choose())\n>Z=datum\n>\n>#transform z to r\n>Z_r=transf.ztor(Z)\n>\n>Once this was done, I added this data to a csv to perform my analyses with the\n>back-transformed r instead of my original Fisher's r-to-z transformed correlation\n>coefficient\n>\n>________________________________\n>From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf\n>of John Mahas via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>\n>Sent: Wednesday, August 16, 2023 2:36 PM\n>To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-\n>project.org>\n>Cc: John Mahas <jwm0055 at auburn.edu>\n>Subject: [EXT] [R-meta] Back-transforming Fisher's r-to-z transformed correlation\n>coefficient to r in funnel and forest plots results\n>\n>Hi All,\n>\n>I performed a random-effect summary meta-analysis where study was used as a\n>random effect. Here, I used the rma.mv function using the Fisher's r-to-z\n>transformed correlation coefficient effect size (see code below).\n>\n>CODE: results=rma.mv(yi,vi,data=datum,method=\"REML\",random=~1|Study)\n>\n>I can use then use the below code to create funnel and forest plots.\n>\n>CODE: forest(results)\n>CODE: funnel(results)\n>\n>The x axis for these plots would be my effect size (Fisher's r-to-z transformed\n>correlation coefficient). My question is, what must I do in order to back\n>transform my Fisher's r-to-z transformed correlation coefficient here in the\n>plots so that they are displayed as the Pearson's correlation coefficient (r).\n>\n>Thanks,\n>\n>John\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Wolfgang,\n\nThank you for pointing this out! I also realized that issue soon after performing the analysis. I did not know about the \"atransf\" argument, but I have incorporated this into my analysis",
+      "thread_id": "thread-9183be4bcd64",
+      "thread_depth": 3,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-0cc6416b499c",
+      "message_id": "<B843FFE1-BB35-47F4-AA98-5979921D8202@uottawa.ca>",
+      "from_name": "Angela Leanne Wilson",
+      "from_email_hash": "fe319da92db20534ace5241d51c0328af35c3c5e09bc9326fde6af57efbaddb0",
+      "date": "2023-08-22T02:29:06Z",
+      "subject": "[R-meta] Meta-analysis - missing study-specific variance",
+      "subject_clean": "[R-meta] Meta-analysis - missing study-specific variance",
+      "in_reply_to": "<0b90389c5794417c99d67e781c5bd476@maastrichtuniversity.nl>",
+      "references": [
+        "<B25DFCE3-45D5-4B9C-84F9-08D0AA322FE2@uottawa.ca>",
+        "<b1d2d6f4cb9d4e68ac3966c21cb8067c@maastrichtuniversity.nl>",
+        "<D7E7E4F5-3A14-43F8-8A0E-DF910867BFF1@uottawa.ca>",
+        "<0b90389c5794417c99d67e781c5bd476@maastrichtuniversity.nl>"
+      ],
+      "body_plain": "Thank you very much Wolfgang, I appreciate the guidance.\n\nAngela\n\n> On Aug 21, 2023, at 4:19 PM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n> \n> Attention : courriel externe | external email\n> \n> In that case, you essentially want this (assuming that the dataset is called 'dat', the variable with the sample sizes 'ni', and the variable with the standardized regression coefficients 'beta'):\n> \n> dat$id1 <- dat$id2 <- 1:nrow(dat)\n> V <- diag(1/dat$ni)\n> rownames(V) <- dat$id1\n> \n> res <- rma.mv(beta, V=0, random = list(~ 1 | id1, ~ 1 | id2), R=list(id1=V), Rscale=FALSE, data=dat)\n> robust(res, cluster=id1)\n> \n> The only paper I know of that, on a general/conceptual level, touches on this approach is:\n> \n> Nakagawa, S., Noble, D. W. A., Lagisz, M., Spake, R., Viechtbauer, W., & Senior, A. M. (2023). A robust and readily implementable method for the meta-analysis of response ratios with and without missing standard deviations. Ecology Letters, 26(2), 232-244. https://doi.org/10.1111/ele.14144\n> \n> but the context is quite a bit different. We also used a similar approach in:\n> \n> Haslam, N., McGrath, M. J., Viechtbauer, W., & Kuppens, P. (2020). Dimensions over categories: A meta-analysis of taxometric research. Psychological Medicine, 50(9), 1418-1432. https://doi.org/10.1017/S003329172000183X\n> \n> but again with a rather different context and the paper gives little details on this method. I also touched on this approach in this post:\n> \n> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-March/000731.html\n> \n> I will have to leave it at that due to lack of time.\n> \n> Best,\n> Wolfgang\n> \n>> -----Original Message-----\n>> From: Angela Leanne Wilson [mailto:awils046 at uottawa.ca]\n>> Sent: Monday, 21 August, 2023 21:41\n>> To: Viechtbauer, Wolfgang (NP)\n>> Cc: R Special Interest Group for Meta-Analysis; Angeline Tsui\n>> Subject: Re: Meta-analysis - missing study-specific variance\n>> \n>> Hello Wolfgang,\n>> \n>> Thank you very much for this guidance. Unfortunately I do not have the entire\n>> correlation matrices, and I only have the p-values for a small portion of\n>> included studies. So it looks like Option 2 is the most viable choice.\n>> \n>> Could you please direct me to which R package I would use (and/or any resources\n>> to consult) in order to understand and perform this? I am new to using R and\n>> meta-analysis, so any guidance you could provide would be incredibly helpful.\n>> \n>> Many thanks,\n>> Angela\n>> \n>>> On Aug 21, 2023, at 3:53 AM, Viechtbauer, Wolfgang (NP)\n>> <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n>>> \n>>> Attention : courriel externe | external email\n>>> \n>>> Dear Angela,\n>>> \n>>> You would need the entire correlation matrix of all variables involved in a\n>> regression model to compute the sampling variance of a standardized regression\n>> coefficient of such a model. I assume that this is not available to you.\n>>> \n>>> I see a few alternative options:\n>>> \n>>> 1) Do you have the p-values corresponding to these regression coefficients? If\n>> so, you could use this to compute the partial correlation coefficients and\n>> conduct the meta-analysis using those. See:\n>>> \n>>> https://wviechtb.github.io/metafor/reference/escalc.html#partial-and-semi-\n>> partial-correlations\n>>> \n>>> 2) You could fit a model that assumes that the sampling variances of the\n>> standardized regression coefficients are inversely proportional to the sample\n>> sizes and then use robust inference methods. Making this work isn't entirely\n>> straightforward, so I wouldn't suggest to consider this approach unless 1) is not\n>> an option.\n>>> \n>>> Best,\n>>> Wolfgang\n>>> \n>>>> -----Original Message-----\n>>>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org]\n>> On\n>>>> Behalf Of Angela Leanne Wilson via R-sig-meta-analysis\n>>>> Sent: Monday, 21 August, 2023 4:11\n>>>> To: r-sig-meta-analysis at r-project.org\n>>>> Cc: Angela Leanne Wilson\n>>>> Subject: [R-meta] Meta-analysis - missing study-specific variance\n>>>> \n>>>> Hello all,\n>>>> \n>>>> I am conducting a meta-analysis to summarize effect sizes from different\n>> studies\n>>>> that ran mediation analysis.\n>>>> \n>>>> I have extracted the standardized regression coefficients (i.e., the indirect\n>>>> effects from each mediation study) as the effect size. I also have the sample\n>>>> size for each study, however I found that only a few studies reported any\n>>>> error/variance estimate (probably because the authors have reported a\n>>>> standardized regression coefficient and thus they did not report any\n>>>> error/variance of the corresponding regression coefficient). In this case, it\n>>>> means that many studies in my meta-analysis lack study-specific variance\n>>>> information.\n>>>> \n>>>> My understanding is that the study-specific variance is needed to calculate\n>> the\n>>>> weight for each study when calculating the average effect size across studies.\n>>>> May I ask if you can suggest what I need to do to estimate the study-specific\n>>>> variance?\n>>>> \n>>>> (Apologies I do not have any code as I cannot begin the analysis without first\n>>>> resolving this issue)\n>>>> \n>>>> Many thanks,\n>>>> Angela\n>>>> \n>>>> Angela Wilson (she, her/elle)\n>>>> Doctoral Candidate, Clinical Psychology\n>>>> University of Ottawa\n>>>> Healthy Active Living and Obesity (HALO) Research Group\n>>>> Children?s Hospital of Eastern Ontario (CHEO), Research Institute\n>>>> Email: awils046 at uottawa.ca",
+      "body_snippet": "Thank you very much Wolfgang, I appreciate the guidance.\n\nAngela\n\n> On Aug 21, 2023, at 4:19 PM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n> \n> Attention : co",
+      "thread_id": "thread-2922bf5d6c17",
+      "thread_depth": 4,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-02ba48c2c327",
+      "message_id": "<CAPm5Ok3bR+uCRCkP0S4nVEmgGuip3ODvqxSOEos-g63BWtPWhA@mail.gmail.com>",
+      "from_name": "英文科陳品誠",
+      "from_email_hash": "d22c1fdc78ac35cee35931ea6db2e47782c0e14fb9c1915e37b6eae604ebaa91",
+      "date": "2023-08-23T21:38:25+08:00",
+      "subject": "[R-meta] Questions about extracting the p-value in subgroup analysis",
+      "subject_clean": "[R-meta] Questions about extracting the p-value in subgroup analysis",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Thanks in advance for whoever is going to answer my questions?\n\n\n\nI?ve complete a subgroup analysis using this command:\n\n> update.meta(m.gen,+             subgroup = ins,+             tau.common = FALSE)\n\nand the result is as follows:\n\n-------------------------------------------------------------------------------------------------------------\n\n\n\nReview:     DGBL\n\n\n\nNumber of studies: k = 59\n\n\n\n                             SMD           95%-CI    t  p-value\n\nRandom effects model (HK) 1.3783 [0.9980; 1.7587] 7.25 < 0.0001\n\n\n\nQuantifying heterogeneity:\n\n tau^2 = 1.7452 [1.3574; 3.2543]; tau = 1.3211 [1.1651; 1.8040]\n\n I^2 = 91.2% [89.4%; 92.7%]; H = 3.37 [3.07; 3.70]\n\n\n\nTest of heterogeneity:\n\n      Q d.f.  p-value\n\n 658.12   58 < 0.0001\n\n\n\nResults for subgroups (random effects model (HK)):\n\n              k    SMD           95%-CI  tau^2    tau      Q   I^2\n\nins = GM_BA  47 1.4920 [1.0182; 1.9658] 2.2007 1.4835 595.63 92.3%\n\nins = GM_EN  12 0.9195 [0.5273; 1.3117] 0.2476 0.4976  48.15 77.2%\n\n\n\nTest for subgroup differences (random effects model (HK)):\n\n                  Q d.f. p-value\n\nBetween groups 3.76    1  0.0525\n\n\n\nDetails on meta-analytical method:\n\n- Inverse variance method\n\n- Restricted maximum-likelihood estimator for tau^2\n\n- Q-Profile method for confidence interval of tau^2 and tau\n\n- Hartung-Knapp adjustment for random effects model (df = 58)\n\n\n\nYet, in order to present the outcome of this subgroup analysis, I need the\np-value. And the command on the website only says,? ?To extract the\nsubgroup-specific p-values, it is necessary to save the results of\nupdate.meta to an object, and then extract the pval.random.w element from\nthat object using the $ operator.?\n\nBut what are the commands I should put in order to (1) save the\naforementioned result to an object, and (2) extract the p-value (like where\nshould I put the $ ?)\n\n\n\nThank you so much for the time for newbies to R!\n\n\n\nBest,\n\nNick Chen\n??? (Nick Chen)\nEmail: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Thanks in advance for whoever is going to answer my questions?\n\n\n\nI?ve complete a subgroup analysis using this command:\n\n> update.meta(m.gen,+             subgroup = ins,+             tau.common = FAL",
+      "thread_id": "thread-02ba48c2c327",
+      "thread_depth": 0,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-c85f555faaa9",
+      "message_id": "<AM0PR01MB60838B553AC2E1CFCCD2149D861CA@AM0PR01MB6083.eurprd01.prod.exchangelabs.com>",
+      "from_name": "Ishtiaq Ahmed",
+      "from_email_hash": "150ab4a059ef0bff8f92945aa9393eb8d2fd3e5f08151cfd97be251fa6839074",
+      "date": "2023-08-23T14:41:39Z",
+      "subject": "[R-meta] Questions about extracting the p-value in subgroup analysis",
+      "subject_clean": "[R-meta] Questions about extracting the p-value in subgroup analysis",
+      "in_reply_to": "<CAPm5Ok3bR+uCRCkP0S4nVEmgGuip3ODvqxSOEos-g63BWtPWhA@mail.gmail.com>",
+      "references": [
+        "<CAPm5Ok3bR+uCRCkP0S4nVEmgGuip3ODvqxSOEos-g63BWtPWhA@mail.gmail.com>"
+      ],
+      "body_plain": "Dear Nick,\n\nPlease use \"test.subgroup.random =T\" in your code.\n\nupdate.meta(m.gen, test.subgroup.random =T , subgroup = ins, tau.common = FALSE)\n\n\nBest regards,\n\n\nIshtiaq Ahmed\n\n\n\nPh.D. Researcher\n\n\n\n[cid:6b96a5ea-fbdb-456e-a23e-347e05dfffec]  [cid:5b8d82c7-0c01-4cc5-b2b1-780c271cb6fb]\n\n\n\n\n\n\n\n\n\nFaculty of Physical Education and Physiotherapy\n\nDepartment KIMA/KINE\n\nVrije Universiteit Brussels\n\nPleinlaan 2 - 1050 Brussel - www.vub.be<https://www.vub.be/>\n\nPain in Motion International Research Group ? www.paininmotion.be<http://www.paininmotion.be/>\n\n[cid:3d3abd65-f199-4f35-8e86-4dccd5c087ff]\n________________________________\nFrom: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of ?????? via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>\nSent: Wednesday, August 23, 2023 3:38 PM\nTo: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>\nCc: ?????? <t571 at wlgsh.tp.edu.tw>\nSubject: [R-meta] Questions about extracting the p-value in subgroup analysis\n\nThanks in advance for whoever is going to answer my questions?\n\n\n\nI?ve complete a subgroup analysis using this command:\n\n> update.meta(m.gen,+             subgroup = ins,+             tau.common = FALSE)\n\nand the result is as follows:\n\n-------------------------------------------------------------------------------------------------------------\n\n\n\nReview:     DGBL\n\n\n\nNumber of studies: k = 59\n\n\n\n                             SMD           95%-CI    t  p-value\n\nRandom effects model (HK) 1.3783 [0.9980; 1.7587] 7.25 < 0.0001\n\n\n\nQuantifying heterogeneity:\n\n tau^2 = 1.7452 [1.3574; 3.2543]; tau = 1.3211 [1.1651; 1.8040]\n\n I^2 = 91.2% [89.4%; 92.7%]; H = 3.37 [3.07; 3.70]\n\n\n\nTest of heterogeneity:\n\n      Q d.f.  p-value\n\n 658.12   58 < 0.0001\n\n\n\nResults for subgroups (random effects model (HK)):\n\n              k    SMD           95%-CI  tau^2    tau      Q   I^2\n\nins = GM_BA  47 1.4920 [1.0182; 1.9658] 2.2007 1.4835 595.63 92.3%\n\nins = GM_EN  12 0.9195 [0.5273; 1.3117] 0.2476 0.4976  48.15 77.2%\n\n\n\nTest for subgroup differences (random effects model (HK)):\n\n                  Q d.f. p-value\n\nBetween groups 3.76    1  0.0525\n\n\n\nDetails on meta-analytical method:\n\n- Inverse variance method\n\n- Restricted maximum-likelihood estimator for tau^2\n\n- Q-Profile method for confidence interval of tau^2 and tau\n\n- Hartung-Knapp adjustment for random effects model (df = 58)\n\n\n\nYet, in order to present the outcome of this subgroup analysis, I need the\np-value. And the command on the website only says,? ?To extract the\nsubgroup-specific p-values, it is necessary to save the results of\nupdate.meta to an object, and then extract the pval.random.w element from\nthat object using the $ operator.?\n\nBut what are the commands I should put in order to (1) save the\naforementioned result to an object, and (2) extract the p-value (like where\nshould I put the $ ?)\n\n\n\nThank you so much for the time for newbies to R!\n\n\n\nBest,\n\nNick Chen\n??? (Nick Chen)\nEmail: t571 at wlgsh.tp.edu.tw <t5741 at wlgsh.tp.edu.tw>\n\n        [[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230823/9348733f/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: Outlook-ysfzhejk.png\nType: image/png\nSize: 51178 bytes\nDesc: Outlook-ysfzhejk.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230823/9348733f/attachment-0003.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: Outlook-omjqadci.png\nType: image/png\nSize: 8266 bytes\nDesc: Outlook-omjqadci.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230823/9348733f/attachment-0004.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: Outlook-agt1z05j.png\nType: image/png\nSize: 134658 bytes\nDesc: Outlook-agt1z05j.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20230823/9348733f/attachment-0005.png>",
+      "body_snippet": "Dear Nick,\n\nPlease use \"test.subgroup.random =T\" in your code.\n\nupdate.meta(m.gen, test.subgroup.random =T , subgroup = ins, tau.common = FALSE)\n\n\nBest regards,\n\n\nIshtiaq Ahmed\n\n\n\nPh.D. Researcher\n\n\n\n",
+      "thread_id": "thread-02ba48c2c327",
+      "thread_depth": 1,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-116712b7007e",
+      "message_id": "<CAAKwTDGvtRFsffYZamhW+S8X7rGMzZKDEOPHhCPj42b5vtdAvQ@mail.gmail.com>",
+      "from_name": "Gabriel Cotlier",
+      "from_email_hash": "fe6b7ece94315f2ba414b8c7053cca118260d4229688ad762179e180bbdf3aaf",
+      "date": "2023-08-24T16:48:37+03:00",
+      "subject": "[R-meta] Question on Fisher's z possible range of values",
+      "subject_clean": "[R-meta] Question on Fisher's z possible range of values",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hello all,\n\nI would like to ask what is the theoretical possible range for Fisher's z\ncorrelation coefficient --output of the conversion from Pearson's\nproduct-moment correlation coefficient ( *r* )-- determined by means of the\n\"Metafor package function escalc() as follows:\n\n## Transformation of Pearson's Product-moment correlation coefficients (r)\nto Fisher's Z\ndat <-escalc(measure = \"ZCOR\",\n             ri = ri,\n             ni = ni,\n             data = dat)\n\nThanks a lot for your help.\nKind regards,\nGabriel\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hello all,\n\nI would like to ask what is the theoretical possible range for Fisher's z\ncorrelation coefficient --output of the conversion from Pearson's\nproduct-moment correlation coefficient ( *r* )--",
+      "thread_id": "thread-116712b7007e",
+      "thread_depth": 0,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-87f5c9f73b11",
+      "message_id": "<2b50de94-fec5-b070-9128-f733f3ec3122@dewey.myzen.co.uk>",
+      "from_name": "Michael Dewey",
+      "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
+      "date": "2023-08-24T16:35:48+01:00",
+      "subject": "[R-meta] Question on Fisher's z possible range of values",
+      "subject_clean": "[R-meta] Question on Fisher's z possible range of values",
+      "in_reply_to": "<CAAKwTDGvtRFsffYZamhW+S8X7rGMzZKDEOPHhCPj42b5vtdAvQ@mail.gmail.com>",
+      "references": [
+        "<CAAKwTDGvtRFsffYZamhW+S8X7rGMzZKDEOPHhCPj42b5vtdAvQ@mail.gmail.com>"
+      ],
+      "body_plain": "Dear Gabriel\n\nIt might help get better answers if you said why you want to know and \nwhy experimenting with extreme values of r has not enlightened you. In \nprinciple z takes on any value on the real line although you would need \nan r very, very, very close to 1 to get anywhere near infinity.\n\nMichael\n\nOn 24/08/2023 14:48, Gabriel Cotlier via R-sig-meta-analysis wrote:\n> Hello all,\n> \n> I would like to ask what is the theoretical possible range for Fisher's z\n> correlation coefficient --output of the conversion from Pearson's\n> product-moment correlation coefficient ( *r* )-- determined by means of the\n> \"Metafor package function escalc() as follows:\n> \n> ## Transformation of Pearson's Product-moment correlation coefficients (r)\n> to Fisher's Z\n> dat <-escalc(measure = \"ZCOR\",\n>               ri = ri,\n>               ni = ni,\n>               data = dat)\n> \n> Thanks a lot for your help.\n> Kind regards,\n> Gabriel\n> \n> \t[[alternative HTML version deleted]]\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n\n-- \nMichael\nhttp://www.dewey.myzen.co.uk/home.html",
+      "body_snippet": "Dear Gabriel\n\nIt might help get better answers if you said why you want to know and \nwhy experimenting with extreme values of r has not enlightened you. In \nprinciple z takes on any value on the real ",
+      "thread_id": "thread-116712b7007e",
+      "thread_depth": 1,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-737de18fc445",
+      "message_id": "<CAAKwTDFHJSqSpVX5rsvn7=O4QfFnU6jjB-GeXTRokBi0JxaCRg@mail.gmail.com>",
+      "from_name": "Gabriel Cotlier",
+      "from_email_hash": "fe6b7ece94315f2ba414b8c7053cca118260d4229688ad762179e180bbdf3aaf",
+      "date": "2023-08-25T18:56:16+03:00",
+      "subject": "[R-meta] Question on Fisher's z possible range of values",
+      "subject_clean": "[R-meta] Question on Fisher's z possible range of values",
+      "in_reply_to": "<2b50de94-fec5-b070-9128-f733f3ec3122@dewey.myzen.co.uk>",
+      "references": [
+        "<CAAKwTDGvtRFsffYZamhW+S8X7rGMzZKDEOPHhCPj42b5vtdAvQ@mail.gmail.com>",
+        "<2b50de94-fec5-b070-9128-f733f3ec3122@dewey.myzen.co.uk>"
+      ],
+      "body_plain": "Dear Michael,\nThank you very much for your reply and the information.\nI think that knowing that z can take any value in the real line is\nenough for my purpose, which is to report the range of values that z can\ntake.\nSince I am transforming from r-tozm, I thought about giving a range of z to\nguide readers.\nThank you very much again.\nGabriel\n\n\nOn Thu, Aug 24, 2023 at 6:35?PM Michael Dewey <lists at dewey.myzen.co.uk>\nwrote:\n\n> Dear Gabriel\n>\n> It might help get better answers if you said why you want to know and\n> why experimenting with extreme values of r has not enlightened you. In\n> principle z takes on any value on the real line although you would need\n> an r very, very, very close to 1 to get anywhere near infinity.\n>\n> Michael\n>\n> On 24/08/2023 14:48, Gabriel Cotlier via R-sig-meta-analysis wrote:\n> > Hello all,\n> >\n> > I would like to ask what is the theoretical possible range for Fisher's z\n> > correlation coefficient --output of the conversion from Pearson's\n> > product-moment correlation coefficient ( *r* )-- determined by means of\n> the\n> > \"Metafor package function escalc() as follows:\n> >\n> > ## Transformation of Pearson's Product-moment correlation coefficients\n> (r)\n> > to Fisher's Z\n> > dat <-escalc(measure = \"ZCOR\",\n> >               ri = ri,\n> >               ni = ni,\n> >               data = dat)\n> >\n> > Thanks a lot for your help.\n> > Kind regards,\n> > Gabriel\n> >\n> >       [[alternative HTML version deleted]]\n> >\n> > _______________________________________________\n> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> > To manage your subscription to this mailing list, go to:\n> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> >\n>\n> --\n> Michael\n> http://www.dewey.myzen.co.uk/home.html\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Michael,\nThank you very much for your reply and the information.\nI think that knowing that z can take any value in the real line is\nenough for my purpose, which is to report the range of values t",
+      "thread_id": "thread-116712b7007e",
+      "thread_depth": 2,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-b62c5ddd11d9",
+      "message_id": "<2AE60A86-D063-469F-BC37-11A97DDFA668@uniklinik-freiburg.de>",
+      "from_name": "Dr. Guido Schwarzer",
+      "from_email_hash": "5933fdbd5c0e719b579ab557521981d64d6fe4975312ea53734438638abdd271",
+      "date": "2023-08-28T16:34:44Z",
+      "subject": "[R-meta] Questions about extracting the p-value in subgroup analysis",
+      "subject_clean": "[R-meta] Questions about extracting the p-value in subgroup analysis",
+      "in_reply_to": "<CAPm5Ok3bR+uCRCkP0S4nVEmgGuip3ODvqxSOEos-g63BWtPWhA@mail.gmail.com>",
+      "references": [
+        "<CAPm5Ok3bR+uCRCkP0S4nVEmgGuip3ODvqxSOEos-g63BWtPWhA@mail.gmail.com>"
+      ],
+      "body_plain": "Nick,\n\nI am not sure which p-value(s) you are interested in and which website you are referring to (I couldn't find the statement in the current help pages of R package meta). So, the following might not fully answer your question.\n\nAs Ishtiaq wrote, the argument test.subgroup.random can be used to print the result of the test for subgroup differences. However, this argument is TRUE by default and, accordingly, the result is part of the R output in your email (see \"Test for subgroup differences (random effects model (HK)):\").\n\nIf you are interested in the p-values for the test of effect in individual subgroups, you can extract this information using\n\nupdate.meta(m.gen, test.subgroup.random =T , subgroup = ins, tau.common = FALSE)$pval.random.w\n\nor\n\nm.gen.ins <- update.meta(m.gen, test.subgroup.random =T , subgroup = ins, tau.common = FALSE)\nm.gen.ins$pval.random.w\n\nThese p-values are not part of the printout as this could result in \"cherry picking\", i.e., identifying subgroups with a significant treatment effect. This point is discussed in the Cochrane Handbook under the topic of \"within-subgroup inferences\" (see https://training.cochrane.org/handbook/current/chapter-10#section-10-11-3-1).\n\nBest,\nGuido",
+      "body_snippet": "Nick,\n\nI am not sure which p-value(s) you are interested in and which website you are referring to (I couldn't find the statement in the current help pages of R package meta). So, the following might ",
+      "thread_id": "thread-02ba48c2c327",
+      "thread_depth": 1,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-7e838bd12785",
+      "message_id": "<8AAD0B6F-58F5-4D04-B9DB-811F3AA265B7@latrobe.edu.au>",
+      "from_name": "Mick Girdwood",
+      "from_email_hash": "4f9ba839f493b7cf3e0c112874eddc342a79a214819a33c23e831719900ad619",
+      "date": "2023-08-31T02:16:47Z",
+      "subject": "[R-meta] Restricted cubic spline behaviour in moderator variable",
+      "subject_clean": "[R-meta] Restricted cubic spline behaviour in moderator variable",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi everyone,\n\nI am fitting an rma.mv model with a restricted cubic spline moderator. I have followed the helpful examples from the metafor website, as well as looking through this mailing list for previous examples. All of that went well. I have however run into an interesting issue.\n\nI guess this relates less to meta-analysis as such and more specifically to the rcs fitting/package. Here is my model:\n\nmodel1 <- rma.mv(yi, V,\n                     mods = ~rcs(timepoint, 4),\n                     data = data,\n                     random = list(~ timepoint|cohort),\n                     struct = c(\"CAR?))\n\nI have been comparing the model fit for different moderator structures using heuristics (AIC, BIC etc) as well as visually looking at predicted plots. The fit of this example seemed quite strange, with the tail of the spline at the last knot angling well away from any data points. I was curious and went and extracted the knot positions with:\n\nknots <- attr(rcs(model.matrix(model1)[,2], 4), \"parms?)\n(e.g. in my example: 3.00000,  6.00000, 12.00000, 51.64118)\n\nI then refit another model, but specifying these exact same knot positions\n\nmodel2 <- rma.mv(yi, V,\n                     mods = ~rcs(timepoint, c(3.00000,  6.00000, 12.00000, 51.64118)),\n                     data = data,\n                     random = list(~ timepoint|cohort),\n                     struct = c(\"CAR?))\n\nThis time the fit is completely different (not subtle, they are two completely different angles on the 3rd spline/last knot) - i.e. in model 2 the tail of the spline is perhaps what would be ?expected' of the data. What is going on here? To my mind I am fitting the same model with the same knot positions (as I used the knot positions from the first model to fit the second), but have just specified them differently, why are they behaving differently? Is there some other parameter of rcs that I am not using/missing/misunderstanding? I tried reading into the help and source for rcs but didn?t notice anything.  I?m guessing this wouldn?t be metafor related... I tried testing what the attributes of the two different rcs calls looked like but they were identical too, so I don?t understand how it can fit them so differently? I also tried fitting the same model with splines::ns and the fit was identical to model2. Any ideas what is happening with model1?\n\nSorry if this question is perhaps slightly off topic.\nThank you for your help as always.\n\nMick Girdwood\nLa Trobe University | Australia\n\n\n\n\nLa Trobe University | TEQSA PRV12132 - Australian University | CRICOS Provider 00115M",
+      "body_snippet": "Hi everyone,\n\nI am fitting an rma.mv model with a restricted cubic spline moderator. I have followed the helpful examples from the metafor website, as well as looking through this mailing list for pre",
+      "thread_id": "thread-7e838bd12785",
+      "thread_depth": 0,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-c1972af8afb7",
+      "message_id": "<7ef9b34a3531461e9abde3e6fd6659da@maastrichtuniversity.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2023-08-31T08:21:56Z",
+      "subject": "[R-meta]  Restricted cubic spline behaviour in moderator variable",
+      "subject_clean": "[R-meta]  Restricted cubic spline behaviour in moderator variable",
+      "in_reply_to": "<8AAD0B6F-58F5-4D04-B9DB-811F3AA265B7@latrobe.edu.au>",
+      "references": [
+        "<8AAD0B6F-58F5-4D04-B9DB-811F3AA265B7@latrobe.edu.au>"
+      ],
+      "body_plain": "Dear Mick,\n\nThis might have to do with missing values. In the example on the metafor website (https://www.metafor-project.org/doku.php/tips:non_linear_meta_regression), both of these lead to the exact same results:\n\nres.rcs <- rma(yi, vi, mods = ~ rcs(xi, 4), data=dat)\nres.rcs\n\nknots <- attr(rcs(model.matrix(res.rcs)[,2], 4), \"parms\")\nknots\n\nres.rcs <- rma(yi, vi, mods = ~ rcs(xi, knots), data=dat)\nres.rcs\n\nBut let's make some of the yi values missing:\n\ndat$yi[1:10] <- NA\n\nThen rerunning the code above will lead to somewhat different results.\n\nThis happens because:\n\nrcs(dat$xi, 4)\n\nis actually based on the entire dataset, while\n\nattr(rcs(model.matrix(res.rcs)[,2], 4), \"parms\")\n\nuses only the rows actually included in the analysis (i.e., removing the first 10 rows).\n\nIf you use:\n\nknots <- attr(rcs(dat$xi, 4), \"parms\")\n\nthen\n\nres.rcs <- rma(yi, vi, mods = ~ rcs(xi, knots), data=dat)\nres.rcs\n\nwill give the same results again.\n\nI have changed the code in the example to use 'knots <- attr(rcs(dat$xi, 4), \"parms\")' as this is more accurate as to what is happening (even though it makes no difference in the example on the website since there are no missing values). Also, I've expanded the first footnote which gives a hint in this direction.\n\nIt would be nice if you could confirm that this solves the issue. If not, we will have to go digging deeper.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Mick Girdwood via R-sig-meta-analysis\n>Sent: Thursday, 31 August, 2023 4:17\n>To: Gabriel Cotlier via R-sig-meta-analysis\n>Cc: Mick Girdwood\n>Subject: [R-meta] Restricted cubic spline behaviour in moderator variable\n>\n>Hi everyone,\n>\n>I am fitting an rma.mv model with a restricted cubic spline moderator. I have\n>followed the helpful examples from the metafor website, as well as looking\n>through this mailing list for previous examples. All of that went well. I have\n>however run into an interesting issue.\n>\n>I guess this relates less to meta-analysis as such and more specifically to the\n>rcs fitting/package. Here is my model:\n>\n>model1 <- rma.mv(yi, V,\n>                     mods = ~rcs(timepoint, 4),\n>                     data = data,\n>                     random = list(~ timepoint|cohort),\n>                     struct = c(\"CAR?))\n>\n>I have been comparing the model fit for different moderator structures using\n>heuristics (AIC, BIC etc) as well as visually looking at predicted plots. The fit\n>of this example seemed quite strange, with the tail of the spline at the last\n>knot angling well away from any data points. I was curious and went and extracted\n>the knot positions with:\n>\n>knots <- attr(rcs(model.matrix(model1)[,2], 4), \"parms?)\n>(e.g. in my example: 3.00000,  6.00000, 12.00000, 51.64118)\n>\n>I then refit another model, but specifying these exact same knot positions\n>\n>model2 <- rma.mv(yi, V,\n>                     mods = ~rcs(timepoint, c(3.00000,  6.00000, 12.00000,\n>51.64118)),\n>                     data = data,\n>                     random = list(~ timepoint|cohort),\n>                     struct = c(\"CAR?))\n>\n>This time the fit is completely different (not subtle, they are two completely\n>different angles on the 3rd spline/last knot) - i.e. in model 2 the tail of the\n>spline is perhaps what would be ?expected' of the data. What is going on here? To\n>my mind I am fitting the same model with the same knot positions (as I used the\n>knot positions from the first model to fit the second), but have just specified\n>them differently, why are they behaving differently? Is there some other\n>parameter of rcs that I am not using/missing/misunderstanding? I tried reading\n>into the help and source for rcs but didn?t notice anything.  I?m guessing this\n>wouldn?t be metafor related... I tried testing what the attributes of the two\n>different rcs calls looked like but they were identical too, so I don?t\n>understand how it can fit them so differently? I also tried fitting the same\n>model with splines::ns and the fit was identical to model2. Any ideas what is\n>happening with model1?\n>\n>Sorry if this question is perhaps slightly off topic.\n>Thank you for your help as always.\n>\n>Mick Girdwood\n>La Trobe University | Australia",
+      "body_snippet": "Dear Mick,\n\nThis might have to do with missing values. In the example on the metafor website (https://www.metafor-project.org/doku.php/tips:non_linear_meta_regression), both of these lead to the exact",
+      "thread_id": "thread-7e838bd12785",
+      "thread_depth": 1,
+      "month": "2023-08"
+    },
+    {
+      "id": "msg-abf4edf6731d",
+      "message_id": "<946DBDD5-EBA9-4D5D-80C8-8664769191D6@latrobe.edu.au>",
+      "from_name": "Mick Girdwood",
+      "from_email_hash": "4f9ba839f493b7cf3e0c112874eddc342a79a214819a33c23e831719900ad619",
+      "date": "2023-08-31T13:11:47Z",
+      "subject": "[R-meta]  Restricted cubic spline behaviour in moderator variable",
+      "subject_clean": "[R-meta]  Restricted cubic spline behaviour in moderator variable",
+      "in_reply_to": "<7ef9b34a3531461e9abde3e6fd6659da@maastrichtuniversity.nl>",
+      "references": [
+        "<8AAD0B6F-58F5-4D04-B9DB-811F3AA265B7@latrobe.edu.au>",
+        "<7ef9b34a3531461e9abde3e6fd6659da@maastrichtuniversity.nl>"
+      ],
+      "body_plain": "Dear Wolfgang,\n\nThank you for your quick reply. You are right this is to do with the NA values, thank you. Those subtle NA differences ever so slightly affected knot position. That wouldn?t be an issue but as you point out, we are then using a different knot when using  attr(rcs(model.matrix(res.rcs)[,2], 4), \"parms\")\n\nThat alone didn?t fully explain my very aberrant plot that I saw. I tried playing around with subtle changes to knot positions (e.g. moving + - 1) and that to the naked eye actually made almost no change. The differences in the plots were because:\n\npredict(model1,  newmods=rcspline.eval(seq(1,100, length = 100), knots, inclx=TRUE))) was using knot positions that were slightly different position to those that were parameterised in the model (because of how I incorrectly attained them), but in the predict/plot calculation this then resulted in stranger predicted points. Hence strange tail.\n\nI guess I didn?t think of this, as when manually providing the knots, and then using the same predict and plot before, there obviously wasn?t any difference as they were based on exactly the same knot positions.\n\nThanks for your help here, I was going to resort to manually providing knots as per Harrell, 2015 recommendations (which is what rcs does?), but this will save some hassle.\n\nThanks\nMick\n\nOn 31 Aug 2023, at 18:21, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl<mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>> wrote:\n\nDear Mick,\n\nThis might have to do with missing values. In the example on the metafor website (https://www.metafor-project.org/doku.php/tips:non_linear_meta_regression<https://www.metafor-project.org/doku.php/tips:non_linear_meta_regression>), both of these lead to the exact same results:\n\nres.rcs <- rma(yi, vi, mods = ~ rcs(xi, 4), data=dat)\nres.rcs\n\nknots <- attr(rcs(model.matrix(res.rcs)[,2], 4), \"parms\")\nknots\n\nres.rcs <- rma(yi, vi, mods = ~ rcs(xi, knots), data=dat)\nres.rcs\n\nBut let's make some of the yi values missing:\n\ndat$yi[1:10] <- NA\n\nThen rerunning the code above will lead to somewhat different results.\n\nThis happens because:\n\nrcs(dat$xi, 4)\n\nis actually based on the entire dataset, while\n\nattr(rcs(model.matrix(res.rcs)[,2], 4), \"parms\")\n\nuses only the rows actually included in the analysis (i.e., removing the first 10 rows).\n\nIf you use:\n\nknots <- attr(rcs(dat$xi, 4), \"parms\")\n\nthen\n\nres.rcs <- rma(yi, vi, mods = ~ rcs(xi, knots), data=dat)\nres.rcs\n\nwill give the same results again.\n\nI have changed the code in the example to use 'knots <- attr(rcs(dat$xi, 4), \"parms\")' as this is more accurate as to what is happening (even though it makes no difference in the example on the website since there are no missing values). Also, I've expanded the first footnote which gives a hint in this direction.\n\nIt would be nice if you could confirm that this solves the issue. If not, we will have to go digging deeper.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Mick Girdwood via R-sig-meta-analysis\n>Sent: Thursday, 31 August, 2023 4:17\n>To: Gabriel Cotlier via R-sig-meta-analysis\n>Cc: Mick Girdwood\n>Subject: [R-meta] Restricted cubic spline behaviour in moderator variable\n>\n>Hi everyone,\n>\n>I am fitting an rma.mv model with a restricted cubic spline moderator. I have\n>followed the helpful examples from the metafor website, as well as looking\n>through this mailing list for previous examples. All of that went well. I have\n>however run into an interesting issue.\n>\n>I guess this relates less to meta-analysis as such and more specifically to the\n>rcs fitting/package. Here is my model:\n>\n>model1 <- rma.mv(yi, V,\n> mods = ~rcs(timepoint, 4),\n> data = data,\n> random = list(~ timepoint|cohort),\n> struct = c(\"CAR?))\n>\n>I have been comparing the model fit for different moderator structures using\n>heuristics (AIC, BIC etc) as well as visually looking at predicted plots. The fit\n>of this example seemed quite strange, with the tail of the spline at the last\n>knot angling well away from any data points. I was curious and went and extracted\n>the knot positions with:\n>\n>knots <- attr(rcs(model.matrix(model1)[,2], 4), \"parms?)\n>(e.g. in my example: 3.00000, 6.00000, 12.00000, 51.64118)\n>\n>I then refit another model, but specifying these exact same knot positions\n>\n>model2 <- rma.mv(yi, V,\n> mods = ~rcs(timepoint, c(3.00000, 6.00000, 12.00000,\n>51.64118)),\n> data = data,\n> random = list(~ timepoint|cohort),\n> struct = c(\"CAR?))\n>\n>This time the fit is completely different (not subtle, they are two completely\n>different angles on the 3rd spline/last knot) - i.e. in model 2 the tail of the\n>spline is perhaps what would be ?expected' of the data. What is going on here? To\n>my mind I am fitting the same model with the same knot positions (as I used the\n>knot positions from the first model to fit the second), but have just specified\n>them differently, why are they behaving differently? Is there some other\n>parameter of rcs that I am not using/missing/misunderstanding? I tried reading\n>into the help and source for rcs but didn?t notice anything. I?m guessing this\n>wouldn?t be metafor related... I tried testing what the attributes of the two\n>different rcs calls looked like but they were identical too, so I don?t\n>understand how it can fit them so differently? I also tried fitting the same\n>model with splines::ns and the fit was identical to model2. Any ideas what is\n>happening with model1?\n>\n>Sorry if this question is perhaps slightly off topic.\n>Thank you for your help as always.\n>\n>Mick Girdwood\n>La Trobe University | Australia\n\n\nLa Trobe University | TEQSA PRV12132 - Australian University | CRICOS Provider 00115M\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Wolfgang,\n\nThank you for your quick reply. You are right this is to do with the NA values, thank you. Those subtle NA differences ever so slightly affected knot position. That wouldn?t be an issu",
+      "thread_id": "thread-7e838bd12785",
+      "thread_depth": 2,
+      "month": "2023-08"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-f4cdc33b3610",
+      "subject": "[R-meta] Using rcalc() in metafor",
+      "message_count": 1,
+      "participants": [
+        "Yuhang Hu"
+      ],
+      "started": "2023-08-04T11:12:01+08:00",
+      "last_reply": "2023-08-04T11:12:01+08:00",
+      "root_message_id": "msg-f4cdc33b3610"
+    },
+    {
+      "id": "thread-41631103e1a6",
+      "subject": "[R-meta] Using rcalc() in metafor",
+      "message_count": 2,
+      "participants": [
+        "Lukasz Stasielowicz",
+        "Yuhang Hu"
+      ],
+      "started": "2023-08-04T13:23:52+02:00",
+      "last_reply": "2023-08-05T08:26:01+08:00",
+      "root_message_id": "msg-41631103e1a6"
+    },
+    {
+      "id": "thread-8761e571c042",
+      "subject": "[R-meta] Using rcalc() in metafor",
+      "message_count": 1,
+      "participants": [
+        "Lukasz Stasielowicz"
+      ],
+      "started": "2023-08-07T09:51:14+02:00",
+      "last_reply": "2023-08-07T09:51:14+02:00",
+      "root_message_id": "msg-8761e571c042"
+    },
+    {
+      "id": "thread-e0add3fa3978",
+      "subject": "[R-meta] Calculating pooled effect size",
+      "message_count": 2,
+      "participants": [
+        "Adelina Artenie",
+        "Dr. Gerta Rücker"
+      ],
+      "started": "2023-08-12T10:28:07+00:00",
+      "last_reply": "2023-08-12T11:18:19+00:00",
+      "root_message_id": "msg-e0add3fa3978"
+    },
+    {
+      "id": "thread-9183be4bcd64",
+      "subject": "[R-meta] Back-transforming Fisher's r-to-z transformed correlation coefficient to r in funnel and forest plots results",
+      "message_count": 4,
+      "participants": [
+        "John Mahas",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2023-08-16T19:36:04+00:00",
+      "last_reply": "2023-08-22T00:12:36+00:00",
+      "root_message_id": "msg-9183be4bcd64"
+    },
+    {
+      "id": "thread-2922bf5d6c17",
+      "subject": "[R-meta] Meta-analysis - missing study-specific variance",
+      "message_count": 5,
+      "participants": [
+        "Angela Leanne Wilson",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2023-08-21T02:10:45+00:00",
+      "last_reply": "2023-08-22T02:29:06+00:00",
+      "root_message_id": "msg-2922bf5d6c17"
+    },
+    {
+      "id": "thread-02ba48c2c327",
+      "subject": "[R-meta] Questions about extracting the p-value in subgroup analysis",
+      "message_count": 3,
+      "participants": [
+        "Dr. Guido Schwarzer",
+        "Ishtiaq Ahmed",
+        "英文科陳品誠"
+      ],
+      "started": "2023-08-23T21:38:25+08:00",
+      "last_reply": "2023-08-28T16:34:44+00:00",
+      "root_message_id": "msg-02ba48c2c327"
+    },
+    {
+      "id": "thread-116712b7007e",
+      "subject": "[R-meta] Question on Fisher's z possible range of values",
+      "message_count": 3,
+      "participants": [
+        "Gabriel Cotlier",
+        "Michael Dewey"
+      ],
+      "started": "2023-08-24T16:48:37+03:00",
+      "last_reply": "2023-08-25T18:56:16+03:00",
+      "root_message_id": "msg-116712b7007e"
+    },
+    {
+      "id": "thread-7e838bd12785",
+      "subject": "[R-meta] Restricted cubic spline behaviour in moderator variable",
+      "message_count": 3,
+      "participants": [
+        "Mick Girdwood",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2023-08-31T02:16:47+00:00",
+      "last_reply": "2023-08-31T13:11:47+00:00",
+      "root_message_id": "msg-7e838bd12785"
+    }
+  ]
+}

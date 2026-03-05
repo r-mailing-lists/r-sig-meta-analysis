@@ -1,0 +1,387 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2022-12",
+  "messages": [
+    {
+      "id": "msg-6bc4f7d8c684",
+      "message_id": "<CA+dzWjp7MVtvytKgzK8eAQmGUzRsVex2zdvsi86UGP2QwHcgTA@mail.gmail.com>",
+      "from_name": "Yuhang Hu",
+      "from_email_hash": "b0634bac76ff7996231a855de79b1199f6ae3db82e807c9f518efb38e239b00e",
+      "date": "2022-12-13T20:28:55-07:00",
+      "subject": "[R-meta] Using variance components with effect size transformation",
+      "subject_clean": "[R-meta] Using variance components with effect size transformation",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear Meta Community,\n\nI have a 3-level meta-regression model with a categorical moderator (3\nlevels) plus some covariates fit as:\n\nm6 = rma.mv(r2z_transformed ~ 0 + cat_mod + covariates, random = ~ 1 |\nstudy/effect)\n\nI wonder to calculate probabilities from the distribution of effects as\nexplained in this post (\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-August/004136.html),\nwhether I should use the transformed variance components (A) or\nback-transformed variance components (B)?\n\nA: confint.rma.mv(m6)   # transformed i.e., 'r2z'\nB: confint.rma.mv(m6, transf = transf.ztor) # back-transformed i.e., 'z2r'\n\nCurrently, A and B give the same result, and I wonder why?\n\nThanks,\nYuhang\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Meta Community,\n\nI have a 3-level meta-regression model with a categorical moderator (3\nlevels) plus some covariates fit as:\n\nm6 = rma.mv(r2z_transformed ~ 0 + cat_mod + covariates, random = ~ 1 ",
+      "thread_id": "thread-6bc4f7d8c684",
+      "thread_depth": 0,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-6006948b978e",
+      "message_id": "<672f79ec33e842e9acdab525f8f0bbae@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-12-14T14:44:07Z",
+      "subject": "[R-meta]  Using variance components with effect size transformation",
+      "subject_clean": "[R-meta]  Using variance components with effect size transformation",
+      "in_reply_to": "<cd1bf6f998106411303e6392bccb022b@posteo.de>",
+      "references": [
+        "<cd1bf6f998106411303e6392bccb022b@posteo.de>"
+      ],
+      "body_plain": "Dear Yuhang,\n\nThe 'transf' argument in confint() only applies to fixed effects ('model coefficients'). One cannot directly transform the variance components from one scale to another (there are in principle ways of doing this, but this rarely is appropriate).\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: Wolfgang Viechtbauer [mailto:wviechtb at posteo.de]\n>Sent: Wednesday, 14 December, 2022 15:40\n>To: Viechtbauer, Wolfgang (NP)\n>Subject: Fwd: [R-meta] Using variance components with effect size transformation\n>\n>Dear Meta Community,\n>\n>I have a 3-level meta-regression model with a categorical moderator (3\n>levels) plus some covariates fit as:\n>\n>m6 = rma.mv(r2z_transformed ~ 0 + cat_mod + covariates, random = ~ 1 |\n>study/effect)\n>\n>I wonder to calculate probabilities from the distribution of effects as\n>explained in this post (\n>https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-August/004136.html),\n>whether I should use the transformed variance components (A) or\n>back-transformed variance components (B)?\n>\n>A: confint.rma.mv(m6)   # transformed i.e., 'r2z'\n>B: confint.rma.mv(m6, transf = transf.ztor) # back-transformed i.e.,\n>'z2r'\n>\n>Currently, A and B give the same result, and I wonder why?\n>\n>Thanks,\n>Yuhang",
+      "body_snippet": "Dear Yuhang,\n\nThe 'transf' argument in confint() only applies to fixed effects ('model coefficients'). One cannot directly transform the variance components from one scale to another (there are in pri",
+      "thread_id": "thread-6006948b978e",
+      "thread_depth": 0,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-ad3f9837f1de",
+      "message_id": "<CA+dzWjpjhJi5dGTtKS5DcDrFSyrqfEWKa_7t4tBMizN78ecRpQ@mail.gmail.com>",
+      "from_name": "Yuhang Hu",
+      "from_email_hash": "b0634bac76ff7996231a855de79b1199f6ae3db82e807c9f518efb38e239b00e",
+      "date": "2022-12-14T18:33:22-07:00",
+      "subject": "[R-meta] R-sig-meta-analysis Digest, Vol 67, Issue 2",
+      "subject_clean": "[R-meta] R-sig-meta-analysis Digest, Vol 67, Issue 2",
+      "in_reply_to": "<mailman.4284.13.1671015602.1822.r-sig-meta-analysis@r-project.org>",
+      "references": [
+        "<mailman.4284.13.1671015602.1822.r-sig-meta-analysis@r-project.org>"
+      ],
+      "body_plain": "Dear Wolfgang,\n\nMany thanks for your response. To make sure, as a general principle, do you\nrecommend always computing those probabilities based off of the\nr2z-transformed effect size estimates?\n\nMy intuition regarding transforming the variance components back to their\noriginal scale came from the fact that the emmeans package does a similar\nthing (for standard errors) via the delta method (\nhttps://cran.r-project.org/web/packages/emmeans/vignettes/transformations.html#after\n).\n\nAnd my desire to accurately back transform the variance components was\nsolely because I thought it could improve interpretability given the ease\nof working with correlations than r2z transformed correlations.\n\nThanks again,\nYuhang\n\nOn Wed, Dec 14, 2022 at 4:01 AM <r-sig-meta-analysis-request at r-project.org>\nwrote:\n\n> Send R-sig-meta-analysis mailing list submissions to\n>         r-sig-meta-analysis at r-project.org\n>\n> To subscribe or unsubscribe via the World Wide Web, visit\n>         https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n>         r-sig-meta-analysis-request at r-project.org\n>\n> You can reach the person managing the list at\n>         r-sig-meta-analysis-owner at r-project.org\n>\n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n>\n>\n> Today's Topics:\n>\n>    1. Using variance components with effect size transformation\n>       (Yuhang Hu)\n>\n> ----------------------------------------------------------------------\n>\n> Message: 1\n> Date: Tue, 13 Dec 2022 20:28:55 -0700\n> From: Yuhang Hu <yh342 at nau.edu>\n> To: R meta <r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] Using variance components with effect size\n>         transformation\n> Message-ID:\n>         <\n> CA+dzWjp7MVtvytKgzK8eAQmGUzRsVex2zdvsi86UGP2QwHcgTA at mail.gmail.com>\n> Content-Type: text/plain; charset=\"utf-8\"\n>\n> Dear Meta Community,\n>\n> I have a 3-level meta-regression model with a categorical moderator (3\n> levels) plus some covariates fit as:\n>\n> m6 = rma.mv(r2z_transformed ~ 0 + cat_mod + covariates, random = ~ 1 |\n> study/effect)\n>\n> I wonder to calculate probabilities from the distribution of effects as\n> explained in this post (\n> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-August/004136.html\n> ),\n> whether I should use the transformed variance components (A) or\n> back-transformed variance components (B)?\n>\n> A: confint.rma.mv(m6)   # transformed i.e., 'r2z'\n> B: confint.rma.mv(m6, transf = transf.ztor) # back-transformed i.e., 'z2r'\n>\n> Currently, A and B give the same result, and I wonder why?\n>\n> Thanks,\n> Yuhang\n>\n>         [[alternative HTML version deleted]]\n>\n>\n>\n>\n> ------------------------------\n>\n> Subject: Digest Footer\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n>\n> ------------------------------\n>\n> End of R-sig-meta-analysis Digest, Vol 67, Issue 2\n> **************************************************\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Wolfgang,\n\nMany thanks for your response. To make sure, as a general principle, do you\nrecommend always computing those probabilities based off of the\nr2z-transformed effect size estimates?\n\nMy i",
+      "thread_id": "thread-ad3f9837f1de",
+      "thread_depth": 0,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-5520c5e3c7c7",
+      "message_id": "<CAFUVuJxVmBEwOE1jXWo8L0015dWAM_Xajp7GgJ5_qCrAKBaQgg@mail.gmail.com>",
+      "from_name": "James Pustejovsky",
+      "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
+      "date": "2022-12-15T09:53:39-06:00",
+      "subject": "[R-meta] R-sig-meta-analysis Digest, Vol 67, Issue 2",
+      "subject_clean": "[R-meta] R-sig-meta-analysis Digest, Vol 67, Issue 2",
+      "in_reply_to": "<CA+dzWjpjhJi5dGTtKS5DcDrFSyrqfEWKa_7t4tBMizN78ecRpQ@mail.gmail.com>",
+      "references": [
+        "<mailman.4284.13.1671015602.1822.r-sig-meta-analysis@r-project.org>",
+        "<CA+dzWjpjhJi5dGTtKS5DcDrFSyrqfEWKa_7t4tBMizN78ecRpQ@mail.gmail.com>"
+      ],
+      "body_plain": "Hi Yuhang,\n\nFor the sort of probability calculations you are trying to do, it is best\nto use the transformed scale (i.e., the Fisher z scale). These sorts of\ncalculations rely on ALL of the model's distributional assumptions, so it\nis critical to use the scale that best conforms to those assumptions. That\nsaid, you can still interpret the results of these calculations in the\noriginal metric.\n\nSay that zi = transf.rtoz(ri) and that zi is an approximately unbiased\nestimate of the parameter zeta-i. We can interpret zeta-i as the r-to-z\ntransformation of the correlation parameter rho-i. Assume that zeta-i\nfollows a normal distribution (possibly with a hierarchical structure, like\nin your example, but I'll ignore that for now). Then this assumption\nimplies that rho-i also follows some distribution, but a non-normal one.\nHowever, you can still do percentile calculations on the zeta-i scale. For\ninstance, based on the model, we can calculate\nPr(zeta-i > 0)\nSince transf.rtoz(0) = 0, then\nPr(zeta-i > 0) = Pr(rho-i > 0)\nMore generally, suppose you want to find Pr(rho-i > c_r). Then you can take\nc_z = transf.rtoz(c_r) and find\nPr(zeta-i > c_z),\nwhich will correspond to Pr(rho-i > c_r). For small values of c_r, the\ncutoffs are very similar, e.g.\nc_r = 0.2 implies c_z = 0.2027\nc_r = 0.3 implies c_z = 0.3095\nc_z = 0.4 implies c_z = 0.4236\netc.\n\nAll of these calculations work more generally with the sort of multi-level\nrandom effects model that you described in your example.\n\nCheers,\nJames\n\nOn Wed, Dec 14, 2022 at 7:33 PM Yuhang Hu <yh342 at nau.edu> wrote:\n\n> Dear Wolfgang,\n>\n> Many thanks for your response. To make sure, as a general principle, do you\n> recommend always computing those probabilities based off of the\n> r2z-transformed effect size estimates?\n>\n> My intuition regarding transforming the variance components back to their\n> original scale came from the fact that the emmeans package does a similar\n> thing (for standard errors) via the delta method (\n>\n> https://cran.r-project.org/web/packages/emmeans/vignettes/transformations.html#after\n> ).\n>\n> And my desire to accurately back transform the variance components was\n> solely because I thought it could improve interpretability given the ease\n> of working with correlations than r2z transformed correlations.\n>\n> Thanks again,\n> Yuhang\n>\n> On Wed, Dec 14, 2022 at 4:01 AM <r-sig-meta-analysis-request at r-project.org\n> >\n> wrote:\n>\n> > Send R-sig-meta-analysis mailing list submissions to\n> >         r-sig-meta-analysis at r-project.org\n> >\n> > To subscribe or unsubscribe via the World Wide Web, visit\n> >         https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> > or, via email, send a message with subject or body 'help' to\n> >         r-sig-meta-analysis-request at r-project.org\n> >\n> > You can reach the person managing the list at\n> >         r-sig-meta-analysis-owner at r-project.org\n> >\n> > When replying, please edit your Subject line so it is more specific\n> > than \"Re: Contents of R-sig-meta-analysis digest...\"\n> >\n> >\n> > Today's Topics:\n> >\n> >    1. Using variance components with effect size transformation\n> >       (Yuhang Hu)\n> >\n> > ----------------------------------------------------------------------\n> >\n> > Message: 1\n> > Date: Tue, 13 Dec 2022 20:28:55 -0700\n> > From: Yuhang Hu <yh342 at nau.edu>\n> > To: R meta <r-sig-meta-analysis at r-project.org>\n> > Subject: [R-meta] Using variance components with effect size\n> >         transformation\n> > Message-ID:\n> >         <\n> > CA+dzWjp7MVtvytKgzK8eAQmGUzRsVex2zdvsi86UGP2QwHcgTA at mail.gmail.com>\n> > Content-Type: text/plain; charset=\"utf-8\"\n> >\n> > Dear Meta Community,\n> >\n> > I have a 3-level meta-regression model with a categorical moderator (3\n> > levels) plus some covariates fit as:\n> >\n> > m6 = rma.mv(r2z_transformed ~ 0 + cat_mod + covariates, random = ~ 1 |\n> > study/effect)\n> >\n> > I wonder to calculate probabilities from the distribution of effects as\n> > explained in this post (\n> >\n> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-August/004136.html\n> > ),\n> > whether I should use the transformed variance components (A) or\n> > back-transformed variance components (B)?\n> >\n> > A: confint.rma.mv(m6)   # transformed i.e., 'r2z'\n> > B: confint.rma.mv(m6, transf = transf.ztor) # back-transformed i.e.,\n> 'z2r'\n> >\n> > Currently, A and B give the same result, and I wonder why?\n> >\n> > Thanks,\n> > Yuhang\n> >\n> >         [[alternative HTML version deleted]]\n> >\n> >\n> >\n> >\n> > ------------------------------\n> >\n> > Subject: Digest Footer\n> >\n> > _______________________________________________\n> > R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> > To manage your subscription to this mailing list, go to:\n> > https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> >\n> >\n> > ------------------------------\n> >\n> > End of R-sig-meta-analysis Digest, Vol 67, Issue 2\n> > **************************************************\n> >\n>\n>         [[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Yuhang,\n\nFor the sort of probability calculations you are trying to do, it is best\nto use the transformed scale (i.e., the Fisher z scale). These sorts of\ncalculations rely on ALL of the model's di",
+      "thread_id": "thread-ad3f9837f1de",
+      "thread_depth": 1,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-d98884e2d027",
+      "message_id": "<IA1PR12MB6043A7FB6EA2559217920E55AAE19@IA1PR12MB6043.namprd12.prod.outlook.com>",
+      "from_name": "Sicong Liu",
+      "from_email_hash": "2476a0094e23a3911fb84bab8ec1a75a2ba8263963c2eb7bf0009e6bda1e7ae4",
+      "date": "2022-12-15T17:06:18Z",
+      "subject": "[R-meta] formula for calculating variance",
+      "subject_clean": "[R-meta] formula for calculating variance",
+      "in_reply_to": "<CAFUVuJxVmBEwOE1jXWo8L0015dWAM_Xajp7GgJ5_qCrAKBaQgg@mail.gmail.com>",
+      "references": [
+        "<mailman.4284.13.1671015602.1822.r-sig-meta-analysis@r-project.org>",
+        "<CA+dzWjpjhJi5dGTtKS5DcDrFSyrqfEWKa_7t4tBMizN78ecRpQ@mail.gmail.com>",
+        "<CAFUVuJxVmBEwOE1jXWo8L0015dWAM_Xajp7GgJ5_qCrAKBaQgg@mail.gmail.com>"
+      ],
+      "body_plain": "Dear All,\n\nHope all of you are doing well.\n\nI have a question regarding the calculation of the effect size variance on OddsRatio metric and wish to hear your thoughts:\n\nWhen computing the effect size variance based on odds ratio using binary data (assuming the four cells has observation number A, B, C, D like the example in Chapter 5 of Borenstein et al. (2009) book, p. 33), the formula suggested for calculating effect size variance is: var = 1/A + 1/B + 1/C + 1/D. My question is that if I convert the effect size from logOddsRatio to d, is it appropriate to calculate the effect size variance using the converted d in that: var = (n1 + n2)/(n1*n2) + d^2/(2*n1 + 2*n2) (Chapter 4, p. 27)? Regardless of the appropriateness, could you please explain the main differences between these two approaches in calculating effect size variances and how the selection between them may affect the modeling? \n\nThank you very much and stay warm!\n\nCheers, \nSicong\n-------------",
+      "body_snippet": "Dear All,\n\nHope all of you are doing well.\n\nI have a question regarding the calculation of the effect size variance on OddsRatio metric and wish to hear your thoughts:\n\nWhen computing the effect size ",
+      "thread_id": "thread-ad3f9837f1de",
+      "thread_depth": 2,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-f8d10ae1b5f6",
+      "message_id": "<a94833c9e8de43de9d313ac0ccab2931@UM-MAIL3214.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-12-15T18:44:58Z",
+      "subject": "[R-meta] formula for calculating variance",
+      "subject_clean": "[R-meta] formula for calculating variance",
+      "in_reply_to": "<IA1PR12MB6043A7FB6EA2559217920E55AAE19@IA1PR12MB6043.namprd12.prod.outlook.com>",
+      "references": [
+        "<mailman.4284.13.1671015602.1822.r-sig-meta-analysis@r-project.org>",
+        "<CA+dzWjpjhJi5dGTtKS5DcDrFSyrqfEWKa_7t4tBMizN78ecRpQ@mail.gmail.com>",
+        "<CAFUVuJxVmBEwOE1jXWo8L0015dWAM_Xajp7GgJ5_qCrAKBaQgg@mail.gmail.com>",
+        "<IA1PR12MB6043A7FB6EA2559217920E55AAE19@IA1PR12MB6043.namprd12.prod.outlook.com>"
+      ],
+      "body_plain": "Dear Sicong,\n\nNo, this would not be correct, because that equation for the sampling variance of d assumes that one has means and SDs available for the two groups. The proper way to compute the sampling variance of d when it was obtained by converting the log odds ratio to d involves applying the appropriate transformation to the variance of the log odds ratio. For example, one commonly used method for converting a log odds ratio to d is:\n\nd = sqrt(3) / pi * logOR.\n\nThen the variance of d is given by:\n\nvar(d) = 3 / pi^2 * var(logOR),\n\nwhere var(logOR) is typically estimated as you point out with 1/A + 1/B + 1/C + 1/D.\n\nPS: When posting to this mailing list with a new topic, don't just reply to a previous message and change the subject. The reply message still contains information about the original thread. When you do this, the threading in the archives is messed up. See:\n\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-December/thread.html\n\n(your post should be a new thread, not a reply to James' last message).\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Sicong Liu\n>Sent: Thursday, 15 December, 2022 18:06\n>Cc: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] formula for calculating variance\n>\n>Dear All,\n>\n>Hope all of you are doing well.\n>\n>I have a question regarding the calculation of the effect size variance on\n>OddsRatio metric and wish to hear your thoughts:\n>\n>When computing the effect size variance based on odds ratio using binary data\n>(assuming the four cells has observation number A, B, C, D like the example in\n>Chapter 5 of Borenstein et al. (2009) book, p. 33), the formula suggested for\n>calculating effect size variance is: var = 1/A + 1/B + 1/C + 1/D. My question is\n>that if I convert the effect size from logOddsRatio to d, is it appropriate to\n>calculate the effect size variance using the converted d in that: var = (n1 +\n>n2)/(n1*n2) + d^2/(2*n1 + 2*n2) (Chapter 4, p. 27)? Regardless of the\n>appropriateness, could you please explain the main differences between these two\n>approaches in calculating effect size variances and how the selection between\n>them may affect the modeling?\n>\n>Thank you very much and stay warm!\n>\n>Cheers,\n>Sicong",
+      "body_snippet": "Dear Sicong,\n\nNo, this would not be correct, because that equation for the sampling variance of d assumes that one has means and SDs available for the two groups. The proper way to compute the samplin",
+      "thread_id": "thread-ad3f9837f1de",
+      "thread_depth": 3,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-0dd7388da9bd",
+      "message_id": "<IA1PR12MB6043F2A7AD665B72865BF156AAE19@IA1PR12MB6043.namprd12.prod.outlook.com>",
+      "from_name": "Sicong Liu",
+      "from_email_hash": "2476a0094e23a3911fb84bab8ec1a75a2ba8263963c2eb7bf0009e6bda1e7ae4",
+      "date": "2022-12-15T19:19:51Z",
+      "subject": "[R-meta] formula for calculating variance",
+      "subject_clean": "[R-meta] formula for calculating variance",
+      "in_reply_to": "<a94833c9e8de43de9d313ac0ccab2931@UM-MAIL3214.unimaas.nl>",
+      "references": [
+        "<mailman.4284.13.1671015602.1822.r-sig-meta-analysis@r-project.org>",
+        "<CA+dzWjpjhJi5dGTtKS5DcDrFSyrqfEWKa_7t4tBMizN78ecRpQ@mail.gmail.com>",
+        "<CAFUVuJxVmBEwOE1jXWo8L0015dWAM_Xajp7GgJ5_qCrAKBaQgg@mail.gmail.com>",
+        "<IA1PR12MB6043A7FB6EA2559217920E55AAE19@IA1PR12MB6043.namprd12.prod.outlook.com>",
+        "<a94833c9e8de43de9d313ac0ccab2931@UM-MAIL3214.unimaas.nl>"
+      ],
+      "body_plain": "Dear Wolfgang,\n\nThank you so much! My apology for not posting in a new thread and I will do so for future posts! \n\nCheers, \nSicong\n------------- \n\n\n\n\n?On 12/15/22, 1:45 PM, \"Viechtbauer, Wolfgang (NP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>> wrote:\n\n\nDear Sicong,\n\n\nNo, this would not be correct, because that equation for the sampling variance of d assumes that one has means and SDs available for the two groups. The proper way to compute the sampling variance of d when it was obtained by converting the log odds ratio to d involves applying the appropriate transformation to the variance of the log odds ratio. For example, one commonly used method for converting a log odds ratio to d is:\n\n\nd = sqrt(3) / pi * logOR.\n\n\nThen the variance of d is given by:\n\n\nvar(d) = 3 / pi^2 * var(logOR),\n\n\nwhere var(logOR) is typically estimated as you point out with 1/A + 1/B + 1/C + 1/D.\n\n\nPS: When posting to this mailing list with a new topic, don't just reply to a previous message and change the subject. The reply message still contains information about the original thread. When you do this, the threading in the archives is messed up. See:\n\n\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-December/thread.html <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-December/thread.html>\n\n\n(your post should be a new thread, not a reply to James' last message).\n\n\nBest,\nWolfgang\n\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org <mailto:r-sig-meta-analysis-bounces at r-project.org>] On\n>Behalf Of Sicong Liu\n>Sent: Thursday, 15 December, 2022 18:06\n>Cc: r-sig-meta-analysis at r-project.org <mailto:r-sig-meta-analysis at r-project.org>\n>Subject: [R-meta] formula for calculating variance\n>\n>Dear All,\n>\n>Hope all of you are doing well.\n>\n>I have a question regarding the calculation of the effect size variance on\n>OddsRatio metric and wish to hear your thoughts:\n>\n>When computing the effect size variance based on odds ratio using binary data\n>(assuming the four cells has observation number A, B, C, D like the example in\n>Chapter 5 of Borenstein et al. (2009) book, p. 33), the formula suggested for\n>calculating effect size variance is: var = 1/A + 1/B + 1/C + 1/D. My question is\n>that if I convert the effect size from logOddsRatio to d, is it appropriate to\n>calculate the effect size variance using the converted d in that: var = (n1 +\n>n2)/(n1*n2) + d^2/(2*n1 + 2*n2) (Chapter 4, p. 27)? Regardless of the\n>appropriateness, could you please explain the main differences between these two\n>approaches in calculating effect size variances and how the selection between\n>them may affect the modeling?\n>\n>Thank you very much and stay warm!\n>\n>Cheers,\n>Sicong",
+      "body_snippet": "Dear Wolfgang,\n\nThank you so much! My apology for not posting in a new thread and I will do so for future posts! \n\nCheers, \nSicong\n------------- \n\n\n\n\n?On 12/15/22, 1:45 PM, \"Viechtbauer, Wolfgang (NP)",
+      "thread_id": "thread-ad3f9837f1de",
+      "thread_depth": 4,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-51fdc5b1b1fc",
+      "message_id": "<CAKCG_TYp+yQvDhMc7pz0COy=y-0SUp=gRFopPFiY9F3o6GocLA@mail.gmail.com>",
+      "from_name": "Mohamed Rahouma",
+      "from_email_hash": "ccf18aec40985317d3d4c38bd4a1f5240f0e8d54de98aa57ede3c1b55660fb1b",
+      "date": "2022-12-17T16:51:12-05:00",
+      "subject": "[R-meta] calculation of weighted median instead of weighted mean",
+      "subject_clean": "[R-meta] calculation of weighted median instead of weighted mean",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Greetings\nI am trying to calculate weighted median instead of weighted mean for\nmeta-analysis.\nI used to use `metamean` but unfortunately no `metamedian` if the data was\nskewed.\nI saw [this][1] but it is irrelevant in case of meta-analysis.\nI appreciate any help or guidance on this.\n\nHere is my prior code.\n\n```\nlibrary(meta)\ndata(Fleiss1993cont)\n# Meta-analysis of weighted mean from each study in a *single arm\nmeta-analysis*\nm1 <- metamean(n.psyc, mean.psyc, sd.psyc,   data = Fleiss1993cont, studlab\n= study); forest(m1)\n```\nI posted my question in stackoverflow.com (Link:\nhttps://stackoverflow.com/questions/74804396/how-do-i-calculate-weighted-median-instead-of-weighted-mean-for-single-arm-meta\n)\n\nAppreciate your help and guidance and help\n\n  [1]:\nhttps://stackoverflow.com/questions/2748725/is-there-a-weighted-median-function\n-- \nBest Regards;\nSincerely\nMohamed Rahouma\n<https://www.google.com./url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&cad=rja&uact=8&ved=0CCkQFjAB&url=https%3A%2F%2Fsincerely.com%2F&ei=neObVayoG4v0-QH0xIrQBg&usg=AFQjCNGzY8IeWvSHsGzJCztf4BSaSxH76g&bvm=bv.96952980,d.cWw>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Greetings\nI am trying to calculate weighted median instead of weighted mean for\nmeta-analysis.\nI used to use `metamean` but unfortunately no `metamedian` if the data was\nskewed.\nI saw [this][1] but it",
+      "thread_id": "thread-51fdc5b1b1fc",
+      "thread_depth": 0,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-53c8b05a3e8a",
+      "message_id": "<148160cd-c40b-14a3-58a4-c2984c5e29cc@dewey.myzen.co.uk>",
+      "from_name": "Michael Dewey",
+      "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
+      "date": "2022-12-18T09:28:51Z",
+      "subject": "[R-meta]  calculation of weighted median instead of weighted mean",
+      "subject_clean": "[R-meta]  calculation of weighted median instead of weighted mean",
+      "in_reply_to": "<CAKCG_TYp+yQvDhMc7pz0COy=y-0SUp=gRFopPFiY9F3o6GocLA@mail.gmail.com>",
+      "references": [
+        "<CAKCG_TYp+yQvDhMc7pz0COy=y-0SUp=gRFopPFiY9F3o6GocLA@mail.gmail.com>"
+      ],
+      "body_plain": "Dear Mohamed\n\nDoes\nhttps://cran.r-project.org/package=metamedian\ndo what you want?\n\nMichael\n\nOn 17/12/2022 21:51, Mohamed Rahouma wrote:\n> Greetings\n> I am trying to calculate weighted median instead of weighted mean for\n> meta-analysis.\n> I used to use `metamean` but unfortunately no `metamedian` if the data was\n> skewed.\n> I saw [this][1] but it is irrelevant in case of meta-analysis.\n> I appreciate any help or guidance on this.\n> \n> Here is my prior code.\n> \n> ```\n> library(meta)\n> data(Fleiss1993cont)\n> # Meta-analysis of weighted mean from each study in a *single arm\n> meta-analysis*\n> m1 <- metamean(n.psyc, mean.psyc, sd.psyc,   data = Fleiss1993cont, studlab\n> = study); forest(m1)\n> ```\n> I posted my question in stackoverflow.com (Link:\n> https://stackoverflow.com/questions/74804396/how-do-i-calculate-weighted-median-instead-of-weighted-mean-for-single-arm-meta\n> )\n> \n> Appreciate your help and guidance and help\n> \n>    [1]:\n> https://stackoverflow.com/questions/2748725/is-there-a-weighted-median-function\n\n-- \nMichael\nhttp://www.dewey.myzen.co.uk/home.html",
+      "body_snippet": "Dear Mohamed\n\nDoes\nhttps://cran.r-project.org/package=metamedian\ndo what you want?\n\nMichael\n\nOn 17/12/2022 21:51, Mohamed Rahouma wrote:\n> Greetings\n> I am trying to calculate weighted median instead ",
+      "thread_id": "thread-51fdc5b1b1fc",
+      "thread_depth": 1,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-e4a5c8b7ce1b",
+      "message_id": "<VI1PR0602MB3437D6EA14E8CE3815108571BFE89@VI1PR0602MB3437.eurprd06.prod.outlook.com>",
+      "from_name": "Adelina Artenie",
+      "from_email_hash": "9ff2878230a453d3312ea6043803390878238021e7419fa0ce344446a33e84ff",
+      "date": "2022-12-22T14:19:01Z",
+      "subject": "[R-meta] Diagnostic tests meta regression",
+      "subject_clean": "[R-meta] Diagnostic tests meta regression",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi Wolfgang/all,\n\nI am trying to check my model assumptions and I think I don?t understand fully what to look at and how, so if possible, any advice you may have would be greatly appreciated:\n\nI am running a mixed-effects meta-regression model. Because the outcome (a rate) is rare in some cases, there is a concern that the normality assumption is not met (Viechtbauer, Chapter 11, Handbook of Meta Analysis).\n\nAs I read about this, my understanding is that both the random-effects and the random-error terms are assumed to be normally distributed (though this is not 100% clear to me, because different sources tend to focus on one term or the other, some<https://www.meta-analysis.com/downloads/MRManual.pdf> say that the method-of-moments does not, in fact, make assumptions about the distribution of random-effects (page 150)).\n\nIf true that both terms have to be normally distributed, I am trying to understand how to visualise/test this. One straightforward approach would be to look at a normal QQplot.  My questions are:\n\n\n  1.  If I follow this approach<https://www.metafor-project.org/doku.php/plots:normal_qq_plots>, and run a mixed-effects meta-regression (res4), I would be visualising/checking the assumption that the residual heterogeneity in the true effects is normally distributed or not. Am I correct in saying that this would be a proxy for checking the assumption that the random-effects are normally distributed?\n\n\n  1.  If so, how would I check if the error terms are normally distributed? Would I plot a normal QQplot for each study? I have several outcomes and a total of 150 outcomes..\n\nThank you in advance,\nAdelina\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Wolfgang/all,\n\nI am trying to check my model assumptions and I think I don?t understand fully what to look at and how, so if possible, any advice you may have would be greatly appreciated:\n\nI am ru",
+      "thread_id": "thread-e4a5c8b7ce1b",
+      "thread_depth": 0,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-b1bd5d2edf44",
+      "message_id": "<CAMoGG=rJ3PVK1oKRaiZQbstQugXFMa7wAZYru2vreHFw8i5hYQ@mail.gmail.com>",
+      "from_name": "Alicia Foxx",
+      "from_email_hash": "7f5517f516bcc896fa39691a6435e9ec95b02271dcb1606b86bd7bf7a0ea5eee",
+      "date": "2022-12-27T10:34:57-06:00",
+      "subject": "[R-meta] Comparing several predictors and responses & most appropriate model",
+      "subject_clean": "[R-meta] Comparing several predictors and responses & most appropriate model",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hello Everyone,\n\nMy coauthor and I are working on a meta-analysis in which we want to know\nthe relationship (direction and magnitude) between a variable (mean\ndifference on the x-axis) and a log response ratio (on the y-axis). As a\ntoy example, we want to know if differences in beak length between bird\nspecies predict fitness outcomes across studies. From each study, we\ncollected differences in beak length between species as well as fitness\noutcomes of birds alone (i.e., not in competition) and in competition.\n\n   -\n\n      Difference (raw mean difference) in beak length:\n      -\n\n         A beak length - B beak length\n         -\n\n         A beak length - C beak length\n         -\n\n         B beak length - A beak length\n         -\n\n         C beak length - A beak length\n         -\n\n      Fitness outcomes (log response ratio):\n      -\n\n         log(mean(A fitness with B)/mean(fitness alone))\n         -\n\n         log(mean(A fitness with C)/mean(fitness alone))\n         -\n\n         log(mean(B fitness with A)/mean(fitness alone))\n         -\n\n         log(mean(C fitness with A)/mean(fitness alone))\n         -\n\n   We want to use such comparisons from *many studies* to obtain a general\n   relationship between differences in beak length and fitness outcomes.\n   -\n\n      Fitness outcomes:\n      -\n\n         log(mean(A fitness with B)/mean(fitness alone)) ~ A-B (beak length)\n         -\n\n         log(mean(A fitness with C)/mean(fitness alone)) ~ A-C (beak length)\n         -\n\n         log(mean(B fitness with A)/mean(fitness alone)) ~ B-A (beak length)\n         -\n\n         log(mean(C fitness with A)/mean(fitness alone)) ~ C-A (beak length)\n         -\n\n   As you can see, each study contributes several log response ratios\n   (i.e., y effect sizes) and several raw mean differences (i.e., predictor\n   effect sizes). We have several questions:\n   -\n\n      What is the best model to assess an overall relationship between\n      differences in beak length and fitness across studies?\n      -\n\n         It seems that a meta-regression would work for this question but\n         our concern is that this is an inappropriate model given that we?re\n         comparing one effect size (mean difference) with another (log response\n         ratio). We investigated bivariate meta-analyses, but the\ninputs appear to\n         both be outcomes.\n         -\n\n         How do we account for non-independence at the level of comparison\n         (Species A vs. Species B, and species B vs. species A), and\nstudy. We?ve\n         thought about nested random effects or even mathematical\ncorrections for\n         the non-independence.\n         -\n\n   We?d greatly appreciate any advice that can be shared.\n\n\nThank you,\n\n\nAlicia\n________________________________________\n\n*Dr. Alicia Foxx, MS, PhD*\n\nshe/her/hers\n\nResearch Scientist\n\nThe Chicago Botanic Garden & New Roots for Restoration\n<http://www.newrootsforrestoration.org/>\n\nAdjunct Professor: Northwestern University\nAssociate Editor: Ecological Solutions and Evidence\n<https://besjournals.onlinelibrary.wiley.com/journal/26888319>\n\nResearchGate <https://www.researchgate.net/profile/Alicia-Foxx> & Google\nScholar <https://scholar.google.com/citations?user=nlWrL0YAAAAJ&hl=en>\n\nE: afoxx at chicagobotanic.org\n\n_________________________________________\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hello Everyone,\n\nMy coauthor and I are working on a meta-analysis in which we want to know\nthe relationship (direction and magnitude) between a variable (mean\ndifference on the x-axis) and a log respo",
+      "thread_id": "thread-b1bd5d2edf44",
+      "thread_depth": 0,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-71a77d456115",
+      "message_id": "<57932d17-7e07-dc93-2774-e8b18e8b8de5@unipd.it>",
+      "from_name": "Patrizio E Tressoldi",
+      "from_email_hash": "a716683c164f88555339c266ef96fcafbdd479f25aa862d2711056fb0b3e54fb",
+      "date": "2022-12-28T15:24:12+01:00",
+      "subject": "[R-meta] Open AI ChatGPT",
+      "subject_clean": "[R-meta] Open AI ChatGPT",
+      "in_reply_to": "<mailman.4294.9.1672225202.13349.r-sig-meta-analysis@r-project.org>",
+      "references": [
+        "<mailman.4294.9.1672225202.13349.r-sig-meta-analysis@r-project.org>"
+      ],
+      "body_plain": "I asked the following question: \"/I need the metafor syntax for a mixed \nmodel with two dependent variable and three categorical moderators/\"? \nand I received the following syntax with detailed explanations:\n\nfit <- rma.mv(yi = dat[, c(\"yi1\", \"yi2\")],\n ????????????? V = dat[, c(\"vi1\", \"vi2\")],\n ????????????? mods = ~ moderator1 + moderator2 + moderator3,\n ????????????? random = ~ 1 | grouping_variable,\n ????????????? data = dat)\n\nI'm curious what Wolfgang and James think about.\n\nPatrizio\n\n-- \nPatrizio E. Tressoldi Ph.D.\nScience of Consciousness Research Group\nStudium Patavinum\nUniversit? di Padova\nPadova - ITALY\nhttp://www.patriziotressoldi.it  \nhttps://socrg.org\nhttps://orcid.org/0000-0002-6404-0058\nhttps://opensciences.org/about/manifesto-for-a-post-materialist-science\n\nMake war history\nsupporthttps://en.emergency.it  \n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "I asked the following question: \"/I need the metafor syntax for a mixed \nmodel with two dependent variable and three categorical moderators/\"? \nand I received the following syntax with detailed explan",
+      "thread_id": "thread-71a77d456115",
+      "thread_depth": 0,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-af040e7722cd",
+      "message_id": "<aa4835d9-7f18-c868-8ff0-b92e3ca8b810@dewey.myzen.co.uk>",
+      "from_name": "Michael Dewey",
+      "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
+      "date": "2022-12-28T16:18:00Z",
+      "subject": "[R-meta] Mis-leading title, was Open AI ChatGPT",
+      "subject_clean": "[R-meta] Mis-leading title, was Open AI ChatGPT",
+      "in_reply_to": "<57932d17-7e07-dc93-2774-e8b18e8b8de5@unipd.it>",
+      "references": [
+        "<mailman.4294.9.1672225202.13349.r-sig-meta-analysis@r-project.org>",
+        "<57932d17-7e07-dc93-2774-e8b18e8b8de5@unipd.it>"
+      ],
+      "body_plain": "Dear Patrizio\n\nIt is hard to see anything about AI in your question.\n\nAs far as your syntax goes can you explain mre about why you doubt that \nit is doing what you want?\n\nAs an aside if I was using the data = dat method of specifying data I \nwould not have used dat[ ] elsewhere.\n\nMichael\n\nOn 28/12/2022 14:24, Patrizio E Tressoldi wrote:\n> I asked the following question: \"/I need the metafor syntax for a mixed\n> model with two dependent variable and three categorical moderators/\"\n> and I received the following syntax with detailed explanations:\n> \n> fit <- rma.mv(yi = dat[, c(\"yi1\", \"yi2\")],\n>   ????????????? V = dat[, c(\"vi1\", \"vi2\")],\n>   ????????????? mods = ~ moderator1 + moderator2 + moderator3,\n>   ????????????? random = ~ 1 | grouping_variable,\n>   ????????????? data = dat)\n> \n> I'm curious what Wolfgang and James think about.\n> \n> Patrizio\n> \n\n-- \nMichael\nhttp://www.dewey.myzen.co.uk/home.html",
+      "body_snippet": "Dear Patrizio\n\nIt is hard to see anything about AI in your question.\n\nAs far as your syntax goes can you explain mre about why you doubt that \nit is doing what you want?\n\nAs an aside if I was using th",
+      "thread_id": "thread-71a77d456115",
+      "thread_depth": 1,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-d65103c181a4",
+      "message_id": "<ff5527cfb3614dd8b34ff613af18b23b@UM-MAIL3213.unimaas.nl>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2022-12-29T11:54:11Z",
+      "subject": "[R-meta] Open AI ChatGPT",
+      "subject_clean": "[R-meta] Open AI ChatGPT",
+      "in_reply_to": "<57932d17-7e07-dc93-2774-e8b18e8b8de5@unipd.it>",
+      "references": [
+        "<mailman.4294.9.1672225202.13349.r-sig-meta-analysis@r-project.org>",
+        "<57932d17-7e07-dc93-2774-e8b18e8b8de5@unipd.it>"
+      ],
+      "body_plain": "Dear Patrizio,\n\nThat code is nonsense. One cannot pass multiple columns to the yi argument. There even is a check in rma.mv() to make sure people don't try to do this:\n\nError in rma.mv(...):                  \n  The object/variable specified for the 'yi' argument is a data frame with multiple columns.\n\nAlso, V should either be a vector or a kxk matrix where k is the length of yi. \n\nThis is now the second example where ChatGPT is providing either misleading or entirely incorrect info about how to use metafor:\n\nhttps://scholar.social/@wviechtb/109516606479461002\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Patrizio E Tressoldi\n>Sent: Wednesday, 28 December, 2022 15:24\n>To: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] Open AI ChatGPT\n>\n>I asked the following question: \"/I need the metafor syntax for a mixed\n>model with two dependent variable and three categorical moderators/\"\n>and I received the following syntax with detailed explanations:\n>\n>fit <- rma.mv(yi = dat[, c(\"yi1\", \"yi2\")],\n> ????????????? V = dat[, c(\"vi1\", \"vi2\")],\n> ????????????? mods = ~ moderator1 + moderator2 + moderator3,\n> ????????????? random = ~ 1 | grouping_variable,\n> ????????????? data = dat)\n>\n>I'm curious what Wolfgang and James think about.\n>\n>Patrizio\n>\n>--\n>Patrizio E. Tressoldi Ph.D.\n>Science of Consciousness Research Group\n>Studium Patavinum\n>Universit? di Padova\n>Padova - ITALY\n>http://www.patriziotressoldi.it\n>https://socrg.org\n>https://orcid.org/0000-0002-6404-0058\n>https://opensciences.org/about/manifesto-for-a-post-materialist-science\n>\n>Make war history\n>supporthttps://en.emergency.it",
+      "body_snippet": "Dear Patrizio,\n\nThat code is nonsense. One cannot pass multiple columns to the yi argument. There even is a check in rma.mv() to make sure people don't try to do this:\n\nError in rma.mv(...):          ",
+      "thread_id": "thread-71a77d456115",
+      "thread_depth": 1,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-239d10f67b7b",
+      "message_id": "<2a4d18ac-cdd8-ff88-ce21-93360ac86006@unipd.it>",
+      "from_name": "Patrizio E Tressoldi",
+      "from_email_hash": "a716683c164f88555339c266ef96fcafbdd479f25aa862d2711056fb0b3e54fb",
+      "date": "2022-12-29T15:02:02+01:00",
+      "subject": "[R-meta] Open AI ChatGPT",
+      "subject_clean": "[R-meta] Open AI ChatGPT",
+      "in_reply_to": "<ff5527cfb3614dd8b34ff613af18b23b@UM-MAIL3213.unimaas.nl>",
+      "references": [
+        "<mailman.4294.9.1672225202.13349.r-sig-meta-analysis@r-project.org>",
+        "<57932d17-7e07-dc93-2774-e8b18e8b8de5@unipd.it>",
+        "<ff5527cfb3614dd8b34ff613af18b23b@UM-MAIL3213.unimaas.nl>"
+      ],
+      "body_plain": "Il 29/12/2022 12:54, Viechtbauer, Wolfgang (NP) wrote:\n> Dear Patrizio,\n>\n> That code is nonsense. One cannot pass multiple columns to the yi argument. There even is a check in rma.mv() to make sure people don't try to do this:\n>\n> Error in rma.mv(...):\n>    The object/variable specified for the 'yi' argument is a data frame with multiple columns.\n>\n> Also, V should either be a vector or a kxk matrix where k is the length of yi.\n>\n> This is now the second example where ChatGPT is providing either misleading or entirely incorrect info about how to use metafor:\n>\n> https://scholar.social/@wviechtb/109516606479461002\n>\nIt seems that we must wait for future updates in order to have a correct \nmetafor syntax\n\nby simply writing a request in plain language.\n\n\nThank you and Happy New 2023 to all metafor supporters and users.\n\nPatrizio\n\n-- \nPatrizio E. Tressoldi Ph.D.\nScience of Consciousness Research Group\nStudium Patavinum\nUniversit? di Padova\nPadova - ITALY\nhttp://www.patriziotressoldi.it  \nhttps://socrg.org\nhttps://orcid.org/0000-0002-6404-0058\nhttps://opensciences.org/about/manifesto-for-a-post-materialist-science\n\nMake war history\nsupporthttps://en.emergency.it  \n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Il 29/12/2022 12:54, Viechtbauer, Wolfgang (NP) wrote:\n> Dear Patrizio,\n>\n> That code is nonsense. One cannot pass multiple columns to the yi argument. There even is a check in rma.mv() to make sure p",
+      "thread_id": "thread-71a77d456115",
+      "thread_depth": 2,
+      "month": "2022-12"
+    },
+    {
+      "id": "msg-73fd071860c2",
+      "message_id": "<CAFUVuJz9083T3YMe+Y4UsYfyg-JQPNn5m44GfHJ-ccT9Ek9asA@mail.gmail.com>",
+      "from_name": "James Pustejovsky",
+      "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
+      "date": "2022-12-29T14:13:45-06:00",
+      "subject": "[R-meta] Comparing several predictors and responses & most appropriate model",
+      "subject_clean": "[R-meta] Comparing several predictors and responses & most appropriate model",
+      "in_reply_to": "<CAMoGG=rJ3PVK1oKRaiZQbstQugXFMa7wAZYru2vreHFw8i5hYQ@mail.gmail.com>",
+      "references": [
+        "<CAMoGG=rJ3PVK1oKRaiZQbstQugXFMa7wAZYru2vreHFw8i5hYQ@mail.gmail.com>"
+      ],
+      "body_plain": "Hi Alicia,\n\nThis seems like a pretty challenging modeling problem, and (speaking\npersonally) I'm reluctant to offer guidance because I don't know the\nscientific context of the problem that you're investigating. Could you say\nmore about the evolutionary or ecological question that you're aiming to\ninvestigate with the synthesis? I follow the example you gave in which\nyou're trying to understand how beak length relates to species\nfitness---but is there any relevant ecological theory to suggest *how*\ndifferences in beak length alter fitness when in competition with another\nspecies?\n\nSo with that disclaimer, below are some comments/reactions to your\nquestions.\n\nBest,\nJames\n\nOn Tue, Dec 27, 2022 at 10:35 AM Alicia Foxx <afoxx at u.northwestern.edu>\nwrote:\n\n> Hello Everyone,\n>\n> My coauthor and I are working on a meta-analysis in which we want to know\n> the relationship (direction and magnitude) between a variable (mean\n> difference on the x-axis) and a log response ratio (on the y-axis). As a\n> toy example, we want to know if differences in beak length between bird\n> species predict fitness outcomes across studies. From each study, we\n> collected differences in beak length between species as well as fitness\n> outcomes of birds alone (i.e., not in competition) and in competition.\n>\n<snip>\n\n>    As you can see, each study contributes several log response ratios\n>    (i.e., y effect sizes) and several raw mean differences (i.e., predictor\n>    effect sizes). We have several questions:\n>       What is the best model to assess an overall relationship between\n>       differences in beak length and fitness across studies?\n>          It seems that a meta-regression would work for this question but\n>          our concern is that this is an inappropriate model given that\n> we?re\n>          comparing one effect size (mean difference) with another (log\n> response\n>          ratio). We investigated bivariate meta-analyses, but the inputs\n> appear to\n>          both be outcomes.\n>\n>\n\nMy first thought would be to use a bivariate meta-analysis, as you\nconsidered. I'm not sure what you mean by \"the inputs appear to both be\noutcomes.\" Could you say more about what you see as the drawback of\nbivariate meta-analysis?\n\nIgnoring the non-independence issue, I would think one could investigate\nthe question by using a bivariate meta-analysis where the bivariate ES\nwould be (fitness ratio, beak length difference) and the predictor would be\nseparate indicator variables for each variable (i.e., a dummy for fitness\nratio and a dummy for beak length difference) and the model would include\nbivariate random effects with an unstructured covariance matrix. The\nquestion of how fitness ratio relates to beak length difference could then\nbe answered by looking at the *covariance* between the random effects. One\ncould even compute the regression of fitness ratio on beak length\ndifference by calculating it directly from the random effects variance\ncomponents (i.e., the covariance divided by the variance of the beak length\nrandom effects). There's surely some formula for the standard error of that\nbeta estimate, but one could also just do a bootstrap (resampling studies)\nto get a standard error / confidence interval.\n\n         How do we account for non-independence at the level of comparison\n>          (Species A vs. Species B, and species B vs. species A), and\n> study. We?ve\n>          thought about nested random effects or even mathematical\n> corrections for\n>          the non-independence.\n>          -\n>\n\nThis seems pretty tricky, and is where I would be looking for relevant\nevolutionary/ecological theory to guide how to approach the model. It seems\nlike you've really got a system with *three* variables instead of just two:\n1. Beak length differences (B vs A)\n2. Competitive fitness of species B when in competition with A (relative to\nbaseline fitness)\n3. Competitive fitness of species A when in competition with B (relative to\nbaseline fitness)\nSo perhaps there would be a way to do a multivariate regression of\n(competitive fitness of B, competitive fitness of A) on beak length\ndifference? A tri-variate meta-analysis model, instead of the bivariate\nmodel I sketched above?\n\nOne thing I wonder about is whether variables (2) and (3) are really\ndifferent things. Is competitive fitness of species B when in competition\nwith A a distinct variable from competitive fitness of species A when in\ncompetition with B? Or are those variables different ways of saying the\nsame thing? Or maybe it would make sense to look at a ratio-of-ratios, such\nas\n\n[(competitive fitness of species B when in competition with A) / (baseline\nfitness of B)] / [(competitive fitness of species A when in competition\nwith B) / (baseline fitness of A)]\n\nwhich is the same thing as\n\n[(competitive fitness of species B when in competition with A) /\n(competitive fitness of species A when in competition with B)] / [(baseline\nfitness of B) / (baseline fitness of A)]\n\nThis ratio-of-ratios seems like it could be interpreted as a measure of how\nthe relative fitness of the two species changes when they are put into\ncompetition compared to their relative fitness in the absence of\ncompetition. Using the ratio-of-ratios would allow for use of the bivariate\nmodel as described above.\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Alicia,\n\nThis seems like a pretty challenging modeling problem, and (speaking\npersonally) I'm reluctant to offer guidance because I don't know the\nscientific context of the problem that you're inve",
+      "thread_id": "thread-b1bd5d2edf44",
+      "thread_depth": 1,
+      "month": "2022-12"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-6bc4f7d8c684",
+      "subject": "[R-meta] Using variance components with effect size transformation",
+      "message_count": 1,
+      "participants": [
+        "Yuhang Hu"
+      ],
+      "started": "2022-12-13T20:28:55-07:00",
+      "last_reply": "2022-12-13T20:28:55-07:00",
+      "root_message_id": "msg-6bc4f7d8c684"
+    },
+    {
+      "id": "thread-6006948b978e",
+      "subject": "[R-meta]  Using variance components with effect size transformation",
+      "message_count": 1,
+      "participants": [
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2022-12-14T14:44:07+00:00",
+      "last_reply": "2022-12-14T14:44:07+00:00",
+      "root_message_id": "msg-6006948b978e"
+    },
+    {
+      "id": "thread-ad3f9837f1de",
+      "subject": "[R-meta] R-sig-meta-analysis Digest, Vol 67, Issue 2",
+      "message_count": 5,
+      "participants": [
+        "James Pustejovsky",
+        "Sicong Liu",
+        "Viechtbauer, Wolfgang (NP)",
+        "Yuhang Hu"
+      ],
+      "started": "2022-12-14T18:33:22-07:00",
+      "last_reply": "2022-12-15T19:19:51+00:00",
+      "root_message_id": "msg-ad3f9837f1de"
+    },
+    {
+      "id": "thread-51fdc5b1b1fc",
+      "subject": "[R-meta] calculation of weighted median instead of weighted mean",
+      "message_count": 2,
+      "participants": [
+        "Michael Dewey",
+        "Mohamed Rahouma"
+      ],
+      "started": "2022-12-17T16:51:12-05:00",
+      "last_reply": "2022-12-18T09:28:51+00:00",
+      "root_message_id": "msg-51fdc5b1b1fc"
+    },
+    {
+      "id": "thread-e4a5c8b7ce1b",
+      "subject": "[R-meta] Diagnostic tests meta regression",
+      "message_count": 1,
+      "participants": [
+        "Adelina Artenie"
+      ],
+      "started": "2022-12-22T14:19:01+00:00",
+      "last_reply": "2022-12-22T14:19:01+00:00",
+      "root_message_id": "msg-e4a5c8b7ce1b"
+    },
+    {
+      "id": "thread-b1bd5d2edf44",
+      "subject": "[R-meta] Comparing several predictors and responses & most appropriate model",
+      "message_count": 2,
+      "participants": [
+        "Alicia Foxx",
+        "James Pustejovsky"
+      ],
+      "started": "2022-12-27T10:34:57-06:00",
+      "last_reply": "2022-12-29T14:13:45-06:00",
+      "root_message_id": "msg-b1bd5d2edf44"
+    },
+    {
+      "id": "thread-71a77d456115",
+      "subject": "[R-meta] Open AI ChatGPT",
+      "message_count": 4,
+      "participants": [
+        "Michael Dewey",
+        "Patrizio E Tressoldi",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2022-12-28T15:24:12+01:00",
+      "last_reply": "2022-12-29T15:02:02+01:00",
+      "root_message_id": "msg-71a77d456115"
+    }
+  ]
+}

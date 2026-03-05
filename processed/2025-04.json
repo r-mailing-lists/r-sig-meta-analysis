@@ -1,0 +1,324 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2025-04",
+  "messages": [
+    {
+      "id": "msg-449385da4720",
+      "message_id": "<bb597607-e4ef-4364-ae49-ea88fb6e8d85@Spark>",
+      "from_name": "Zhouhan Jin",
+      "from_email_hash": "a493e2985c9b945d2ce5f2186e2a93a81e13de0567555a2ee88721a13cdcc5c2",
+      "date": "2025-04-05T19:17:30Z",
+      "subject": "[R-meta] d_z and d_av effect sizes in metafor",
+      "subject_clean": "[R-meta] d_z and d_av effect sizes in metafor",
+      "in_reply_to": null,
+      "references": [
+        "<1b32dd3f-1ad3-4d24-8ff2-f72dda3c4ecf@Spark>"
+      ],
+      "body_plain": "Hello Wolfgang and Rmeta Community,\n\nI always assumed that under pre-post correlation = 0.5, metafor::escal()'s measure = \"SMCC\" and \"SMCRP\" referred to in the article below as \"d_z\" and \"d_av\" respectively, are equivalent. But that doesn't seem to be the case (see R code below).\n\nQuestions: 1- Can they be equivalent under any condition?\n                  2- If yes, will their sampling variances then also be equal?\n                  3- If no, are there any other two SMC variants that will be equivalent in both effect size and sampling variances under r=0.5?\n\nARTICLE: https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.00863/full\n\n# R code:\nlibrary(metafor)\nn <- 30\nr <- 0.5  # r set to 0.5 for demonstration\nmean_pre <- 0\nmean_post <- 0.5\nsd_pre <- 1\nsd_post <- .5\n\nesc_dz <- escalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\n                 sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nesc_dav <- escalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\n                  sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nBest wishes,\n\nZhouhan Jin\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hello Wolfgang and Rmeta Community,\n\nI always assumed that under pre-post correlation = 0.5, metafor::escal()'s measure = \"SMCC\" and \"SMCRP\" referred to in the article below as \"d_z\" and \"d_av\" respec",
+      "thread_id": "thread-449385da4720",
+      "thread_depth": 0,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-9b43938a64f8",
+      "message_id": "<GV2PR08MB9205A4CA94A59291C32316858BAA2@GV2PR08MB9205.eurprd08.prod.outlook.com>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2025-04-07T11:17:48Z",
+      "subject": "[R-meta] d_z and d_av effect sizes in metafor",
+      "subject_clean": "[R-meta] d_z and d_av effect sizes in metafor",
+      "in_reply_to": "<bb597607-e4ef-4364-ae49-ea88fb6e8d85@Spark>",
+      "references": [
+        "<1b32dd3f-1ad3-4d24-8ff2-f72dda3c4ecf@Spark>",
+        "<bb597607-e4ef-4364-ae49-ea88fb6e8d85@Spark>"
+      ],
+      "body_plain": "Dear Zhouhan,\n\nIf r=0.5 *and* sd_pre = sd_post, *then* the SMCC and SMCR are identical:\n\nn <- 30\nr <- 0.5  # r set to 0.5 for demonstration\nmean_pre <- 0\nmean_post <- 0.5\nsd_pre <- 0.75\nsd_post <- 0.75\n\nescalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\n       sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nescalc(measure = \"SMCR\", m1i = mean_post, m2i = mean_pre,\n       sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nHowever, r=0.5 is not sufficient for this equivalence to hold.\n\nEven then, SMCRP will be slightly different, since it uses a different bias-adjustment factor:\n\nescalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\n       sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nWe can switch off the bias correction and then get equivalence for this measure as well:\n\nescalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\n       sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n, correct=FALSE)\n\nescalc(measure = \"SMCR\", m1i = mean_post, m2i = mean_pre,\n       sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n, correct=FALSE)\n\nescalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\n       sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n, correct=FALSE)\n\nThe sampling variance will still be different for SMCRP, since it uses more information compared to SMCR.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Zhouhan Jin via R-sig-meta-analysis\n> Sent: Saturday, April 5, 2025 21:18\n> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-\n> project.org>\n> Cc: Zhouhan Jin <zjin65 at uwo.ca>\n> Subject: [R-meta] d_z and d_av effect sizes in metafor\n>\n> Hello Wolfgang and Rmeta Community,\n>\n> I always assumed that under pre-post correlation = 0.5, metafor::escal()'s\n> measure = \"SMCC\" and \"SMCRP\" referred to in the article below as \"d_z\" and\n> \"d_av\" respectively, are equivalent. But that doesn't seem to be the case (see R\n> code below).\n>\n> Questions: 1- Can they be equivalent under any condition?\n>                   2- If yes, will their sampling variances then also be equal?\n>                   3- If no, are there any other two SMC variants that will be\n> equivalent in both effect size and sampling variances under r=0.5?\n>\n> ARTICLE:\n> https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.0086\n> 3/full\n>\n> # R code:\n> library(metafor)\n> n <- 30\n> r <- 0.5  # r set to 0.5 for demonstration\n> mean_pre <- 0\n> mean_post <- 0.5\n> sd_pre <- 1\n> sd_post <- .5\n>\n> esc_dz <- escalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\n>                  sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n>\n> esc_dav <- escalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\n>                   sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n>\n> Best wishes,\n>\n> Zhouhan Jin",
+      "body_snippet": "Dear Zhouhan,\n\nIf r=0.5 *and* sd_pre = sd_post, *then* the SMCC and SMCR are identical:\n\nn <- 30\nr <- 0.5  # r set to 0.5 for demonstration\nmean_pre <- 0\nmean_post <- 0.5\nsd_pre <- 0.75\nsd_post <- 0.7",
+      "thread_id": "thread-449385da4720",
+      "thread_depth": 1,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-147682556f14",
+      "message_id": "<9734767a-e30b-4268-b66c-ae4758c5b499@Spark>",
+      "from_name": "Zhouhan Jin",
+      "from_email_hash": "a493e2985c9b945d2ce5f2186e2a93a81e13de0567555a2ee88721a13cdcc5c2",
+      "date": "2025-04-07T18:40:12Z",
+      "subject": "[R-meta] d_z and d_av effect sizes in metafor",
+      "subject_clean": "[R-meta] d_z and d_av effect sizes in metafor",
+      "in_reply_to": "<GV2PR08MB9205A4CA94A59291C32316858BAA2@GV2PR08MB9205.eurprd08.prod.outlook.com>",
+      "references": [
+        "<1b32dd3f-1ad3-4d24-8ff2-f72dda3c4ecf@Spark>",
+        "<bb597607-e4ef-4364-ae49-ea88fb6e8d85@Spark>",
+        "<GV2PR08MB9205A4CA94A59291C32316858BAA2@GV2PR08MB9205.eurprd08.prod.outlook.com>"
+      ],
+      "body_plain": "Thank you, Wolfgang, for the clarification! Is it possible to share the formula for bias correction for SMCRP and how it is different from the correction factor used in SMCC or SMD? Any references for the difference in correction factors are highly appreciated?\n\nBest wishes,\n\nZhouhan Jin\nOn Apr 7, 2025 at 07:18 -0400, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>, wrote:\nDear Zhouhan,\n\nIf r=0.5 *and* sd_pre = sd_post, *then* the SMCC and SMCR are identical:\n\nn <- 30\nr <- 0.5 # r set to 0.5 for demonstration\nmean_pre <- 0\nmean_post <- 0.5\nsd_pre <- 0.75\nsd_post <- 0.75\n\nescalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\nsd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nescalc(measure = \"SMCR\", m1i = mean_post, m2i = mean_pre,\nsd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nHowever, r=0.5 is not sufficient for this equivalence to hold.\n\nEven then, SMCRP will be slightly different, since it uses a different bias-adjustment factor:\n\nescalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\nsd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nWe can switch off the bias correction and then get equivalence for this measure as well:\n\nescalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\nsd1i = sd_post, sd2i = sd_pre, ri = r, ni = n, correct=FALSE)\n\nescalc(measure = \"SMCR\", m1i = mean_post, m2i = mean_pre,\nsd1i = sd_post, sd2i = sd_pre, ri = r, ni = n, correct=FALSE)\n\nescalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\nsd1i = sd_post, sd2i = sd_pre, ri = r, ni = n, correct=FALSE)\n\nThe sampling variance will still be different for SMCRP, since it uses more information compared to SMCR.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\nOf Zhouhan Jin via R-sig-meta-analysis\nSent: Saturday, April 5, 2025 21:18\nTo: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-\nproject.org>\nCc: Zhouhan Jin <zjin65 at uwo.ca>\nSubject: [R-meta] d_z and d_av effect sizes in metafor\n\nHello Wolfgang and Rmeta Community,\n\nI always assumed that under pre-post correlation = 0.5, metafor::escal()'s\nmeasure = \"SMCC\" and \"SMCRP\" referred to in the article below as \"d_z\" and\n\"d_av\" respectively, are equivalent. But that doesn't seem to be the case (see R\ncode below).\n\nQuestions: 1- Can they be equivalent under any condition?\n2- If yes, will their sampling variances then also be equal?\n3- If no, are there any other two SMC variants that will be\nequivalent in both effect size and sampling variances under r=0.5?\n\nARTICLE:\nhttps://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.0086\n3/full\n\n# R code:\nlibrary(metafor)\nn <- 30\nr <- 0.5 # r set to 0.5 for demonstration\nmean_pre <- 0\nmean_post <- 0.5\nsd_pre <- 1\nsd_post <- .5\n\nesc_dz <- escalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\nsd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nesc_dav <- escalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\nsd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n\nBest wishes,\n\nZhouhan Jin\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Thank you, Wolfgang, for the clarification! Is it possible to share the formula for bias correction for SMCRP and how it is different from the correction factor used in SMCC or SMD? Any references for",
+      "thread_id": "thread-449385da4720",
+      "thread_depth": 2,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-167f147525cf",
+      "message_id": "<AS8PR08MB919367FCC55F83620343F1678BB52@AS8PR08MB9193.eurprd08.prod.outlook.com>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2025-04-08T12:37:32Z",
+      "subject": "[R-meta] d_z and d_av effect sizes in metafor",
+      "subject_clean": "[R-meta] d_z and d_av effect sizes in metafor",
+      "in_reply_to": "<9734767a-e30b-4268-b66c-ae4758c5b499@Spark>",
+      "references": [
+        "<1b32dd3f-1ad3-4d24-8ff2-f72dda3c4ecf@Spark>",
+        "<bb597607-e4ef-4364-ae49-ea88fb6e8d85@Spark>",
+        "<GV2PR08MB9205A4CA94A59291C32316858BAA2@GV2PR08MB9205.eurprd08.prod.outlook.com>",
+        "<9734767a-e30b-4268-b66c-ae4758c5b499@Spark>"
+      ],
+      "body_plain": "The formula for the bias-correction factor is the same:\n\ngamma(mi/2)/(sqrt(mi/2)*gamma((mi-1)/2))\n\nbut for SMD = n1i+n2i-2, for SMCC, mi = ni-1, and for SMCRP, mi = 2*(ni-1) / (1 + ri^2). As for references, see the documentation of escalc():\n\nhttps://wviechtb.github.io/metafor/reference/escalc.html#-a-measures-for-quantitative-variables-2\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: Zhouhan Jin <zjin65 at uwo.ca>\n> Sent: Monday, April 7, 2025 20:40\n> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-\n> project.org>; Viechtbauer, Wolfgang (NP)\n> <wolfgang.viechtbauer at maastrichtuniversity.nl>\n> Subject: RE: d_z and d_av effect sizes in metafor\n>\n> Thank you, Wolfgang, for the clarification! Is it possible to share the formula\n> for bias correction for SMCRP and how it is different from the correction factor\n> used in SMCC or SMD? Any references for the difference in correction factors are\n> highly appreciated?\n>\n> Best wishes,\n>\n> Zhouhan Jin\n> On Apr 7, 2025 at 07:18 -0400, Viechtbauer, Wolfgang (NP)\n> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>, wrote:\n>\n> Dear Zhouhan,\n>\n> If r=0.5 *and* sd_pre = sd_post, *then* the SMCC and SMCR are identical:\n>\n> n <- 30\n> r <- 0.5 # r set to 0.5 for demonstration\n> mean_pre <- 0\n> mean_post <- 0.5\n> sd_pre <- 0.75\n> sd_post <- 0.75\n>\n> escalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\n> sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n>\n> escalc(measure = \"SMCR\", m1i = mean_post, m2i = mean_pre,\n> sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n>\n> However, r=0.5 is not sufficient for this equivalence to hold.\n>\n> Even then, SMCRP will be slightly different, since it uses a different bias-\n> adjustment factor:\n>\n> escalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\n> sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n>\n> We can switch off the bias correction and then get equivalence for this measure\n> as well:\n>\n> escalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\n> sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n, correct=FALSE)\n>\n> escalc(measure = \"SMCR\", m1i = mean_post, m2i = mean_pre,\n> sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n, correct=FALSE)\n>\n> escalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\n> sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n, correct=FALSE)\n>\n> The sampling variance will still be different for SMCRP, since it uses more\n> information compared to SMCR.\n>\n> Best,\n> Wolfgang\n>\n> -----Original Message-----\n> From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org> On\n> Behalf\n> Of Zhouhan Jin via R-sig-meta-analysis\n> Sent: Saturday, April 5, 2025 21:18\n> To: R Special Interest Group for Meta-Analysis <mailto:r-sig-meta-analysis at r-\n> project.org>\n> Cc: Zhouhan Jin <mailto:zjin65 at uwo.ca>\n> Subject: [R-meta] d_z and d_av effect sizes in metafor\n>\n> Hello Wolfgang and Rmeta Community,\n>\n> I always assumed that under pre-post correlation = 0.5, metafor::escal()'s\n> measure = \"SMCC\" and \"SMCRP\" referred to in the article below as \"d_z\" and\n> \"d_av\" respectively, are equivalent. But that doesn't seem to be the case (see R\n> code below).\n>\n> Questions: 1- Can they be equivalent under any condition?\n> 2- If yes, will their sampling variances then also be equal?\n> 3- If no, are there any other two SMC variants that will be\n> equivalent in both effect size and sampling variances under r=0.5?\n>\n> ARTICLE:\n> https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2013.0086\n> 3/full\n>\n> # R code:\n> library(metafor)\n> n <- 30\n> r <- 0.5 # r set to 0.5 for demonstration\n> mean_pre <- 0\n> mean_post <- 0.5\n> sd_pre <- 1\n> sd_post <- .5\n>\n> esc_dz <- escalc(measure = \"SMCC\", m1i = mean_post, m2i = mean_pre,\n> sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n>\n> esc_dav <- escalc(measure = \"SMCRP\", m1i = mean_post, m2i = mean_pre,\n> sd1i = sd_post, sd2i = sd_pre, ri = r, ni = n)\n>\n> Best wishes,\n>\n> Zhouhan Jin",
+      "body_snippet": "The formula for the bias-correction factor is the same:\n\ngamma(mi/2)/(sqrt(mi/2)*gamma((mi-1)/2))\n\nbut for SMD = n1i+n2i-2, for SMCC, mi = ni-1, and for SMCRP, mi = 2*(ni-1) / (1 + ri^2). As for refer",
+      "thread_id": "thread-449385da4720",
+      "thread_depth": 3,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-b39029188511",
+      "message_id": "<CAE89KOP9vAe-en-Jec6psqqApBg9gon5uC1Qz3X=CxkVs=L+0A@mail.gmail.com>",
+      "from_name": "Emanuel Schembri",
+      "from_email_hash": "74fb249d27ad50c8cc65dbc715c9eee902b4ef632af4c9d6f95a3712b4474e76",
+      "date": "2025-04-19T11:08:02+02:00",
+      "subject": "[R-meta] Help with Forest Plot – Avoiding Duplicate Display of Mean Difference and 95% CI",
+      "subject_clean": "[R-meta] Help with Forest Plot – Avoiding Duplicate Display of Mean Difference and 95% CI",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear Meta Group,\n\nWishing you all a happy Easter period!\n\nI?m currently using the meta package and working on including risk of\nbias plots within a forest plot, which I have been able to set up\nsuccessfully. However, I?ve encountered an issue: the mean difference\nand 95% confidence interval are appearing twice within the forest plot\noutput.\n\nI?ve attached the resulting forest plot and the R code I used.\n\nCould anyone kindly advise how to prevent the mean difference and 95%\nCI from appearing twice in the plot?\n\nMany thanks in advance for your help!\n\nKind regards,\nEmanuel\n\n\n\n\n\nlibrary(tidyverse)\n\nlibrary(meta)\n\nlibrary('readxl')\n\nsetwd(\"D:/abc/testROB\")\n\n\n\nE1 = read_xlsx(\"D:/abc/testROB/test.xlsx\")\n\nhead(E1)\n\nstr(E1)\n\n\n\n\n\n> dput(E1)\n\nstructure(list(study = c(\"A\", \"B\", \"C\", \"D\", \"E\"), year = c(2000,\n\n2001, 2002, 2003, 2004), n.mt = c(35, 10, 54, 22, 32), mean.mt = c(4.7,\n\n4.01, 2.2, 5.25, 4.07), sd.mt = c(2.8, 0.26, 1.5, 1.52, 1.89),\n\n    n.control = c(34, 10, 47, 21, 29), mean.control = c(5.7,\n\n    8.8, 2.5, 6.3, 4.73), sd.control = c(2.5, 0.29, 1.22, 1.73,\n\n    1.79), D1 = c(\"Low risk\", \"Some concerns\", \"Some concerns\",\n\n    \"Low risk\", \"Low risk\"), D2 = c(\"Some concerns\", \"High risk\",\n\n    \"High risk\", \"Some concerns\", \"High risk\"), D3 = c(\"Low risk\",\n\n    \"Low risk\", \"Some concerns\", \"Low risk\", \"Some concerns\"),\n\n    D4 = c(\"Some concerns\", \"Some concerns\", \"High risk\", \"Some concerns\",\n\n    \"High risk\"), D5 = c(\"Low risk\", \"Low risk\", \"Low risk\",\n\n    \"Low risk\", \"Low risk\"), rob = c(\"Some concerns\", \"High risk\",\n\n    \"High risk\", \"Some concerns\", \"High risk\")), class = c(\"tbl_df\",\n\n\"tbl\", \"data.frame\"), row.names = c(NA, -5L))\n\n>\n\n\n\n# Meta-analysis\n\nm.publ = metacont(n.mt,\n\n                  mean.mt,\n\n                  sd.mt,\n\n                  n.control,\n\n                  mean.control,\n\n                  sd.control,\n\n                  common = T,\n\n                  random = T,\n\n                  studlab = paste0(study, \" (\", year, \")\"),\n\n                  data = E1,\n\n                  sm = \"MD\"\n\n)\n\n\n\nm2 <- rob(D1, D2, D3, D4, D5, overall = rob, data = m.publ, tool = \"rob2\")\n\nrob(m2)\n\n\n\nforest(m2,\n\n       common = FALSE,\n\n       test.overall.random = TRUE,\n\n       prediction = TRUE,\n\n       print.Q = TRUE,\n\n       print.Q.pval = TRUE,\n\n       digits.pval = 2,\n\n       digits.sd = 1,\n\n       digits.weight = 1,\n\n       digits.mean = 1,\n\n       label.left = \"Favours Therapy\",\n\n       label.right = \"Favours Control\",\n\n       cilayout(\"(\", \"; \"),\n\n       addrows = 1,\n\n       just = \"center\",\n\n       print.subgroup.name = FALSE,\n\n       text.random.w = \"Subtotal (95% CI)\",\n\n       label.e = \"Therapy\",\n\n       label.c = \"Control\",\n\n       layout = \"RevMan5\",\n\n       text.random = \"Total (95% CI)\",\n\n       text.w.random = \"Random\",\n\n       text.predict = \"95% Prediction Interval\",\n\n       col.label.right = \"black\",\n\n       col.label.left = \"black\",\n\n       xlim = c(-8, 5),\n\n       xlab = \" \\n Post-treatment\",\n\n       ff.xlab = \"bold\"\n\n)\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: test plot rob.png\nType: image/png\nSize: 33070 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20250419/7ec7db74/attachment-0001.png>",
+      "body_snippet": "Dear Meta Group,\n\nWishing you all a happy Easter period!\n\nI?m currently using the meta package and working on including risk of\nbias plots within a forest plot, which I have been able to set up\nsucces",
+      "thread_id": "thread-b39029188511",
+      "thread_depth": 0,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-c68852f0dea7",
+      "message_id": "<CAEmuQj8gXiUsfHC8x7=dzOzbXC=7hpjBsLp9paunmO4xdj4bgA@mail.gmail.com>",
+      "from_name": "Tori Peña",
+      "from_email_hash": "eefcfa036a4510887dea5e95bdb9d249e5ee269efd012beb315a5feab9c811a0",
+      "date": "2025-04-22T12:24:02-04:00",
+      "subject": "[R-meta] Questions Re: I^2",
+      "subject_clean": "[R-meta] Questions Re: I^2",
+      "in_reply_to": "<CAEmuQj9qW1H_LTEq66WFyQmoQhqqbRqkn9aJc70BDH=SOjzgxA@mail.gmail.com>",
+      "references": [
+        "<CAEmuQj9qW1H_LTEq66WFyQmoQhqqbRqkn9aJc70BDH=SOjzgxA@mail.gmail.com>"
+      ],
+      "body_plain": "Hi again,\n\nI just wanted to follow-up on this email -\n\nI am running a three-level rma.mv model in R. When I calculated I^2, it\nsuggested that 78% of heterogeneity is *within *clusters in level two.  I\nwasn't sure if this suggests that we should not conduct moderator analyses\nor if it suggests we should consider a two-level model?  Thanks in advance\nfor your guidance!\n\nSee code below:\n\nm_1 <- rma.mv(yi = yi,\n                     V = vi,\n                     slab = StudyID,\n                     data = nestedAgg,\n                     random = ~ 1 | StudyID/ESid,\n                     test = \"t\",\n                     method = \"REML\")\n\nW <- diag(1/m_1$vi)\nX <- model.matrix(m_1)\nP <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W\n100 * sum(m_1$sigma2) / (sum(m_1$sigma2) + (m_1$k-m_1$p)/sum(diag(P)))\n\n100 * m_1$sigma2 / (sum(m_1$sigma2) + (m_1$k-m_1$p)/sum(diag(P)))\n\n[OUTPUT: ## [1] 9.890334 77.989904]\n\nOn Tue, Apr 15, 2025 at 11:20?AM Tori Pe?a <Tori.Pena at stonybrook.edu> wrote:\n\n> Hi everyone,\n>\n> I am running a three-level rma.mv model in R. When I calculated I^2, it\n> suggested that 78% of heterogeneity is *within *clusters in level two.  I\n> wasn't sure if this suggests that we should not conduct moderator analyses\n> or if it suggests we should consider a two-level model?  Thanks in advance\n> for your guidance!\n>\n> See code below:\n>\n> m_1 <- rma.mv(yi = yi,\n>                      V = vi,\n>                      slab = StudyID,\n>                      data = nestedAgg,\n>                      random = ~ 1 | StudyID/ESid,\n>                      test = \"t\",\n>                      method = \"REML\")\n>\n> W <- diag(1/m_1$vi)\n> X <- model.matrix(m_1)\n> P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W\n> 100 * sum(m_1$sigma2) / (sum(m_1$sigma2) + (m_1$k-m_1$p)/sum(diag(P)))\n>\n> 100 * m_1$sigma2 / (sum(m_1$sigma2) + (m_1$k-m_1$p)/sum(diag(P)))\n>\n> [OUTPUT: ## [1] 9.890334 77.989904]\n>\n> Thanks,\n> Tori\n>\n> --\n> *Tori Pe?a, Ph.D. *(she/her/ella)\n> Cognitive Psychology\n> Dept. of Psychology\n> Stony Brook University\n> Stony Brook, NY 11790-2500\n> [image: Stony Brook University logo]\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi again,\n\nI just wanted to follow-up on this email -\n\nI am running a three-level rma.mv model in R. When I calculated I^2, it\nsuggested that 78% of heterogeneity is *within *clusters in level two.  I",
+      "thread_id": "thread-c68852f0dea7",
+      "thread_depth": 0,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-6919032ff591",
+      "message_id": "<CAHmG7t6qrpeS0UpR-fWOX_SQAWsD03C+GZe=ux2P-rUPz50neA@mail.gmail.com>",
+      "from_name": "Orestis Efthimiou",
+      "from_email_hash": "aba70abc974949a58d74ddab5910220dfc7199e314245583bc16ba5d3bdd4948",
+      "date": "2025-04-23T08:59:06+02:00",
+      "subject": "[R-meta]  Help with Forest Plot – Avoiding Duplicate Display of Mean Difference and 95% CI",
+      "subject_clean": "[R-meta]  Help with Forest Plot – Avoiding Duplicate Display of Mean Difference and 95% CI",
+      "in_reply_to": "<CAE89KOP9vAe-en-Jec6psqqApBg9gon5uC1Qz3X=CxkVs=L+0A@mail.gmail.com>",
+      "references": [
+        "<CAE89KOP9vAe-en-Jec6psqqApBg9gon5uC1Qz3X=CxkVs=L+0A@mail.gmail.com>"
+      ],
+      "body_plain": "Hi Emanuel,\n\nYou just need to add this in the forest function\nleftcols=c(\"studlab\", \"n.e\", \"mean.e\", \"sd.e\", \"n.c\", \"mean.c\", \"sd.c\")\n\nBest,\nOrestis\n\nOn Sat, Apr 19, 2025 at 11:08?AM Emanuel Schembri via R-sig-meta-analysis <\nr-sig-meta-analysis at r-project.org> wrote:\n\n> Dear Meta Group,\n>\n> Wishing you all a happy Easter period!\n>\n> I?m currently using the meta package and working on including risk of\n> bias plots within a forest plot, which I have been able to set up\n> successfully. However, I?ve encountered an issue: the mean difference\n> and 95% confidence interval are appearing twice within the forest plot\n> output.\n>\n> I?ve attached the resulting forest plot and the R code I used.\n>\n> Could anyone kindly advise how to prevent the mean difference and 95%\n> CI from appearing twice in the plot?\n>\n> Many thanks in advance for your help!\n>\n> Kind regards,\n> Emanuel\n>\n>\n>\n>\n>\n> library(tidyverse)\n>\n> library(meta)\n>\n> library('readxl')\n>\n> setwd(\"D:/abc/testROB\")\n>\n>\n>\n> E1 = read_xlsx(\"D:/abc/testROB/test.xlsx\")\n>\n> head(E1)\n>\n> str(E1)\n>\n>\n>\n>\n>\n> > dput(E1)\n>\n> structure(list(study = c(\"A\", \"B\", \"C\", \"D\", \"E\"), year = c(2000,\n>\n> 2001, 2002, 2003, 2004), n.mt = c(35, 10, 54, 22, 32), mean.mt = c(4.7,\n>\n> 4.01, 2.2, 5.25, 4.07), sd.mt = c(2.8, 0.26, 1.5, 1.52, 1.89),\n>\n>     n.control = c(34, 10, 47, 21, 29), mean.control = c(5.7,\n>\n>     8.8, 2.5, 6.3, 4.73), sd.control = c(2.5, 0.29, 1.22, 1.73,\n>\n>     1.79), D1 = c(\"Low risk\", \"Some concerns\", \"Some concerns\",\n>\n>     \"Low risk\", \"Low risk\"), D2 = c(\"Some concerns\", \"High risk\",\n>\n>     \"High risk\", \"Some concerns\", \"High risk\"), D3 = c(\"Low risk\",\n>\n>     \"Low risk\", \"Some concerns\", \"Low risk\", \"Some concerns\"),\n>\n>     D4 = c(\"Some concerns\", \"Some concerns\", \"High risk\", \"Some concerns\",\n>\n>     \"High risk\"), D5 = c(\"Low risk\", \"Low risk\", \"Low risk\",\n>\n>     \"Low risk\", \"Low risk\"), rob = c(\"Some concerns\", \"High risk\",\n>\n>     \"High risk\", \"Some concerns\", \"High risk\")), class = c(\"tbl_df\",\n>\n> \"tbl\", \"data.frame\"), row.names = c(NA, -5L))\n>\n> >\n>\n>\n>\n> # Meta-analysis\n>\n> m.publ = metacont(n.mt,\n>\n>                   mean.mt,\n>\n>                   sd.mt,\n>\n>                   n.control,\n>\n>                   mean.control,\n>\n>                   sd.control,\n>\n>                   common = T,\n>\n>                   random = T,\n>\n>                   studlab = paste0(study, \" (\", year, \")\"),\n>\n>                   data = E1,\n>\n>                   sm = \"MD\"\n>\n> )\n>\n>\n>\n> m2 <- rob(D1, D2, D3, D4, D5, overall = rob, data = m.publ, tool = \"rob2\")\n>\n> rob(m2)\n>\n>\n>\n> forest(m2,\n>\n>        common = FALSE,\n>\n>        test.overall.random = TRUE,\n>\n>        prediction = TRUE,\n>\n>        print.Q = TRUE,\n>\n>        print.Q.pval = TRUE,\n>\n>        digits.pval = 2,\n>\n>        digits.sd = 1,\n>\n>        digits.weight = 1,\n>\n>        digits.mean = 1,\n>\n>        label.left = \"Favours Therapy\",\n>\n>        label.right = \"Favours Control\",\n>\n>        cilayout(\"(\", \"; \"),\n>\n>        addrows = 1,\n>\n>        just = \"center\",\n>\n>        print.subgroup.name = FALSE,\n>\n>        text.random.w = \"Subtotal (95% CI)\",\n>\n>        label.e = \"Therapy\",\n>\n>        label.c = \"Control\",\n>\n>        layout = \"RevMan5\",\n>\n>        text.random = \"Total (95% CI)\",\n>\n>        text.w.random = \"Random\",\n>\n>        text.predict = \"95% Prediction Interval\",\n>\n>        col.label.right = \"black\",\n>\n>        col.label.left = \"black\",\n>\n>        xlim = c(-8, 5),\n>\n>        xlab = \" \\n Post-treatment\",\n>\n>        ff.xlab = \"bold\"\n>\n> )\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Emanuel,\n\nYou just need to add this in the forest function\nleftcols=c(\"studlab\", \"n.e\", \"mean.e\", \"sd.e\", \"n.c\", \"mean.c\", \"sd.c\")\n\nBest,\nOrestis\n\nOn Sat, Apr 19, 2025 at 11:08?AM Emanuel Schembri ",
+      "thread_id": "thread-b39029188511",
+      "thread_depth": 1,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-54e591b17c03",
+      "message_id": "<1FD001C9-1152-475E-A4BB-30B324C786A6@uniklinik-freiburg.de>",
+      "from_name": "Dr. Guido Schwarzer",
+      "from_email_hash": "5933fdbd5c0e719b579ab557521981d64d6fe4975312ea53734438638abdd271",
+      "date": "2025-04-23T14:00:13Z",
+      "subject": "[R-meta]  Help with Forest Plot – Avoiding Duplicate Display of Mean Difference and 95% CI",
+      "subject_clean": "[R-meta]  Help with Forest Plot – Avoiding Duplicate Display of Mean Difference and 95% CI",
+      "in_reply_to": "<CAE89KOP9vAe-en-Jec6psqqApBg9gon5uC1Qz3X=CxkVs=L+0A@mail.gmail.com>",
+      "references": [
+        "<CAE89KOP9vAe-en-Jec6psqqApBg9gon5uC1Qz3X=CxkVs=L+0A@mail.gmail.com>"
+      ],
+      "body_plain": "Dear Emanuel,\n\nYou hit a bug in R package meta.\n\nI fixed the bug in the development version of meta on GitHub. \n\nYou could install this version using\n\ninstall.packages(\"remotes\")\nremotes::install_github(\"guido-s/meta\", build_vignettes = TRUE)\n\nor without the vignette\n\nremotes::install_github(\"guido-s/meta\")\n\nBest,\nGuido",
+      "body_snippet": "Dear Emanuel,\n\nYou hit a bug in R package meta.\n\nI fixed the bug in the development version of meta on GitHub. \n\nYou could install this version using\n\ninstall.packages(\"remotes\")\nremotes::install_gith",
+      "thread_id": "thread-b39029188511",
+      "thread_depth": 1,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-4d4b8b79fea6",
+      "message_id": "<72af6f28-5644-4ee7-b7c4-30a288559f28@frankbosco.com>",
+      "from_name": "Frank Bosco",
+      "from_email_hash": "00b38d5a6c68ba18095e4705eacb181a0c4f7949314b890b73d485bf9a47ad6c",
+      "date": "2025-04-23T12:31:02-04:00",
+      "subject": "[R-meta] Adjusted R^2 for rma.mv?",
+      "subject_clean": "[R-meta] Adjusted R^2 for rma.mv?",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi all,\n\nI am running a variety of multilevel meta-regressions using rma.mv. I am \nestimating pseudo R^2 using the following: (sum(model0$sigma2) - \nsum(model1$sigma2)) / sum(model0$sigma2) -- where model0 is an \nintercept-only model and model1 contains moderators.\n\nI would like to estimate an adjusted R^2 that will penalize the addition \nof moderators. However, the number of studies I am summarizing is large \n(in the thousands). Thus, using the standard formula for adjusted R^2, \nadding 20 or so predictors to the model reduces the R^2 by only decimal \ndust.\n\nAre there any suggestions on how to arrive at something like an adjusted \nR^2 in this context?\n\nAlthough other fit indices might be preferred, I would like to stay \nwithin the familiar R^2 metric for ease of interpretation. (Though, I am \ncurious as to which other fit indices would be preferred.)\n\nThanks,\n\nFrank\n\n*Frank Bosco, Ph.D.*\nDirector, metaBUS.org\nProfessor\nSchool of Business\nDepartment of Management & Entrepreneurship\n\nVirginia Commonwealth University\nSnead Hall\n301 West Main Street, Room B4151\nRichmond, Virginia 23284\nFax: 804 828-1602\nbusiness.vcu.edu <http://business.vcu.edu>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi all,\n\nI am running a variety of multilevel meta-regressions using rma.mv. I am \nestimating pseudo R^2 using the following: (sum(model0$sigma2) - \nsum(model1$sigma2)) / sum(model0$sigma2) -- where m",
+      "thread_id": "thread-4d4b8b79fea6",
+      "thread_depth": 0,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-5ccaa723c995",
+      "message_id": "<CAFUVuJz3JCjNnFAMsCUNhjH4O1KqzUXK=+RVDT5kZNDMfoTe_w@mail.gmail.com>",
+      "from_name": "James Pustejovsky",
+      "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
+      "date": "2025-04-23T12:03:55-05:00",
+      "subject": "[R-meta] Questions Re: I^2",
+      "subject_clean": "[R-meta] Questions Re: I^2",
+      "in_reply_to": "<CAEmuQj8gXiUsfHC8x7=dzOzbXC=7hpjBsLp9paunmO4xdj4bgA@mail.gmail.com>",
+      "references": [
+        "<CAEmuQj9qW1H_LTEq66WFyQmoQhqqbRqkn9aJc70BDH=SOjzgxA@mail.gmail.com>",
+        "<CAEmuQj8gXiUsfHC8x7=dzOzbXC=7hpjBsLp9paunmO4xdj4bgA@mail.gmail.com>"
+      ],
+      "body_plain": "If you take the heterogeneity estimates at face value, then what you have\nobserved implies that there is a lot of within-study heterogeneity in the\neffect sizes. Another way, perhaps more direct, to get a sense of the\nheterogeneity is just to examine m_1$sigma2 directly and to calculate\nprofile likelihood confidence intervals using\nconfint(m_1)\nIn my view, high within-study heterogeneity does NOT indicate that you\nshould avoid moderator analysis or drop the within-study heterogeneity term\nfrom the model. Rather, I think it suggests two directions for further\ninvestigation:\n\n1) The model you've specified assumes that the within-study heterogeneity\nterm is homoskedastic across the included studies. This assumption should\nbe examined, at minimum, by plotting the effect sizes grouped within study\n(as in a forest plot, with one row per study but possibly with multiple\neffect size estimates on each row) and looking at the degree of dispersion\nin the cloud of effect sizes from each study. (It might be that one or two\nof the studies are substantially more heterogeneous than others, perhaps\ndue to outliers.)\n\n2) If the heterogeneity assumptions are reasonable and there is a lot of\nwithin-study heterogeneity, then that raises the question of what factors\nare producing the within-study heterogeneity. What features of the effect\nsize estimates vary _within_ studies, not just between? Identifying such\nfeatures could help you to explain the within-study heterogeneity. Such\nfeatures might also be very useful as control variables for examining other\nmoderators (even study-level moderators) because they could help to soak up\nvariation in the effect size estimates, making it easier to identify other\npatterns of moderation.\n\nOne other note: If the effect size estimates that have different ESid's but\nthe same StudyID are calculated for different outcomes but are based on the\nsame sample of participants, then it would be useful to treat them as\ncorrelated rather than conditionally independent. More details about how to\ndo this in metafor can be found here:\nhttps://wviechtb.github.io/metafor/reference/misc-recs.html#general-workflow-for-meta-analyses-involving-complex-dependency-structures\nAnd a much more detailed discussion can be found here:\nhttps://jepusto.com/publications/RVE-Meta-analysis-expanding-the-range/index.html\nIn your example, I would guess that treating the effect size estimates as\ncorrelated will actually lead to even more within-study heterogeneity (and\npossibly a bit less between-study heterogeneity), so it doesn't exactly\nhelp, but still it might be a more plausible model for the data.\n\nJames\n\n\nOn Tue, Apr 22, 2025 at 11:24?AM Tori Pe?a via R-sig-meta-analysis <\nr-sig-meta-analysis at r-project.org> wrote:\n\n> Hi again,\n>\n> I just wanted to follow-up on this email -\n>\n> I am running a three-level rma.mv model in R. When I calculated I^2, it\n> suggested that 78% of heterogeneity is *within *clusters in level two.  I\n> wasn't sure if this suggests that we should not conduct moderator analyses\n> or if it suggests we should consider a two-level model?  Thanks in advance\n> for your guidance!\n>\n> See code below:\n>\n> m_1 <- rma.mv(yi = yi,\n>                      V = vi,\n>                      slab = StudyID,\n>                      data = nestedAgg,\n>                      random = ~ 1 | StudyID/ESid,\n>                      test = \"t\",\n>                      method = \"REML\")\n>\n> W <- diag(1/m_1$vi)\n> X <- model.matrix(m_1)\n> P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W\n> 100 * sum(m_1$sigma2) / (sum(m_1$sigma2) + (m_1$k-m_1$p)/sum(diag(P)))\n>\n> 100 * m_1$sigma2 / (sum(m_1$sigma2) + (m_1$k-m_1$p)/sum(diag(P)))\n>\n> [OUTPUT: ## [1] 9.890334 77.989904]\n>\n> On Tue, Apr 15, 2025 at 11:20?AM Tori Pe?a <Tori.Pena at stonybrook.edu>\n> wrote:\n>\n> > Hi everyone,\n> >\n> > I am running a three-level rma.mv model in R. When I calculated I^2, it\n> > suggested that 78% of heterogeneity is *within *clusters in level two.  I\n> > wasn't sure if this suggests that we should not conduct moderator\n> analyses\n> > or if it suggests we should consider a two-level model?  Thanks in\n> advance\n> > for your guidance!\n> >\n> > See code below:\n> >\n> > m_1 <- rma.mv(yi = yi,\n> >                      V = vi,\n> >                      slab = StudyID,\n> >                      data = nestedAgg,\n> >                      random = ~ 1 | StudyID/ESid,\n> >                      test = \"t\",\n> >                      method = \"REML\")\n> >\n> > W <- diag(1/m_1$vi)\n> > X <- model.matrix(m_1)\n> > P <- W - W %*% X %*% solve(t(X) %*% W %*% X) %*% t(X) %*% W\n> > 100 * sum(m_1$sigma2) / (sum(m_1$sigma2) + (m_1$k-m_1$p)/sum(diag(P)))\n> >\n> > 100 * m_1$sigma2 / (sum(m_1$sigma2) + (m_1$k-m_1$p)/sum(diag(P)))\n> >\n> > [OUTPUT: ## [1] 9.890334 77.989904]\n> >\n> > Thanks,\n> > Tori\n> >\n> > --\n> > *Tori Pe?a, Ph.D. *(she/her/ella)\n> > Cognitive Psychology\n> > Dept. of Psychology\n> > Stony Brook University\n> > Stony Brook, NY 11790-2500\n> > [image: Stony Brook University logo]\n> >\n>\n>         [[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "If you take the heterogeneity estimates at face value, then what you have\nobserved implies that there is a lot of within-study heterogeneity in the\neffect sizes. Another way, perhaps more direct, to g",
+      "thread_id": "thread-c68852f0dea7",
+      "thread_depth": 1,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-b57a5105615b",
+      "message_id": "<CAE89KOMxWwLVxQNXM_KO7sygPf2keq_hd9oy=DGsbHauLsg4mA@mail.gmail.com>",
+      "from_name": "Emanuel Schembri",
+      "from_email_hash": "74fb249d27ad50c8cc65dbc715c9eee902b4ef632af4c9d6f95a3712b4474e76",
+      "date": "2025-04-23T23:21:49+02:00",
+      "subject": "[R-meta]  Help with Forest Plot – Avoiding Duplicate Display of Mean Difference and 95% CI",
+      "subject_clean": "[R-meta]  Help with Forest Plot – Avoiding Duplicate Display of Mean Difference and 95% CI",
+      "in_reply_to": "<1FD001C9-1152-475E-A4BB-30B324C786A6@uniklinik-freiburg.de>",
+      "references": [
+        "<CAE89KOP9vAe-en-Jec6psqqApBg9gon5uC1Qz3X=CxkVs=L+0A@mail.gmail.com>",
+        "<1FD001C9-1152-475E-A4BB-30B324C786A6@uniklinik-freiburg.de>"
+      ],
+      "body_plain": "Dear Guido,\n\nI appreciate your help.\nI have now managed to get it correctly.\n\nRegards,\nEmanuel\n\nOn Wed, Apr 23, 2025 at 4:00?PM Dr. Guido Schwarzer\n<guido.schwarzer at uniklinik-freiburg.de> wrote:\n>\n> Dear Emanuel,\n>\n> You hit a bug in R package meta.\n>\n> I fixed the bug in the development version of meta on GitHub.\n>\n> You could install this version using\n>\n> install.packages(\"remotes\")\n> remotes::install_github(\"guido-s/meta\", build_vignettes = TRUE)\n>\n> or without the vignette\n>\n> remotes::install_github(\"guido-s/meta\")\n>\n> Best,\n> Guido\n>",
+      "body_snippet": "Dear Guido,\n\nI appreciate your help.\nI have now managed to get it correctly.\n\nRegards,\nEmanuel\n\nOn Wed, Apr 23, 2025 at 4:00?PM Dr. Guido Schwarzer\n<guido.schwarzer at uniklinik-freiburg.de> wrote:\n>\n",
+      "thread_id": "thread-b39029188511",
+      "thread_depth": 2,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-3447252fa479",
+      "message_id": "<CAERzG5M5Y05nG2c9Ez3roPU_7GkmacCuQ9_WLmVOpG6VUNKPMA@mail.gmail.com>",
+      "from_name": "Manuela Santos Santana",
+      "from_email_hash": "cbba414308dcc73163c05fa9a5a9df76fc443907740b6e4119366ce4d02e888c",
+      "date": "2025-04-24T15:57:13-03:00",
+      "subject": "[R-meta] Single group mean - metafor",
+      "subject_clean": "[R-meta] Single group mean - metafor",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear all,\n\nI am seeking input on a conceptual approach I?m considering for determining\ncritical thresholds for a biological response (a biomarker) using the\nmetafor package.\n\nI have data from a monitoring program and aim to establish thresholds by\nestimating a central tendency of the biomarker while accounting for its\nvariability across time, sampling efforts, and locations. The idea is to\nuse a single-group meta-analytic model to estimate a mean value, and then\nuse the confidence interval of that mean as a data-driven threshold range.\n\nSpecifically, I am considering using rma.mv() to model the mean response,\nwhile including random effects to account for:\n\n   -\n\n   site-level variability,\n   -\n\n   temporal and sampling effort heterogeneity, and\n   -\n\n   potentially, phylogenetic correlations among species.\n\nWould this be considered a sound statistical approach for defining such\nthresholds? Are there any caveats or alternative modeling strategies I\nshould consider?\n\nI appreciate any insights or references you can offer.\n\nBest,\n\nManu\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear all,\n\nI am seeking input on a conceptual approach I?m considering for determining\ncritical thresholds for a biological response (a biomarker) using the\nmetafor package.\n\nI have data from a monito",
+      "thread_id": "thread-3447252fa479",
+      "thread_depth": 0,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-831690e87c6d",
+      "message_id": "<AS8PR08MB919330F1EB2326AA258742D98B812@AS8PR08MB9193.eurprd08.prod.outlook.com>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2025-04-28T10:06:52Z",
+      "subject": "[R-meta] Adjusted R^2 for rma.mv?",
+      "subject_clean": "[R-meta] Adjusted R^2 for rma.mv?",
+      "in_reply_to": "<72af6f28-5644-4ee7-b7c4-30a288559f28@frankbosco.com>",
+      "references": [
+        "<72af6f28-5644-4ee7-b7c4-30a288559f28@frankbosco.com>"
+      ],
+      "body_plain": "Hi Frank,\n\nInterestingly, the proportional reduction in residual variance in an OLS regression model is actually equal to the *adjusted* R^2:\n\ndat <- mtcars\nres1 <- lm(mpg ~ hp + wt, data=dat)\nres0 <- lm(mpg ~ 1, data=dat)\n\nsummary(res1)$r.squared\nsummary(res1)$adj.r.squared\n(sigma(res0)^2 - sigma(res1)^2) / sigma(res0)^2\n\nlibrary(metafor)\nrma(mpg ~ hp + wt, vi=0, data=dat)$R2 / 100\n\nBut as you say, with a large sample size, this matters little.\n\nMaybe you could look into using some kind of regularization (e.g., ridge, lasso). The pema package (https://cran.r-project.org/package=pema) might be worth checking out.\n\nThe rma.mv() function (if you install the devel version) allows you to pass two arguments via ... called lambda1 and lambda2. These are L1 and L2 penalty terms for the regression coefficients (so lambda1 > 0 corresponds to lasso, lambda2 > 0 corresponds to ridge, and lambda1 > 0 & lambda2 > 0 corresponds to elastic net regularization). The higher the penalty terms, the stronger the shrinkage. This should tend to increase sum(model1$sigma2) and hence penalized R^2 values.\n\nChoosing appropriate values for lambda1/lambda2 could be done with cross-validation, given that you have thousands of studies.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Frank Bosco via R-sig-meta-analysis\n> Sent: Wednesday, April 23, 2025 18:31\n> To: r-sig-meta-analysis at r-project.org\n> Cc: Frank Bosco <meta at frankbosco.com>\n> Subject: [R-meta] Adjusted R^2 for rma.mv?\n>\n> Hi all,\n>\n> I am running a variety of multilevel meta-regressions using rma.mv. I am\n> estimating pseudo R^2 using the following: (sum(model0$sigma2) -\n> sum(model1$sigma2)) / sum(model0$sigma2) -- where model0 is an\n> intercept-only model and model1 contains moderators.\n>\n> I would like to estimate an adjusted R^2 that will penalize the addition\n> of moderators. However, the number of studies I am summarizing is large\n> (in the thousands). Thus, using the standard formula for adjusted R^2,\n> adding 20 or so predictors to the model reduces the R^2 by only decimal\n> dust.\n>\n> Are there any suggestions on how to arrive at something like an adjusted\n> R^2 in this context?\n>\n> Although other fit indices might be preferred, I would like to stay\n> within the familiar R^2 metric for ease of interpretation. (Though, I am\n> curious as to which other fit indices would be preferred.)\n>\n> Thanks,\n>\n> Frank\n>\n> *Frank Bosco, Ph.D.*\n> Director, metaBUS.org\n> Professor\n> School of Business\n> Department of Management & Entrepreneurship\n>\n> Virginia Commonwealth University\n> Snead Hall\n> 301 West Main Street, Room B4151\n> Richmond, Virginia 23284\n> Fax: 804 828-1602\n> business.vcu.edu <http://business.vcu.edu>",
+      "body_snippet": "Hi Frank,\n\nInterestingly, the proportional reduction in residual variance in an OLS regression model is actually equal to the *adjusted* R^2:\n\ndat <- mtcars\nres1 <- lm(mpg ~ hp + wt, data=dat)\nres0 <-",
+      "thread_id": "thread-4d4b8b79fea6",
+      "thread_depth": 1,
+      "month": "2025-04"
+    },
+    {
+      "id": "msg-c42358d7462f",
+      "message_id": "<AS8PR08MB91933A9F5F183090791BA0AB8B812@AS8PR08MB9193.eurprd08.prod.outlook.com>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2025-04-28T10:15:54Z",
+      "subject": "[R-meta] Single group mean - metafor",
+      "subject_clean": "[R-meta] Single group mean - metafor",
+      "in_reply_to": "<CAERzG5M5Y05nG2c9Ez3roPU_7GkmacCuQ9_WLmVOpG6VUNKPMA@mail.gmail.com>",
+      "references": [
+        "<CAERzG5M5Y05nG2c9Ez3roPU_7GkmacCuQ9_WLmVOpG6VUNKPMA@mail.gmail.com>"
+      ],
+      "body_plain": "Hi Manu,\n\nJust a brief response, as I am not too familiar with this specific application (determining critical thresholds). Your general thinking sounds reasonable to me if those means you intend to synthesize are indeed estimates of such a threshold.\n\nWhen dealing with complex dependency structures, it would be wise to compare the model-based results with those from using cluster-robust inference methods, although the latter gets tricky when including crossed random effects than can span the entire dataset (like phylogenetic or spatial correlations). But if these end up being negligible and one is left with a strictly hierarchical dependency structure, using robust(..., cluster=<>, clubSandwich=TRUE) with the highest level as the cluster variable will get you those results.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Manuela Santos Santana via R-sig-meta-analysis\n> Sent: Thursday, April 24, 2025 20:57\n> To: r-sig-meta-analysis at r-project.org\n> Cc: Manuela Santos Santana <manuelasantana.oc at gmail.com>\n> Subject: [R-meta] Single group mean - metafor\n>\n> Dear all,\n>\n> I am seeking input on a conceptual approach I?m considering for determining\n> critical thresholds for a biological response (a biomarker) using the\n> metafor package.\n>\n> I have data from a monitoring program and aim to establish thresholds by\n> estimating a central tendency of the biomarker while accounting for its\n> variability across time, sampling efforts, and locations. The idea is to\n> use a single-group meta-analytic model to estimate a mean value, and then\n> use the confidence interval of that mean as a data-driven threshold range.\n>\n> Specifically, I am considering using rma.mv() to model the mean response,\n> while including random effects to account for:\n>\n>    - site-level variability,\n>    - temporal and sampling effort heterogeneity, and\n>    - potentially, phylogenetic correlations among species.\n>\n> Would this be considered a sound statistical approach for defining such\n> thresholds? Are there any caveats or alternative modeling strategies I\n> should consider?\n>\n> I appreciate any insights or references you can offer.\n>\n> Best,\n>\n> Manu",
+      "body_snippet": "Hi Manu,\n\nJust a brief response, as I am not too familiar with this specific application (determining critical thresholds). Your general thinking sounds reasonable to me if those means you intend to s",
+      "thread_id": "thread-3447252fa479",
+      "thread_depth": 1,
+      "month": "2025-04"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-449385da4720",
+      "subject": "[R-meta] d_z and d_av effect sizes in metafor",
+      "message_count": 4,
+      "participants": [
+        "Viechtbauer, Wolfgang (NP)",
+        "Zhouhan Jin"
+      ],
+      "started": "2025-04-05T19:17:30+00:00",
+      "last_reply": "2025-04-08T12:37:32+00:00",
+      "root_message_id": "msg-449385da4720"
+    },
+    {
+      "id": "thread-b39029188511",
+      "subject": "[R-meta] Help with Forest Plot – Avoiding Duplicate Display of Mean Difference and 95% CI",
+      "message_count": 4,
+      "participants": [
+        "Dr. Guido Schwarzer",
+        "Emanuel Schembri",
+        "Orestis Efthimiou"
+      ],
+      "started": "2025-04-19T11:08:02+02:00",
+      "last_reply": "2025-04-23T23:21:49+02:00",
+      "root_message_id": "msg-b39029188511"
+    },
+    {
+      "id": "thread-c68852f0dea7",
+      "subject": "[R-meta] Questions Re: I^2",
+      "message_count": 2,
+      "participants": [
+        "James Pustejovsky",
+        "Tori Peña"
+      ],
+      "started": "2025-04-22T12:24:02-04:00",
+      "last_reply": "2025-04-23T12:03:55-05:00",
+      "root_message_id": "msg-c68852f0dea7"
+    },
+    {
+      "id": "thread-4d4b8b79fea6",
+      "subject": "[R-meta] Adjusted R^2 for rma.mv?",
+      "message_count": 2,
+      "participants": [
+        "Frank Bosco",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2025-04-23T12:31:02-04:00",
+      "last_reply": "2025-04-28T10:06:52+00:00",
+      "root_message_id": "msg-4d4b8b79fea6"
+    },
+    {
+      "id": "thread-3447252fa479",
+      "subject": "[R-meta] Single group mean - metafor",
+      "message_count": 2,
+      "participants": [
+        "Manuela Santos Santana",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2025-04-24T15:57:13-03:00",
+      "last_reply": "2025-04-28T10:15:54+00:00",
+      "root_message_id": "msg-3447252fa479"
+    }
+  ]
+}
