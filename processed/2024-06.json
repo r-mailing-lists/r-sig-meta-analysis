@@ -637,25 +637,6 @@
       "thread_id": "thread-06f58bcc9a08",
       "thread_depth": 1,
       "month": "2024-06"
-    },
-    {
-      "id": "msg-f156f1c0e07c",
-      "message_id": "<LO4P265MB3501C0D428F7C13208085D34EDD22@LO4P265MB3501.GBRP265.PROD.OUTLOOK.COM>",
-      "from_name": "Andreas Voldstad",
-      "from_email_hash": "8d730894073e446d6faa7b7c29c1da8da1379c5db085021e8d3d2ce52f8c2f11",
-      "date": "2024-06-30T22:22:39Z",
-      "subject": "[R-meta] Non-positive definite covariance matrix for rma.mv",
-      "subject_clean": "[R-meta] Non-positive definite covariance matrix for rma.mv",
-      "in_reply_to": "<5D714D39-72F9-4F05-B50F-AC6CB5B1A1AA@gmail.com>",
-      "references": [
-        "<LO4P265MB35011DDB3A5E33536E6C939FEDD22@LO4P265MB3501.GBRP265.PROD.OUTLOOK.COM>",
-        "<5D714D39-72F9-4F05-B50F-AC6CB5B1A1AA@gmail.com>"
-      ],
-      "body_plain": "Hi James, thank you for responding. Indeed, I am fitting a model across all the contrasts, and metafor did yell at me for the NPD V matrix. Is this a case where it might be appropriate to use the nearpd = T argument in vcalc?\n\nBest wishes,\nAndreas\n\n\nSent from Outlook for iOS<https://aka.ms/o0ukef>\n________________________________\nFrom: James Pustejovsky <jepusto at gmail.com>\nSent: Sunday, June 30, 2024 5:13:32 PM\nTo: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>\nCc: Andreas Voldstad <andreas.voldstad at kellogg.ox.ac.uk>\nSubject: Re: [R-meta] Non-positive definite covariance matrix for rma.mv\n\nHi Andreas,\n\nI think the NPD issue arises from having treatment contrasts that are perfectly collinear. Consider that if you know the contrasts Tx1 vs Passive, Tx2 vs Passive, and Tx1 vs Active, then you can infer the Tx2 vs Active contrast:\n(Tx2 vs Passive) - (Tx1 vs Passive) + (Tx1 vs Active) = (Tx2 - Tx1)  + (Tx1 vs Active) = (Tx2 vs Active)\n\nAs far as I can see, the only way to avoid this is to calculate all effect size contrasts relative to a common comparison condition.\n\nDepending on the meta-analytic model in which you use this covariance matrix, the NPD issue might or might not be important?it really depends on the structure of the model. For example, if you are going to run separate models with the active control contrasts and passive control contrasts, then the fact that the whole covariance matrix is NPD is NBD?not a big deal. But if you?re fitting some sort of multilevel meta-analysis model across all the contrasts, then metafor will yell at you if you use an NBD matrix in the V argument.\n\nJames\n\n> On Jun 30, 2024, at 8:37?AM, Andreas Voldstad via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:\n>\n> ?Dear everyone,\n>\n> I have one study in my meta-analysis with a covariance matrix that is non-positive definite.\n>\n> I am wondering what consequences this might have for my meta-analysis with rma.mv, and whether you have any suggestions of how to deal with the issue.\n>\n> The study had four arms and effect sizes are additionally correlated over time and within dyads.\n>\n> The correlations over time and dyad members used for creating the covariance matrix was based on the corresponding correlations between participants' scores, estimated from the study dataset.\n>\n> Because of the four arms, some effect sizes have no overlap, leading to blocks of zeros in the covariance matrix.\n>\n> The covariance matrix is reproduced below:\n>\n> study_escalc <- data.frame(  StudyID = c(\"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\", \"StudyA\"),  Role = c(\"Husband\", \"Husband\", \"Wife\", \"Wife\", \"Husband\", \"Husband\", \"Wife\", \"Wife\", \"Husband\", \"Husband\", \"Wife\", \"Wife\", \"Husband\", \"Husband\", \"Wife\", \"Wife\"),  Timenum = c(2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3),  Tx = c(\"Tx1\", \"Tx1\", \"Tx1\", \"Tx1\", \"Tx2\", \"Tx2\", \"Tx2\", \"Tx2\", \"Tx1\", \"Tx1\", \"Tx1\", \"Tx1\", \"Tx2\", \"Tx2\", \"Tx2\", \"Tx2\"),  Control = c(\"Passive\", \"Passive\", \"Passive\", \"Passive\", \"Passive\", \"Passive\", \"Passive\", \"Passive\", \"Active\", \"Active\", \"Active\", \"Active\", \"Active\", \"Active\", \"Active\", \"Active\"),  Contrast = c(\"Tx1 vs Passive\", \"Tx1 vs Passive\", \"Tx1 vs Passive\", \"Tx1 vs Passive\", \"Tx2 vs Passive\", \"Tx2 vs Passive\", \"Tx2 vs Passive\", \"Tx2 vs Passive\", \"Tx1 vs Active\", \"Tx1 vs Active\", \"Tx1 vs Active\", \"Tx1 vs Active\", \"Tx2 vs Active\", \"Tx2 vs Active\", \"Tx2 vs Active\", \"Tx2 vs Active\"),  delta = c(0.467304, 0.429311, 0.145277, 0.248136, 0.684523, 0.537425, 0.380137, 0.335112, 0.432723, 0.480095, 0.145031, 0.252715, 0.628890, 0.572478, 0.373187, 0.338829),  v = c(0.053375, 0.053154, 0.051417, 0.051710, 0.056543, 0.056865, 0.052208, 0.052756, 0.053863, 0.053454, 0.050774, 0.053052, 0.056766, 0.057132, 0.051522, 0.054108),  N_tx = c(38, 39, 39, 38, 36, 35, 39, 37, 38, 39, 39, 38, 36, 35, 39, 37),  N_Control = c(39, 38, 39, 40, 39, 38, 39, 40, 38, 38, 40, 38, 38, 38, 40, 38),  Category = c(\"Husband_2\", \"Husband_3\", \"Wife_2\", \"Wife_3\", \"Husband_2\", \"Husband_3\", \"Wife_2\", \"Wife_3\", \"Husband_2\", \"Husband_3\", \"Wife_2\", \"Wife_3\", \"Husband_2\", \"Husband_3\", \"Wife_2\", \"Wife_3\"),  Effect = c(\"Tx1 vs Passive_Husband_2\", \"Tx1 vs Passive_Husband_3\", \"Tx1 vs Passive_Wife_2\", \"Tx1 vs Passive_Wife_3\", \"Tx2 vs Passive_Husband_2\", \"Tx2 vs Passive_Husband_3\", \"Tx2 vs Passive_Wife_2\", \"Tx2 vs Passive_Wife_3\", \"Tx1 vs Active_Husband_2\", \"Tx1 vs Active_Husband_3\", \"Tx1 vs Active_Wife_2\", \"Tx1 vs Active_Wife_3\", \"Tx2 vs Active_Husband_2\", \"Tx2 vs Active_Husband_3\", \"Tx2 vs Active_Wife_2\", \"Tx2 vs Active_Wife_3\"))\n>\n> study_cormat <- matrix(c(  1.000000, 0.781447, 0.689538, 0.639455,  0.781447, 1.000000, 0.565192, 0.653545,  0.689538, 0.565192, 1.000000, 0.820650,  0.639455, 0.653545, 0.820650, 1.000000),  nrow=4, byrow=TRUE, dimnames = list(    c(\"Husband_2\", \"Husband_3\", \"Wife_2\", \"Wife_3\"),    c(\"Husband_2\", \"Husband_3\", \"Wife_2\", \"Wife_3\")))\n>\n> Study_Vmat <-   vcalc(vi = v,        cluster = StudyID,        obs = Category,                 grp1 = Tx,         grp2 = Control,                 w1 = N_tx,        w2 = N_Control,                rho = study_cormat,        data = study_escalc)\n>\n> # Warning message: The var-cov matrix appears to be not positive definite in cluster StudyA. cov2cor(Study_Vmat)\n>\n>\n>\n> Warm wishes,\n>\n> Andreas Voldstad (he/him)\n> PhD student in Psychiatry\n> University of Oxford\n> Please don?t feel obliged to read or respond to my email outside your own working hours.\n>\n>    [[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n\t[[alternative HTML version deleted]]",
-      "body_snippet": "Hi James, thank you for responding. Indeed, I am fitting a model across all the contrasts, and metafor did yell at me for the NPD V matrix. Is this a case where it might be appropriate to use the near",
-      "thread_id": "thread-8d50493a628f",
-      "thread_depth": 2,
-      "month": "2024-06"
     }
   ],
   "threads": [
@@ -794,13 +775,13 @@
     {
       "id": "thread-8d50493a628f",
       "subject": "[R-meta] Non-positive definite covariance matrix for rma.mv",
-      "message_count": 3,
+      "message_count": 2,
       "participants": [
         "Andreas Voldstad",
         "James Pustejovsky"
       ],
       "started": "2024-06-30T13:37:13+00:00",
-      "last_reply": "2024-06-30T22:22:39+00:00",
+      "last_reply": "2024-06-30T11:13:32-05:00",
       "root_message_id": "msg-8d50493a628f"
     }
   ]
