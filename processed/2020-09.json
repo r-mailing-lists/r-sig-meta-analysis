@@ -462,6 +462,26 @@
       "thread_id": "thread-458d9da4a1db",
       "thread_depth": 1,
       "month": "2020-09"
+    },
+    {
+      "id": "msg-9a82fe30546f",
+      "message_id": "<CAFUVuJzenxF17-XGDUN4TV0c3BDNgabY8bpYA34_nDWKyVu66A@mail.gmail.com>",
+      "from_name": "James Pustejovsky",
+      "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
+      "date": "2020-09-30T20:18:37-05:00",
+      "subject": "[R-meta]  Multilevel Meta-regression with Multiple Level Covariates",
+      "subject_clean": "[R-meta]  Multilevel Meta-regression with Multiple Level Covariates",
+      "in_reply_to": "<CAP8W3ONRAygTbjkS1YmZV8_4tPcZRUy31TqsasFtgCzuicYa+A@mail.gmail.com>",
+      "references": [
+        "<CAP8W3OPb_8znAehT9AwmEYE8=9=5AZgHsJ6eNf-ik9TyLwrZvg@mail.gmail.com>",
+        "<CAFUVuJxWrgq4Pdm_9ugvXUYfjyi5rLD4bgxcpMO_zfqMjqAK0A@mail.gmail.com>",
+        "<CAP8W3ONRAygTbjkS1YmZV8_4tPcZRUy31TqsasFtgCzuicYa+A@mail.gmail.com>"
+      ],
+      "body_plain": "Hi Billy,\n\nThe metafor package does have the rma.glmm() function for fitting\ngeneralized linear mixed models (GLMMs), including with non-gaussian\ndistributions. However, as far as I understand GLMMs (which are also what\nlme4 does) would not really work for your data because you have cluster\ndependence in the measurement level of the model, not just in the random\neffects. GEEs could handle this though, and the packages you found (gee and\ngeepack) are what I would recommend using. There's a very large literature\non these models. Here's a good introductory blog post, which has links to\nfurther (more formal) reading:\nhttps://rlbarter.github.io/Practical-Statistics/2017/05/10/generalized-estimating-equations-gee/\n\nJames\n\nOn Tue, Sep 29, 2020 at 4:27 PM Billy Goette <billy.goette at gmail.com> wrote:\n\n> This is an interesting framework (GEE that is) that I was not previously\n> familiar with. I appreciate bringing my attention to this. I agree that a\n> binomial distribution is more intuitive to what I'm trying to answer. If I\n> had actual, item-level data for a sample (i.e., each participant's\n> responses -- either 0 or 1 -- to each item), then I would use GLMM assuming\n> a binomial, though really Bernoulli, distribution to do an item response\n> theory model. The idea of doing this meta-analysis actually came from\n> trying to figure out how to do that kind of analysis on summary level data\n> since I don't have that individual-level data.\n>\n> For my own edification, is this something that is doable in metafor? I\n> don't see how to specify a non-gaussian distribution in rma.mv, but I'm\n> also no expert on the metafor package. Cursory googling brought my\n> attention to gee and geepack packages for R, but it doesn't seem like it's\n> possible to include more than one cluster in those packages. I could do\n> this in lme4, but I believe that their estimation method is still\n> inappropriate for meta-analysis (though maybe this has been changed? it's\n> been a while since I looked at multilevel meta-analysis in lme4 since\n> rma.mv works so well).\n>\n> Also, is there any guidance on how many studies should be collected for\n> these kinds of analyses? I suspect that this is a relatively specific\n> meta-analysis, and it sounds like rules-of-thumbs will be biased if the\n> distribution of moderators is restricted or sparse. Any good Monte Carlo\n> simulation methods that could be used to check the extent to which the\n> model has too few studies to estimate the various moderators?\n>\n> On Mon, Sep 28, 2020 at 8:17 PM James Pustejovsky <jepusto at gmail.com>\n> wrote:\n>\n>> Hi Billy,\n>>\n>> The approach you describe seems reasonable to me. Whether you've got too\n>> many predictors will depend on how many studies' worth of data you are able\n>> to gather and on the distribution of the item-level, study-level, and\n>> test-level characteristics. Not knowing the correlations between items does\n>> complicate things a bit, but could be handled using robust variance\n>> estimation methods.\n>>\n>> One way to set up this problem might be by using proportion of successes\n>> as the effect size metric, modeled by a binomial distribution (where the\n>> number of trials = number of respondents to that item), and where the\n>> probability of success is related to the covariates via a logit (or probit)\n>> link. Combining this with RVE for standard errors gives you something like\n>> a GEE model.\n>>\n>> James\n>>\n>> On Fri, Sep 25, 2020 at 12:39 PM Billy Goette <billy.goette at gmail.com>\n>> wrote:\n>>\n>>> Hope this finds everyone well,\n>>>\n>>> I was hoping to get some feedback on addressing some practical concerns\n>>> with an idea for a meta-analysis that I have. At the core, I'm concerned\n>>> with the interpretability of the data analysis, so I'm trying to check\n>>> whether this is even possible before I start the study.\n>>>\n>>> My field commonly administers lists of words that a participant must read\n>>> correctly. Item difficulty is often summarized in studies as the\n>>> proportion\n>>> of respondents who got an item correct over the total sample size.\n>>> Studies\n>>> use different word-reading tests and lists of varying length (usually\n>>> between 20 and 50). Each test differs in how long the words are\n>>> presented, how many words are presented at a time, etc. I'm interested in\n>>> whether certain word-specific variables (e.g., frequency of word in\n>>> English) are related to the item difficulty (i.e., proportion of people\n>>> who\n>>> answer it correctly).\n>>>\n>>> My current conceptualization of the problem is as a multilevel\n>>> meta-regression. The effect size is computed from the proportion of\n>>> correct\n>>> answers to each word which is nested within study and within tests. I\n>>> would\n>>> have multiple covariates (i.e., word traits) for each effect size,\n>>> covariates at the study level (i.e., average sample demographics), and\n>>> covariates at the test level (i.e., administration differences). My\n>>> concern\n>>> is that these are too many predictors to include in a meta-regression,\n>>> and\n>>> I also am anticipating that I won't have any information about\n>>> the covariance matrix of the effect sizes. Any recommendations, words of\n>>> warning, caveats, or suggestions would be incredibly helpful since I'm\n>>> early in the process.\n>>>\n>>> Thank you!\n>>>\n>>>         [[alternative HTML version deleted]]\n>>>\n>>> _______________________________________________\n>>> R-sig-meta-analysis mailing list\n>>> R-sig-meta-analysis at r-project.org\n>>> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n>>>\n>>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi Billy,\n\nThe metafor package does have the rma.glmm() function for fitting\ngeneralized linear mixed models (GLMMs), including with non-gaussian\ndistributions. However, as far as I understand GLMMs (",
+      "thread_id": "thread-c5cdec0e0b85",
+      "thread_depth": 3,
+      "month": "2020-09"
     }
   ],
   "threads": [
@@ -541,13 +561,13 @@
     {
       "id": "thread-c5cdec0e0b85",
       "subject": "[R-meta] Multilevel Meta-regression with Multiple Level Covariates",
-      "message_count": 3,
+      "message_count": 4,
       "participants": [
         "Billy Goette",
         "James Pustejovsky"
       ],
       "started": "2020-09-25T12:38:58-05:00",
-      "last_reply": "2020-09-29T16:26:58-05:00",
+      "last_reply": "2020-09-30T20:18:37-05:00",
       "root_message_id": "msg-c5cdec0e0b85"
     },
     {
