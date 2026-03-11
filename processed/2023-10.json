@@ -42,7 +42,7 @@
       "message_id": "<48F472A2-E5B7-477B-B11D-3A8ED0B76E5D@gmail.com>",
       "from_name": "Kiet Huynh",
       "from_email_hash": "9acfc42d9e118a599689f99f1aa2cb87472034889a9fae681dfcc556152eca6b",
-      "date": "2023-10-03T11:35:32-05:00",
+      "date": "2023-10-03T16:35:32Z",
       "subject": "[R-meta] Score Normalization for Moderator Analysis in Meta-Analysis",
       "subject_clean": "[R-meta] Score Normalization for Moderator Analysis in Meta-Analysis",
       "in_reply_to": "<6cbdec2681be423b90b376b000fca274@maastrichtuniversity.nl>",
@@ -55,22 +55,6 @@
       "body_plain": "Wolfgang,\n\nThanks for info and resources. You answered my question about looking for some guidance on both the minimum number of studies needed to estimate such a model, and some general rules of thumb to work from. \n\nI also enjoyed your ?three patients? video. I got a good laugh from that!\n\n- KH\n\n> On Sep 29, 2023, at 6:27 AM, Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n> \n> I just noticed that the last question has remained unanswered: \n> \n> Depends on what you mean by \"need\". To run such an analysis, assuming 'scale' is just a two-level factor and you want to run a model with '~ factor(scale) * pompmean', then you will need five effect sizes, two for the first and three for the second level of 'scale'. That will give you just enough information to fit such a model and estimate the amount of residual heterogeneity.\n> \n> But I assume that this is not what you mean by \"need\". If you meant something along the lines of 'having enough power', then I cannot give you an answer to that question, because it is like asking: \"I want to run a study - how many subjects do I need?\" (although turns out that the answer to that question is: \"three patients\" -- https://www.youtube.com/watch?v=Hz1fyhVOjr4). To give an informed answer to that question, one would have to do a power analysis:\n> \n> Hedges, L. V., & Pigott, T. D. (2004). The power of statistical tests for moderators in meta-analysis. Psychological Methods, 9(4), 426-445. \n> \n> If you meant something along the lines of 'so that reviewers are not going to complain that my sample size is too small', then one could refer to rules of thumb like what you can find in the Cochrane Handbook:\n> \n> https://training.cochrane.org/handbook/current/chapter-10#section-10-11-5-1\n> \n> \"It is very unlikely that an investigation of heterogeneity will produce useful findings unless there is a substantial number of studies. Typical advice for undertaking simple regression analyses: that at least ten observations (i.e. ten studies in a meta-analysis) should be available for each characteristic modelled. However, even this will be too few when the covariates are unevenly distributed across studies.\"\n> \n> To be clear, this is an entirely arbitrary rule (and one also finds suggestions like '5 studies per characteristic'). Also, what exactly 'for each characteristic modelled' means is not entirely clear, but say we interpret this as 'per model coefficient'. The model above has 4 model coefficients (including the intercept), so then we would need at least 40 effect sizes.\n> \n> To be fair, this rule does relate somewhat to the issue of overfitting, since more complex models require more data points to avoid overfitting. But even then, one would have to articulate more precisely what exactly one is concerned about.\n> \n> Best,\n> Wolfgang\n> \n>> -----Original Message-----\n>> From: Kiet Huynh [mailto:kietduchuynh at gmail.com]\n>> Sent: Thursday, 14 September, 2023 17:10\n>> To: Viechtbauer, Wolfgang (NP)\n>> Cc: R Special Interest Group for Meta-Analysis\n>> Subject: Re: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis\n>> \n>> Hi Wolfgang,\n>> \n>> Thanks for the reminder about including links when cross posting.\n>> \n>> I appreciate the helpful expiation for the proportion/percentage of maximum\n>> possible' (POMP) score method for moderation analysis. Especially helpful was the\n>> tip on using the scale type to interact with the POMP score mean to determine if\n>> the relationship between social support and the strength of the association\n>> between LGBTQ+ discrimination and mental health differs depending on the scale\n>> used. Do you have a sense of how many effect sizes would be needed for that?\n>> \n>> Best,\n>> \n>> Kiet\n>> \n>> On Sep 13, 2023, at 3:25 AM, Viechtbauer, Wolfgang (NP)\n>> <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n>> \n>> Dear Kiet,\n>> \n>> I don't mind cross-posting, but when doing so, please indicate this in posts, so\n>> in case answers are provided elsewhere, duplicate efforts can be avoided. For\n>> reference, this question was also posted here:\n>> \n>> https://stats.stackexchange.com/questions/626306/score-normalization-for-\n>> moderator-analysis-in-meta-analysis\n>> \n>> What you describe under 2 is the 'proportion/percentage of maximum possible'\n>> (POMP) score method, which is nicely discussed in this article:\n>> \n>> Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units\n>> and the circumstance for POMP. Multivariate Behavioral Research, 34(3), 315-\n>> 346. https://doi.org/10.1207/S15327906MBR3403_2\n>> \n>> This approach assumes that the observed values on one scale are linear\n>> transformations of the observed values on other scales. Of course that is never\n>> quite true, but can hold as a rough approximation. In fact, this is also the\n>> assumption underlying various effect size / outcome measures (e.g., standardized\n>> mean differences, correlation coefficients), so it is an implicit assumption in\n>> many meta-analyses anyway (except that you are now also applying this assumption\n>> to the moderator variable). There was a thread related to this in April:\n>> \n>> https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-April/004529.html\n>> \n>> When this assumption is not correct (with respect to the variables involved in\n>> computing the correlations or with respect to the moderator variable), then this\n>> becomes one of the sources of (residual) heterogeneity. Of course, we have\n>> random/mixed-effects models to account for (residual) heterogeneity, so this is\n>> not the end of the world. But if scales are measuring entirely different\n>> constructs, then we should be more worried if we lump them together.\n>> \n>> If you have enough studies, then you can also code the type of scale used to\n>> measure social support (e.g., MSPSS versus other or even more fine-grained if you\n>> have enough studies) and include this in your moderator analysis and allow it to\n>> interact with the POMP score mean of the social support scale. That way, you can\n>> examine if the relationship between social support and the strength of the\n>> association between LGBTQ+ discrimination and mental health differs depending on\n>> the scale used.\n>> \n>> Best,\n>> Wolfgang\n>> \n>> -----Original Message-----\n>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>> Behalf Of Kiet Huynh via R-sig-meta-analysis\n>> Sent: Tuesday, 12 September, 2023 21:56\n>> To: R meta\n>> Cc: Kiet Huynh\n>> Subject: [R-meta] Score Normalization for Moderator Analysis in Meta-Analysis\n>> \n>> Hello colleagues,\n>> \n>> I?m conducting a meta-analysis of the association between LGBTQ+ discrimination\n>> and mental health. Both are continuous variables, and I am analyzing correlation\n>> coefficients. I?m interested in looking at moderators (continuous) of the\n>> relationship between these two variables. One such moderator is social support\n>> (continuous). I am considering two approaches for running the moderator analysis:\n>> \n>> 1) Many of the studies used the same MSPSS social support scale. I plan to use\n>> the mean value of the MSPSS as a continuous moderator variable of the\n>> discrimination-mental health relationship.\n>> \n>> 2) Most studies, however, use different measures of social support. I plan to use\n>> the min-max normalization method to put all the social support measure on the\n>> same scale, and then use that normalized mean as the moderator variable of the\n>> discrimination-mental health relationship. For an example use of min-max\n>> normalization method, see Endendijk et al. (2020). However, the Endendijk et al.\n>> (2020) study uses the min-max normalization method for the outcome and not for a\n>> moderator. The formula for the min-max normalization method is:\n>> \n>> x? = (x - min)/(max - min)\n>> x? is the normalized mean, x is the mean of the sample, min is the minimum\n>> possible value of the scale, and max is the maximum possible value of the scale.\n>> \n>> The benefit to the second approach is that I can include more studies in this\n>> moderator analysis, and not just the studies using the same measure of social\n>> support.\n>> \n>> My question is whether both approaches are valid methods for testing moderator\n>> analysis? Are there any issues with using the of min-max normalization method for\n>> moderator analysis?\n>> \n>> Thank you,\n>> \n>> - KH\n>> \n>> Reference:\n>> \n>> Endendijk, J. J., van Baar, A. L., & Dekovi?, M. (2020). He is a stud, she is a\n>> slut! A meta-analysis on the continued existence of sexual double standards.\n>> Personality and Social Psychology Review, 24(2), 163?190.\n>> https://doi.org/10.1177/1088868319891310\n>> \n>> ----\n>> \n>> Kiet Huynh, PhD (he/him)\n>> (hear pronunciation <https://www.name-coach.com/kiet-huynh-94be0772-1bfd-4ece-\n>> afba-14699186f2b9>)\n>> Assistant Professor\n>> Department of Psychology\n>> \n>> Terrill Hall Rm # 336\n>> University of North Texas\n>> Denton, TX 76203\n>> Kiet.Huynh at unt.edu <mailto:Kiet.Huynh at unt.edu>\n>",
       "body_snippet": "Wolfgang,\n\nThanks for info and resources. You answered my question about looking for some guidance on both the minimum number of studies needed to estimate such a model, and some general rules of thum",
       "thread_id": "thread-6ee93449736c",
-      "thread_depth": 0,
-      "month": "2023-10"
-    },
-    {
-      "id": "msg-cccb8f39a260",
-      "message_id": "<SY4P282MB07290CB982702E01D6CB637FCECEA-6455@SY4P282MB0729.AUSP282.PROD.OUTLOOK.COM>",
-      "from_name": "Lauren Mary Heidenreich",
-      "from_email_hash": "9e1423c50000bfa85b014b1d39f3ce0dba1c4e25a0b94c39d24dd180ca0eaee3",
-      "date": "2023-10-09T01:42:10Z",
-      "subject": "[R-meta] Questions re multilevel meta-analysis",
-      "subject_clean": "[R-meta] Questions re multilevel meta-analysis",
-      "in_reply_to": null,
-      "references": [],
-      "body_plain": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the relationship between cognitive reserve (CR) indicators (e.g., educational attainment, occupational complexity, pre-morbid IQ) and cognitive outcomes (e.g., working memory, long term memory, visual processing speed etc), among individuals previously infected with COVID-19. Because the moderating effect of CR on cognitive outcomes can only be assessed by including an estimate of brain pathology status, we are specifically exploring how CR and COVID-19 severity (e.g., time in hospital, need for oxygen therapy) interact to predict cognitive outcomes. We would expect to find a negative relationship between the severity of the disease and cognitive outcomes, which is less pronounced in people who have a higher CR (see hypothetical interaction: https://universityofadelaide.box.com/s/c0ehcj70m3765w99xbi6om61udos5czv).\n\n[cid:7fe4ce9b-00b6-4c72-9e73-5dee198341eb]\nTo assess this relationship we have performed regression models which take the following form:\nlm(cognitive outcome ~ age + sex + cognitive reserve * COVID severity)\n\nIn a given study, there may be a range of cognitive outcomes, cognitive reserve indicators and COVID severity indicators that were assessed. In order to capture all this information we have repeated the linear model for every possible combination of these (ranging anywhere from a handful to 200 models per study). The size of the main effects and interaction effect were then extracted in the form of semipartial correlations<https://journals.sagepub.com/doi/10.3102/1076998610396901>, which are the effect sizes of interest for the meta-analyses. (A semipartial correlation is essentially a standard correlation which has been corrected for potential confounds). Across 30 studies we have derived approximately 1000 effect sizes for each of the main effects, and the interaction term.\n\nWe have then run three multilevel meta-analyses (for the main effect of CR, main effect of COVID severity, and the interaction effect) with the following code:\n\nV = impute_covariance_matrix(vi = df$vi, cluster = df$study_id, r = 0.6)\nmodel <- rma.mv(yi,\n              V,\n              random = list(~ 1 | study_id/effectsize_id),\n              tdist = TRUE,\n              method = \"REML\",\n              sparse = TRUE,\n              data = data_temp)\n\nand performed a series of moderation analyses which assess the influence of (1) cognitive domain, (2) CR indicator and (3) severity indicator on the results.\n\nmoderation <- rma.mv(yi,\n                           V,\n                           mods = ~ moderator,\n                           random = list(~ moderator | study_id, ~1 | effectsize_id),\n                           struct =\"HCS\",\n                           tdist = TRUE,\n                           method = \"REML\",\n                           sparse = TRUE,\n                           control = list(rel.tol=1e-8),\n                           data = data_temp_2)\n\nAs I have been conducting these analyses, several questions have presented themselves.\n\n(1) Plotting the moderating influence of CR indicator (CRQ scores, Education level, Education years etc) on the main effect of CR resulted in the following: https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel\n\n [cid:e94c07b9-e951-489f-b76c-15ab7b0d332f]\n\nAs you can see, the estimated central tendency for CRQ scores is very inflated relative to the individual effect sizes (it is also somewhat inflated for the other CR indicators). I am assuming the estimate for CRQ scores is inflated because 64 effect sizes were derived from only one study? If this is correct, should it be dropped from the moderation analysis? If not, are you able to explain why this has occurred?\n\n(2) In regards to the calculations used to compute V via the impute_covariance_matrix() function, is it possible to manually calculate this from the raw data? If so, are you able to provide resources on how to do this?\n\n(3) Finally, given the unique nature of our meta-analysis and the large number of effect sizes that are derived from often very similar regression models, are there any problems you can see regarding our use of these functions?\n\nAny help with these questions would be greatly appreciated!\n\nKind regards,\nLauren Heidenreich\nPhD Student, University of Adelaide, South Australia\n\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 271326 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0002.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 35011 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0003.png>",
-      "body_snippet": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the rel",
-      "thread_id": "thread-cccb8f39a260",
       "thread_depth": 0,
       "month": "2023-10"
     },
@@ -91,11 +75,27 @@
       "month": "2023-10"
     },
     {
+      "id": "msg-cccb8f39a260",
+      "message_id": "<SY4P282MB07290CB982702E01D6CB637FCECEA-6455@SY4P282MB0729.AUSP282.PROD.OUTLOOK.COM>",
+      "from_name": "Lauren Mary Heidenreich",
+      "from_email_hash": "9e1423c50000bfa85b014b1d39f3ce0dba1c4e25a0b94c39d24dd180ca0eaee3",
+      "date": "2023-10-09T01:42:10Z",
+      "subject": "[R-meta] Questions re multilevel meta-analysis",
+      "subject_clean": "[R-meta] Questions re multilevel meta-analysis",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the relationship between cognitive reserve (CR) indicators (e.g., educational attainment, occupational complexity, pre-morbid IQ) and cognitive outcomes (e.g., working memory, long term memory, visual processing speed etc), among individuals previously infected with COVID-19. Because the moderating effect of CR on cognitive outcomes can only be assessed by including an estimate of brain pathology status, we are specifically exploring how CR and COVID-19 severity (e.g., time in hospital, need for oxygen therapy) interact to predict cognitive outcomes. We would expect to find a negative relationship between the severity of the disease and cognitive outcomes, which is less pronounced in people who have a higher CR (see hypothetical interaction: https://universityofadelaide.box.com/s/c0ehcj70m3765w99xbi6om61udos5czv).\n\n[cid:7fe4ce9b-00b6-4c72-9e73-5dee198341eb]\nTo assess this relationship we have performed regression models which take the following form:\nlm(cognitive outcome ~ age + sex + cognitive reserve * COVID severity)\n\nIn a given study, there may be a range of cognitive outcomes, cognitive reserve indicators and COVID severity indicators that were assessed. In order to capture all this information we have repeated the linear model for every possible combination of these (ranging anywhere from a handful to 200 models per study). The size of the main effects and interaction effect were then extracted in the form of semipartial correlations<https://journals.sagepub.com/doi/10.3102/1076998610396901>, which are the effect sizes of interest for the meta-analyses. (A semipartial correlation is essentially a standard correlation which has been corrected for potential confounds). Across 30 studies we have derived approximately 1000 effect sizes for each of the main effects, and the interaction term.\n\nWe have then run three multilevel meta-analyses (for the main effect of CR, main effect of COVID severity, and the interaction effect) with the following code:\n\nV = impute_covariance_matrix(vi = df$vi, cluster = df$study_id, r = 0.6)\nmodel <- rma.mv(yi,\n              V,\n              random = list(~ 1 | study_id/effectsize_id),\n              tdist = TRUE,\n              method = \"REML\",\n              sparse = TRUE,\n              data = data_temp)\n\nand performed a series of moderation analyses which assess the influence of (1) cognitive domain, (2) CR indicator and (3) severity indicator on the results.\n\nmoderation <- rma.mv(yi,\n                           V,\n                           mods = ~ moderator,\n                           random = list(~ moderator | study_id, ~1 | effectsize_id),\n                           struct =\"HCS\",\n                           tdist = TRUE,\n                           method = \"REML\",\n                           sparse = TRUE,\n                           control = list(rel.tol=1e-8),\n                           data = data_temp_2)\n\nAs I have been conducting these analyses, several questions have presented themselves.\n\n(1) Plotting the moderating influence of CR indicator (CRQ scores, Education level, Education years etc) on the main effect of CR resulted in the following: https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel\n\n [cid:e94c07b9-e951-489f-b76c-15ab7b0d332f]\n\nAs you can see, the estimated central tendency for CRQ scores is very inflated relative to the individual effect sizes (it is also somewhat inflated for the other CR indicators). I am assuming the estimate for CRQ scores is inflated because 64 effect sizes were derived from only one study? If this is correct, should it be dropped from the moderation analysis? If not, are you able to explain why this has occurred?\n\n(2) In regards to the calculations used to compute V via the impute_covariance_matrix() function, is it possible to manually calculate this from the raw data? If so, are you able to provide resources on how to do this?\n\n(3) Finally, given the unique nature of our meta-analysis and the large number of effect sizes that are derived from often very similar regression models, are there any problems you can see regarding our use of these functions?\n\nAny help with these questions would be greatly appreciated!\n\nKind regards,\nLauren Heidenreich\nPhD Student, University of Adelaide, South Australia\n\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 271326 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0002.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 35011 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0003.png>",
+      "body_snippet": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the rel",
+      "thread_id": "thread-cccb8f39a260",
+      "thread_depth": 0,
+      "month": "2023-10"
+    },
+    {
       "id": "msg-079157a10d44",
       "message_id": "<CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>",
       "from_name": "Gabriel Cotlier",
       "from_email_hash": "fe6b7ece94315f2ba414b8c7053cca118260d4229688ad762179e180bbdf3aaf",
-      "date": "2023-10-11T17:10:52+03:00",
+      "date": "2023-10-11T14:10:52Z",
       "subject": "[R-meta] forest plot function overall effect size rounded",
       "subject_clean": "[R-meta] forest plot function overall effect size rounded",
       "in_reply_to": null,
@@ -111,7 +111,7 @@
       "message_id": "<c7e0bdfa-c900-5e75-3ce3-1ceecb58498e@dewey.myzen.co.uk>",
       "from_name": "Michael Dewey",
       "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
-      "date": "2023-10-11T15:45:53+01:00",
+      "date": "2023-10-11T14:45:53Z",
       "subject": "[R-meta] forest plot function overall effect size rounded",
       "subject_clean": "[R-meta] forest plot function overall effect size rounded",
       "in_reply_to": "<CAAKwTDExv_amTrLojXQ0CBKOEi=AF_4vZSGT3CmuEC8Fa48gTQ@mail.gmail.com>",
@@ -129,7 +129,7 @@
       "message_id": "<CAAKwTDFqsK0Qf8vJLMdosmv8WfEL9kD=DsjSdtuZgWw5_po5KA@mail.gmail.com>",
       "from_name": "Gabriel Cotlier",
       "from_email_hash": "fe6b7ece94315f2ba414b8c7053cca118260d4229688ad762179e180bbdf3aaf",
-      "date": "2023-10-11T18:31:15+03:00",
+      "date": "2023-10-11T15:31:15Z",
       "subject": "[R-meta] forest plot function overall effect size rounded",
       "subject_clean": "[R-meta] forest plot function overall effect size rounded",
       "in_reply_to": "<c7e0bdfa-c900-5e75-3ce3-1ceecb58498e@dewey.myzen.co.uk>",
@@ -148,7 +148,7 @@
       "message_id": "<CACw+Tfdzm14vn2e1_=04nmu2X+bsTsfa9FmWc0fvQnYOkaAjNw@mail.gmail.com>",
       "from_name": "Catia Oliveira",
       "from_email_hash": "30516b3226e02bcb5551a11ef10c90c1444a67963e0155c2a6b2c5fb9046fa8d",
-      "date": "2023-10-11T16:36:43+01:00",
+      "date": "2023-10-11T15:36:43Z",
       "subject": "[R-meta] How to examine the moderating effect of sex in a meta-analysis of group differences?",
       "subject_clean": "[R-meta] How to examine the moderating effect of sex in a meta-analysis of group differences?",
       "in_reply_to": null,
@@ -164,7 +164,7 @@
       "message_id": "<f8b7971f-2555-2dfd-dba5-c95b15a84530@dewey.myzen.co.uk>",
       "from_name": "Michael Dewey",
       "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
-      "date": "2023-10-11T16:46:02+01:00",
+      "date": "2023-10-11T15:46:02Z",
       "subject": "[R-meta] forest plot function overall effect size rounded",
       "subject_clean": "[R-meta] forest plot function overall effect size rounded",
       "in_reply_to": "<CAAKwTDFqsK0Qf8vJLMdosmv8WfEL9kD=DsjSdtuZgWw5_po5KA@mail.gmail.com>",
@@ -184,7 +184,7 @@
       "message_id": "<CAAKwTDGD=wYvFQqBh+ypGFq6sBLx=uMhci4dahauEtLOLuMECQ@mail.gmail.com>",
       "from_name": "Gabriel Cotlier",
       "from_email_hash": "fe6b7ece94315f2ba414b8c7053cca118260d4229688ad762179e180bbdf3aaf",
-      "date": "2023-10-11T19:04:04+03:00",
+      "date": "2023-10-11T16:04:04Z",
       "subject": "[R-meta] forest plot function overall effect size rounded",
       "subject_clean": "[R-meta] forest plot function overall effect size rounded",
       "in_reply_to": "<f8b7971f-2555-2dfd-dba5-c95b15a84530@dewey.myzen.co.uk>",
@@ -205,7 +205,7 @@
       "message_id": "<092c01d9fd3c$7ddfe2f0$799fa8d0$@gmail.com>",
       "from_name": "Will Hopkins",
       "from_email_hash": "47f312cf901ea2e744ba9f1c730942b8d59531f8af7ff3280051632aa2057f09",
-      "date": "2023-10-13T07:47:00+13:00",
+      "date": "2023-10-12T18:47:00Z",
       "subject": "[R-meta] How to examine the moderating effect of sex in a meta-analysis of group differences?",
       "subject_clean": "[R-meta] How to examine the moderating effect of sex in a meta-analysis of group differences?",
       "in_reply_to": "<CACw+Tfdzm14vn2e1_=04nmu2X+bsTsfa9FmWc0fvQnYOkaAjNw@mail.gmail.com>",
@@ -299,7 +299,7 @@
       "message_id": "<CAAKwTDGm6uGs+3iV3gg4b3iNsH5rh1BXJAmRCs+6M9k8wGR9GA@mail.gmail.com>",
       "from_name": "Gabriel Cotlier",
       "from_email_hash": "fe6b7ece94315f2ba414b8c7053cca118260d4229688ad762179e180bbdf3aaf",
-      "date": "2023-10-19T22:43:04+03:00",
+      "date": "2023-10-19T19:43:04Z",
       "subject": "[R-meta] forest plot function overall effect size rounded",
       "subject_clean": "[R-meta] forest plot function overall effect size rounded",
       "in_reply_to": "<AS8PR08MB919305CA9A82D3C64F58A5178BD5A@AS8PR08MB9193.eurprd08.prod.outlook.com>",
@@ -366,7 +366,7 @@
       "message_id": "<CA+dzWjqnk-46b9g0jZesRE9UdYVeVMJjkS6VqFizZKaWRvnVOQ@mail.gmail.com>",
       "from_name": "Yuhang Hu",
       "from_email_hash": "b0634bac76ff7996231a855de79b1199f6ae3db82e807c9f518efb38e239b00e",
-      "date": "2023-10-25T12:22:56-07:00",
+      "date": "2023-10-25T19:22:56Z",
       "subject": "[R-meta] Profile likelihood for metafor::rma.mv()",
       "subject_clean": "[R-meta] Profile likelihood for metafor::rma.mv()",
       "in_reply_to": null,
@@ -400,7 +400,7 @@
       "message_id": "<CAFUVuJyudJUWtLwSw2-hFmfAJ7ijtj8MTTk0k_qnqDT0Or3QJg@mail.gmail.com>",
       "from_name": "James Pustejovsky",
       "from_email_hash": "8e06b2f7b3c4fed4d29177cf04ef673e9a6723b661aa70c4ebd2fa8843e37a8a",
-      "date": "2023-10-26T16:18:03-05:00",
+      "date": "2023-10-26T21:18:03Z",
       "subject": "[R-meta] Questions about multilevel meta-analysis structure",
       "subject_clean": "[R-meta] Questions about multilevel meta-analysis structure",
       "in_reply_to": "<SY4P282MB3016A0F42BA0F864DB018E39B1DFA@SY4P282MB3016.AUSP282.PROD.OUTLOOK.COM>",
@@ -423,7 +423,7 @@
       "message_id": "<CAPm5Ok0RbLV0vFC4TCx=Mv3jTkSxrYixQtFGkJ-SdAd-7Q=qwQ@mail.gmail.com>",
       "from_name": "英文科陳品誠",
       "from_email_hash": "d22c1fdc78ac35cee35931ea6db2e47782c0e14fb9c1915e37b6eae604ebaa91",
-      "date": "2023-10-28T17:08:38+08:00",
+      "date": "2023-10-28T09:08:38Z",
       "subject": "[R-meta] About how to interpret the following P-value from the result",
       "subject_clean": "[R-meta] About how to interpret the following P-value from the result",
       "in_reply_to": null,
@@ -439,7 +439,7 @@
       "message_id": "<a07f12c4-8067-41cf-99ca-2a62d3e4e129@dewey.myzen.co.uk>",
       "from_name": "Michael Dewey",
       "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
-      "date": "2023-10-28T13:37:47+01:00",
+      "date": "2023-10-28T12:37:47Z",
       "subject": "[R-meta] About how to interpret the following P-value from the result",
       "subject_clean": "[R-meta] About how to interpret the following P-value from the result",
       "in_reply_to": "<CAPm5Ok0RbLV0vFC4TCx=Mv3jTkSxrYixQtFGkJ-SdAd-7Q=qwQ@mail.gmail.com>",
@@ -457,7 +457,7 @@
       "message_id": "<CAC_J9Nt3=Quztnt3MLzgDJEsp_wukGnRvFixow2X4ZRX0u9pTA@mail.gmail.com>",
       "from_name": "Nick Chen",
       "from_email_hash": "670f6a1e8c03d0b1f640de31aabb02f1276c81697c261a4e7f5094afd352411b",
-      "date": "2023-10-28T22:48:54+08:00",
+      "date": "2023-10-28T14:48:54Z",
       "subject": "[R-meta] About how to interpret the following P-value from the result",
       "subject_clean": "[R-meta] About how to interpret the following P-value from the result",
       "in_reply_to": "<a07f12c4-8067-41cf-99ca-2a62d3e4e129@dewey.myzen.co.uk>",
@@ -476,7 +476,7 @@
       "message_id": "<8b43d811-38f7-2ac6-c5b1-743ecc6bf1c4@dewey.myzen.co.uk>",
       "from_name": "Michael Dewey",
       "from_email_hash": "23eddf46e0ea9b02c3ac4701d820ec1c7cb1ea6f9f9d602508498f7026c2f5f3",
-      "date": "2023-10-28T16:20:46+01:00",
+      "date": "2023-10-28T15:20:46Z",
       "subject": "[R-meta] About how to interpret the following P-value from the result",
       "subject_clean": "[R-meta] About how to interpret the following P-value from the result",
       "in_reply_to": "<CAC_J9Nt3=Quztnt3MLzgDJEsp_wukGnRvFixow2X4ZRX0u9pTA@mail.gmail.com>",
@@ -496,7 +496,7 @@
       "message_id": "<CAKeUzcWodQGheBVRk51WwcpDo2u+ox9U-13a6D_GMv0f1pvBVg@mail.gmail.com>",
       "from_name": "Andrzej Andrzej",
       "from_email_hash": "7c554e8252f0b40e643bdc9f889b2358611865127646840bfc5d94defbde1e87",
-      "date": "2023-10-29T16:30:24+01:00",
+      "date": "2023-10-29T15:30:24Z",
       "subject": "[R-meta] \"Favours experimental/vaccinated\", \"Favours control\" - Metafor",
       "subject_clean": "[R-meta] \"Favours experimental/vaccinated\", \"Favours control\" - Metafor",
       "in_reply_to": null,
@@ -530,7 +530,7 @@
       "message_id": "<CAKeUzcUfEqDA=JSpqJ-h6L6Y_aVS2q+XJypra1LvT9Tj9GXJjw@mail.gmail.com>",
       "from_name": "Andrzej Andrzej",
       "from_email_hash": "7c554e8252f0b40e643bdc9f889b2358611865127646840bfc5d94defbde1e87",
-      "date": "2023-10-29T18:24:49+01:00",
+      "date": "2023-10-29T17:24:49Z",
       "subject": "[R-meta] \"Favours experimental/vaccinated\", \"Favours control\" - Metafor",
       "subject_clean": "[R-meta] \"Favours experimental/vaccinated\", \"Favours control\" - Metafor",
       "in_reply_to": "<17be7e64-7d4b-76ed-0fcc-7448f78ff6a4@dewey.myzen.co.uk>",
@@ -589,7 +589,7 @@
       "message_id": "<CAKeUzcVpYJ5+DjZN3krTz=13aLUdq5KYVPvEqvu8Vh7u-LPw4g@mail.gmail.com>",
       "from_name": "Andrzej Andrzej",
       "from_email_hash": "7c554e8252f0b40e643bdc9f889b2358611865127646840bfc5d94defbde1e87",
-      "date": "2023-10-30T17:09:26+01:00",
+      "date": "2023-10-30T16:09:26Z",
       "subject": "[R-meta] \"Favours experimental/vaccinated\", \"Favours control\" - Metafor",
       "subject_clean": "[R-meta] \"Favours experimental/vaccinated\", \"Favours control\" - Metafor",
       "in_reply_to": "<AS8PR08MB9193417B71E44FBD8243AC1F8BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>",
@@ -632,7 +632,7 @@
       "message_id": "<CAKeUzcVTbphL_zqZPgEE0UoS38W+c8=fPVXCPDtpP8onoWutKg@mail.gmail.com>",
       "from_name": "Andrzej Andrzej",
       "from_email_hash": "7c554e8252f0b40e643bdc9f889b2358611865127646840bfc5d94defbde1e87",
-      "date": "2023-10-30T18:57:52+01:00",
+      "date": "2023-10-30T17:57:52Z",
       "subject": "[R-meta] \"Favours experimental/vaccinated\", \"Favours control\" - Metafor",
       "subject_clean": "[R-meta] \"Favours experimental/vaccinated\", \"Favours control\" - Metafor",
       "in_reply_to": "<AS8PR08MB9193D763071968BFB9B191C78BA1A@AS8PR08MB9193.eurprd08.prod.outlook.com>",
@@ -683,8 +683,8 @@
       "participants": [
         "Brendan Pearl"
       ],
-      "started": "2023-10-01T08:55:53+00:00",
-      "last_reply": "2023-10-01T11:11:19+00:00",
+      "started": "2023-10-01T08:55:53Z",
+      "last_reply": "2023-10-01T11:11:19Z",
       "root_message_id": "msg-8059d47e6107"
     },
     {
@@ -694,20 +694,9 @@
       "participants": [
         "Kiet Huynh"
       ],
-      "started": "2023-10-03T11:35:32-05:00",
-      "last_reply": "2023-10-03T11:35:32-05:00",
+      "started": "2023-10-03T16:35:32Z",
+      "last_reply": "2023-10-03T16:35:32Z",
       "root_message_id": "msg-6ee93449736c"
-    },
-    {
-      "id": "thread-d5ba73fb352b",
-      "subject": "[R-meta] Questions re multilevel meta-analysis",
-      "message_count": 1,
-      "participants": [
-        "Lauren Mary Heidenreich"
-      ],
-      "started": "2023-10-09T01:42:10+00:00",
-      "last_reply": "2023-10-09T01:42:10+00:00",
-      "root_message_id": "msg-d5ba73fb352b"
     },
     {
       "id": "thread-cccb8f39a260",
@@ -716,21 +705,20 @@
       "participants": [
         "Lauren Mary Heidenreich"
       ],
-      "started": "2023-10-09T01:42:10+00:00",
-      "last_reply": "2023-10-09T01:42:10+00:00",
+      "started": "2023-10-09T01:42:10Z",
+      "last_reply": "2023-10-09T01:42:10Z",
       "root_message_id": "msg-cccb8f39a260"
     },
     {
-      "id": "thread-4c194a03786f",
-      "subject": "[R-meta] How to examine the moderating effect of sex in a meta-analysis of group differences?",
-      "message_count": 2,
+      "id": "thread-d5ba73fb352b",
+      "subject": "[R-meta] Questions re multilevel meta-analysis",
+      "message_count": 1,
       "participants": [
-        "Catia Oliveira",
-        "Will Hopkins"
+        "Lauren Mary Heidenreich"
       ],
-      "started": "2023-10-11T16:36:43+01:00",
-      "last_reply": "2023-10-13T07:47:00+13:00",
-      "root_message_id": "msg-4c194a03786f"
+      "started": "2023-10-09T01:42:10Z",
+      "last_reply": "2023-10-09T01:42:10Z",
+      "root_message_id": "msg-d5ba73fb352b"
     },
     {
       "id": "thread-079157a10d44",
@@ -741,9 +729,21 @@
         "Michael Dewey",
         "Viechtbauer, Wolfgang (NP)"
       ],
-      "started": "2023-10-11T17:10:52+03:00",
-      "last_reply": "2023-10-19T22:43:04+03:00",
+      "started": "2023-10-11T14:10:52Z",
+      "last_reply": "2023-10-19T19:43:04Z",
       "root_message_id": "msg-079157a10d44"
+    },
+    {
+      "id": "thread-4c194a03786f",
+      "subject": "[R-meta] How to examine the moderating effect of sex in a meta-analysis of group differences?",
+      "message_count": 2,
+      "participants": [
+        "Catia Oliveira",
+        "Will Hopkins"
+      ],
+      "started": "2023-10-11T15:36:43Z",
+      "last_reply": "2023-10-12T18:47:00Z",
+      "root_message_id": "msg-4c194a03786f"
     },
     {
       "id": "thread-7e4646877c6d",
@@ -753,8 +753,8 @@
         "Arne Janssen",
         "Viechtbauer, Wolfgang (NP)"
       ],
-      "started": "2023-10-17T12:27:09+00:00",
-      "last_reply": "2023-10-17T13:09:14+00:00",
+      "started": "2023-10-17T12:27:09Z",
+      "last_reply": "2023-10-17T13:09:14Z",
       "root_message_id": "msg-7e4646877c6d"
     },
     {
@@ -764,8 +764,8 @@
       "participants": [
         "Viechtbauer, Wolfgang (NP)"
       ],
-      "started": "2023-10-17T13:21:00+00:00",
-      "last_reply": "2023-10-17T13:21:00+00:00",
+      "started": "2023-10-17T13:21:00Z",
+      "last_reply": "2023-10-17T13:21:00Z",
       "root_message_id": "msg-9ca73ee28cbf"
     },
     {
@@ -775,8 +775,8 @@
       "participants": [
         "Isaac Calvin Saywell"
       ],
-      "started": "2023-10-24T03:09:42+00:00",
-      "last_reply": "2023-10-24T03:09:42+00:00",
+      "started": "2023-10-24T03:09:42Z",
+      "last_reply": "2023-10-24T03:09:42Z",
       "root_message_id": "msg-3e5435fa21fb"
     },
     {
@@ -786,8 +786,8 @@
       "participants": [
         "Isaac Calvin Saywell"
       ],
-      "started": "2023-10-24T03:09:42+00:00",
-      "last_reply": "2023-10-24T03:09:42+00:00",
+      "started": "2023-10-24T03:09:42Z",
+      "last_reply": "2023-10-24T03:09:42Z",
       "root_message_id": "msg-44171a31e69b"
     },
     {
@@ -798,8 +798,8 @@
         "Viechtbauer, Wolfgang (NP)",
         "Yuhang Hu"
       ],
-      "started": "2023-10-25T12:22:56-07:00",
-      "last_reply": "2023-10-26T06:42:55+00:00",
+      "started": "2023-10-25T19:22:56Z",
+      "last_reply": "2023-10-26T06:42:55Z",
       "root_message_id": "msg-9af1a2b489f4"
     },
     {
@@ -809,8 +809,8 @@
       "participants": [
         "James Pustejovsky"
       ],
-      "started": "2023-10-26T16:18:03-05:00",
-      "last_reply": "2023-10-26T16:18:03-05:00",
+      "started": "2023-10-26T21:18:03Z",
+      "last_reply": "2023-10-26T21:18:03Z",
       "root_message_id": "msg-360eef0992ac"
     },
     {
@@ -822,8 +822,8 @@
         "Nick Chen",
         "英文科陳品誠"
       ],
-      "started": "2023-10-28T17:08:38+08:00",
-      "last_reply": "2023-10-28T16:20:46+01:00",
+      "started": "2023-10-28T09:08:38Z",
+      "last_reply": "2023-10-28T15:20:46Z",
       "root_message_id": "msg-a62478f1ad06"
     },
     {
@@ -835,8 +835,8 @@
         "Michael Dewey",
         "Viechtbauer, Wolfgang (NP)"
       ],
-      "started": "2023-10-29T16:30:24+01:00",
-      "last_reply": "2023-10-30T18:06:17+00:00",
+      "started": "2023-10-29T15:30:24Z",
+      "last_reply": "2023-10-30T18:06:17Z",
       "root_message_id": "msg-2123181e7dcf"
     }
   ]
