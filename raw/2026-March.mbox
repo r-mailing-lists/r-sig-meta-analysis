@@ -426,3 +426,399 @@ Wolfgang
 > Coordinatrice du r?seau ETHNOECO
 > 07 72 07 93 31
 
+From g|@dou86 @end|ng |rom gm@||@com  Thu Mar 26 09:41:39 2026
+From: g|@dou86 @end|ng |rom gm@||@com (Gladys Barragan-Jason)
+Date: Thu, 26 Mar 2026 09:41:39 +0100
+Subject: [R-meta] Question on meta-analytic analysis of means
+In-Reply-To: <PA4PR08MB7435D990A60CACBC609556308B48A@PA4PR08MB7435.eurprd08.prod.outlook.com>
+References: <CAGtj4DxbFJo4qCO9Cm1a1r-G_+wiF=HFzHGDOs9oRfb1kUBwgA@mail.gmail.com>
+ <PA4PR08MB7435D990A60CACBC609556308B48A@PA4PR08MB7435.eurprd08.prod.outlook.com>
+Message-ID: <CAGtj4Dyd3yBYrCcuW6rAjUV3fV5rx6GMf4rNOmitm66Kc3y5RA@mail.gmail.com>
+
+Dear Wolfgang,
+
+Thank you so much for your response?and for the POMP reference!
+
+I have a quick follow-up question regarding how best to visualize the
+results.
+
+Since I am :
+
+(1) using the rescaled means (POMP values)
+
+(2) putting them into escalc(measure="MN"..)
+
+(3) and then I'm doing : m1 <- rma.mv( yi, vi, mods = ~ age_mean +gender +
+region , random = list(~ 1 | study_id,    ~ 1 | scale), method = "REML",
+data = hnc_data).
+
+Would you recommend primarily plotting the observed effect sizes (e.g., a
+forest plot of the means), or focusing instead on the model estimates
+(e.g., coefficients from the meta-regression)?
+
+More generally, in this type of meta-analysis of means, what would you
+consider the most informative way to present the results?
+
+Thank you again for your help!
+
+Best,
+Gladys
+
+Le mar. 24 mars 2026 ? 11:17, Viechtbauer, Wolfgang (NP) <
+wolfgang.viechtbauer at maastrichtuniversity.nl> a ?crit :
+
+> Dear Gladys,
+>
+> As long as the means are numerically comparable, one can also meta-analyze
+> means. Nothing wrong with that and this is also a meta-analysis, no need to
+> use some other term.
+>
+> Just to put a bit of context on this: A proportion is the mean of a
+> dichotomous variable. There are lots of meta-analyses of proportions (not
+> differences / ratios thereof). Think about the meta-analysis of
+> prevalences, the meta-analysis of sensitivity or specificity in diagnostic
+> studies, the meta-analysis of the risk of side-effects, and so on. All of
+> these can be thought of as meta-analyses of means.
+>
+> The difference here is that the response variable of interest (HNC) is
+> measured not as a dichtomous variable, but as a quantitative one. If all
+> studies used the same scale/measure for HNC, then you could directly
+> meta-analyze the means. But since you mentioned rescaling, that doesn't
+> seem to be the case. So I assume you did the following:
+>
+> rescaled mean = (mean - minimum-possible-score) / (maximum-possible-score
+> - minimum-possible-score)
+>
+> which gives you a value between 0 and 1. Note that the minimum and maximum
+> possible scores must be based on the possible range of scores on the
+> scale/measure, not the minimum and maximum observed in the sample.
+>
+> One additional step involves the standard deviation. The reported SD must
+> also be rescaled with:
+>
+> rescaled SD = SD / (maximum-possible-score - minimum-possible-score)
+>
+> And these you can then stick into escalc():
+>
+> escalc(measure="MN", mi=<rescaled means>, sdi=<rescaled SDs>, ni=<sample
+> sizes>)
+>
+> and proceed as you have done.
+>
+> By the way, the rescaled means above are sometimes called 'POMP'
+> (percent/proportion of maximum possible score) values:
+>
+> Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of
+> units and the circumstance for POMP. Multivariate Behavioral Research,
+> 34(3), 315-346. https://doi.org/10.1207/S15327906MBR3403_2
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Gladys Barragan-Jason via R-sig-meta-analysis
+> > Sent: Tuesday, March 24, 2026 08:59
+> > To: R meta <r-sig-meta-analysis at r-project.org>
+> > Cc: Gladys Barragan-Jason <gladou86 at gmail.com>
+> > Subject: [R-meta] Question on meta-analytic analysis of means
+> >
+> > Dear meta community,
+> >
+> > I am currently working on a meta-analysis (following PRISMA guidelines)
+> > examining cultural and developmental variations in human?nature
+> connectedness
+> > (HNC). However, I am facing a methodological issue: most of the
+> literature does
+> > not report direct comparisons (e.g., children vs. adults, or
+> country-to-country
+> > contrasts), and therefore I do not have conventional effect sizes (e.g.,
+> > standardized mean differences or correlations). Instead, I extracted
+> descriptive
+> > statistics from each study, including mean HNC, standard deviation,
+> sample size,
+> > mean age, percentage of female participants, country, region, and type
+> of HNC
+> > scale. My idea was to treat the (rescaled) mean HNC values as the
+> outcome and
+> > examine variation across studies using meta-analytic models, but I am
+> unsure
+> > whether this is an appropriate approach given the absence of explicit
+> > comparative effect sizes.
+> >
+> > In terms of analysis, I first cleaned and harmonized the dataset (numeric
+> > conversion, country harmonization, etc.), and rescaled HNC scores to a
+> common
+> > metric based on scale ranges (between 0 and 1). I then computed sampling
+> > variances using escalc(measure = "MN") in metafor, effectively treating
+> each
+> > study?s mean as an effect size. I fitted multilevel meta-analytic models
+> > (rma.mv) with study ID and scale as random effects, and included
+> > moderators such as age, gender, region, and scale type. I also explored
+> > publication bias (funnel plots, Egger test) and conducted moderator
+> analyses
+> > (including societal indicators like SDG index and biodiversity
+> intactness).
+> >
+> > My main question is whether this strategy?meta-analyzing means using
+> measure =
+> > "MN" and modeling moderators?is methodologically ok in this context, or
+> whether
+> > I am misusing meta-analytic tools. Should this instead be framed as a
+> different
+> > type of analysis (e.g., meta-regression of descriptive outcomes, or a
+> multilevel
+> > modeling approach rather than meta-analysis)? Are there recommended
+> alternatives
+> > when effect sizes are not directly available, particularly for
+> cross-cultural
+> > and developmental comparisons? Any guidance or references would be
+> greatly
+> > appreciated.
+> >
+> > Thank you very much for your time and help.
+> >
+> > Best regards,
+> > Gladys
+> >
+> > --
+> > ------------------------------------------
+> > Gladys Barragan-Jason,
+> > PhD. https://sites.google.com/view/gladysbarraganjason/home /
+> https://sites.goog
+> > le.com/view/frgladysbarragan-jason/accueil
+> > Charg?e de recherche, CRCN
+> > Station d'Ecologie Th?orique et Exp?rimentale (SETE)
+> > Centre National de la Recherche Scientifique (CNRS)
+> > 2 route du CNRS, 09200 Moulis
+> > Equipe LINKING
+> > Groupe de recherche RISE (Recherche Interdisciplinaire pour la
+> Soutenabilit?
+> > Environnementale)
+> > Coordinatrice du r?seau ETHNOECO
+> > 07 72 07 93 31
+>
+
+
+-- 
+
+------------------------------------------
+
+Gladys Barragan-Jason, PhD.  Website
+<https://sites.google.com/view/gladysbarraganjason/home> / Site web
+<https://sites.google.com/view/frgladysbarragan-jason/accueil>
+
+Charg?e de recherche, CRCN
+
+Station d'Ecologie Th?orique et Exp?rimentale (SETE)
+
+Centre National de la Recherche Scientifique (CNRS)
+
+2 route du CNRS, 09200 Moulis
+
+Equipe LINKING
+
+Groupe de recherche RISE (Recherche Interdisciplinaire pour la
+Soutenabilit? Environnementale)
+
+Coordinatrice du r?seau ETHNOECO
+
+07 72 07 93 31
+
+[image: image.png][image: image.png]
+
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20260326/9eae5ba7/attachment-0001.html>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image003.png
+Type: image/png
+Size: 7519 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20260326/9eae5ba7/attachment-0002.png>
+
+-------------- next part --------------
+A non-text attachment was scrubbed...
+Name: image004.png
+Type: image/png
+Size: 7125 bytes
+Desc: not available
+URL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20260326/9eae5ba7/attachment-0003.png>
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Thu Mar 26 10:28:51 2026
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Thu, 26 Mar 2026 09:28:51 +0000
+Subject: [R-meta] Question on meta-analytic analysis of means
+In-Reply-To: <CAGtj4Dyd3yBYrCcuW6rAjUV3fV5rx6GMf4rNOmitm66Kc3y5RA@mail.gmail.com>
+References: <CAGtj4DxbFJo4qCO9Cm1a1r-G_+wiF=HFzHGDOs9oRfb1kUBwgA@mail.gmail.com>
+ <PA4PR08MB7435D990A60CACBC609556308B48A@PA4PR08MB7435.eurprd08.prod.outlook.com>
+ <CAGtj4Dyd3yBYrCcuW6rAjUV3fV5rx6GMf4rNOmitm66Kc3y5RA@mail.gmail.com>
+Message-ID: <PA4PR08MB743506AD972F5A76A12DFC1D8B56A@PA4PR08MB7435.eurprd08.prod.outlook.com>
+
+Dear Gladys,
+
+I don't think there is a general answer to this. This depends on your research questions and also whether there is indication of heterogeneity in the underlying true means. However, when meta-analyzing single-group estimates like means and proportions, in my experience there is usually lots of heterogeneity [1]. In that case, interest is often focused on understanding why the true means/proportions differ from each other. In that case, the results of the meta-regression analyses would be of prime interest.
+
+[1] When we meta-analyze estimates that reflect the difference between two groups (like raw or standardized mean differences, risk differences, risk/odds ratios), then the influence of any variable/predictor that affects both groups equally within a study will get cancelled out. So in this case, predictors are only relevant if they can predict the size of the difference between groups, not their absolute level. This is why we also call such variables 'moderators', since they may moderate the size of the group difference. On the other hand, when our outcome measure reflects a property of single groups (like means or proportions), then predictors that affect the absolute level are relevant. And there are usually many more of such predictors (and their influence on the absolute level tends to be stronger). As a result, there is usually lots of heterogeneity in single-group meta-analyses of means and proportions.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Gladys Barragan-Jason <gladou86 at gmail.com>
+> Sent: Thursday, March 26, 2026 09:42
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Subject: Re: [R-meta] Question on meta-analytic analysis of means
+> 
+> Dear Wolfgang,
+> 
+> Thank you so much for your response?and for the POMP reference!
+> 
+> I have a quick follow-up question regarding how best to visualize the results.
+> 
+> Since I am :
+> 
+> (1) using the rescaled means (POMP values)
+> (2) putting them into escalc(measure="MN"..)
+> (3) and then I'm doing : m1 <- rma.mv( yi, vi, mods = ~ age_mean +gender +
+> region , random = list(~ 1 | study_id,? ? ~ 1 | scale), method = "REML", data =
+> hnc_data).
+> 
+> Would you recommend primarily plotting the observed effect sizes (e.g., a forest
+> plot of the means), or focusing instead on the model estimates (e.g.,
+> coefficients from the meta-regression)?
+> 
+> More generally, in this type of meta-analysis of means, what would you consider
+> the most informative way to present the results?
+> 
+> Thank you again for your help!
+> 
+> Best,
+> Gladys
+> 
+> Le?mar. 24 mars 2026 ??11:17, Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> a ?crit?:
+> Dear Gladys,
+> 
+> As long as the means are numerically comparable, one can also meta-analyze
+> means. Nothing wrong with that and this is also a meta-analysis, no need to use
+> some other term.
+> 
+> Just to put a bit of context on this: A proportion is the mean of a dichotomous
+> variable. There are lots of meta-analyses of proportions (not differences /
+> ratios thereof). Think about the meta-analysis of prevalences, the meta-analysis
+> of sensitivity or specificity in diagnostic studies, the meta-analysis of the
+> risk of side-effects, and so on. All of these can be thought of as meta-analyses
+> of means.
+> 
+> The difference here is that the response variable of interest (HNC) is measured
+> not as a dichtomous variable, but as a quantitative one. If all studies used the
+> same scale/measure for HNC, then you could directly meta-analyze the means. But
+> since you mentioned rescaling, that doesn't seem to be the case. So I assume you
+> did the following:
+> 
+> rescaled mean = (mean - minimum-possible-score) / (maximum-possible-score -
+> minimum-possible-score)
+> 
+> which gives you a value between 0 and 1. Note that the minimum and maximum
+> possible scores must be based on the possible range of scores on the
+> scale/measure, not the minimum and maximum observed in the sample.
+> 
+> One additional step involves the standard deviation. The reported SD must also
+> be rescaled with:
+> 
+> rescaled SD = SD / (maximum-possible-score - minimum-possible-score)
+> 
+> And these you can then stick into escalc():
+> 
+> escalc(measure="MN", mi=<rescaled means>, sdi=<rescaled SDs>, ni=<sample sizes>)
+> 
+> and proceed as you have done.
+> 
+> By the way, the rescaled means above are sometimes called 'POMP'
+> (percent/proportion of maximum possible score) values:
+> 
+> Cohen, P., Cohen, J., Aiken, L. S., & West, S. G. (1999). The problem of units
+> and the circumstance for POMP. Multivariate Behavioral Research, 34(3), 315-346.
+> https://doi.org/10.1207/S15327906MBR3403_2
+> 
+> Best,
+> Wolfgang
+> 
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Gladys Barragan-Jason via R-sig-meta-analysis
+> > Sent: Tuesday, March 24, 2026 08:59
+> > To: R meta <mailto:r-sig-meta-analysis at r-project.org>
+> > Cc: Gladys Barragan-Jason <mailto:gladou86 at gmail.com>
+> > Subject: [R-meta] Question on meta-analytic analysis of means
+> >
+> > Dear meta community,
+> >
+> > I am currently working on a meta-analysis (following PRISMA guidelines)
+> > examining cultural and developmental variations in human?nature connectedness
+> > (HNC). However, I am facing a methodological issue: most of the literature
+> does
+> > not report direct comparisons (e.g., children vs. adults, or country-to-
+> country
+> > contrasts), and therefore I do not have conventional effect sizes (e.g.,
+> > standardized mean differences or correlations). Instead, I extracted
+> descriptive
+> > statistics from each study, including mean HNC, standard deviation, sample
+> size,
+> > mean age, percentage of female participants, country, region, and type of HNC
+> > scale. My idea was to treat the (rescaled) mean HNC values as the outcome and
+> > examine variation across studies using meta-analytic models, but I am unsure
+> > whether this is an appropriate approach given the absence of explicit
+> > comparative effect sizes.
+> >
+> > In terms of analysis, I first cleaned and harmonized the dataset (numeric
+> > conversion, country harmonization, etc.), and rescaled HNC scores to a common
+> > metric based on scale ranges (between 0 and 1). I then computed sampling
+> > variances using escalc(measure = "MN") in metafor, effectively treating each
+> > study?s mean as an effect size. I fitted multilevel meta-analytic models
+> > (http://rma.mv) with study ID and scale as random effects, and included
+> > moderators such as age, gender, region, and scale type. I also explored
+> > publication bias (funnel plots, Egger test) and conducted moderator analyses
+> > (including societal indicators like SDG index and biodiversity intactness).
+> >
+> > My main question is whether this strategy?meta-analyzing means using measure =
+> > "MN" and modeling moderators?is methodologically ok in this context, or
+> whether
+> > I am misusing meta-analytic tools. Should this instead be framed as a
+> different
+> > type of analysis (e.g., meta-regression of descriptive outcomes, or a
+> multilevel
+> > modeling approach rather than meta-analysis)? Are there recommended
+> alternatives
+> > when effect sizes are not directly available, particularly for cross-cultural
+> > and developmental comparisons? Any guidance or references would be greatly
+> > appreciated.
+> >
+> > Thank you very much for your time and help.
+> >
+> > Best regards,
+> > Gladys
+> >
+> > --
+> > ------------------------------------------
+> > Gladys Barragan-Jason,
+> >
+> PhD.?https://sites.google.com/view/gladysbarraganjason/home?/?https://sites.goog
+> > http://le.com/view/frgladysbarragan-jason/accueil
+> > Charg?e de recherche, CRCN
+> > Station d'Ecologie Th?orique et Exp?rimentale (SETE)
+> > Centre National de la Recherche Scientifique (CNRS)
+> > 2 route du CNRS, 09200 Moulis
+> > Equipe LINKING
+> > Groupe de recherche RISE (Recherche Interdisciplinaire pour la Soutenabilit?
+> > Environnementale)
+> > Coordinatrice du r?seau ETHNOECO
+> > 07 72 07 93 31
+
