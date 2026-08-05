@@ -59,22 +59,6 @@
       "month": "2023-10"
     },
     {
-      "id": "msg-d5ba73fb352b",
-      "message_id": "<SY4P282MB07290CB982702E01D6CB637FCECEA-123@SY4P282MB0729.AUSP282.PROD.OUTLOOK.COM>",
-      "from_name": "Lauren Mary Heidenreich",
-      "from_email_hash": "9e1423c50000bfa85b014b1d39f3ce0dba1c4e25a0b94c39d24dd180ca0eaee3",
-      "date": "2023-10-09T01:42:10Z",
-      "subject": "[R-meta] Questions re multilevel meta-analysis",
-      "subject_clean": "[R-meta] Questions re multilevel meta-analysis",
-      "in_reply_to": null,
-      "references": [],
-      "body_plain": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the relationship between cognitive reserve (CR) indicators (e.g., educational attainment, occupational complexity, pre-morbid IQ) and cognitive outcomes (e.g., working memory, long term memory, visual processing speed etc), among individuals previously infected with COVID-19. Because the moderating effect of CR on cognitive outcomes can only be assessed by including an estimate of brain pathology status, we are specifically exploring how CR and COVID-19 severity (e.g., time in hospital, need for oxygen therapy) interact to predict cognitive outcomes. We would expect to find a negative relationship between the severity of the disease and cognitive outcomes, which is less pronounced in people who have a higher CR (see hypothetical interaction: https://universityofadelaide.box.com/s/c0ehcj70m3765w99xbi6om61udos5czv).\n\n[cid:7fe4ce9b-00b6-4c72-9e73-5dee198341eb]\nTo assess this relationship we have performed regression models which take the following form:\nlm(cognitive outcome ~ age + sex + cognitive reserve * COVID severity)\n\nIn a given study, there may be a range of cognitive outcomes, cognitive reserve indicators and COVID severity indicators that were assessed. In order to capture all this information we have repeated the linear model for every possible combination of these (ranging anywhere from a handful to 200 models per study). The size of the main effects and interaction effect were then extracted in the form of semipartial correlations<https://journals.sagepub.com/doi/10.3102/1076998610396901>, which are the effect sizes of interest for the meta-analyses. (A semipartial correlation is essentially a standard correlation which has been corrected for potential confounds). Across 30 studies we have derived approximately 1000 effect sizes for each of the main effects, and the interaction term.\n\nWe have then run three multilevel meta-analyses (for the main effect of CR, main effect of COVID severity, and the interaction effect) with the following code:\n\nV = impute_covariance_matrix(vi = df$vi, cluster = df$study_id, r = 0.6)\nmodel <- rma.mv(yi,\n              V,\n              random = list(~ 1 | study_id/effectsize_id),\n              tdist = TRUE,\n              method = \"REML\",\n              sparse = TRUE,\n              data = data_temp)\n\nand performed a series of moderation analyses which assess the influence of (1) cognitive domain, (2) CR indicator and (3) severity indicator on the results.\n\nmoderation <- rma.mv(yi,\n                           V,\n                           mods = ~ moderator,\n                           random = list(~ moderator | study_id, ~1 | effectsize_id),\n                           struct =\"HCS\",\n                           tdist = TRUE,\n                           method = \"REML\",\n                           sparse = TRUE,\n                           control = list(rel.tol=1e-8),\n                           data = data_temp_2)\n\nAs I have been conducting these analyses, several questions have presented themselves.\n\n(1) Plotting the moderating influence of CR indicator (CRQ scores, Education level, Education years etc) on the main effect of CR resulted in the following: https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel\n\n [cid:e94c07b9-e951-489f-b76c-15ab7b0d332f]\n\nAs you can see, the estimated central tendency for CRQ scores is very inflated relative to the individual effect sizes (it is also somewhat inflated for the other CR indicators). I am assuming the estimate for CRQ scores is inflated because 64 effect sizes were derived from only one study? If this is correct, should it be dropped from the moderation analysis? If not, are you able to explain why this has occurred?\n\n(2) In regards to the calculations used to compute V via the impute_covariance_matrix() function, is it possible to manually calculate this from the raw data? If so, are you able to provide resources on how to do this?\n\n(3) Finally, given the unique nature of our meta-analysis and the large number of effect sizes that are derived from often very similar regression models, are there any problems you can see regarding our use of these functions?\n\nAny help with these questions would be greatly appreciated!\n\nKind regards,\nLauren Heidenreich\nPhD Student, University of Adelaide, South Australia\n\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/371c2160/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 271326 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/371c2160/attachment-0002.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 35011 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/371c2160/attachment-0003.png>",
-      "body_snippet": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the rel",
-      "thread_id": "thread-d5ba73fb352b",
-      "thread_depth": 0,
-      "month": "2023-10"
-    },
-    {
       "id": "msg-cccb8f39a260",
       "message_id": "<SY4P282MB07290CB982702E01D6CB637FCECEA-6455@SY4P282MB0729.AUSP282.PROD.OUTLOOK.COM>",
       "from_name": "Lauren Mary Heidenreich",
@@ -87,6 +71,22 @@
       "body_plain": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the relationship between cognitive reserve (CR) indicators (e.g., educational attainment, occupational complexity, pre-morbid IQ) and cognitive outcomes (e.g., working memory, long term memory, visual processing speed etc), among individuals previously infected with COVID-19. Because the moderating effect of CR on cognitive outcomes can only be assessed by including an estimate of brain pathology status, we are specifically exploring how CR and COVID-19 severity (e.g., time in hospital, need for oxygen therapy) interact to predict cognitive outcomes. We would expect to find a negative relationship between the severity of the disease and cognitive outcomes, which is less pronounced in people who have a higher CR (see hypothetical interaction: https://universityofadelaide.box.com/s/c0ehcj70m3765w99xbi6om61udos5czv).\n\n[cid:7fe4ce9b-00b6-4c72-9e73-5dee198341eb]\nTo assess this relationship we have performed regression models which take the following form:\nlm(cognitive outcome ~ age + sex + cognitive reserve * COVID severity)\n\nIn a given study, there may be a range of cognitive outcomes, cognitive reserve indicators and COVID severity indicators that were assessed. In order to capture all this information we have repeated the linear model for every possible combination of these (ranging anywhere from a handful to 200 models per study). The size of the main effects and interaction effect were then extracted in the form of semipartial correlations<https://journals.sagepub.com/doi/10.3102/1076998610396901>, which are the effect sizes of interest for the meta-analyses. (A semipartial correlation is essentially a standard correlation which has been corrected for potential confounds). Across 30 studies we have derived approximately 1000 effect sizes for each of the main effects, and the interaction term.\n\nWe have then run three multilevel meta-analyses (for the main effect of CR, main effect of COVID severity, and the interaction effect) with the following code:\n\nV = impute_covariance_matrix(vi = df$vi, cluster = df$study_id, r = 0.6)\nmodel <- rma.mv(yi,\n              V,\n              random = list(~ 1 | study_id/effectsize_id),\n              tdist = TRUE,\n              method = \"REML\",\n              sparse = TRUE,\n              data = data_temp)\n\nand performed a series of moderation analyses which assess the influence of (1) cognitive domain, (2) CR indicator and (3) severity indicator on the results.\n\nmoderation <- rma.mv(yi,\n                           V,\n                           mods = ~ moderator,\n                           random = list(~ moderator | study_id, ~1 | effectsize_id),\n                           struct =\"HCS\",\n                           tdist = TRUE,\n                           method = \"REML\",\n                           sparse = TRUE,\n                           control = list(rel.tol=1e-8),\n                           data = data_temp_2)\n\nAs I have been conducting these analyses, several questions have presented themselves.\n\n(1) Plotting the moderating influence of CR indicator (CRQ scores, Education level, Education years etc) on the main effect of CR resulted in the following: https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel\n\n [cid:e94c07b9-e951-489f-b76c-15ab7b0d332f]\n\nAs you can see, the estimated central tendency for CRQ scores is very inflated relative to the individual effect sizes (it is also somewhat inflated for the other CR indicators). I am assuming the estimate for CRQ scores is inflated because 64 effect sizes were derived from only one study? If this is correct, should it be dropped from the moderation analysis? If not, are you able to explain why this has occurred?\n\n(2) In regards to the calculations used to compute V via the impute_covariance_matrix() function, is it possible to manually calculate this from the raw data? If so, are you able to provide resources on how to do this?\n\n(3) Finally, given the unique nature of our meta-analysis and the large number of effect sizes that are derived from often very similar regression models, are there any problems you can see regarding our use of these functions?\n\nAny help with these questions would be greatly appreciated!\n\nKind regards,\nLauren Heidenreich\nPhD Student, University of Adelaide, South Australia\n\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 271326 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0002.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 35011 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/147c8b93/attachment-0003.png>",
       "body_snippet": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the rel",
       "thread_id": "thread-cccb8f39a260",
+      "thread_depth": 0,
+      "month": "2023-10"
+    },
+    {
+      "id": "msg-d5ba73fb352b",
+      "message_id": "<SY4P282MB07290CB982702E01D6CB637FCECEA-123@SY4P282MB0729.AUSP282.PROD.OUTLOOK.COM>",
+      "from_name": "Lauren Mary Heidenreich",
+      "from_email_hash": "9e1423c50000bfa85b014b1d39f3ce0dba1c4e25a0b94c39d24dd180ca0eaee3",
+      "date": "2023-10-09T01:42:10Z",
+      "subject": "[R-meta] Questions re multilevel meta-analysis",
+      "subject_clean": "[R-meta] Questions re multilevel meta-analysis",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the relationship between cognitive reserve (CR) indicators (e.g., educational attainment, occupational complexity, pre-morbid IQ) and cognitive outcomes (e.g., working memory, long term memory, visual processing speed etc), among individuals previously infected with COVID-19. Because the moderating effect of CR on cognitive outcomes can only be assessed by including an estimate of brain pathology status, we are specifically exploring how CR and COVID-19 severity (e.g., time in hospital, need for oxygen therapy) interact to predict cognitive outcomes. We would expect to find a negative relationship between the severity of the disease and cognitive outcomes, which is less pronounced in people who have a higher CR (see hypothetical interaction: https://universityofadelaide.box.com/s/c0ehcj70m3765w99xbi6om61udos5czv).\n\n[cid:7fe4ce9b-00b6-4c72-9e73-5dee198341eb]\nTo assess this relationship we have performed regression models which take the following form:\nlm(cognitive outcome ~ age + sex + cognitive reserve * COVID severity)\n\nIn a given study, there may be a range of cognitive outcomes, cognitive reserve indicators and COVID severity indicators that were assessed. In order to capture all this information we have repeated the linear model for every possible combination of these (ranging anywhere from a handful to 200 models per study). The size of the main effects and interaction effect were then extracted in the form of semipartial correlations<https://journals.sagepub.com/doi/10.3102/1076998610396901>, which are the effect sizes of interest for the meta-analyses. (A semipartial correlation is essentially a standard correlation which has been corrected for potential confounds). Across 30 studies we have derived approximately 1000 effect sizes for each of the main effects, and the interaction term.\n\nWe have then run three multilevel meta-analyses (for the main effect of CR, main effect of COVID severity, and the interaction effect) with the following code:\n\nV = impute_covariance_matrix(vi = df$vi, cluster = df$study_id, r = 0.6)\nmodel <- rma.mv(yi,\n              V,\n              random = list(~ 1 | study_id/effectsize_id),\n              tdist = TRUE,\n              method = \"REML\",\n              sparse = TRUE,\n              data = data_temp)\n\nand performed a series of moderation analyses which assess the influence of (1) cognitive domain, (2) CR indicator and (3) severity indicator on the results.\n\nmoderation <- rma.mv(yi,\n                           V,\n                           mods = ~ moderator,\n                           random = list(~ moderator | study_id, ~1 | effectsize_id),\n                           struct =\"HCS\",\n                           tdist = TRUE,\n                           method = \"REML\",\n                           sparse = TRUE,\n                           control = list(rel.tol=1e-8),\n                           data = data_temp_2)\n\nAs I have been conducting these analyses, several questions have presented themselves.\n\n(1) Plotting the moderating influence of CR indicator (CRQ scores, Education level, Education years etc) on the main effect of CR resulted in the following: https://universityofadelaide.box.com/s/7r3km1oxdq8l0k8v42o3y7jtblq2ctel\n\n [cid:e94c07b9-e951-489f-b76c-15ab7b0d332f]\n\nAs you can see, the estimated central tendency for CRQ scores is very inflated relative to the individual effect sizes (it is also somewhat inflated for the other CR indicators). I am assuming the estimate for CRQ scores is inflated because 64 effect sizes were derived from only one study? If this is correct, should it be dropped from the moderation analysis? If not, are you able to explain why this has occurred?\n\n(2) In regards to the calculations used to compute V via the impute_covariance_matrix() function, is it possible to manually calculate this from the raw data? If so, are you able to provide resources on how to do this?\n\n(3) Finally, given the unique nature of our meta-analysis and the large number of effect sizes that are derived from often very similar regression models, are there any problems you can see regarding our use of these functions?\n\nAny help with these questions would be greatly appreciated!\n\nKind regards,\nLauren Heidenreich\nPhD Student, University of Adelaide, South Australia\n\n\n-------------- next part --------------\nAn HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/371c2160/attachment-0001.html>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 271326 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/371c2160/attachment-0002.png>\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: image.png\nType: image/png\nSize: 35011 bytes\nDesc: image.png\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231009/371c2160/attachment-0003.png>",
+      "body_snippet": "Hi everyone,\n\nI am using the rma.mv() function to perform a multilevel meta-analysis. It is an individual participant data (IPD) meta-analysis, so I have access to the raw data. I am exploring the rel",
+      "thread_id": "thread-d5ba73fb352b",
       "thread_depth": 0,
       "month": "2023-10"
     },
@@ -699,17 +699,6 @@
       "root_message_id": "msg-6ee93449736c"
     },
     {
-      "id": "thread-d5ba73fb352b",
-      "subject": "[R-meta] Questions re multilevel meta-analysis",
-      "message_count": 1,
-      "participants": [
-        "Lauren Mary Heidenreich"
-      ],
-      "started": "2023-10-09T01:42:10Z",
-      "last_reply": "2023-10-09T01:42:10Z",
-      "root_message_id": "msg-d5ba73fb352b"
-    },
-    {
       "id": "thread-cccb8f39a260",
       "subject": "[R-meta] Questions re multilevel meta-analysis",
       "message_count": 1,
@@ -719,6 +708,17 @@
       "started": "2023-10-09T01:42:10Z",
       "last_reply": "2023-10-09T01:42:10Z",
       "root_message_id": "msg-cccb8f39a260"
+    },
+    {
+      "id": "thread-d5ba73fb352b",
+      "subject": "[R-meta] Questions re multilevel meta-analysis",
+      "message_count": 1,
+      "participants": [
+        "Lauren Mary Heidenreich"
+      ],
+      "started": "2023-10-09T01:42:10Z",
+      "last_reply": "2023-10-09T01:42:10Z",
+      "root_message_id": "msg-d5ba73fb352b"
     },
     {
       "id": "thread-079157a10d44",
@@ -769,17 +769,6 @@
       "root_message_id": "msg-9ca73ee28cbf"
     },
     {
-      "id": "thread-3e5435fa21fb",
-      "subject": "[R-meta] Questions about multilevel meta-analysis structure",
-      "message_count": 1,
-      "participants": [
-        "Isaac Calvin Saywell"
-      ],
-      "started": "2023-10-24T03:09:42Z",
-      "last_reply": "2023-10-24T03:09:42Z",
-      "root_message_id": "msg-3e5435fa21fb"
-    },
-    {
       "id": "thread-44171a31e69b",
       "subject": "[R-meta] Questions about multilevel meta-analysis structure",
       "message_count": 1,
@@ -789,6 +778,17 @@
       "started": "2023-10-24T03:09:42Z",
       "last_reply": "2023-10-24T03:09:42Z",
       "root_message_id": "msg-44171a31e69b"
+    },
+    {
+      "id": "thread-3e5435fa21fb",
+      "subject": "[R-meta] Questions about multilevel meta-analysis structure",
+      "message_count": 1,
+      "participants": [
+        "Isaac Calvin Saywell"
+      ],
+      "started": "2023-10-24T03:09:42Z",
+      "last_reply": "2023-10-24T03:09:42Z",
+      "root_message_id": "msg-3e5435fa21fb"
     },
     {
       "id": "thread-9af1a2b489f4",
