@@ -1,0 +1,55 @@
+{
+  "list": "r-sig-meta-analysis",
+  "description": "",
+  "month": "2026-09",
+  "messages": [
+    {
+      "id": "msg-6370286f73c9",
+      "message_id": "<CAEmuQj-Ftt4NNsGo0Q8wxv-iy3rSsY+2aQ9g6JRugYTdYF2BSw@mail.gmail.com>",
+      "from_name": "Tori Peña",
+      "from_email_hash": "eefcfa036a4510887dea5e95bdb9d249e5ee269efd012beb315a5feab9c811a0",
+      "date": "2026-09-23T14:38:22Z",
+      "subject": "[R-meta] Question Re: Rma.mv Model",
+      "subject_clean": "[R-meta] Question Re: Rma.mv Model",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Hello everyone -\n\nI have a couple of questions related to a three-level model we plan to\nconduct using *metafor. *For context, we have compiled correlations\nindexing relationships between cognition and inflammation in the body. We\nplan to nest effect sizes (level 1) in sample cohorts (level 2) within\nstudies (level 3). I wanted to check the following questions:\n\n   1. The literature has different types of correlations. Is it acceptable\n   to convert all of these correlations to Fisher's *z *for the models?\n   Or, should there way to handle these varying effect size types?\n   2. I could not find information in the *metafor *documentation about\n   conducting sensitivity analyses for rma.mv objects. Is this possible? If\n   so, how?\n\nThanks in advance,\nTori\n\n\n-- \n*Tori Pe?a, Ph.D. *(she/her/ella)\nLecturer of Psychology\nDirector, FaM Lab <https://ptori.github.io/famlab/>\nDepartment of Psychology\nStony Brook University\n[image: Stony Brook University logo]\n\n*Note. *I honor and respect boundaries around work/life balance. Please\nfeel no pressure to respond if you receive my email outside your working\nhours.\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hello everyone -\n\nI have a couple of questions related to a three-level model we plan to\nconduct using *metafor. *For context, we have compiled correlations\nindexing relationships between cognition an",
+      "thread_id": "thread-6370286f73c9",
+      "thread_depth": 0,
+      "month": "2026-09"
+    },
+    {
+      "id": "msg-085ed22310a5",
+      "message_id": "<VI1PR08MB4334F25066AA403A5930068F8B822@VI1PR08MB4334.eurprd08.prod.outlook.com>",
+      "from_name": "Viechtbauer, Wolfgang (NP)",
+      "from_email_hash": "bfe931aadd3cb7631b70e83086a082e314918464e0b2d0cbb3f72828d9937141",
+      "date": "2026-09-23T15:17:03Z",
+      "subject": "[R-meta] Question Re: Rma.mv Model",
+      "subject_clean": "[R-meta] Question Re: Rma.mv Model",
+      "in_reply_to": "<CAEmuQj-Ftt4NNsGo0Q8wxv-iy3rSsY+2aQ9g6JRugYTdYF2BSw@mail.gmail.com>",
+      "references": [
+        "<CAEmuQj-Ftt4NNsGo0Q8wxv-iy3rSsY+2aQ9g6JRugYTdYF2BSw@mail.gmail.com>"
+      ],
+      "body_plain": "Dear Tori,\n\nPlease see my responses below.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Tori Pe?a via R-sig-meta-analysis\n> Sent: Wednesday, September 23, 2026 16:38\n> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-\n> project.org>\n> Cc: Tori Pe?a <Tori.Pena at stonybrook.edu>\n> Subject: [R-meta] Question Re: Rma.mv Model\n> \n> Hello everyone -\n> \n> I have a couple of questions related to a three-level model we plan to\n> conduct using *metafor. *For context, we have compiled correlations\n> indexing relationships between cognition and inflammation in the body. We\n> plan to nest effect sizes (level 1) in sample cohorts (level 2) within\n> studies (level 3). I wanted to check the following questions:\n> \n>    1. The literature has different types of correlations. Is it acceptable\n>    to convert all of these correlations to Fisher's *z *for the models?\n>    Or, should there way to handle these varying effect size types?\n\nYou can use the standard r-to-z transformation on all kinds of correlation coefficients. However, the sampling variance equation 1/(n-3) only applies when converting Pearson product-moment correlations with the r-to-z transformation. For other types of correlation coefficients (Spearman, (point-)biserial, tetrachoric, (semi)partial, and so on), it would not be correct to use 1/(n-3) as the variance.\n\nUsing the delta method, one can compute the variance of any r-to-z transformed correlation coefficient as long as one has an estimate of the variance of the correlation coefficient to begin with. For example, say you have a study that dichotomized both variables of interest and reports the results in terms of a 2x2 table (how many people scored above/below the cutoff on the first variable versus the second variable). Say this is the 2x2 table:\n\n       Above  Below\nAbove  15     5\nBelow   8     18\n\nThen we can get the tetrachoric correlation with:\n\ndat <- escalc(measure=\"RTET\", ai=15, bi=5, ci=8, di=18)\ndat\n\n      yi     vi \n1 0.6397 0.0258\n \n(this estimates the correlation between the underlying continuous variables). I can now r-to-z transform this with:\n\ntransf.rtoz(dat$yi)\n[1] 0.757601\n\nBut\n\n1/((15+5+8+18)-3)\n[1] 0.02325581\n\nis NOT the sampling variance of the transformed tetrachoric correlation. Using the delta method, we can compute a correct (i.e., consistent) estimate of the sampling variance:\n\nconv.delta(yi, vi, data=dat, transf=transf.rtoz, replace=TRUE)                                                     \n\n      yi     vi \n1 0.7576 0.0740\n\nNote that the variance (0.0740) is more than 3 times larger than the incorrect estimate (0.0233), because we lost information from the dichotomization of the two variables and having to reconstruct the correlation from that information. You can actually skip the whole conv.delta() thing since escalc() can directly do all of this for you:\n\ndat <- escalc(measure=\"ZTET\", ai=15, bi=5, ci=8, di=18)                                                            \ndat                                                                                                                \n                                                                                                                     \n      yi     vi \n1 0.7576 0.0740\n\nThe same principle applies to other correlation coefficients. Note that the r-to-z transformation is only a variance stabilizing transformation for Pearson product-moment correlations, not for (most) other types of correlation coefficients. However, using the transformation can still be advantageous, since raw correlations are bounded which can result in skewed sampling distributions. The r-to-z transformation can then help to normalize the sampling distributions.\n\n>    2. I could not find information in the *metafor *documentation about\n>    conducting sensitivity analyses for rma.mv objects. Is this possible? If\n>    so, how?\n\nWhat type of sensitivity analyses are you thinking of?\n\n> Thanks in advance,\n> Tori\n> \n> --\n> *Tori Pe?a, Ph.D. *(she/her/ella)\n> Lecturer of Psychology\n> Director, FaM Lab <https://ptori.github.io/famlab/>\n> Department of Psychology\n> Stony Brook University\n> [image: Stony Brook University logo]",
+      "body_snippet": "Dear Tori,\n\nPlease see my responses below.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Tori Pe?a via R-sig-m",
+      "thread_id": "thread-6370286f73c9",
+      "thread_depth": 1,
+      "month": "2026-09"
+    }
+  ],
+  "threads": [
+    {
+      "id": "thread-6370286f73c9",
+      "subject": "[R-meta] Question Re: Rma.mv Model",
+      "message_count": 2,
+      "participants": [
+        "Tori Peña",
+        "Viechtbauer, Wolfgang (NP)"
+      ],
+      "started": "2026-09-23T14:38:22Z",
+      "last_reply": "2026-09-23T15:17:03Z",
+      "root_message_id": "msg-6370286f73c9"
+    }
+  ]
+}

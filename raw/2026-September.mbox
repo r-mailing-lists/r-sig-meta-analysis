@@ -1,0 +1,136 @@
+From Tor|@Pen@ @end|ng |rom @tonybrook@edu  Wed Sep 23 16:38:22 2026
+From: Tor|@Pen@ @end|ng |rom @tonybrook@edu (=?UTF-8?Q?Tori_Pe=C3=B1a?=)
+Date: Wed, 23 Sep 2026 10:38:22 -0400
+Subject: [R-meta] Question Re: Rma.mv Model
+Message-ID: <CAEmuQj-Ftt4NNsGo0Q8wxv-iy3rSsY+2aQ9g6JRugYTdYF2BSw@mail.gmail.com>
+
+Hello everyone -
+
+I have a couple of questions related to a three-level model we plan to
+conduct using *metafor. *For context, we have compiled correlations
+indexing relationships between cognition and inflammation in the body. We
+plan to nest effect sizes (level 1) in sample cohorts (level 2) within
+studies (level 3). I wanted to check the following questions:
+
+   1. The literature has different types of correlations. Is it acceptable
+   to convert all of these correlations to Fisher's *z *for the models?
+   Or, should there way to handle these varying effect size types?
+   2. I could not find information in the *metafor *documentation about
+   conducting sensitivity analyses for rma.mv objects. Is this possible? If
+   so, how?
+
+Thanks in advance,
+Tori
+
+
+-- 
+*Tori Pe?a, Ph.D. *(she/her/ella)
+Lecturer of Psychology
+Director, FaM Lab <https://ptori.github.io/famlab/>
+Department of Psychology
+Stony Brook University
+[image: Stony Brook University logo]
+
+*Note. *I honor and respect boundaries around work/life balance. Please
+feel no pressure to respond if you receive my email outside your working
+hours.
+
+	[[alternative HTML version deleted]]
+
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Sep 23 17:17:03 2026
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 23 Sep 2026 15:17:03 +0000
+Subject: [R-meta] Question Re: Rma.mv Model
+In-Reply-To: <CAEmuQj-Ftt4NNsGo0Q8wxv-iy3rSsY+2aQ9g6JRugYTdYF2BSw@mail.gmail.com>
+References: <CAEmuQj-Ftt4NNsGo0Q8wxv-iy3rSsY+2aQ9g6JRugYTdYF2BSw@mail.gmail.com>
+Message-ID: <VI1PR08MB4334F25066AA403A5930068F8B822@VI1PR08MB4334.eurprd08.prod.outlook.com>
+
+Dear Tori,
+
+Please see my responses below.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Tori Pe?a via R-sig-meta-analysis
+> Sent: Wednesday, September 23, 2026 16:38
+> To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Cc: Tori Pe?a <Tori.Pena at stonybrook.edu>
+> Subject: [R-meta] Question Re: Rma.mv Model
+> 
+> Hello everyone -
+> 
+> I have a couple of questions related to a three-level model we plan to
+> conduct using *metafor. *For context, we have compiled correlations
+> indexing relationships between cognition and inflammation in the body. We
+> plan to nest effect sizes (level 1) in sample cohorts (level 2) within
+> studies (level 3). I wanted to check the following questions:
+> 
+>    1. The literature has different types of correlations. Is it acceptable
+>    to convert all of these correlations to Fisher's *z *for the models?
+>    Or, should there way to handle these varying effect size types?
+
+You can use the standard r-to-z transformation on all kinds of correlation coefficients. However, the sampling variance equation 1/(n-3) only applies when converting Pearson product-moment correlations with the r-to-z transformation. For other types of correlation coefficients (Spearman, (point-)biserial, tetrachoric, (semi)partial, and so on), it would not be correct to use 1/(n-3) as the variance.
+
+Using the delta method, one can compute the variance of any r-to-z transformed correlation coefficient as long as one has an estimate of the variance of the correlation coefficient to begin with. For example, say you have a study that dichotomized both variables of interest and reports the results in terms of a 2x2 table (how many people scored above/below the cutoff on the first variable versus the second variable). Say this is the 2x2 table:
+
+       Above  Below
+Above  15     5
+Below   8     18
+
+Then we can get the tetrachoric correlation with:
+
+dat <- escalc(measure="RTET", ai=15, bi=5, ci=8, di=18)
+dat
+
+      yi     vi 
+1 0.6397 0.0258
+ 
+(this estimates the correlation between the underlying continuous variables). I can now r-to-z transform this with:
+
+transf.rtoz(dat$yi)
+[1] 0.757601
+
+But
+
+1/((15+5+8+18)-3)
+[1] 0.02325581
+
+is NOT the sampling variance of the transformed tetrachoric correlation. Using the delta method, we can compute a correct (i.e., consistent) estimate of the sampling variance:
+
+conv.delta(yi, vi, data=dat, transf=transf.rtoz, replace=TRUE)                                                     
+
+      yi     vi 
+1 0.7576 0.0740
+
+Note that the variance (0.0740) is more than 3 times larger than the incorrect estimate (0.0233), because we lost information from the dichotomization of the two variables and having to reconstruct the correlation from that information. You can actually skip the whole conv.delta() thing since escalc() can directly do all of this for you:
+
+dat <- escalc(measure="ZTET", ai=15, bi=5, ci=8, di=18)                                                            
+dat                                                                                                                
+                                                                                                                     
+      yi     vi 
+1 0.7576 0.0740
+
+The same principle applies to other correlation coefficients. Note that the r-to-z transformation is only a variance stabilizing transformation for Pearson product-moment correlations, not for (most) other types of correlation coefficients. However, using the transformation can still be advantageous, since raw correlations are bounded which can result in skewed sampling distributions. The r-to-z transformation can then help to normalize the sampling distributions.
+
+>    2. I could not find information in the *metafor *documentation about
+>    conducting sensitivity analyses for rma.mv objects. Is this possible? If
+>    so, how?
+
+What type of sensitivity analyses are you thinking of?
+
+> Thanks in advance,
+> Tori
+> 
+> --
+> *Tori Pe?a, Ph.D. *(she/her/ella)
+> Lecturer of Psychology
+> Director, FaM Lab <https://ptori.github.io/famlab/>
+> Department of Psychology
+> Stony Brook University
+> [image: Stony Brook University logo]
+
