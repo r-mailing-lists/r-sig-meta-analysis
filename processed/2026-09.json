@@ -36,19 +36,38 @@
       "thread_id": "thread-6370286f73c9",
       "thread_depth": 1,
       "month": "2026-09"
+    },
+    {
+      "id": "msg-24c7f35fd13e",
+      "message_id": "<CAEmuQj917vocT1WX62qc2MBmKJ4vqH=tnrHPTq25tMCFBaCBng@mail.gmail.com>",
+      "from_name": "Tori Peña",
+      "from_email_hash": "eefcfa036a4510887dea5e95bdb9d249e5ee269efd012beb315a5feab9c811a0",
+      "date": "2026-09-24T21:04:31Z",
+      "subject": "[R-meta] Question Re: Rma.mv Model",
+      "subject_clean": "[R-meta] Question Re: Rma.mv Model",
+      "in_reply_to": "<VI1PR08MB4334F25066AA403A5930068F8B822@VI1PR08MB4334.eurprd08.prod.outlook.com>",
+      "references": [
+        "<CAEmuQj-Ftt4NNsGo0Q8wxv-iy3rSsY+2aQ9g6JRugYTdYF2BSw@mail.gmail.com>",
+        "<VI1PR08MB4334F25066AA403A5930068F8B822@VI1PR08MB4334.eurprd08.prod.outlook.com>"
+      ],
+      "body_plain": "This is incredibly helpful!\n\nI did not have specific sensitivity analyses in mind.  I'm open to any\nsuggestions based on your expertise.\n\nOn Wed, Sep 23, 2026 at 11:17?AM Viechtbauer, Wolfgang (NP) <\nwolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n\n> EXTERNAL EMAIL - This email was sent by a person from outside your\n> organization. Exercise caution when clicking links, opening attachments or\n> taking further action, before validating its authenticity.\n> Dear Tori,\n>\n> Please see my responses below.\n>\n> Best,\n> Wolfgang\n>\n> > -----Original Message-----\n> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>\n> On Behalf\n> > Of Tori Pe?a via R-sig-meta-analysis\n> > Sent: Wednesday, September 23, 2026 16:38\n> > To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-\n> > project.org>\n> > Cc: Tori Pe?a <Tori.Pena at stonybrook.edu>\n> > Subject: [R-meta] Question Re: Rma.mv Model\n> >\n> > Hello everyone -\n> >\n> > I have a couple of questions related to a three-level model we plan to\n> > conduct using *metafor. *For context, we have compiled correlations\n> > indexing relationships between cognition and inflammation in the body. We\n> > plan to nest effect sizes (level 1) in sample cohorts (level 2) within\n> > studies (level 3). I wanted to check the following questions:\n> >\n> >    1. The literature has different types of correlations. Is it\n> acceptable\n> >    to convert all of these correlations to Fisher's *z *for the models?\n> >    Or, should there way to handle these varying effect size types?\n>\n> You can use the standard r-to-z transformation on all kinds of correlation\n> coefficients. However, the sampling variance equation 1/(n-3) only applies\n> when converting Pearson product-moment correlations with the r-to-z\n> transformation. For other types of correlation coefficients (Spearman,\n> (point-)biserial, tetrachoric, (semi)partial, and so on), it would not be\n> correct to use 1/(n-3) as the variance.\n>\n> Using the delta method, one can compute the variance of any r-to-z\n> transformed correlation coefficient as long as one has an estimate of the\n> variance of the correlation coefficient to begin with. For example, say you\n> have a study that dichotomized both variables of interest and reports the\n> results in terms of a 2x2 table (how many people scored above/below the\n> cutoff on the first variable versus the second variable). Say this is the\n> 2x2 table:\n>\n>        Above  Below\n> Above  15     5\n> Below   8     18\n>\n> Then we can get the tetrachoric correlation with:\n>\n> dat <- escalc(measure=\"RTET\", ai=15, bi=5, ci=8, di=18)\n> dat\n>\n>       yi     vi\n> 1 0.6397 0.0258\n>\n> (this estimates the correlation between the underlying continuous\n> variables). I can now r-to-z transform this with:\n>\n> transf.rtoz(dat$yi)\n> [1] 0.757601\n>\n> But\n>\n> 1/((15+5+8+18)-3)\n> [1] 0.02325581\n>\n> is NOT the sampling variance of the transformed tetrachoric correlation.\n> Using the delta method, we can compute a correct (i.e., consistent)\n> estimate of the sampling variance:\n>\n> conv.delta(yi, vi, data=dat, transf=transf.rtoz,\n> replace=TRUE)\n>\n>       yi     vi\n> 1 0.7576 0.0740\n>\n> Note that the variance (0.0740) is more than 3 times larger than the\n> incorrect estimate (0.0233), because we lost information from the\n> dichotomization of the two variables and having to reconstruct the\n> correlation from that information. You can actually skip the whole\n> conv.delta() thing since escalc() can directly do all of this for you:\n>\n> dat <- escalc(measure=\"ZTET\", ai=15, bi=5, ci=8,\n> di=18)\n> dat\n>\n>\n>\n>       yi     vi\n> 1 0.7576 0.0740\n>\n> The same principle applies to other correlation coefficients. Note that\n> the r-to-z transformation is only a variance stabilizing transformation for\n> Pearson product-moment correlations, not for (most) other types of\n> correlation coefficients. However, using the transformation can still be\n> advantageous, since raw correlations are bounded which can result in skewed\n> sampling distributions. The r-to-z transformation can then help to\n> normalize the sampling distributions.\n>\n> >    2. I could not find information in the *metafor *documentation about\n> >    conducting sensitivity analyses for rma.mv objects. Is this\n> possible? If\n> >    so, how?\n>\n> What type of sensitivity analyses are you thinking of?\n>\n> > Thanks in advance,\n> > Tori\n> >\n> > --\n> > *Tori Pe?a, Ph.D. *(she/her/ella)\n> > Lecturer of Psychology\n> > Director, FaM Lab <\n> https://protect.checkpoint.com/v2/r01/___https://ptori.github.io/famlab/___.YzJ1OnN0b255YnJvb2s6YzpnOmYxM2E4YzhiNjY2MjliNTU4ZTE2NmJjOTQwNGExMTk0Ojc6NWI5ZTpjNjZkOGU1N2Y1YTg2YzFkMDhkNTA4YzlhYTZhMGRhNGYwY2E4MjBjYmEzMTI2MWJlMTZmOGFiMDc5YzllNTMyOnA6VDpG\n> >\n> > Department of Psychology\n> > Stony Brook University\n> > [image: Stony Brook University logo]\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "This is incredibly helpful!\n\nI did not have specific sensitivity analyses in mind.  I'm open to any\nsuggestions based on your expertise.\n\nOn Wed, Sep 23, 2026 at 11:17?AM Viechtbauer, Wolfgang (NP) <\n",
+      "thread_id": "thread-6370286f73c9",
+      "thread_depth": 2,
+      "month": "2026-09"
     }
   ],
   "threads": [
     {
       "id": "thread-6370286f73c9",
       "subject": "[R-meta] Question Re: Rma.mv Model",
-      "message_count": 2,
+      "message_count": 3,
       "participants": [
         "Tori Peña",
         "Viechtbauer, Wolfgang (NP)"
       ],
       "started": "2026-09-23T14:38:22Z",
-      "last_reply": "2026-09-23T15:17:03Z",
+      "last_reply": "2026-09-24T21:04:31Z",
       "root_message_id": "msg-6370286f73c9"
     }
   ]
