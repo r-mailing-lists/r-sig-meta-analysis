@@ -279,3 +279,173 @@ wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
 	[[alternative HTML version deleted]]
 
 
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Fri Sep 25 09:11:05 2026
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Fri, 25 Sep 2026 07:11:05 +0000
+Subject: [R-meta] Question Re: Rma.mv Model
+In-Reply-To: <CAEmuQj917vocT1WX62qc2MBmKJ4vqH=tnrHPTq25tMCFBaCBng@mail.gmail.com>
+References: <CAEmuQj-Ftt4NNsGo0Q8wxv-iy3rSsY+2aQ9g6JRugYTdYF2BSw@mail.gmail.com>
+ <VI1PR08MB4334F25066AA403A5930068F8B822@VI1PR08MB4334.eurprd08.prod.outlook.com>
+ <CAEmuQj917vocT1WX62qc2MBmKJ4vqH=tnrHPTq25tMCFBaCBng@mail.gmail.com>
+Message-ID: <AMBPR08MB4921285CB6D97D8DFF000606068B802@AMBPR08MB492128.eurprd08.prod.outlook.com>
+
+With respect to sensitivity analyses:
+
+Many sensitivity analyses involve the typical kinds of choices one has to make when conducting a meta-analysis (or really any kind of analysis). Gelman and Loken used the metaphor of "the garden of forking paths" to describe this idea (not in the context of meta-analysis but more broadly):
+
+Gelman, A., & Loken, E. (2014). The statistical crisis in science. American Scientist, 102(6), 460. https://doi.org/10.1511/2014.111.460
+
+Simmons and colleagues call this "researcher degrees of freedom":
+
+Simmons, J. P., Nelson, L. D., & Simonsohn, U. (2011). False-positive psychology: Undisclosed flexibility in data collection and analysis allows presenting anything as significant. Psychological Science, 22(11), 1359-1366. https://doi.org/10.1177/0956797611417632
+
+Of course, none of this is new. The idea that one has to make many decisions, judgments, and choices in collecting and analyzing a set of data is completely apparent to anybody who has ever been in this situation. In the meta-analytic context, this was discussed already early on; for example:
+
+Light, R. J. (1980). Synthesis methods: Some judgment calls that must be made. Evaluation in Education, 4, 13-17. https://doi.org/10.1016/0191-765X(80)90002-6
+
+Wanous, J. P., Sullivan, S. E., & Malinak, J. (1989). The role of judgment calls in meta-analysis. Journal of Applied Psychology, 74(2), 259-264. https://doi.org/10.1037/0021-9010.74.2.259
+
+And more related to the choices around the statistical methods:
+
+Mengersen, K. L., Tweedie, R. L., & Biggerstaff, B. (1995). The impact of method choice on meta-analysis. Australian Journal of Statistics, 37(1), 19-44. https://doi.org/10.1111/j.1467-842X.1995.tb00869.x
+
+Describing all these kinds of choices and decision points would take too long and some of this is specific to a particular project. But typical choices and judgment calls include:
+
+- eligibility: which studies, outcomes, time points, and populations to include.
+- effect-size definition: which effect measure to use and how to compute it; also which effect size to extract when there are multiple reasonable options (e.g., adjusted vs unadjusted odds ratio).
+- data handling: dealing with missing information, multiple outcomes, multiple groups, and dependent effects.
+- model choice: equal/common-effect vs. random-effects; potentially multilevel/multivariate models.
+- estimation: estimator for heterogeneity, inference method, confidence/prediction intervals.
+- heterogeneity: how to assess it and which moderators/subgroups to examine via meta-regression or subgrouping.
+- study quality: how risk of bias and/or study quality are evaluated and how they enter the analysis.
+- Outliers/influential studies: whether and how to identify and handle them.
+- Publication bias: which diagnostics and adjustment/sensitivity methods to use.
+
+Hence, there isn't a sensitivity() function. Instead, you have to think about these choices, their potential impact, and which ones you think need to be examined (which is yet another choice - it's INCEPTION all over again). You do this by going down the alternative path in the garden to see what happens (e.g., what happens when I DO remove the non-randomized studies? what happens when I assume a pre-post correlation of 0.7 or 0.1 instead of 0.4? what happens when I exclude this or that study?).
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: Tori Pe?a <Tori.Pena at stonybrook.edu>
+> Sent: Thursday, September 24, 2026 23:05
+> To: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>
+> Cc: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> project.org>
+> Subject: Re: [R-meta] Question Re: Rma.mv Model
+> 
+> This is incredibly helpful!
+> 
+> I did not have specific sensitivity analyses in mind.? I'm open to any
+> suggestions based on your expertise.
+> 
+> On Wed, Sep 23, 2026 at 11:17?AM Viechtbauer, Wolfgang (NP)
+> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:
+> 
+> Dear Tori,
+> 
+> Please see my responses below.
+> 
+> Best,
+> Wolfgang
+> 
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <mailto:r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Tori Pe?a via R-sig-meta-analysis
+> > Sent: Wednesday, September 23, 2026 16:38
+> > To: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-
+> > http://project.org>
+> > Cc: Tori Pe?a <mailto:Tori.Pena at stonybrook.edu>
+> > Subject: [R-meta] Question Re: Rma.mv Model
+> >
+> > Hello everyone -
+> >
+> > I have a couple of questions related to a three-level model we plan to
+> > conduct using *metafor. *For context, we have compiled correlations
+> > indexing relationships between cognition and inflammation in the body. We
+> > plan to nest effect sizes (level 1) in sample cohorts (level 2) within
+> > studies (level 3). I wanted to check the following questions:
+> >
+> >??? 1. The literature has different types of correlations. Is it acceptable
+> >??? to convert all of these correlations to Fisher's *z *for the models?
+> >??? Or, should there way to handle these varying effect size types?
+> 
+> You can use the standard r-to-z transformation on all kinds of correlation
+> coefficients. However, the sampling variance equation 1/(n-3) only applies when
+> converting Pearson product-moment correlations with the r-to-z transformation.
+> For other types of correlation coefficients (Spearman, (point-)biserial,
+> tetrachoric, (semi)partial, and so on), it would not be correct to use 1/(n-3)
+> as the variance.
+> 
+> Using the delta method, one can compute the variance of any r-to-z transformed
+> correlation coefficient as long as one has an estimate of the variance of the
+> correlation coefficient to begin with. For example, say you have a study that
+> dichotomized both variables of interest and reports the results in terms of a
+> 2x2 table (how many people scored above/below the cutoff on the first variable
+> versus the second variable). Say this is the 2x2 table:
+> 
+> ?????? Above? Below
+> Above? 15???? 5
+> Below?? 8???? 18
+> 
+> Then we can get the tetrachoric correlation with:
+> 
+> dat <- escalc(measure="RTET", ai=15, bi=5, ci=8, di=18)
+> dat
+> 
+> ????? yi???? vi
+> 1 0.6397 0.0258
+> 
+> (this estimates the correlation between the underlying continuous variables). I
+> can now r-to-z transform this with:
+> 
+> transf.rtoz(dat$yi)
+> [1] 0.757601
+> 
+> But
+> 
+> 1/((15+5+8+18)-3)
+> [1] 0.02325581
+> 
+> is NOT the sampling variance of the transformed tetrachoric correlation. Using
+> the delta method, we can compute a correct (i.e., consistent) estimate of the
+> sampling variance:
+> 
+> conv.delta(yi, vi, data=dat, transf=transf.rtoz,
+> replace=TRUE)
+> 
+> ????? yi???? vi
+> 1 0.7576 0.0740
+> 
+> Note that the variance (0.0740) is more than 3 times larger than the incorrect
+> estimate (0.0233), because we lost information from the dichotomization of the
+> two variables and having to reconstruct the correlation from that information.
+> You can actually skip the whole conv.delta() thing since escalc() can directly
+> do all of this for you:
+> 
+> dat <- escalc(measure="ZTET", ai=15, bi=5, ci=8,
+> di=18)
+> dat
+> 
+> 
+> 
+> ????? yi???? vi
+> 1 0.7576 0.0740
+> 
+> The same principle applies to other correlation coefficients. Note that the r-
+> to-z transformation is only a variance stabilizing transformation for Pearson
+> product-moment correlations, not for (most) other types of correlation
+> coefficients. However, using the transformation can still be advantageous, since
+> raw correlations are bounded which can result in skewed sampling distributions.
+> The r-to-z transformation can then help to normalize the sampling distributions.
+> 
+> >??? 2. I could not find information in the *metafor *documentation about
+> >??? conducting sensitivity analyses for rma.mv objects. Is this possible? If
+> >??? so, how?
+> 
+> What type of sensitivity analyses are you thinking of?
+> 
+> > Thanks in advance,
+> > Tori
+
