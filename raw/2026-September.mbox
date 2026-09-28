@@ -449,3 +449,92 @@ Wolfgang
 > > Thanks in advance,
 > > Tori
 
+From @01047351077 @end|ng |rom gm@||@com  Sun Sep 27 05:08:02 2026
+From: @01047351077 @end|ng |rom gm@||@com (Donghui Kim)
+Date: Sun, 27 Sep 2026 12:08:02 +0900
+Subject: [R-meta] Bivariate GLMM for DTA with k = 4: one arm's between-study
+ variance estimated at zero - how to report the prediction interval?
+Message-ID: <CAFf=ywQqW4PVkmEby08fJNzwH0RnR4PCF3=cemLPeCRg9k-EfA@mail.gmail.com>
+
+Dear list,
+
+I am fitting the bivariate binomial-normal model for diagnostic test
+accuracy (Chu & Cole 2006) with lme4 in a subset analysis that has only
+four studies. The code below uses made-up counts that reproduce the
+behaviour I see, including one small study with no false positives.
+
+The full model is singular with the correlation at -1; the specificity
+SD there is not zero, but it is tied to sensitivity through that
+correlation. I then followed the usual fallback and fixed the
+correlation at 0 (which here is the same as fitting separate univariate
+random-effects models). In that fit the between-study variance for
+specificity is estimated at exactly zero, so the 95% prediction interval
+for specificity, computed as b +/- 1.96 * sqrt(tau^2 + var(b)) on the
+logit scale, collapses onto the confidence interval, while sensitivity
+keeps a wider prediction interval.
+
+I have read the 2019 thread "convergence in Mada" on this list, which
+notes that few studies and a perfect between-study correlation can
+cause problems and suggests profiling the correlation. I have also read
+Takwoingi et al. (2017), who consider univariate random-effects models
+appropriate when the bivariate model cannot be fitted, and univariate
+fixed-effect models when there is minimal or no variability (their
+Box 1). In the real data I profiled the correlation: on a grid of 11
+values from -0.999 to 0.999, the change in deviance is at most 0.075,
+so the data carry essentially no information about it.
+
+My question is about what comes after that advice. With k = 4 and
+tau^2 estimated at 0 for one arm, what is the most defensible way to
+report that arm's prediction interval? The options I can see are
+(a) the normal-quantile interval above, identical to the confidence
+interval; (b) a t quantile on k - 2 degrees of freedom (Higgins et al.
+2009), which with tau^2 = 0 is only a widened confidence interval, not
+a statement about heterogeneity; (c) saying that the prediction
+interval is not estimable for that arm; (d) a weakly informative prior
+on tau, for example with blme; or (e) reporting an upper
+profile-likelihood limit for tau instead, since tau^2 = 0 at k = 4 is
+not evidence of homogeneity.
+
+library(lme4)
+# made-up counts; study s4 is small and has no false positives
+d <- data.frame(study = paste0("s", 1:4),
+TP = c(42, 36, 8, 10), FN = c(10, 16, 8, 18),
+TN = c(111, 93, 80, 12), FP = c(39, 28, 20, 0))
+long <- rbind(
+data.frame(study = d$study, grp = "sens", succ = d$TP, fail = d$FN),
+data.frame(study = d$study, grp = "spec", succ = d$TN, fail = d$FP))
+long$grp <- factor(long$grp)
+ctrl <- glmerControl(optimizer = "bobyqa",
+optCtrl = list(maxfun = 2e5))
+
+m1 <- glmer(cbind(succ, fail) ~ 0 + grp + (0 + grp | study),
+data = long, family = binomial, control = ctrl)
+isSingular(m1); VarCorr(m1) # TRUE; corr = -1
+
+long$is_sens <- as.numeric(long$grp == "sens")
+long$is_spec <- as.numeric(long$grp == "spec")
+m2 <- glmer(cbind(succ, fail) ~ 0 + grp + (0 + is_sens | study) +
+(0 + is_spec | study),
+data = long, family = binomial, control = ctrl)
+isSingular(m2); VarCorr(m2) # TRUE; SD(is_spec) = 0
+
+b <- fixef(m2); vb <- diag(vcov(m2)); V <- as.data.frame(VarCorr(m2))
+t2 <- c(V$vcov[V$grp == "study" & V$var1 == "is_sens"],
+V$vcov[V$grp == "study.1" & V$var1 == "is_spec"])
+ci <- cbind(ci.lo = b - 1.96 * sqrt(vb),
+ci.hi = b + 1.96 * sqrt(vb))
+pred <- cbind(pi.lo = b - 1.96 * sqrt(t2 + vb),
+pi.hi = b + 1.96 * sqrt(t2 + vb))
+round(plogis(cbind(est = b, ci, pred)), 3)
+# est ci.lo ci.hi pi.lo pi.hi
+# grpsens 0.614 0.423 0.775 0.250 0.883
+# grpspec 0.773 0.728 0.812 0.728 0.812
+# (R 4.6.0, lme4 2.0-6)
+
+Thank you for any advice.
+
+Donghui Kim
+Clinical Practice Nurse
+Hallym University Kangdong Sacred Heart Hospital, Seoul, Republic of Korea
+
+
