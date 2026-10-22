@@ -17,7 +17,8 @@
       "body_snippet": "Hi everybody,\n\nThe title of my forest plot is too big so I loose part of the title.\nI use 'main=' in forest()\nHow can I make the font smaller?\n\nMy R page is 3.5.0.\nMy question is about forest() in met",
       "thread_id": "thread-5d7e9b3894b7",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000895.html"
     },
     {
       "id": "msg-621f6f9830c3",
@@ -31,11 +32,12 @@
       "references": [
         "<318ce8bd-e5b1-4c36-8d82-fcea79737414@Spark>"
       ],
-      "body_plain": "Dear Heidi,\n\nThese are some interesting questions. In part, I suspect these questions are a consequence of certain multilevel software requiring users to specify the levels of their variables. This is not necessary in metafor (or nlme/lme4 or many other multilevel / mixed-effects model packages). Instead, the level of a variable is simply a consequence of its coding. Since this is a common source of confusion, I'll provide an extensive answer.\n\nConsider an example. Let's say we have a dataset like this:\n\nstudy  x1\n1      3\n2      1\n3      2\n4      4\n...    ...\n\nstudy  outcome  x2  y\n1      A        5   .\n1      B        8   .\n2      A        3   .\n3      A        4   .\n3      B        8   .\n3      C        6   .\n4      B        5   .\n\nSo, x1 is a study-level predictor and x2 is an outcome-level predictor.\n\nWe do not really need to separate the dataset into the study and outcome levels. A predictor at the study level is just a constant within studies, so we just construct the dataset in this way:\n\nstudy  outcome  x1  x2  y\n1      A        3   5   .\n1      B        3   8   .\n2      A        1   3   .\n3      A        2   4   .\n3      B        2   8   .\n3      C        2   6   .\n4      B        4   5   .\n\nWe can then fit a model like:\n\nrma.mv(y ~ x1 + x2, V, random = ~ 1 | study/outcome, data=dat)\n\nwhich properly treats x1 as a study-level and x2 as an outcome-level predictor (the order of x1 and x2 is not relevant -- 'y ~ x2 + x2' would be the same).\n\nThe other issue is the coding of the random effects. Above, \"~ 1 | study/outcome\" adds random effects (intercepts) for each level of 'study' and random effects (intercepts) for each level of 'outcome' within 'study'. So here, I *explicitly* indicated the nesting of the two variables.\n\nI could also do:\n\ndat$study.outcome <- paste(dat$study, dat$outcome, sep=\".\")\n\nwhich simply pastes 'study' and 'outcome' together into a single variable, so the dataset now looks like this:\n\nstudy  outcome  x1  x2  y  study.outcome\n1      A        3   5   .  1.A\n1      B        3   8   .  1.B\n2      A        1   3   .  2.A\n3      A        2   4   .  3.A\n3      B        2   8   .  3.B\n3      C        2   6   .  3.C\n4      B        4   5   .  4.B\n\nand then fit the model:\n\nrma.mv(y ~ x1 + x2, V, random = list(~ 1 | study, ~ 1 | study.outcome), data=dat)\n\nThis will give the exact same results. Here, through the coding of my random effects, I add random effects at the study level and *implicitly* I add random effects for each level of outcome within studies.\n\nThe order in the list is totally irrelevant. So, I could also do:\n\nrma.mv(y ~ x1 + x2, V, random = list(~ 1 | study.outcome, ~ 1 | study), data=dat)\n\nwhich will again give the same results (but I hope it is clear that '~ 1 | outcome/study' WOULD be rather different -- and pretty nonsensical).\n\nNote above that 'study.outcome' is unique for every row. So, in fact, I could also just do:\n\ndat$id <- 1:nrow(dat)\n\nstudy  outcome  x1  x2  y  study.outcome  id\n1      A        3   5   .  1.A            1\n1      B        3   8   .  1.B            2\n2      A        1   3   .  2.A            3\n3      A        2   4   .  3.A            4 \n3      B        2   8   .  3.B            5\n3      C        2   6   .  3.C            6\n4      B        4   5   .  4.B            7\n\nand then fit:\n\nrma.mv(y ~ x1 + x2, V, random = list(~ 1 | study, ~ 1 | id), data=dat)\n\nThis would again be the same.\n\nSidenote: If there are multiple rows with the same level of 'outcome' within 'study' (for one or multiple studies), then the latter is NOT the same anymore. Then one could in fact fit the model:\n\nrma.mv(y ~ x1 + x2, V, random = ~ 1 | study/outcome/id, data=dat)\n\nbut I would only consider doing this if a sufficient number of studies provide multiple estimates for the same outcome (as otherwise the 'outcome' and 'id' level variance components will be very difficult to distinguish).\n\nOkay, but leaving aside this point, let's consider one other model:\n\nrma.mv(y ~ x1 + x2, V, random = list(~ 1 | study, ~ 1 | outcome), data=dat)\n\nNow this is REALLY different. This allows for *crossed* random effects; in this example, it allows 1.A, 2.A, and 3.A to share the same random effect (and 1.B, 3.B, and 4.B share the same random effect; and 3.C is feeling really lonely all by itself, but such is life). And of course 1.A and 1.B share the same study-level random effect, since they come from the same study. And so on.\n\nSo, this model not only allows for correlation in estimates coming from the same study, but also allows for correlation in estimates across studies, as long as they measured the same outcome. With '~ 1 | study/outcome', estimates from the same study are allowed to be correlated (since they share the same random effect), but estimates from different studies, whether they measured the same outcome or not, do not share any common random effects and are hence not correlated.\n\nI hope this clarifies how coding of predictors and random effects work in metafor.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Man Hey CHIU\nSent: Tuesday, 26 June, 2018 5:10\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Questions about fitting a multilevel meta-analysis model with effect sizes measured as different outcome\n\n(It seems that I accidentally cancelled my last submission, so I resent this email. Sorry for the inconvenience caused.)\n\nDear Dr. Viechtbauer and All,\n\nI am writing this letter to seek?for your help on multilevel meta-analysis using the metafor package you have?developed.\n\nIn our meta-analysis, we chose to conduct a mutilevel meta-analysis due to multiple effect sizes from a single study (i.e., dependence).\n\nThus,?we are thinking about?a 3-level random effect meta-analysis model with level 1 being sampling biases, level 2 being the variation of effect sizes measured as different outcomes within the same studies and level 3 being the variation between studies across the whole dataset.\n\nDuring running the analyses, we have encountered a specific?problem about the organization of the data file that is entered into the model. We have one column 'StudyName' representing each study, 'Outcome' representing each outcome within a study (p.s. different studies can have the same outcome) and 'EffectID' representing each unique effect size across all studies (p.s. if the whole dataset has?300 effect sizes, there would be 300 different EffectID.)\n\nAnd I wonder?whether the 'Outcome' (the first line of code below) or the 'EffectID' (the second line of code below) should be used to get our desired outcome:\n\n(1)?rma.mv(yi=Hedge.g, V = Variances, data=df, slab=StudyName, random = list(~1|Outcome, ~1|StudyName))\n\n(2)?rma.mv(yi=Hedge.g, V = Variances, data=df, slab=StudyName, random = list(~1|EffectID, ~1|StudyName))\n\nI have read the demonstration of doing the multilevel meta-analysis on sample dataset dat.konstantopoulos2011, the 'school' column can have the same code which may be reused in different districts. Yet, actually, every school should be unique. In contrast, in my case, different studies can share the same outcomes. Since my case is different than the example that you showed, I am not so sure how should I fit my dataset to the model.\n\nAnother question would be whether the order of specific effect inside list() would matter. As the following two line of code would give the same result, how does the function know which level 2 and level 3 is? Since level 2 should be clustered in level 3, why don't we have to specify the level 2 and level 3?\n\nThe final question we have encountered?would be about adding moderators to the above function. Since in multilevel-meta analysis, there might be covariates on the level 2 outcome and level 3 study respectively, e.g., similar outcome may be measured across different studies. Would the function automatically detect the covariate as a level 2 covariate when that value is different across the outcomes in a specific cluster (i.e. study) or do we have to specify the level of covariates?\n\nThank you in advance for your time and help, we?really appreciate your input on these questions.\n\nRegards,\nHeidi Chiu",
+      "body_plain": "Dear Heidi,\n\nThese are some interesting questions. In part, I suspect these questions are a consequence of certain multilevel software requiring users to specify the levels of their variables. This is not necessary in metafor (or nlme/lme4 or many other multilevel / mixed-effects model packages). Instead, the level of a variable is simply a consequence of its coding. Since this is a common source of confusion, I'll provide an extensive answer.\n\nConsider an example. Let's say we have a dataset like this:\n\nstudy  x1\n1      3\n2      1\n3      2\n4      4\n...    ...\n\nstudy  outcome  x2  y\n1      A        5   .\n1      B        8   .\n2      A        3   .\n3      A        4   .\n3      B        8   .\n3      C        6   .\n4      B        5   .\n\nSo, x1 is a study-level predictor and x2 is an outcome-level predictor.\n\nWe do not really need to separate the dataset into the study and outcome levels. A predictor at the study level is just a constant within studies, so we just construct the dataset in this way:\n\nstudy  outcome  x1  x2  y\n1      A        3   5   .\n1      B        3   8   .\n2      A        1   3   .\n3      A        2   4   .\n3      B        2   8   .\n3      C        2   6   .\n4      B        4   5   .\n\nWe can then fit a model like:\n\nrma.mv(y ~ x1 + x2, V, random = ~ 1 | study/outcome, data=dat)\n\nwhich properly treats x1 as a study-level and x2 as an outcome-level predictor (the order of x1 and x2 is not relevant -- 'y ~ x2 + x2' would be the same).\n\nThe other issue is the coding of the random effects. Above, \"~ 1 | study/outcome\" adds random effects (intercepts) for each level of 'study' and random effects (intercepts) for each level of 'outcome' within 'study'. So here, I *explicitly* indicated the nesting of the two variables.\n\nI could also do:\n\ndat$study.outcome <- paste(dat$study, dat$outcome, sep=\".\")\n\nwhich simply pastes 'study' and 'outcome' together into a single variable, so the dataset now looks like this:\n\nstudy  outcome  x1  x2  y  study.outcome\n1      A        3   5   .  1.A\n1      B        3   8   .  1.B\n2      A        1   3   .  2.A\n3      A        2   4   .  3.A\n3      B        2   8   .  3.B\n3      C        2   6   .  3.C\n4      B        4   5   .  4.B\n\nand then fit the model:\n\nrma.mv(y ~ x1 + x2, V, random = list(~ 1 | study, ~ 1 | study.outcome), data=dat)\n\nThis will give the exact same results. Here, through the coding of my random effects, I add random effects at the study level and *implicitly* I add random effects for each level of outcome within studies.\n\nThe order in the list is totally irrelevant. So, I could also do:\n\nrma.mv(y ~ x1 + x2, V, random = list(~ 1 | study.outcome, ~ 1 | study), data=dat)\n\nwhich will again give the same results (but I hope it is clear that '~ 1 | outcome/study' WOULD be rather different -- and pretty nonsensical).\n\nNote above that 'study.outcome' is unique for every row. So, in fact, I could also just do:\n\ndat$id <- 1:nrow(dat)\n\nstudy  outcome  x1  x2  y  study.outcome  id\n1      A        3   5   .  1.A            1\n1      B        3   8   .  1.B            2\n2      A        1   3   .  2.A            3\n3      A        2   4   .  3.A            4 \n3      B        2   8   .  3.B            5\n3      C        2   6   .  3.C            6\n4      B        4   5   .  4.B            7\n\nand then fit:\n\nrma.mv(y ~ x1 + x2, V, random = list(~ 1 | study, ~ 1 | id), data=dat)\n\nThis would again be the same.\n\nSidenote: If there are multiple rows with the same level of 'outcome' within 'study' (for one or multiple studies), then the latter is NOT the same anymore. Then one could in fact fit the model:\n\nrma.mv(y ~ x1 + x2, V, random = ~ 1 | study/outcome/id, data=dat)\n\nbut I would only consider doing this if a sufficient number of studies provide multiple estimates for the same outcome (as otherwise the 'outcome' and 'id' level variance components will be very difficult to distinguish).\n\nOkay, but leaving aside this point, let's consider one other model:\n\nrma.mv(y ~ x1 + x2, V, random = list(~ 1 | study, ~ 1 | outcome), data=dat)\n\nNow this is REALLY different. This allows for *crossed* random effects; in this example, it allows 1.A, 2.A, and 3.A to share the same random effect (and 1.B, 3.B, and 4.B share the same random effect; and 3.C is feeling really lonely all by itself, but such is life). And of course 1.A and 1.B share the same study-level random effect, since they come from the same study. And so on.\n\nSo, this model not only allows for correlation in estimates coming from the same study, but also allows for correlation in estimates across studies, as long as they measured the same outcome. With '~ 1 | study/outcome', estimates from the same study are allowed to be correlated (since they share the same random effect), but estimates from different studies, whether they measured the same outcome or not, do not share any common random effects and are hence not correlated.\n\nI hope this clarifies how coding of predictors and random effects work in metafor.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Man Hey CHIU\nSent: Tuesday, 26 June, 2018 5:10\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Questions about fitting a multilevel meta-analysis model with effect sizes measured as different outcome\n\n(It seems that I accidentally cancelled my last submission, so I resent this email. Sorry for the inconvenience caused.)\n\nDear Dr. Viechtbauer and All,\n\nI am writing this letter to seek for your help on multilevel meta-analysis using the metafor package you have developed.\n\nIn our meta-analysis, we chose to conduct a mutilevel meta-analysis due to multiple effect sizes from a single study (i.e., dependence).\n\nThus, we are thinking about a 3-level random effect meta-analysis model with level 1 being sampling biases, level 2 being the variation of effect sizes measured as different outcomes within the same studies and level 3 being the variation between studies across the whole dataset.\n\nDuring running the analyses, we have encountered a specific problem about the organization of the data file that is entered into the model. We have one column 'StudyName' representing each study, 'Outcome' representing each outcome within a study (p.s. different studies can have the same outcome) and 'EffectID' representing each unique effect size across all studies (p.s. if the whole dataset has 300 effect sizes, there would be 300 different EffectID.)\n\nAnd I wonder whether the 'Outcome' (the first line of code below) or the 'EffectID' (the second line of code below) should be used to get our desired outcome:\n\n(1) rma.mv(yi=Hedge.g, V = Variances, data=df, slab=StudyName, random = list(~1|Outcome, ~1|StudyName))\n\n(2) rma.mv(yi=Hedge.g, V = Variances, data=df, slab=StudyName, random = list(~1|EffectID, ~1|StudyName))\n\nI have read the demonstration of doing the multilevel meta-analysis on sample dataset dat.konstantopoulos2011, the 'school' column can have the same code which may be reused in different districts. Yet, actually, every school should be unique. In contrast, in my case, different studies can share the same outcomes. Since my case is different than the example that you showed, I am not so sure how should I fit my dataset to the model.\n\nAnother question would be whether the order of specific effect inside list() would matter. As the following two line of code would give the same result, how does the function know which level 2 and level 3 is? Since level 2 should be clustered in level 3, why don't we have to specify the level 2 and level 3?\n\nThe final question we have encountered would be about adding moderators to the above function. Since in multilevel-meta analysis, there might be covariates on the level 2 outcome and level 3 study respectively, e.g., similar outcome may be measured across different studies. Would the function automatically detect the covariate as a level 2 covariate when that value is different across the outcomes in a specific cluster (i.e. study) or do we have to specify the level of covariates?\n\nThank you in advance for your time and help, we really appreciate your input on these questions.\n\nRegards,\nHeidi Chiu",
       "body_snippet": "Dear Heidi,\n\nThese are some interesting questions. In part, I suspect these questions are a consequence of certain multilevel software requiring users to specify the levels of their variables. This is",
       "thread_id": "thread-621f6f9830c3",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000896.html"
     },
     {
       "id": "msg-33cec3be43a6",
@@ -53,7 +55,8 @@
       "body_snippet": "Hi Roberto,\n\nUse 'cex.main' to adjust the size of the title.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of P.",
       "thread_id": "thread-5d7e9b3894b7",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000897.html"
     },
     {
       "id": "msg-e4635c252483",
@@ -69,7 +72,8 @@
       "body_snippet": "Hello everyone, \n\nThank you so much for accepting me to this newsletter. \n\nAs I am fairly new to metaanalysis and especially metaanalysis with R, I\nhave a question concering the usage of the lmer-comm",
       "thread_id": "thread-e4635c252483",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000898.html"
     },
     {
       "id": "msg-4ffbe83eb902",
@@ -87,7 +91,8 @@
       "body_snippet": "Dear Marcel\n\nYou seem to have a large number of grouping variables (the ones to the \nright of the | symbol) which means you have few observations within any \ngiven cell of your design. I think you eit",
       "thread_id": "thread-e4635c252483",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000899.html"
     },
     {
       "id": "msg-a3b0ab65cdc8",
@@ -106,7 +111,8 @@
       "body_snippet": "Dear Marcel,\n\nI was in the process of writing when Michael's response arrived. I'll just add my answer to his.\n\nFirst of all, the subject is a bit misleading -- you are asking about the lme4 package, ",
       "thread_id": "thread-e4635c252483",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000900.html"
     },
     {
       "id": "msg-19b0a9368041",
@@ -122,7 +128,8 @@
       "body_snippet": "Hi,\n\nWhen I have set (in script syntax) the layout of a forest plot and run it\nlater again it looks different sometimes. I am not sure whether could be\ndue to workspace or something else. (metafor - R",
       "thread_id": "thread-19b0a9368041",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000901.html"
     },
     {
       "id": "msg-260be1c79004",
@@ -140,7 +147,8 @@
       "body_snippet": "Without a reproducible example, it's difficult to say what is causing this. My guess is that some plot settings are getting adjusted somewhere and then you are plotting again with those adjusted setti",
       "thread_id": "thread-19b0a9368041",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000902.html"
     },
     {
       "id": "msg-fdf7a559cc73",
@@ -155,11 +163,12 @@
         "<CAKDq9_Mz_rNAfbL7ftescpvN_zzD8Wn+Fx2dKQMOx8mhK9-prg@mail.gmail.com>",
         "<c4ac4a3d43984a8f8799311ecee829cb@UM-MAIL3213.unimaas.nl>"
       ],
-      "body_plain": "Hi all,\n\nI?m running a meta-analysis using Cohen?s d in the metafor-package for R. I?m doubting my method/interpretation of results at various stages. As I want to make sure I?m doing it right, rather than doing what is convenient, I hope you could provide me with some advice regarding the following questions:\n\n1. Heterogeneity is high in my data, and I want to add a list of moderators to test their influence. However, many of these moderators have missing values because not all studies have measured these variables. If I run a model that includes all moderators, the number of comparisons drops from 51 to 27. I?d prefer to include all moderators at once, but is this the right thing to do, or should I test each moderator separately? \n2. Following 1: if I can run the model as a whole, is it possible and useful to in some way compare the overall effect size of the studies with no missing moderator data with those that are excluded in the model because of these missing datapoints?\n3. Some moderators that are significant when including all moderators at once, are not significant when tested individually on the same subset of 27 studies. Which of the two statistics (as part of the larger model, or the individual moderator) should I report?\n\nAnd two questions about interpretation:\n4. I added publication year as moderator and and the estimate is 0.0360. Am I interpreting this result correctly when I say that every increase in the moderator year by 1, increases the effect size by 0.0360?\n5. I also added a dichotomous moderator with options yes/no. In the moderator list, This moderator is listed with the ?yes? option, with an estimate of 0.5739, does this mean the effect size is 0.5739 higher than when the moderator value is ?no??\n\nThank you in advance for your thoughts and advice.\n\nBest wishes,\nTommy",
-      "body_snippet": "Hi all,\n\nI?m running a meta-analysis using Cohen?s d in the metafor-package for R. I?m doubting my method/interpretation of results at various stages. As I want to make sure I?m doing it right, rather",
+      "body_plain": "Hi all,\n\nI’m running a meta-analysis using Cohen’s d in the metafor-package for R. I’m doubting my method/interpretation of results at various stages. As I want to make sure I’m doing it right, rather than doing what is convenient, I hope you could provide me with some advice regarding the following questions:\n\n1. Heterogeneity is high in my data, and I want to add a list of moderators to test their influence. However, many of these moderators have missing values because not all studies have measured these variables. If I run a model that includes all moderators, the number of comparisons drops from 51 to 27. I’d prefer to include all moderators at once, but is this the right thing to do, or should I test each moderator separately? \n2. Following 1: if I can run the model as a whole, is it possible and useful to in some way compare the overall effect size of the studies with no missing moderator data with those that are excluded in the model because of these missing datapoints?\n3. Some moderators that are significant when including all moderators at once, are not significant when tested individually on the same subset of 27 studies. Which of the two statistics (as part of the larger model, or the individual moderator) should I report?\n\nAnd two questions about interpretation:\n4. I added publication year as moderator and and the estimate is 0.0360. Am I interpreting this result correctly when I say that every increase in the moderator year by 1, increases the effect size by 0.0360?\n5. I also added a dichotomous moderator with options yes/no. In the moderator list, This moderator is listed with the ‘yes’ option, with an estimate of 0.5739, does this mean the effect size is 0.5739 higher than when the moderator value is ‘no’?\n\nThank you in advance for your thoughts and advice.\n\nBest wishes,\nTommy",
+      "body_snippet": "Hi all,\n\nI’m running a meta-analysis using Cohen’s d in the metafor-package for R. I’m doubting my method/interpretation of results at various stages. As I want to make sure I’m doing it right, rather",
       "thread_id": "thread-19b0a9368041",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000903.html"
     },
     {
       "id": "msg-06ad6b3d6f7e",
@@ -175,11 +184,12 @@
         "<c4ac4a3d43984a8f8799311ecee829cb@UM-MAIL3213.unimaas.nl>",
         "<B802232E-0C53-4B3F-BBE5-F792082968FE@yahoo.com>"
       ],
-      "body_plain": "Hi Tommy,\n\n1) This is a tricky (and common) issue. I suspect this is one of the reasons why moderators are still often tested one at a time (to 'maximize' the number of studies included in an analysis when testing each moderator). But this makes it impossible to sort out the unique contributions of correlated moderators, so this isn't ideal. One could consider imputation techniques, although this isn't common practice in the meta-analysis context. So, as for a more pragmatic approach, why not do both? If a moderator is found to be relevant when tested individually and also when other moderators are included, then this gives should give us more confidence in the finding.\n\n2) Possible, sure. Is it useful, maybe. Consider the following scatterplot of the effect sizes against some moderator (ignore the *'s for now):\n\n|      *  ..   .\n|      *.. . .\n|    . *. .\n|   . .*.\n|  ..  *\n|      *\n+------*--------\n\nNow suppose all studies where the moderator is below * are missing. This shouldn't bias the slope of the coefficient for the moderator, but studies where the moderator is know will have on average a higher effect size than studies where the moderator is unknown. So what will then the conclusion be once we find this?\n\n3) Again, how about both? Make a side-by-side table of the results.\n\n4) Yes (on average).\n\n5) Yes. If you see a coefficient for \"Yes\", then \"No\" is the reference level. So the coefficient for \"Yes\" tells you how much lower/higher the effect is on average for \"Yes\" compared to \"No\".\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-\n>project.org] On Behalf Of Tommy van Steen\n>Sent: Friday, 06 July, 2018 14:37\n>To: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] Moderator analysis with missing values (Methods and\n>interpretations)\n>\n>Hi all,\n>\n>I?m running a meta-analysis using Cohen?s d in the metafor-package for R.\n>I?m doubting my method/interpretation of results at various stages. As I\n>want to make sure I?m doing it right, rather than doing what is\n>convenient, I hope you could provide me with some advice regarding the\n>following questions:\n>\n>1. Heterogeneity is high in my data, and I want to add a list of\n>moderators to test their influence. However, many of these moderators\n>have missing values because not all studies have measured these\n>variables. If I run a model that includes all moderators, the number of\n>comparisons drops from 51 to 27. I?d prefer to include all moderators at\n>once, but is this the right thing to do, or should I test each moderator\n>separately?\n>2. Following 1: if I can run the model as a whole, is it possible and\n>useful to in some way compare the overall effect size of the studies with\n>no missing moderator data with those that are excluded in the model\n>because of these missing datapoints?\n>3. Some moderators that are significant when including all moderators at\n>once, are not significant when tested individually on the same subset of\n>27 studies. Which of the two statistics (as part of the larger model, or\n>the individual moderator) should I report?\n>\n>And two questions about interpretation:\n>4. I added publication year as moderator and and the estimate is 0.0360.\n>Am I interpreting this result correctly when I say that every increase in\n>the moderator year by 1, increases the effect size by 0.0360?\n>5. I also added a dichotomous moderator with options yes/no. In the\n>moderator list, This moderator is listed with the ?yes? option, with an\n>estimate of 0.5739, does this mean the effect size is 0.5739 higher than\n>when the moderator value is ?no??\n>\n>Thank you in advance for your thoughts and advice.\n>\n>Best wishes,\n>Tommy",
+      "body_plain": "Hi Tommy,\n\n1) This is a tricky (and common) issue. I suspect this is one of the reasons why moderators are still often tested one at a time (to 'maximize' the number of studies included in an analysis when testing each moderator). But this makes it impossible to sort out the unique contributions of correlated moderators, so this isn't ideal. One could consider imputation techniques, although this isn't common practice in the meta-analysis context. So, as for a more pragmatic approach, why not do both? If a moderator is found to be relevant when tested individually and also when other moderators are included, then this gives should give us more confidence in the finding.\n\n2) Possible, sure. Is it useful, maybe. Consider the following scatterplot of the effect sizes against some moderator (ignore the *'s for now):\n\n|      *  ..   .\n|      *.. . .\n|    . *. .\n|   . .*.\n|  ..  *\n|      *\n+------*--------\n\nNow suppose all studies where the moderator is below * are missing. This shouldn't bias the slope of the coefficient for the moderator, but studies where the moderator is know will have on average a higher effect size than studies where the moderator is unknown. So what will then the conclusion be once we find this?\n\n3) Again, how about both? Make a side-by-side table of the results.\n\n4) Yes (on average).\n\n5) Yes. If you see a coefficient for \"Yes\", then \"No\" is the reference level. So the coefficient for \"Yes\" tells you how much lower/higher the effect is on average for \"Yes\" compared to \"No\".\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-\n>project.org] On Behalf Of Tommy van Steen\n>Sent: Friday, 06 July, 2018 14:37\n>To: r-sig-meta-analysis at r-project.org\n>Subject: [R-meta] Moderator analysis with missing values (Methods and\n>interpretations)\n>\n>Hi all,\n>\n>I’m running a meta-analysis using Cohen’s d in the metafor-package for R.\n>I’m doubting my method/interpretation of results at various stages. As I\n>want to make sure I’m doing it right, rather than doing what is\n>convenient, I hope you could provide me with some advice regarding the\n>following questions:\n>\n>1. Heterogeneity is high in my data, and I want to add a list of\n>moderators to test their influence. However, many of these moderators\n>have missing values because not all studies have measured these\n>variables. If I run a model that includes all moderators, the number of\n>comparisons drops from 51 to 27. I’d prefer to include all moderators at\n>once, but is this the right thing to do, or should I test each moderator\n>separately?\n>2. Following 1: if I can run the model as a whole, is it possible and\n>useful to in some way compare the overall effect size of the studies with\n>no missing moderator data with those that are excluded in the model\n>because of these missing datapoints?\n>3. Some moderators that are significant when including all moderators at\n>once, are not significant when tested individually on the same subset of\n>27 studies. Which of the two statistics (as part of the larger model, or\n>the individual moderator) should I report?\n>\n>And two questions about interpretation:\n>4. I added publication year as moderator and and the estimate is 0.0360.\n>Am I interpreting this result correctly when I say that every increase in\n>the moderator year by 1, increases the effect size by 0.0360?\n>5. I also added a dichotomous moderator with options yes/no. In the\n>moderator list, This moderator is listed with the ‘yes’ option, with an\n>estimate of 0.5739, does this mean the effect size is 0.5739 higher than\n>when the moderator value is ‘no’?\n>\n>Thank you in advance for your thoughts and advice.\n>\n>Best wishes,\n>Tommy",
       "body_snippet": "Hi Tommy,\n\n1) This is a tricky (and common) issue. I suspect this is one of the reasons why moderators are still often tested one at a time (to 'maximize' the number of studies included in an analysis",
       "thread_id": "thread-19b0a9368041",
       "thread_depth": 3,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000904.html"
     },
     {
       "id": "msg-e05436f54cb6",
@@ -191,11 +201,12 @@
       "subject_clean": "[R-meta] Meta-analysis controlling for a moderator",
       "in_reply_to": null,
       "references": [],
-      "body_plain": "I?d like to test whether the overall effect size is significantly different\nfrom zero when controlling for a moderator. For a minimal working example,\nI am using the dataset provided with the metafor package, which contains 13\neffect size estimates and corresponding sampling variances of the effect of\nBCG vaccination on the prevention of tuberculosis.  Here are the steps I\ntake:\n\nR>#Load package and dataset\nR> library(\"metafor\")\nR> data(\"dat.bcg\", package = \"metafor\")\n\n1) Once these 13 effect sizes were converted to the same metric,\n\n R> #Calculate effect sizes on common metric\nR> dat <- escalc(measure = \"RR\", ai = tpos, bi = tneg, ci = cpos, di =\ncneg, data = dat.bcg, append = TRUE)\n\n2) I fitted a fixed-effects model examining the magnitude of the effect of\nvaccination on prevention of tuberculosis (with yi = observed outcomes and\nvi = sampling variance), and finding a significant average effect size\nestimate with a substantial amount of heterogeneity:\n\nR> # Fit fixed-effect model\nR> res <- rma(yi, vi, data = dat, method=\"FE\")\n\n3) I then moved on to a moderator analysis. Using the following code, I\nexamined if a continuous variable (ablat, representing the absolute\nlatitude of the study location) significantly moderated the average effect\nsize estimate of the effect of vaccination on the prevention of\ntuberculosis.\n\nR> # Examine continuous moderator (ablat)\nR> res <- rma(yi, vi, mods = ~ ablat, data = dat, method = \"REML\")\n\nI am further interested if the average effect size estimate remains\nsignificant (i.e., whether the effect size is different from zero) when\ncontrolling for this continuous moderator (ablat).  In other words, I?m\ninterested in whether there remains an effect of vaccination on the\nprevention of tuberculosis when controlling for the covariate (i.e.,\nexamining whether vaccination is still effective when controlling for study\nlocation). Is this possible? Any help would be appreciated.\n\nBest,\n\n\nCaroline Hoyniak\nDoctoral Candidate, Clinical Science\nBates Social Development Lab\nIndiana University - Bloomington\n\n\t[[alternative HTML version deleted]]",
-      "body_snippet": "I?d like to test whether the overall effect size is significantly different\nfrom zero when controlling for a moderator. For a minimal working example,\nI am using the dataset provided with the metafor ",
+      "body_plain": "I’d like to test whether the overall effect size is significantly different\nfrom zero when controlling for a moderator. For a minimal working example,\nI am using the dataset provided with the metafor package, which contains 13\neffect size estimates and corresponding sampling variances of the effect of\nBCG vaccination on the prevention of tuberculosis.  Here are the steps I\ntake:\n\nR>#Load package and dataset\nR> library(\"metafor\")\nR> data(\"dat.bcg\", package = \"metafor\")\n\n1) Once these 13 effect sizes were converted to the same metric,\n\n R> #Calculate effect sizes on common metric\nR> dat <- escalc(measure = \"RR\", ai = tpos, bi = tneg, ci = cpos, di =\ncneg, data = dat.bcg, append = TRUE)\n\n2) I fitted a fixed-effects model examining the magnitude of the effect of\nvaccination on prevention of tuberculosis (with yi = observed outcomes and\nvi = sampling variance), and finding a significant average effect size\nestimate with a substantial amount of heterogeneity:\n\nR> # Fit fixed-effect model\nR> res <- rma(yi, vi, data = dat, method=\"FE\")\n\n3) I then moved on to a moderator analysis. Using the following code, I\nexamined if a continuous variable (ablat, representing the absolute\nlatitude of the study location) significantly moderated the average effect\nsize estimate of the effect of vaccination on the prevention of\ntuberculosis.\n\nR> # Examine continuous moderator (ablat)\nR> res <- rma(yi, vi, mods = ~ ablat, data = dat, method = \"REML\")\n\nI am further interested if the average effect size estimate remains\nsignificant (i.e., whether the effect size is different from zero) when\ncontrolling for this continuous moderator (ablat).  In other words, I’m\ninterested in whether there remains an effect of vaccination on the\nprevention of tuberculosis when controlling for the covariate (i.e.,\nexamining whether vaccination is still effective when controlling for study\nlocation). Is this possible? Any help would be appreciated.\n\nBest,\n\n\nCaroline Hoyniak\nDoctoral Candidate, Clinical Science\nBates Social Development Lab\nIndiana University - Bloomington\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "I’d like to test whether the overall effect size is significantly different\nfrom zero when controlling for a moderator. For a minimal working example,\nI am using the dataset provided with the metafor ",
       "thread_id": "thread-e05436f54cb6",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000905.html"
     },
     {
       "id": "msg-2c24d6bae89f",
@@ -209,11 +220,12 @@
       "references": [
         "<CALWvcOu-r24Wzsds4wrNS1i9XC5CLFw3osneQQCivUVJS1pH1g@mail.gmail.com>"
       ],
-      "body_plain": "Dear Caroline,\n\nFirst of all, thank you for putting your question in the context of a reproducible example.\n\nConsider what the model with 'mods = ~ ablat' means. In essence, it says that the average effect is a function of 'ablat'. So, there is no longer 'the' average effect -- it depends on 'ablat'. Therefore, one could argue that your goal cannot be achieved. One can only test whether the average effect is significantly different from zero for a particular value of 'ablat'. For example:\n\nanova(res, L = c(1, 20))\n\ntests whether the average effect is significantly different from 0 at 20 degrees.\n\nA concept you may have come across is the idea of a 'marginal mean'. In the context of the present example, this would be the predicted average effect when setting the predictor equal to its average. So, in essence:\n\nanova(res, L = c(1, mean(dat$ablat)))\n\nSome might see this as the estimated average effect when controlling for the predictor. I am personally not too crazy about this interpretation, because it is really the estimated average effect at 33.46 degrees (the average) and conceptually no different than a prediction at 20 or 40 degrees. In other words, one cannot 'control away' the influence of 'ablat'. At least, I hope this is some food for thought.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Caroline Hoyniak\nSent: Monday, 09 July, 2018 17:24\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Meta-analysis controlling for a moderator\n\nI?d like to test whether the overall effect size is significantly different\nfrom zero when controlling for a moderator. For a minimal working example,\nI am using the dataset provided with the metafor package, which contains 13\neffect size estimates and corresponding sampling variances of the effect of\nBCG vaccination on the prevention of tuberculosis.  Here are the steps I\ntake:\n\nR>#Load package and dataset\nR> library(\"metafor\")\nR> data(\"dat.bcg\", package = \"metafor\")\n\n1) Once these 13 effect sizes were converted to the same metric,\n\n R> #Calculate effect sizes on common metric\nR> dat <- escalc(measure = \"RR\", ai = tpos, bi = tneg, ci = cpos, di =\ncneg, data = dat.bcg, append = TRUE)\n\n2) I fitted a fixed-effects model examining the magnitude of the effect of\nvaccination on prevention of tuberculosis (with yi = observed outcomes and\nvi = sampling variance), and finding a significant average effect size\nestimate with a substantial amount of heterogeneity:\n\nR> # Fit fixed-effect model\nR> res <- rma(yi, vi, data = dat, method=\"FE\")\n\n3) I then moved on to a moderator analysis. Using the following code, I\nexamined if a continuous variable (ablat, representing the absolute\nlatitude of the study location) significantly moderated the average effect\nsize estimate of the effect of vaccination on the prevention of\ntuberculosis.\n\nR> # Examine continuous moderator (ablat)\nR> res <- rma(yi, vi, mods = ~ ablat, data = dat, method = \"REML\")\n\nI am further interested if the average effect size estimate remains\nsignificant (i.e., whether the effect size is different from zero) when\ncontrolling for this continuous moderator (ablat).  In other words, I?m\ninterested in whether there remains an effect of vaccination on the\nprevention of tuberculosis when controlling for the covariate (i.e.,\nexamining whether vaccination is still effective when controlling for study\nlocation). Is this possible? Any help would be appreciated.\n\nBest,\n\nCaroline Hoyniak\nDoctoral Candidate, Clinical Science\nBates Social Development Lab\nIndiana University - Bloomington",
+      "body_plain": "Dear Caroline,\n\nFirst of all, thank you for putting your question in the context of a reproducible example.\n\nConsider what the model with 'mods = ~ ablat' means. In essence, it says that the average effect is a function of 'ablat'. So, there is no longer 'the' average effect -- it depends on 'ablat'. Therefore, one could argue that your goal cannot be achieved. One can only test whether the average effect is significantly different from zero for a particular value of 'ablat'. For example:\n\nanova(res, L = c(1, 20))\n\ntests whether the average effect is significantly different from 0 at 20 degrees.\n\nA concept you may have come across is the idea of a 'marginal mean'. In the context of the present example, this would be the predicted average effect when setting the predictor equal to its average. So, in essence:\n\nanova(res, L = c(1, mean(dat$ablat)))\n\nSome might see this as the estimated average effect when controlling for the predictor. I am personally not too crazy about this interpretation, because it is really the estimated average effect at 33.46 degrees (the average) and conceptually no different than a prediction at 20 or 40 degrees. In other words, one cannot 'control away' the influence of 'ablat'. At least, I hope this is some food for thought.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Caroline Hoyniak\nSent: Monday, 09 July, 2018 17:24\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Meta-analysis controlling for a moderator\n\nI’d like to test whether the overall effect size is significantly different\nfrom zero when controlling for a moderator. For a minimal working example,\nI am using the dataset provided with the metafor package, which contains 13\neffect size estimates and corresponding sampling variances of the effect of\nBCG vaccination on the prevention of tuberculosis.  Here are the steps I\ntake:\n\nR>#Load package and dataset\nR> library(\"metafor\")\nR> data(\"dat.bcg\", package = \"metafor\")\n\n1) Once these 13 effect sizes were converted to the same metric,\n\n R> #Calculate effect sizes on common metric\nR> dat <- escalc(measure = \"RR\", ai = tpos, bi = tneg, ci = cpos, di =\ncneg, data = dat.bcg, append = TRUE)\n\n2) I fitted a fixed-effects model examining the magnitude of the effect of\nvaccination on prevention of tuberculosis (with yi = observed outcomes and\nvi = sampling variance), and finding a significant average effect size\nestimate with a substantial amount of heterogeneity:\n\nR> # Fit fixed-effect model\nR> res <- rma(yi, vi, data = dat, method=\"FE\")\n\n3) I then moved on to a moderator analysis. Using the following code, I\nexamined if a continuous variable (ablat, representing the absolute\nlatitude of the study location) significantly moderated the average effect\nsize estimate of the effect of vaccination on the prevention of\ntuberculosis.\n\nR> # Examine continuous moderator (ablat)\nR> res <- rma(yi, vi, mods = ~ ablat, data = dat, method = \"REML\")\n\nI am further interested if the average effect size estimate remains\nsignificant (i.e., whether the effect size is different from zero) when\ncontrolling for this continuous moderator (ablat).  In other words, I’m\ninterested in whether there remains an effect of vaccination on the\nprevention of tuberculosis when controlling for the covariate (i.e.,\nexamining whether vaccination is still effective when controlling for study\nlocation). Is this possible? Any help would be appreciated.\n\nBest,\n\nCaroline Hoyniak\nDoctoral Candidate, Clinical Science\nBates Social Development Lab\nIndiana University - Bloomington",
       "body_snippet": "Dear Caroline,\n\nFirst of all, thank you for putting your question in the context of a reproducible example.\n\nConsider what the model with 'mods = ~ ablat' means. In essence, it says that the average e",
       "thread_id": "thread-e05436f54cb6",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000906.html"
     },
     {
       "id": "msg-9f46ff45b92e",
@@ -230,11 +242,12 @@
         "<B802232E-0C53-4B3F-BBE5-F792082968FE@yahoo.com>",
         "<38679501bedd4dc19cfdf201693b940d@UM-MAIL3214.unimaas.nl>"
       ],
-      "body_plain": "Hi Wolfgang,\n\nThank you for the helpful and clear responses!\nThe visualisation of the moderators in the scatterplot makes a lot of sense, as does the side by side comparison of moderators individually/together.\n\nBest wishes,\nTommy\n\n> On 6 Jul 2018, at 14:11, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n> \n> Hi Tommy,\n> \n> 1) This is a tricky (and common) issue. I suspect this is one of the reasons why moderators are still often tested one at a time (to 'maximize' the number of studies included in an analysis when testing each moderator). But this makes it impossible to sort out the unique contributions of correlated moderators, so this isn't ideal. One could consider imputation techniques, although this isn't common practice in the meta-analysis context. So, as for a more pragmatic approach, why not do both? If a moderator is found to be relevant when tested individually and also when other moderators are included, then this gives should give us more confidence in the finding.\n> \n> 2) Possible, sure. Is it useful, maybe. Consider the following scatterplot of the effect sizes against some moderator (ignore the *'s for now):\n> \n> |      *  ..   .\n> |      *.. . .\n> |    . *. .\n> |   . .*.\n> |  ..  *\n> |      *\n> +------*--------\n> \n> Now suppose all studies where the moderator is below * are missing. This shouldn't bias the slope of the coefficient for the moderator, but studies where the moderator is know will have on average a higher effect size than studies where the moderator is unknown. So what will then the conclusion be once we find this?\n> \n> 3) Again, how about both? Make a side-by-side table of the results.\n> \n> 4) Yes (on average).\n> \n> 5) Yes. If you see a coefficient for \"Yes\", then \"No\" is the reference level. So the coefficient for \"Yes\" tells you how much lower/higher the effect is on average for \"Yes\" compared to \"No\".\n> \n> Best,\n> Wolfgang\n> \n>> -----Original Message-----\n>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-\n>> project.org] On Behalf Of Tommy van Steen\n>> Sent: Friday, 06 July, 2018 14:37\n>> To: r-sig-meta-analysis at r-project.org\n>> Subject: [R-meta] Moderator analysis with missing values (Methods and\n>> interpretations)\n>> \n>> Hi all,\n>> \n>> I?m running a meta-analysis using Cohen?s d in the metafor-package for R.\n>> I?m doubting my method/interpretation of results at various stages. As I\n>> want to make sure I?m doing it right, rather than doing what is\n>> convenient, I hope you could provide me with some advice regarding the\n>> following questions:\n>> \n>> 1. Heterogeneity is high in my data, and I want to add a list of\n>> moderators to test their influence. However, many of these moderators\n>> have missing values because not all studies have measured these\n>> variables. If I run a model that includes all moderators, the number of\n>> comparisons drops from 51 to 27. I?d prefer to include all moderators at\n>> once, but is this the right thing to do, or should I test each moderator\n>> separately?\n>> 2. Following 1: if I can run the model as a whole, is it possible and\n>> useful to in some way compare the overall effect size of the studies with\n>> no missing moderator data with those that are excluded in the model\n>> because of these missing datapoints?\n>> 3. Some moderators that are significant when including all moderators at\n>> once, are not significant when tested individually on the same subset of\n>> 27 studies. Which of the two statistics (as part of the larger model, or\n>> the individual moderator) should I report?\n>> \n>> And two questions about interpretation:\n>> 4. I added publication year as moderator and and the estimate is 0.0360.\n>> Am I interpreting this result correctly when I say that every increase in\n>> the moderator year by 1, increases the effect size by 0.0360?\n>> 5. I also added a dichotomous moderator with options yes/no. In the\n>> moderator list, This moderator is listed with the ?yes? option, with an\n>> estimate of 0.5739, does this mean the effect size is 0.5739 higher than\n>> when the moderator value is ?no??\n>> \n>> Thank you in advance for your thoughts and advice.\n>> \n>> Best wishes,\n>> Tommy",
+      "body_plain": "Hi Wolfgang,\n\nThank you for the helpful and clear responses!\nThe visualisation of the moderators in the scatterplot makes a lot of sense, as does the side by side comparison of moderators individually/together.\n\nBest wishes,\nTommy\n\n> On 6 Jul 2018, at 14:11, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n> \n> Hi Tommy,\n> \n> 1) This is a tricky (and common) issue. I suspect this is one of the reasons why moderators are still often tested one at a time (to 'maximize' the number of studies included in an analysis when testing each moderator). But this makes it impossible to sort out the unique contributions of correlated moderators, so this isn't ideal. One could consider imputation techniques, although this isn't common practice in the meta-analysis context. So, as for a more pragmatic approach, why not do both? If a moderator is found to be relevant when tested individually and also when other moderators are included, then this gives should give us more confidence in the finding.\n> \n> 2) Possible, sure. Is it useful, maybe. Consider the following scatterplot of the effect sizes against some moderator (ignore the *'s for now):\n> \n> |      *  ..   .\n> |      *.. . .\n> |    . *. .\n> |   . .*.\n> |  ..  *\n> |      *\n> +------*--------\n> \n> Now suppose all studies where the moderator is below * are missing. This shouldn't bias the slope of the coefficient for the moderator, but studies where the moderator is know will have on average a higher effect size than studies where the moderator is unknown. So what will then the conclusion be once we find this?\n> \n> 3) Again, how about both? Make a side-by-side table of the results.\n> \n> 4) Yes (on average).\n> \n> 5) Yes. If you see a coefficient for \"Yes\", then \"No\" is the reference level. So the coefficient for \"Yes\" tells you how much lower/higher the effect is on average for \"Yes\" compared to \"No\".\n> \n> Best,\n> Wolfgang\n> \n>> -----Original Message-----\n>> From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-\n>> project.org] On Behalf Of Tommy van Steen\n>> Sent: Friday, 06 July, 2018 14:37\n>> To: r-sig-meta-analysis at r-project.org\n>> Subject: [R-meta] Moderator analysis with missing values (Methods and\n>> interpretations)\n>> \n>> Hi all,\n>> \n>> I’m running a meta-analysis using Cohen’s d in the metafor-package for R.\n>> I’m doubting my method/interpretation of results at various stages. As I\n>> want to make sure I’m doing it right, rather than doing what is\n>> convenient, I hope you could provide me with some advice regarding the\n>> following questions:\n>> \n>> 1. Heterogeneity is high in my data, and I want to add a list of\n>> moderators to test their influence. However, many of these moderators\n>> have missing values because not all studies have measured these\n>> variables. If I run a model that includes all moderators, the number of\n>> comparisons drops from 51 to 27. I’d prefer to include all moderators at\n>> once, but is this the right thing to do, or should I test each moderator\n>> separately?\n>> 2. Following 1: if I can run the model as a whole, is it possible and\n>> useful to in some way compare the overall effect size of the studies with\n>> no missing moderator data with those that are excluded in the model\n>> because of these missing datapoints?\n>> 3. Some moderators that are significant when including all moderators at\n>> once, are not significant when tested individually on the same subset of\n>> 27 studies. Which of the two statistics (as part of the larger model, or\n>> the individual moderator) should I report?\n>> \n>> And two questions about interpretation:\n>> 4. I added publication year as moderator and and the estimate is 0.0360.\n>> Am I interpreting this result correctly when I say that every increase in\n>> the moderator year by 1, increases the effect size by 0.0360?\n>> 5. I also added a dichotomous moderator with options yes/no. In the\n>> moderator list, This moderator is listed with the ‘yes’ option, with an\n>> estimate of 0.5739, does this mean the effect size is 0.5739 higher than\n>> when the moderator value is ‘no’?\n>> \n>> Thank you in advance for your thoughts and advice.\n>> \n>> Best wishes,\n>> Tommy",
       "body_snippet": "Hi Wolfgang,\n\nThank you for the helpful and clear responses!\nThe visualisation of the moderators in the scatterplot makes a lot of sense, as does the side by side comparison of moderators individually",
       "thread_id": "thread-19b0a9368041",
       "thread_depth": 4,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000907.html"
     },
     {
       "id": "msg-e3e2916f6ba8",
@@ -250,7 +263,8 @@
       "body_snippet": "Dear all,\n\nCould you provide an explanation or an example on why 'W' (for rma.mv) or\n'weights' (for rma.uni) should be applied in a meta-analytic model? If I\nunderstand correctly, one should in princi",
       "thread_id": "thread-e3e2916f6ba8",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000908.html"
     },
     {
       "id": "msg-62e091928f94",
@@ -266,7 +280,8 @@
       "body_snippet": "Dear All\n\nI was wondering about the definition of 'random effects' in the contexts of a mixed-effects model.  The example in the metafor manual using the Konstantopoulos (2011) data  has a fixed numbe",
       "thread_id": "thread-62e091928f94",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000910.html"
     },
     {
       "id": "msg-de82119423cf",
@@ -284,7 +299,8 @@
       "body_snippet": "Hi Gabri,\n\nLet's start with rma() (i.e., rma.uni()). A random-effects model fitted with this function assumes:\n\nyi ~ N(mu, tau^2 + vi),\n\nwhere tau^2 is the estimated amount of heterogeneity (i.e., var",
       "thread_id": "thread-e3e2916f6ba8",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000909.html"
     },
     {
       "id": "msg-789266282608",
@@ -302,7 +318,8 @@
       "body_snippet": "Hi Emily,\n\nThere are many more districts than those included in this meta-analysis. So, while I assume the districts in the dataset are not a random sample from the larger population of districts, it ",
       "thread_id": "thread-62e091928f94",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000911.html"
     },
     {
       "id": "msg-0eb71dcdea44",
@@ -314,11 +331,12 @@
       "subject_clean": "[R-meta] Q-Statistic for Between-Subgroup Heterogeneity",
       "in_reply_to": null,
       "references": [],
-      "body_plain": "I am conducting a meta-analysis of proportions using the metafor package and want to compare heterogeneity between subgroups. I don?t see an option to generate a Q-statistic for between-subgroup heterogeneity. Is there any way to accomplish this with the metafor package?\n\nI can do this with the meta package using metaprop() and the byvar option?however, it does not let me specify separate weightings as rma() from the metafor package does.\n\nThanks,\n\nTy Beal, PhD\nTechnical Specialist\nKnowledge Leadership\n\nGAIN ? Global Alliance for Improved Nutrition\n1509 16th Street NW, 7th Floor | Washington, DC 20036\ntbeal at gainhealth.org<mailto:atumilowicz at gainhealth.org>\nC: +1 (602) 481-5211\nSkype: tyroniousbeal\n[GAINbanner]<http://www.gainhealth.org>\n\nDisclaimer\n\nThe information contained in this communication from the sender is confidential. It is intended solely for use by the recipient and others authorized to receive it. If you are not the recipient, you are hereby notified that any disclosure, copying, distribution or taking action in relation of the contents of this information is strictly prohibited and may be unlawful.\n\nThis email has been scanned for viruses and malware, and may have been automatically archived by Mimecast Ltd, an innovator in Software as a Service (SaaS) for business. Providing a safer and more useful place for your human generated data. Specializing in; Security, archiving and compliance. To find out more visit the Mimecast website.\n\n\t[[alternative HTML version deleted]]",
-      "body_snippet": "I am conducting a meta-analysis of proportions using the metafor package and want to compare heterogeneity between subgroups. I don?t see an option to generate a Q-statistic for between-subgroup heter",
+      "body_plain": "I am conducting a meta-analysis of proportions using the metafor package and want to compare heterogeneity between subgroups. I don’t see an option to generate a Q-statistic for between-subgroup heterogeneity. Is there any way to accomplish this with the metafor package?\n\nI can do this with the meta package using metaprop() and the byvar option—however, it does not let me specify separate weightings as rma() from the metafor package does.\n\nThanks,\n\nTy Beal, PhD\nTechnical Specialist\nKnowledge Leadership\n\nGAIN – Global Alliance for Improved Nutrition\n1509 16th Street NW, 7th Floor | Washington, DC 20036\ntbeal at gainhealth.org<mailto:atumilowicz at gainhealth.org>\nC: +1 (602) 481-5211\nSkype: tyroniousbeal\n[GAINbanner]<http://www.gainhealth.org>\n\nDisclaimer\n\nThe information contained in this communication from the sender is confidential. It is intended solely for use by the recipient and others authorized to receive it. If you are not the recipient, you are hereby notified that any disclosure, copying, distribution or taking action in relation of the contents of this information is strictly prohibited and may be unlawful.\n\nThis email has been scanned for viruses and malware, and may have been automatically archived by Mimecast Ltd, an innovator in Software as a Service (SaaS) for business. Providing a safer and more useful place for your human generated data. Specializing in; Security, archiving and compliance. To find out more visit the Mimecast website.\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "I am conducting a meta-analysis of proportions using the metafor package and want to compare heterogeneity between subgroups. I don’t see an option to generate a Q-statistic for between-subgroup heter",
       "thread_id": "thread-0eb71dcdea44",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000912.html"
     },
     {
       "id": "msg-695a49653299",
@@ -334,7 +352,8 @@
       "body_snippet": "I have some questions regarding the meta-regression analysis. I have the\ndatabase on the proportion (Below bubble plot). My advisor asked me to do\nthe polynomial regression. I have two questions:\n\n1- ",
       "thread_id": "thread-695a49653299",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000913.html"
     },
     {
       "id": "msg-88f06f483ec8",
@@ -348,11 +367,12 @@
       "references": [
         "<7EDF47EE-16B8-480A-AF5C-5E8A8EF14EDD@contoso.com>"
       ],
-      "body_plain": "Dear Ty,\n\nThe test for 'between-group' differences/heterogeneity is provided if you include the subgroup variable as a categorial moderator (i.e., as a factor) in the model. For example:\n\nlibrary(metafor)\n\ndat <- get(data(dat.bcg))\ndat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)\n\nres <- rma(yi, vi, mods = ~ factor(alloc), data=dat)\nres\n\nIn the output, you will find:\n\nTest of Moderators (coefficients 2:3):\nQM(df = 2) = 1.7675, p-val = 0.4132\n\nThis is the test for between-subgroup heterogeneity.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ty Beal\nSent: Friday, 13 July, 2018 15:46\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Q-Statistic for Between-Subgroup Heterogeneity\n\nI am conducting a meta-analysis of proportions using the metafor package and want to compare heterogeneity between subgroups. I don?t see an option to generate a Q-statistic for between-subgroup heterogeneity. Is there any way to accomplish this with the metafor package?\n\nI can do this with the meta package using metaprop() and the byvar option?however, it does not let me specify separate weightings as rma() from the metafor package does.\n\nThanks,\n\nTy Beal, PhD\nTechnical Specialist\nKnowledge Leadership\n\nGAIN ? Global Alliance for Improved Nutrition\n1509 16th Street NW, 7th Floor | Washington, DC 20036\ntbeal at gainhealth.org<mailto:atumilowicz at gainhealth.org>\nC: +1 (602) 481-5211\nSkype: tyroniousbeal\n[GAINbanner]<http://www.gainhealth.org>",
+      "body_plain": "Dear Ty,\n\nThe test for 'between-group' differences/heterogeneity is provided if you include the subgroup variable as a categorial moderator (i.e., as a factor) in the model. For example:\n\nlibrary(metafor)\n\ndat <- get(data(dat.bcg))\ndat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)\n\nres <- rma(yi, vi, mods = ~ factor(alloc), data=dat)\nres\n\nIn the output, you will find:\n\nTest of Moderators (coefficients 2:3):\nQM(df = 2) = 1.7675, p-val = 0.4132\n\nThis is the test for between-subgroup heterogeneity.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ty Beal\nSent: Friday, 13 July, 2018 15:46\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Q-Statistic for Between-Subgroup Heterogeneity\n\nI am conducting a meta-analysis of proportions using the metafor package and want to compare heterogeneity between subgroups. I don’t see an option to generate a Q-statistic for between-subgroup heterogeneity. Is there any way to accomplish this with the metafor package?\n\nI can do this with the meta package using metaprop() and the byvar option—however, it does not let me specify separate weightings as rma() from the metafor package does.\n\nThanks,\n\nTy Beal, PhD\nTechnical Specialist\nKnowledge Leadership\n\nGAIN – Global Alliance for Improved Nutrition\n1509 16th Street NW, 7th Floor | Washington, DC 20036\ntbeal at gainhealth.org<mailto:atumilowicz at gainhealth.org>\nC: +1 (602) 481-5211\nSkype: tyroniousbeal\n[GAINbanner]<http://www.gainhealth.org>",
       "body_snippet": "Dear Ty,\n\nThe test for 'between-group' differences/heterogeneity is provided if you include the subgroup variable as a categorial moderator (i.e., as a factor) in the model. For example:\n\nlibrary(meta",
       "thread_id": "thread-0eb71dcdea44",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000914.html"
     },
     {
       "id": "msg-49f1576ba8b7",
@@ -366,11 +386,12 @@
       "references": [
         "<CAATDBW4rB9x89FdmS_bjxFscoMBh+onC9EXC7A5kAT74Ok5uLA@mail.gmail.com>"
       ],
-      "body_plain": "Dear Hamed,\n\nPlease post in plain text format. I cannot see any plot. Either attach it as a separate image file or post it somewhere else and provide a link.\n\nAs for 2 - If you use poly(), try:\n\npreds <- predict(res, transf = transf.ilogit, newmods = unname(poly(years, degree=2)))\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Hamed Kianmehr\nSent: Friday, 13 July, 2018 16:03\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] A question about meta-regression Analysis\n\nI have some questions regarding the meta-regression analysis. I have the database on the proportion (Below bubble plot). My advisor?asked me to do the polynomial?regression. I have two questions:\n\n1- Is it any polynomial regression pattern in this data?\n2- I wrote below code but I couldn't get the line, Could you help me?\n----------------\nres<-rma(yi=y, vi=s2, data=data, method=\"DL\",mods = ~ poly(year, degree=2))\nyears <- 1989:2016\npreds <- predict(res, transf = transf.ilogit, newmods =cbind(years,years^2))\nwi <- 0.5/sqrt(data$s2)\nwi <- 0.5 + 3.0 * (wi - min(wi))/(max(wi) - min(wi))\nplot(data$year, transf.ilogit(y), cex=wi,xlab=\"Year\",ylab=\"Patient Expectation (%)\")\nlines(years, preds$pred)",
+      "body_plain": "Dear Hamed,\n\nPlease post in plain text format. I cannot see any plot. Either attach it as a separate image file or post it somewhere else and provide a link.\n\nAs for 2 - If you use poly(), try:\n\npreds <- predict(res, transf = transf.ilogit, newmods = unname(poly(years, degree=2)))\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Hamed Kianmehr\nSent: Friday, 13 July, 2018 16:03\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] A question about meta-regression Analysis\n\nI have some questions regarding the meta-regression analysis. I have the database on the proportion (Below bubble plot). My advisor asked me to do the polynomial regression. I have two questions:\n\n1- Is it any polynomial regression pattern in this data?\n2- I wrote below code but I couldn't get the line, Could you help me?\n----------------\nres<-rma(yi=y, vi=s2, data=data, method=\"DL\",mods = ~ poly(year, degree=2))\nyears <- 1989:2016\npreds <- predict(res, transf = transf.ilogit, newmods =cbind(years,years^2))\nwi <- 0.5/sqrt(data$s2)\nwi <- 0.5 + 3.0 * (wi - min(wi))/(max(wi) - min(wi))\nplot(data$year, transf.ilogit(y), cex=wi,xlab=\"Year\",ylab=\"Patient Expectation (%)\")\nlines(years, preds$pred)",
       "body_snippet": "Dear Hamed,\n\nPlease post in plain text format. I cannot see any plot. Either attach it as a separate image file or post it somewhere else and provide a link.\n\nAs for 2 - If you use poly(), try:\n\npreds",
       "thread_id": "thread-695a49653299",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000915.html"
     },
     {
       "id": "msg-880ccbd42711",
@@ -389,7 +410,8 @@
       "body_snippet": "Thank you for your response.\nPlease see the attached file regarding the plot.\n\nOn Fri, Jul 13, 2018 at 12:35 PM, Viechtbauer, Wolfgang (SP) <\nwolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n\n>",
       "thread_id": "thread-695a49653299",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000918.html"
     },
     {
       "id": "msg-e3f3e16c9c3d",
@@ -405,11 +427,12 @@
         "<112777e7eade407fa47526f9632f637d@UM-MAIL3214.unimaas.nl>",
         "<CAATDBW4FrLzGrpEb6=Qez64PfFa4W-nMdnF_DnvqhpG4Wta8zA@mail.gmail.com>"
       ],
-      "body_plain": "Thanks. Well, hard to say if these data are suggestive of a quadratic trend based on visual inspection.\n\nThe test of the coefficient for 'poly(year, 2)2' tells you whether the quadratic model fits significantly better than just the linear model.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: Hamed Kianmehr [mailto:hkianme1 at binghamton.edu] \nSent: Friday, 13 July, 2018 18:39\nTo: Viechtbauer, Wolfgang (SP)\nCc: r-sig-meta-analysis at r-project.org\nSubject: Re: [R-meta] A question about meta-regression Analysis\n\nATTACHMENT(S) REMOVED: Plot.jpg \n\nThank you for your response.?\nPlease see the attached?file regarding the plot.?\n\nOn Fri, Jul 13, 2018 at 12:35 PM, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\nDear Hamed,\n\nPlease post in plain text format. I cannot see any plot. Either attach it as a separate image file or post it somewhere else and provide a link.\n\nAs for 2 - If you use poly(), try:\n\npreds <- predict(res, transf = transf.ilogit, newmods = unname(poly(years, degree=2)))\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Hamed Kianmehr\nSent: Friday, 13 July, 2018 16:03\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] A question about meta-regression Analysis\n\nI have some questions regarding the meta-regression analysis. I have the database on the proportion (Below bubble plot). My advisor?asked me to do the polynomial?regression. I have two questions:\n\n1- Is it any polynomial regression pattern in this data?\n2- I wrote below code but I couldn't get the line, Could you help me?\n----------------\nres<-rma(yi=y, vi=s2, data=data, method=\"DL\",mods = ~ poly(year, degree=2))\nyears <- 1989:2016\npreds <- predict(res, transf = transf.ilogit, newmods =cbind(years,years^2))\nwi <- 0.5/sqrt(data$s2)\nwi <- 0.5 + 3.0 * (wi - min(wi))/(max(wi) - min(wi))\nplot(data$year, transf.ilogit(y), cex=wi,xlab=\"Year\",ylab=\"Patient Expectation (%)\")\nlines(years, preds$pred)\n\n--\nBest Regards,\nHamed Kianmehr, Ph.D. Candidate\nDepartment of Systems Science and Industrial Engineering\nThe State University of New York at Binghamton",
+      "body_plain": "Thanks. Well, hard to say if these data are suggestive of a quadratic trend based on visual inspection.\n\nThe test of the coefficient for 'poly(year, 2)2' tells you whether the quadratic model fits significantly better than just the linear model.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: Hamed Kianmehr [mailto:hkianme1 at binghamton.edu] \nSent: Friday, 13 July, 2018 18:39\nTo: Viechtbauer, Wolfgang (SP)\nCc: r-sig-meta-analysis at r-project.org\nSubject: Re: [R-meta] A question about meta-regression Analysis\n\nATTACHMENT(S) REMOVED: Plot.jpg \n\nThank you for your response. \nPlease see the attached file regarding the plot. \n\nOn Fri, Jul 13, 2018 at 12:35 PM, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\nDear Hamed,\n\nPlease post in plain text format. I cannot see any plot. Either attach it as a separate image file or post it somewhere else and provide a link.\n\nAs for 2 - If you use poly(), try:\n\npreds <- predict(res, transf = transf.ilogit, newmods = unname(poly(years, degree=2)))\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Hamed Kianmehr\nSent: Friday, 13 July, 2018 16:03\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] A question about meta-regression Analysis\n\nI have some questions regarding the meta-regression analysis. I have the database on the proportion (Below bubble plot). My advisor asked me to do the polynomial regression. I have two questions:\n\n1- Is it any polynomial regression pattern in this data?\n2- I wrote below code but I couldn't get the line, Could you help me?\n----------------\nres<-rma(yi=y, vi=s2, data=data, method=\"DL\",mods = ~ poly(year, degree=2))\nyears <- 1989:2016\npreds <- predict(res, transf = transf.ilogit, newmods =cbind(years,years^2))\nwi <- 0.5/sqrt(data$s2)\nwi <- 0.5 + 3.0 * (wi - min(wi))/(max(wi) - min(wi))\nplot(data$year, transf.ilogit(y), cex=wi,xlab=\"Year\",ylab=\"Patient Expectation (%)\")\nlines(years, preds$pred)\n\n--\nBest Regards,\nHamed Kianmehr, Ph.D. Candidate\nDepartment of Systems Science and Industrial Engineering\nThe State University of New York at Binghamton",
       "body_snippet": "Thanks. Well, hard to say if these data are suggestive of a quadratic trend based on visual inspection.\n\nThe test of the coefficient for 'poly(year, 2)2' tells you whether the quadratic model fits sig",
       "thread_id": "thread-695a49653299",
       "thread_depth": 3,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000916.html"
     },
     {
       "id": "msg-df5878688ebd",
@@ -430,7 +453,8 @@
       "body_snippet": "Thank you for your prompt response.\n\nFor the test, do you mean the value of coefficient(s) (attached file)?  if\nyes, how can I find it better than rest of them?\n\nOn Fri, Jul 13, 2018 at 1:02 PM, Viech",
       "thread_id": "thread-695a49653299",
       "thread_depth": 4,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000919.html"
     },
     {
       "id": "msg-048d7dcf4353",
@@ -445,11 +469,12 @@
         "<7EDF47EE-16B8-480A-AF5C-5E8A8EF14EDD@contoso.com>",
         "<c0c80a2ae1a54927b7e72546a59c4a3a@UM-MAIL3214.unimaas.nl>"
       ],
-      "body_plain": "Dear Wolfgang,\n\nThank you very much. That worked perfectly.\n\nCheers,\nTy\n\n?On 7/13/18, 12:31 PM, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n\n    Dear Ty,\n\n    The test for 'between-group' differences/heterogeneity is provided if you include the subgroup variable as a categorial moderator (i.e., as a factor) in the model. For example:\n\n    library(metafor)\n\n    dat <- get(data(dat.bcg))\n    dat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)\n\n    res <- rma(yi, vi, mods = ~ factor(alloc), data=dat)\n    res\n\n    In the output, you will find:\n\n    Test of Moderators (coefficients 2:3):\n    QM(df = 2) = 1.7675, p-val = 0.4132\n\n    This is the test for between-subgroup heterogeneity.\n\n    Best,\n    Wolfgang\n\n    -----Original Message-----\n    From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ty Beal\n    Sent: Friday, 13 July, 2018 15:46\n    To: r-sig-meta-analysis at r-project.org\n    Subject: [R-meta] Q-Statistic for Between-Subgroup Heterogeneity\n\n    I am conducting a meta-analysis of proportions using the metafor package and want to compare heterogeneity between subgroups. I don?t see an option to generate a Q-statistic for between-subgroup heterogeneity. Is there any way to accomplish this with the metafor package?\n\n    I can do this with the meta package using metaprop() and the byvar option?however, it does not let me specify separate weightings as rma() from the metafor package does.\n\n    Thanks,\n\n    Ty Beal, PhD\n    Technical Specialist\n    Knowledge Leadership\n\n    GAIN ? Global Alliance for Improved Nutrition\n    1509 16th Street NW, 7th Floor | Washington, DC 20036\n    tbeal at gainhealth.org<mailto:atumilowicz at gainhealth.org>\n    C: +1 (602) 481-5211\n    Skype: tyroniousbeal\n    [GAINbanner]<http://www.gainhealth.org>\n\n\n[GAINbanner]<http://www.gainhealth.org>\n\nDisclaimer\n\nThe information contained in this communication from the sender is confidential. It is intended solely for use by the recipient and others authorized to receive it. If you are not the recipient, you are hereby notified that any disclosure, copying, distribution or taking action in relation of the contents of this information is strictly prohibited and may be unlawful.\n\nThis email has been scanned for viruses and malware, and may have been automatically archived by Mimecast Ltd, an innovator in Software as a Service (SaaS) for business. Providing a safer and more useful place for your human generated data. Specializing in; Security, archiving and compliance. To find out more visit the Mimecast website.\n\n\t[[alternative HTML version deleted]]",
-      "body_snippet": "Dear Wolfgang,\n\nThank you very much. That worked perfectly.\n\nCheers,\nTy\n\n?On 7/13/18, 12:31 PM, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n\n    Dear Ty,\n\n   ",
+      "body_plain": "Dear Wolfgang,\n\nThank you very much. That worked perfectly.\n\nCheers,\nTy\n\n﻿On 7/13/18, 12:31 PM, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n\n    Dear Ty,\n\n    The test for 'between-group' differences/heterogeneity is provided if you include the subgroup variable as a categorial moderator (i.e., as a factor) in the model. For example:\n\n    library(metafor)\n\n    dat <- get(data(dat.bcg))\n    dat <- escalc(measure=\"RR\", ai=tpos, bi=tneg, ci=cpos, di=cneg, data=dat.bcg)\n\n    res <- rma(yi, vi, mods = ~ factor(alloc), data=dat)\n    res\n\n    In the output, you will find:\n\n    Test of Moderators (coefficients 2:3):\n    QM(df = 2) = 1.7675, p-val = 0.4132\n\n    This is the test for between-subgroup heterogeneity.\n\n    Best,\n    Wolfgang\n\n    -----Original Message-----\n    From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Ty Beal\n    Sent: Friday, 13 July, 2018 15:46\n    To: r-sig-meta-analysis at r-project.org\n    Subject: [R-meta] Q-Statistic for Between-Subgroup Heterogeneity\n\n    I am conducting a meta-analysis of proportions using the metafor package and want to compare heterogeneity between subgroups. I don’t see an option to generate a Q-statistic for between-subgroup heterogeneity. Is there any way to accomplish this with the metafor package?\n\n    I can do this with the meta package using metaprop() and the byvar option—however, it does not let me specify separate weightings as rma() from the metafor package does.\n\n    Thanks,\n\n    Ty Beal, PhD\n    Technical Specialist\n    Knowledge Leadership\n\n    GAIN – Global Alliance for Improved Nutrition\n    1509 16th Street NW, 7th Floor | Washington, DC 20036\n    tbeal at gainhealth.org<mailto:atumilowicz at gainhealth.org>\n    C: +1 (602) 481-5211\n    Skype: tyroniousbeal\n    [GAINbanner]<http://www.gainhealth.org>\n\n\n[GAINbanner]<http://www.gainhealth.org>\n\nDisclaimer\n\nThe information contained in this communication from the sender is confidential. It is intended solely for use by the recipient and others authorized to receive it. If you are not the recipient, you are hereby notified that any disclosure, copying, distribution or taking action in relation of the contents of this information is strictly prohibited and may be unlawful.\n\nThis email has been scanned for viruses and malware, and may have been automatically archived by Mimecast Ltd, an innovator in Software as a Service (SaaS) for business. Providing a safer and more useful place for your human generated data. Specializing in; Security, archiving and compliance. To find out more visit the Mimecast website.\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Wolfgang,\n\nThank you very much. That worked perfectly.\n\nCheers,\nTy\n\n﻿On 7/13/18, 12:31 PM, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\n\n    Dear Ty,\n\n   ",
       "thread_id": "thread-0eb71dcdea44",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000917.html"
     },
     {
       "id": "msg-ced5665842d3",
@@ -465,11 +490,12 @@
         "<112777e7eade407fa47526f9632f637d@UM-MAIL3214.unimaas.nl>",
         "<CAATDBW4FrLzGrpEb6=Qez64PfFa4W-nMdnF_DnvqhpG4Wta8zA@mail.gmail.com>"
       ],
-      "body_plain": "Dear Hamed\n\nIf the line is supposed to show a polynomial of degree two then to my \neyes it does not. It looks linear. If you think there may be a quadratic \nterm why do you not fit two models, a linear on and a quadratic one, and \njust compare them with anova()?\n\nMost of the points on your plot lie on one side of the line (above) \nwhich does not look quite right.\n\nMichael\n\nOn 13/07/2018 17:38, Hamed Kianmehr wrote:\n> Thank you for your response.\n> Please see the attached?file regarding the plot.\n> \n> On Fri, Jul 13, 2018 at 12:35 PM, Viechtbauer, Wolfgang (SP) \n> <wolfgang.viechtbauer at maastrichtuniversity.nl \n> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>> wrote:\n> \n>     Dear Hamed,\n> \n>     Please post in plain text format. I cannot see any plot. Either\n>     attach it as a separate image file or post it somewhere else and\n>     provide a link.\n> \n>     As for 2 - If you use poly(), try:\n> \n>     preds <- predict(res, transf = transf.ilogit, newmods =\n>     unname(poly(years, degree=2)))\n> \n>     Best,\n>     Wolfgang\n> \n>     -----Original Message-----\n>     From: R-sig-meta-analysis\n>     [mailto:r-sig-meta-analysis-bounces at r-project.org\n>     <mailto:r-sig-meta-analysis-bounces at r-project.org>] On Behalf Of\n>     Hamed Kianmehr\n>     Sent: Friday, 13 July, 2018 16:03\n>     To: r-sig-meta-analysis at r-project.org\n>     <mailto:r-sig-meta-analysis at r-project.org>\n>     Subject: [R-meta] A question about meta-regression Analysis\n> \n>     I have some questions regarding the meta-regression analysis. I have\n>     the database on the proportion (Below bubble plot). My advisor?asked\n>     me to do the polynomial?regression. I have two questions:\n> \n>     1- Is it any polynomial regression pattern in this data?\n>     2- I wrote below code but I couldn't get the line, Could you help me?\n>     ----------------\n>     res<-rma(yi=y, vi=s2, data=data, method=\"DL\",mods = ~ poly(year,\n>     degree=2))\n>     years <- 1989:2016\n>     preds <- predict(res, transf = transf.ilogit, newmods\n>     =cbind(years,years^2))\n>     wi <- 0.5/sqrt(data$s2)\n>     wi <- 0.5 + 3.0 * (wi - min(wi))/(max(wi) - min(wi))\n>     plot(data$year, transf.ilogit(y), cex=wi,xlab=\"Year\",ylab=\"Patient\n>     Expectation (%)\")\n>     lines(years, preds$pred)\n> \n> \n> \n> \n> -- \n> \n> Best Regards,\n> \n> Hamed Kianmehr, Ph.D. Candidate\n> \n> Department of Systems Science and Industrial Engineering\n> \n> The State University of New York at Binghamton\n> \n> \n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list\n> R-sig-meta-analysis at r-project.org\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n\n-- \nMichael\nhttp://www.dewey.myzen.co.uk/home.html",
+      "body_plain": "Dear Hamed\n\nIf the line is supposed to show a polynomial of degree two then to my \neyes it does not. It looks linear. If you think there may be a quadratic \nterm why do you not fit two models, a linear on and a quadratic one, and \njust compare them with anova()?\n\nMost of the points on your plot lie on one side of the line (above) \nwhich does not look quite right.\n\nMichael\n\nOn 13/07/2018 17:38, Hamed Kianmehr wrote:\n> Thank you for your response.\n> Please see the attached file regarding the plot.\n> \n> On Fri, Jul 13, 2018 at 12:35 PM, Viechtbauer, Wolfgang (SP) \n> <wolfgang.viechtbauer at maastrichtuniversity.nl \n> <mailto:wolfgang.viechtbauer at maastrichtuniversity.nl>> wrote:\n> \n>     Dear Hamed,\n> \n>     Please post in plain text format. I cannot see any plot. Either\n>     attach it as a separate image file or post it somewhere else and\n>     provide a link.\n> \n>     As for 2 - If you use poly(), try:\n> \n>     preds <- predict(res, transf = transf.ilogit, newmods =\n>     unname(poly(years, degree=2)))\n> \n>     Best,\n>     Wolfgang\n> \n>     -----Original Message-----\n>     From: R-sig-meta-analysis\n>     [mailto:r-sig-meta-analysis-bounces at r-project.org\n>     <mailto:r-sig-meta-analysis-bounces at r-project.org>] On Behalf Of\n>     Hamed Kianmehr\n>     Sent: Friday, 13 July, 2018 16:03\n>     To: r-sig-meta-analysis at r-project.org\n>     <mailto:r-sig-meta-analysis at r-project.org>\n>     Subject: [R-meta] A question about meta-regression Analysis\n> \n>     I have some questions regarding the meta-regression analysis. I have\n>     the database on the proportion (Below bubble plot). My advisor asked\n>     me to do the polynomial regression. I have two questions:\n> \n>     1- Is it any polynomial regression pattern in this data?\n>     2- I wrote below code but I couldn't get the line, Could you help me?\n>     ----------------\n>     res<-rma(yi=y, vi=s2, data=data, method=\"DL\",mods = ~ poly(year,\n>     degree=2))\n>     years <- 1989:2016\n>     preds <- predict(res, transf = transf.ilogit, newmods\n>     =cbind(years,years^2))\n>     wi <- 0.5/sqrt(data$s2)\n>     wi <- 0.5 + 3.0 * (wi - min(wi))/(max(wi) - min(wi))\n>     plot(data$year, transf.ilogit(y), cex=wi,xlab=\"Year\",ylab=\"Patient\n>     Expectation (%)\")\n>     lines(years, preds$pred)\n> \n> \n> \n> \n> -- \n> \n> Best Regards,\n> \n> Hamed Kianmehr, Ph.D. Candidate\n> \n> Department of Systems Science and Industrial Engineering\n> \n> The State University of New York at Binghamton\n> \n> \n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list\n> R-sig-meta-analysis at r-project.org\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n\n-- \nMichael\nhttp://www.dewey.myzen.co.uk/home.html",
       "body_snippet": "Dear Hamed\n\nIf the line is supposed to show a polynomial of degree two then to my \neyes it does not. It looks linear. If you think there may be a quadratic \nterm why do you not fit two models, a linea",
       "thread_id": "thread-695a49653299",
       "thread_depth": 3,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000920.html"
     },
     {
       "id": "msg-986a70c5dbec",
@@ -490,7 +516,8 @@
       "body_snippet": "Thank you very much, Michael. So, I'll look into it with anova.\n\nWhat does it mean \" Most of the points on your plot lie on one side of the\nline (above) which does not look quite right.\"? is there any",
       "thread_id": "thread-695a49653299",
       "thread_depth": 4,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000923.html"
     },
     {
       "id": "msg-6128ed240cda",
@@ -509,7 +536,8 @@
       "body_snippet": "Am 13.07.18 um 18:31 schrieb Viechtbauer, Wolfgang (SP):\n\n> [...]\n> In the output, you will find:\n>\n> Test of Moderators (coefficients 2:3):\n> QM(df = 2) = 1.7675, p-val = 0.4132\n>\n> This is the test ",
       "thread_id": "thread-0eb71dcdea44",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000921.html"
     },
     {
       "id": "msg-de1a2e12dc70",
@@ -529,7 +557,8 @@
       "body_snippet": "Good point. This was discussed before (for metagen(), but it's the same issue):\n\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2017-December/000430.html\n\nBest,\nWolfgang\n\n-----Original Message----",
       "thread_id": "thread-0eb71dcdea44",
       "thread_depth": 3,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000922.html"
     },
     {
       "id": "msg-5682a4468468",
@@ -545,7 +574,8 @@
       "body_snippet": "Dear R experts,\n\nI'm using Metafor to conducing a met analysis and everything went smoothly.\nHowever when I'm going to use the forest plot function the output it's\nreally difficult to read (see attach",
       "thread_id": "thread-5682a4468468",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000924.html"
     },
     {
       "id": "msg-59092cb2aa0b",
@@ -563,7 +593,8 @@
       "body_snippet": "Dear Davide,\n\nJust use pdf(), png(), or whatever device you want to use and set 'width' and 'height' to something appropriate. You may also need to twiddle with some of the arguments for forest(), lik",
       "thread_id": "thread-5682a4468468",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000925.html"
     },
     {
       "id": "msg-f0a0164bb866",
@@ -579,7 +610,8 @@
       "body_snippet": "Dear Dr. Viechtbauer and all,\n\nThank you Dr. Viechtbauer for answering my previous question on multilevel\nmeta-analysis. It is detailed and helped me a lot.\n\nI ran into other problems when I did the p",
       "thread_id": "thread-f0a0164bb866",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000926.html"
     },
     {
       "id": "msg-f8a0721adb40",
@@ -595,7 +627,8 @@
       "body_snippet": "Dear all,\n\nI plotted the studies in my meta-analysis in a contour-enhanced funnel\nplot. In my meta-analysis, I have about 140 studies. However, when I plot\nthe funnel plot, I find that a number of stu",
       "thread_id": "thread-f8a0721adb40",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000927.html"
     },
     {
       "id": "msg-bcf4d74fb89a",
@@ -613,7 +646,8 @@
       "body_snippet": "I am also having the same problem (but I have more than 400 studies). Any\nhelp regarding this would be highly appreciated\n\nThank you\n\n\nDavide Momi\n\nOn Wed, Jul 18, 2018, 15:58 Angeline Tsui <angelinet",
       "thread_id": "thread-f8a0721adb40",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000928.html"
     },
     {
       "id": "msg-4fd802454256",
@@ -631,7 +665,8 @@
       "body_snippet": "Dear Angeline\n\nThe first thing I would try is using a different plot symbol. A hollow \ncircle or a cross might help if the points are not absolutely identical. \nThe second thing would be to re-run the",
       "thread_id": "thread-f8a0721adb40",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000929.html"
     },
     {
       "id": "msg-cf9290cc1f2b",
@@ -650,7 +685,8 @@
       "body_snippet": "Dear Michael,\n\nThank you very much for your reply. I actually tried different plot symbol,\nbut it didn't help much.\n\nFor the jitter function, do you mean that I need to simply use the jitter\nfunction ",
       "thread_id": "thread-f8a0721adb40",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000930.html"
     },
     {
       "id": "msg-8401890da3d6",
@@ -670,7 +706,8 @@
       "body_snippet": "Dear Angeline\n\nYes, that was what I meant. Of course then the result of rma.uni() will \nbe very slightly different but you are using the funnel plot as what \nTukey called an impact graphic as opposed ",
       "thread_id": "thread-f8a0721adb40",
       "thread_depth": 3,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000931.html"
     },
     {
       "id": "msg-69564fb3326b",
@@ -691,7 +728,8 @@
       "body_snippet": "Hello Michael,\n\nThank you very much for your reply. Yes, I did jitter the effect size or\nvariance before running rma. But I did not find difference of the funnel\nplot plotted using this method.\n\nI am ",
       "thread_id": "thread-f8a0721adb40",
       "thread_depth": 4,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000932.html"
     },
     {
       "id": "msg-7f2ae073c0f0",
@@ -707,7 +745,8 @@
       "body_snippet": "Angeline Tsui <angelinetsui at gmail.com> wrote :\n\nDear Angeline\n\nIf nobody gets back to you I will have a look next week.\n\nMichael\n\n> Hello Michael,Thank you very much for your reply. Yes, I did jitt",
       "thread_id": "thread-7f2ae073c0f0",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000933.html"
     },
     {
       "id": "msg-ae9b8ca6f8be",
@@ -729,7 +768,8 @@
       "body_snippet": "Dear Angeline,\n\nThe easiest way is to (1) copy the meta-analysis object and (2) jitter \nthe points in the new meta-analysis object.\n\nPlease find attached examples for R packages meta and metafor. Note",
       "thread_id": "thread-f8a0721adb40",
       "thread_depth": 5,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000934.html"
     },
     {
       "id": "msg-afabd311fdeb",
@@ -745,7 +785,8 @@
       "body_snippet": "Dear all,\n\nI have a question regarding the metafor package.\nFor the Test of Moderators there is reported a value for QM and a p-value.\nIn the Documentation it's written that the test used is an Omnibu",
       "thread_id": "thread-afabd311fdeb",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000935.html"
     },
     {
       "id": "msg-fda39a57fe08",
@@ -761,7 +802,8 @@
       "body_snippet": "Annika Vater <annika.vater at googlemail.com> wrote :\n\nDear Annika\n\nYou could always experiment with anova.rma() which specifies what sort of test it is doing. Given the documentation for anova.rma I ",
       "thread_id": "thread-fda39a57fe08",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000936.html"
     },
     {
       "id": "msg-5e515fbfee9e",
@@ -784,7 +826,8 @@
       "body_snippet": "Dear Guido,\n\nThank you very much for your reply and the sample R script. I think it\nhelps.\n\nBest,\nAngeline\n\nOn Mon, Jul 23, 2018 at 4:38 AM, Guido Schwarzer <sc at imbi.uni-freiburg.de>\nwrote:\n\n> Dear",
       "thread_id": "thread-f8a0721adb40",
       "thread_depth": 6,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000937.html"
     },
     {
       "id": "msg-81b6e8c370e1",
@@ -806,7 +849,8 @@
       "body_snippet": "Dear Ty,\n\nPlease always CC the mailing list.\n\nAnd please re-read the posts under the link I posted (i.e., the entire thread). In particular, this one is most relevant:\n\nhttps://stat.ethz.ch/pipermail/",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000938.html"
     },
     {
       "id": "msg-f016a5035012",
@@ -824,7 +868,8 @@
       "body_snippet": "Dear Man Hey,\n\nIf the data have a multilevel structure, then I think one should analyze them as such, whether one is conducting the 'main' analysis or some kind of publication bias analysis. \n\nBest,\nW",
       "thread_id": "thread-f0a0164bb866",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000939.html"
     },
     {
       "id": "msg-423ceb64c50e",
@@ -842,7 +887,8 @@
       "body_snippet": "Dear Annika,\n\nIt is indeed a Wald-type test. See also:\n\nhttp://www.metafor-project.org/doku.php/tips:testing_factors_lincoms\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mail",
       "thread_id": "thread-fda39a57fe08",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000940.html"
     },
     {
       "id": "msg-04278ca66b86",
@@ -865,7 +911,8 @@
       "body_snippet": "Dear Wolfgang,\n\nThanks for the tips. I am still getting used to the mailing list. I read through the thread and still have a couple questions, which will require me to explain my analysis in more deta",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000941.html"
     },
     {
       "id": "msg-91c567990ef0",
@@ -881,7 +928,8 @@
       "body_snippet": "Hi,\n\nI have some question sthat I would like to get posted regarding the metafor R package and the rma and rma.mv function. It goes like this:\n\n\nHi,\n\nI am at the moment working in the R package 'metaf",
       "thread_id": "thread-91c567990ef0",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000942.html"
     },
     {
       "id": "msg-13c5d3d9aa03",
@@ -895,11 +943,12 @@
       "references": [
         "<AM0PR08MB3313E482EEC3082E4217F9E08E540@AM0PR08MB3313.eurprd08.prod.outlook.com>"
       ],
-      "body_plain": "Hi Simona,\n\nI am not sure whether it is applicable to your study/problem but I had to\ndeal with a similar situation and ended up with nesting multiple effects\nwithin studies.\nSee Wolfgang's reply:\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-March/000708.html\n\n\nBest\nJens\n\n\n-----Urspr?ngliche Nachricht-----\nVon: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> Im\nAuftrag von Simona Frederiksen\nGesendet: Mittwoch, 25. Juli 2018 11:08\nAn: r-sig-meta-analysis at r-project.org\nBetreff: [R-meta] Question: Metafor R package - rma and rma.mv function\n\nHi,\n\nI have some question sthat I would like to get posted regarding the metafor\nR package and the rma and rma.mv function. It goes like this:\n\n\nHi,\n\nI am at the moment working in the R package 'metafor' in order to perform a\nmeta-analysis which I carry out in collaboration with the Danish Headache\nCenter. I just figured that I have to use the rma.mv function since I have\nseveral effect sizes per study (for two studies).\n\nI have following questions that I hope you can help me answer:\n\n\n  1.  When I calculate the weights for each study, the studies that have\nmore effect sizes receive a really high weight compared to the other studies\nwith just one effect size. So it seems that these studies primarily are used\nto calculate the overall effect size even though N seems to be quite small?\n\n\n\n  1.  How can I see convergence when I use the rma.mv function? When using\nthe rma function, it turns up when adding verbose = T. And if it does not\nconverge, what would be ideal to do?\n\nHere is an example:\nlibrary(\"metafor\")\nstudy_id <- c(1,2,3,3)\nauthors <- c(\"Authors1\", \"Authors2\", \"Authors3\", \"Authors3\") year <- c(2013,\n2009, 1994, 1994) Case_N <- c(18,25,4,4) Case_mean <- c(53, 236, 65, 64)\nCase_sd <- c(31, 216, 19, 18) Control_N <-c(18,50,4,4) Control_mean <-\nc(39,113,67,68) Control_sd <- c(27, 219,10,10) dat2A <-\ndata.frame(study_id,authors, year, Case_N, Case_mean, Case_sd,\n               Control_N, Control_mean, Control_sd)\n\ndat1 <- escalc(measure=\"ROM\", data=dat2A,\n               m1i = Case_mean,\n               n1i = Case_N,\n               sd1i = Case_sd,\n               m2i = Control_mean,\n               n2i = Control_N,\n               sd2i = Control_sd,\n               slab=paste(authors, year, sep=\", \"))\n\nres <- rma.mv(yi, vi, data=dat1,random = ~ 1 | study_id, verbose=T)\nweights(res)\n\nCan you help me to understand this?\n\nBest wishes,\nSimona D Frederiksen\n\n\n\n\t[[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list\nR-sig-meta-analysis at r-project.org\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: smime.p7s\nType: application/pkcs7-signature\nSize: 7675 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20180725/fa72cad0/attachment.p7s>",
+      "body_plain": "Hi Simona,\n\nI am not sure whether it is applicable to your study/problem but I had to\ndeal with a similar situation and ended up with nesting multiple effects\nwithin studies.\nSee Wolfgang's reply:\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-March/000708.html\n\n\nBest\nJens\n\n\n-----Ursprüngliche Nachricht-----\nVon: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> Im\nAuftrag von Simona Frederiksen\nGesendet: Mittwoch, 25. Juli 2018 11:08\nAn: r-sig-meta-analysis at r-project.org\nBetreff: [R-meta] Question: Metafor R package - rma and rma.mv function\n\nHi,\n\nI have some question sthat I would like to get posted regarding the metafor\nR package and the rma and rma.mv function. It goes like this:\n\n\nHi,\n\nI am at the moment working in the R package 'metafor' in order to perform a\nmeta-analysis which I carry out in collaboration with the Danish Headache\nCenter. I just figured that I have to use the rma.mv function since I have\nseveral effect sizes per study (for two studies).\n\nI have following questions that I hope you can help me answer:\n\n\n  1.  When I calculate the weights for each study, the studies that have\nmore effect sizes receive a really high weight compared to the other studies\nwith just one effect size. So it seems that these studies primarily are used\nto calculate the overall effect size even though N seems to be quite small?\n\n\n\n  1.  How can I see convergence when I use the rma.mv function? When using\nthe rma function, it turns up when adding verbose = T. And if it does not\nconverge, what would be ideal to do?\n\nHere is an example:\nlibrary(\"metafor\")\nstudy_id <- c(1,2,3,3)\nauthors <- c(\"Authors1\", \"Authors2\", \"Authors3\", \"Authors3\") year <- c(2013,\n2009, 1994, 1994) Case_N <- c(18,25,4,4) Case_mean <- c(53, 236, 65, 64)\nCase_sd <- c(31, 216, 19, 18) Control_N <-c(18,50,4,4) Control_mean <-\nc(39,113,67,68) Control_sd <- c(27, 219,10,10) dat2A <-\ndata.frame(study_id,authors, year, Case_N, Case_mean, Case_sd,\n               Control_N, Control_mean, Control_sd)\n\ndat1 <- escalc(measure=\"ROM\", data=dat2A,\n               m1i = Case_mean,\n               n1i = Case_N,\n               sd1i = Case_sd,\n               m2i = Control_mean,\n               n2i = Control_N,\n               sd2i = Control_sd,\n               slab=paste(authors, year, sep=\", \"))\n\nres <- rma.mv(yi, vi, data=dat1,random = ~ 1 | study_id, verbose=T)\nweights(res)\n\nCan you help me to understand this?\n\nBest wishes,\nSimona D Frederiksen\n\n\n\n\t[[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list\nR-sig-meta-analysis at r-project.org\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n-------------- next part --------------\nA non-text attachment was scrubbed...\nName: smime.p7s\nType: application/pkcs7-signature\nSize: 7675 bytes\nDesc: not available\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20180725/fa72cad0/attachment.p7s>",
       "body_snippet": "Hi Simona,\n\nI am not sure whether it is applicable to your study/problem but I had to\ndeal with a similar situation and ended up with nesting multiple effects\nwithin studies.\nSee Wolfgang's reply:\nhtt",
       "thread_id": "thread-91c567990ef0",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000943.html"
     },
     {
       "id": "msg-21c99533e151",
@@ -915,7 +964,8 @@
       "body_snippet": "Simona Frederiksen <simona.frederiksen at hotmail.com> wrote :\n\nDear Simona\n\nGiven the calculated variances (vi) the weights seem quite OK to me.\n\nWould the question underlying the convergence issue b",
       "thread_id": "thread-21c99533e151",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000944.html"
     },
     {
       "id": "msg-6a73c1a621ad",
@@ -931,7 +981,8 @@
       "body_snippet": "Dear All,\n\nBasically, I was wondering how to change the effect size of an adjusted model from a study to reflect a different reference group within that study. For example, the study has 4 groups with",
       "thread_id": "thread-6a73c1a621ad",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000945.html"
     },
     {
       "id": "msg-aa3c5f4d6353",
@@ -955,7 +1006,8 @@
       "body_snippet": "Update.\n\nI read through Wolfgang's post here: http://www.metafor-project.org/doku.php/tips:multiple_factors_interactions\n\nI realized that when I changed the reference level to a different region, the ",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000946.html"
     },
     {
       "id": "msg-7be02bc9d9ab",
@@ -974,7 +1026,8 @@
       "body_snippet": "Dear Wolfgang, dear Michael,\n\nthanks so much for your answers!\nThat helps :)\n\nBest,\nAnnika\n\n2018-07-25 0:04 GMT+02:00 Viechtbauer, Wolfgang (SP) <\nwolfgang.viechtbauer at maastrichtuniversity.nl>:\n\n> ",
       "thread_id": "thread-fda39a57fe08",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000947.html"
     },
     {
       "id": "msg-2d0fcd151a2d",
@@ -999,7 +1052,8 @@
       "body_snippet": "Hi Ty,\n\nIndeed, the test for between-group differences does not depend on which level of the factor is chosen as the reference level. For example:\n\nlibrary(metafor)\n\ndat <- get(data(dat.bcg))\ndat <- e",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 3,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000948.html"
     },
     {
       "id": "msg-8c9b88d2421b",
@@ -1017,7 +1071,8 @@
       "body_snippet": "Dear Simona,\n\nI agree with Michael, those weights seem appropriate given those variances.\n\nBut you should read:\n\nhttp://www.metafor-project.org/doku.php/analyses:konstantopoulos2011#a_common_mistake_i",
       "thread_id": "thread-21c99533e151",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000949.html"
     },
     {
       "id": "msg-472f17067801",
@@ -1035,7 +1090,8 @@
       "body_snippet": "Dear Steven,\n\n1. is p1 / p4\n2. is p2 / p4\n3. is p3 / p4\n\nSo, p4 / p1 is just the reciprocal of 1. (i.e. 1/.81).\n\nThe rest is just some simple algebra:\n\n(p2/p4) / (p1/p4) = p2 / p1\n(p3/p4) / (p1/p4) = ",
       "thread_id": "thread-6a73c1a621ad",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000950.html"
     },
     {
       "id": "msg-5f9441169938",
@@ -1061,7 +1117,8 @@
       "body_snippet": "Thank you, Wolfgang. That clears things up.\n\nWhen I run the anova to compare models with fixed t^2 and variable t^2 I get the following:\n\n                    df               AIC               BIC    ",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 4,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000951.html"
     },
     {
       "id": "msg-9e3b3b6b4dcc",
@@ -1088,7 +1145,8 @@
       "body_snippet": "Sorry, the text did not format correctly. The pval is 0.3519.\n\n?On 7/25/18, 3:54 PM, \"Ty Beal\" <tbeal at gainhealth.org> wrote:\n\n    Thank you, Wolfgang. That clears things up.\n\n    When I run the ano",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 5,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000952.html"
     },
     {
       "id": "msg-9f40604563ef",
@@ -1116,7 +1174,8 @@
       "body_snippet": "Indeed, no sig. evidence for heteroscedasticity in the tau^2 values. Also, all of the information criteria (AIC, BIC, AICc) favor the simpler model.\n\n(please post in plain text -- then the formatting ",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 6,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000953.html"
     },
     {
       "id": "msg-7f22ec02d154",
@@ -1145,7 +1204,8 @@
       "body_snippet": "Thanks, will post in plain text from now on. By simpler model, you mean the model with fixed tau^2? Just want to be sure.\n\n?On 7/25/18, 4:06 PM, \"Viechtbauer, Wolfgang (SP)\" <wolfgang.viechtbauer at m",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 7,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000954.html"
     },
     {
       "id": "msg-a1d5649eb63d",
@@ -1175,7 +1235,8 @@
       "body_snippet": "Yes, the model that assumes a common tau^2 value across groups is the simpler one.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: Ty Beal [mailto:tbeal at gainhealth.org] \nSent: Wednesday, 25 July,",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 8,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000955.html"
     },
     {
       "id": "msg-b3fd9268e180",
@@ -1190,11 +1251,12 @@
         "<Zen-1fiJUU-0004z4-Cg@smarthost03d.mail.zen.net.uk>",
         "<AM0PR08MB3313F8861869D0384C806A408E540@AM0PR08MB3313.eurprd08.prod.outlook.com>"
       ],
-      "body_plain": "Dear Michael,\n\n\n\nThank you for your fast reply. It is very appreciated. I should have changed it to plain text now.\n\n\n\nMaybe I?am not quite aware of how this is computed. The model that I am fitting is it as follows: yi = mean + uj[i] + ei for the i?th comparison and the j?th study when using the rma.mv function? And how is the weights applied to it or calculated?\n\n\n\nI tried to use the profile.rma.mv() function and I got one maxima. Can I then assume that it is converged?\n\n\n\nBest wishes,\n\nSimona\n\n\n\n________________________________\nFra: Michael Dewey <lists at dewey.myzen.co.uk<mailto:lists at dewey.myzen.co.uk>>\nSendt: Wednesday, July 25, 2018 3:06:06 PM\nTil: Simona Frederiksen; r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>\nEmne: Re:: [R-meta] Question: Metafor R package - rma and rma.mv function\n\nSimona Frederiksen <simona.frederiksen at hotmail.com<mailto:simona.frederiksen at hotmail.com>> wrote :\n\nDear Simona\n\nGiven the calculated variances (vi) the weights seem quite OK to me.\n\nWould the question underlying the convergence issue be better answered by using profile.rma.mv()?\n\nPlease set your mailer to post in plain text not HTML as your post got mangled which made running your example rather tricky.\n\nMichael.\n\n> Hi,\n>\n> I have some question sthat I would like to get posted regarding the metafor R\n> package and the rma and rma.mv function. It goes like this:\n>\n>\n> Hi,\n>\n> I am at the moment working in the R package 'metafor' in order to perform a\n> meta-analysis which I carry out in collaboration with the Danish Headache\n> Center. I just figured that I have to use the rma.mv function since I have\n> several effect sizes per study (for two studies).\n>\n> I have following questions that I hope you can help me answer:\n>\n>\n>   1.  When I calculate the weights for each study, the studies that have more\n> effect sizes receive a really high weight compared to the other studies with\n> just one effect size. So it seems that these studies primarily are used to\n> calculate the overall effect size even though N seems to be quite small?\n>\n>\n>\n>   1.  How can I see convergence when I use the rma.mv function? When using the\n> rma function, it turns up when adding verbose = T. And if it does not converge,\n> what would be ideal to do?\n>\n> Here is an example:\n> library(\"metafor\")\n> study_id\n\n\n\n\n\n\n\t[[alternative HTML version deleted]]",
-      "body_snippet": "Dear Michael,\n\n\n\nThank you for your fast reply. It is very appreciated. I should have changed it to plain text now.\n\n\n\nMaybe I?am not quite aware of how this is computed. The model that I am fitting i",
+      "body_plain": "Dear Michael,\n\n\n\nThank you for your fast reply. It is very appreciated. I should have changed it to plain text now.\n\n\n\nMaybe I’am not quite aware of how this is computed. The model that I am fitting is it as follows: yi = mean + uj[i] + ei for the i’th comparison and the j’th study when using the rma.mv function? And how is the weights applied to it or calculated?\n\n\n\nI tried to use the profile.rma.mv() function and I got one maxima. Can I then assume that it is converged?\n\n\n\nBest wishes,\n\nSimona\n\n\n\n________________________________\nFra: Michael Dewey <lists at dewey.myzen.co.uk<mailto:lists at dewey.myzen.co.uk>>\nSendt: Wednesday, July 25, 2018 3:06:06 PM\nTil: Simona Frederiksen; r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>\nEmne: Re:: [R-meta] Question: Metafor R package - rma and rma.mv function\n\nSimona Frederiksen <simona.frederiksen at hotmail.com<mailto:simona.frederiksen at hotmail.com>> wrote :\n\nDear Simona\n\nGiven the calculated variances (vi) the weights seem quite OK to me.\n\nWould the question underlying the convergence issue be better answered by using profile.rma.mv()?\n\nPlease set your mailer to post in plain text not HTML as your post got mangled which made running your example rather tricky.\n\nMichael.\n\n> Hi,\n>\n> I have some question sthat I would like to get posted regarding the metafor R\n> package and the rma and rma.mv function. It goes like this:\n>\n>\n> Hi,\n>\n> I am at the moment working in the R package 'metafor' in order to perform a\n> meta-analysis which I carry out in collaboration with the Danish Headache\n> Center. I just figured that I have to use the rma.mv function since I have\n> several effect sizes per study (for two studies).\n>\n> I have following questions that I hope you can help me answer:\n>\n>\n>   1.  When I calculate the weights for each study, the studies that have more\n> effect sizes receive a really high weight compared to the other studies with\n> just one effect size. So it seems that these studies primarily are used to\n> calculate the overall effect size even though N seems to be quite small?\n>\n>\n>\n>   1.  How can I see convergence when I use the rma.mv function? When using the\n> rma function, it turns up when adding verbose = T. And if it does not converge,\n> what would be ideal to do?\n>\n> Here is an example:\n> library(\"metafor\")\n> study_id\n\n\n\n\n\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Dear Michael,\n\n\n\nThank you for your fast reply. It is very appreciated. I should have changed it to plain text now.\n\n\n\nMaybe I’am not quite aware of how this is computed. The model that I am fitting i",
       "thread_id": "thread-b3fd9268e180",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000956.html"
     },
     {
       "id": "msg-b8d8314f61a4",
@@ -1225,7 +1287,8 @@
       "body_snippet": "Dear Wolfgang (and others),\n\nAs a follow-up to the question of whether or not to pool tau^2 between subgroups, I am curious about using knowledge about the subject rather than the statistical model co",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 9,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000957.html"
     },
     {
       "id": "msg-3c2734f4a1f2",
@@ -1257,7 +1320,8 @@
       "body_snippet": "Dear Ty\n\nIf theory suggests that tau^2 will vary then the model with separate \ntau^2 seems preferable to me even if empirically in your particular case \nthey do not. This would be similar to the choic",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 10,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000958.html"
     },
     {
       "id": "msg-12c143b6ca98",
@@ -1290,7 +1354,8 @@
       "body_snippet": "Dear Michael,\n\nThank you for your assistance. I used the same logic to choose a random effects meta-analysis.\n\nBest,\nTy\n\n-----Original Message-----\nFrom: Michael Dewey <lists at dewey.myzen.co.uk>\nSen",
       "thread_id": "thread-81b6e8c370e1",
       "thread_depth": 11,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000959.html"
     },
     {
       "id": "msg-2df0e4341755",
@@ -1306,7 +1371,8 @@
       "body_snippet": "Dear all,\n\nI have done tests for heterogeneity between various subgroups in meta-analysis, but is it possible to do some sort of test for trends between subgroups to see patterns (e.g., income groups:",
       "thread_id": "thread-2df0e4341755",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000960.html"
     },
     {
       "id": "msg-e06dffa498ce",
@@ -1324,7 +1390,8 @@
       "body_snippet": "Dear Ty\n\nThat is what the mods argument is for if I understand you correctly. The \nconcept you are searching for is meta-regression.\n\nMichael\n\nOn 27/07/2018 16:20, Ty Beal wrote:\n> Dear all,\n> \n> I ha",
       "thread_id": "thread-2df0e4341755",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000961.html"
     },
     {
       "id": "msg-3727ea464b91",
@@ -1343,7 +1410,8 @@
       "body_snippet": "Ah, yes. Thank you. I just getting into meta-analysis so still have a lot to learn. That is what I was looking for.\n\n?On 7/27/18, 12:14 PM, \"Michael Dewey\" <lists at dewey.myzen.co.uk> wrote:\n\n    Dea",
       "thread_id": "thread-2df0e4341755",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000962.html"
     },
     {
       "id": "msg-f90e15859a1c",
@@ -1359,7 +1427,8 @@
       "body_snippet": "I am using the Metafor package for the first time.  I read the\ndocumentation and wanted to confirm that I am doing the correct steps to\ncomputing the weighted mean difference where the weights are inv",
       "thread_id": "thread-f90e15859a1c",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000963.html"
     },
     {
       "id": "msg-896abd15504c",
@@ -1375,11 +1444,12 @@
         "<AM0PR08MB3313F8861869D0384C806A408E540@AM0PR08MB3313.eurprd08.prod.outlook.com>",
         "<AM0PR08MB3313933F2C2B1273AA864F548E540@AM0PR08MB3313.eurprd08.prod.outlook.com>"
       ],
-      "body_plain": "Dear Simona,\n\nDid you see my reply?\n\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000949.html\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Simona Frederiksen\nSent: Wednesday, 25 July, 2018 22:45\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Fwd: SV: Re:: Question: Metafor R package - rma and rma.mv function\n\nDear Michael,\n\nThank you for your fast reply. It is very appreciated. I should have changed it to plain text now.\n\nMaybe I?am not quite aware of how this is computed. The model that I am fitting is it as follows: yi = mean + uj[i] + ei for the i?th comparison and the j?th study when using the rma.mv function? And how is the weights applied to it or calculated?\n\nI tried to use the profile.rma.mv() function and I got one maxima. Can I then assume that it is converged?\n\nBest wishes,\n\nSimona\n________________________________\nFra: Michael Dewey <lists at dewey.myzen.co.uk<mailto:lists at dewey.myzen.co.uk>>\nSendt: Wednesday, July 25, 2018 3:06:06 PM\nTil: Simona Frederiksen; r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>\nEmne: Re:: [R-meta] Question: Metafor R package - rma and rma.mv function\n\nSimona Frederiksen <simona.frederiksen at hotmail.com<mailto:simona.frederiksen at hotmail.com>> wrote :\n\nDear Simona\n\nGiven the calculated variances (vi) the weights seem quite OK to me.\n\nWould the question underlying the convergence issue be better answered by using profile.rma.mv()?\n\nPlease set your mailer to post in plain text not HTML as your post got mangled which made running your example rather tricky.\n\nMichael.\n\n> Hi,\n>\n> I have some question sthat I would like to get posted regarding the metafor R\n> package and the rma and rma.mv function. It goes like this:\n>\n> Hi,\n>\n> I am at the moment working in the R package 'metafor' in order to perform a\n> meta-analysis which I carry out in collaboration with the Danish Headache\n> Center. I just figured that I have to use the rma.mv function since I have\n> several effect sizes per study (for two studies).\n>\n> I have following questions that I hope you can help me answer:\n>\n>   1.  When I calculate the weights for each study, the studies that have more\n> effect sizes receive a really high weight compared to the other studies with\n> just one effect size. So it seems that these studies primarily are used to\n> calculate the overall effect size even though N seems to be quite small?\n>\n>   1.  How can I see convergence when I use the rma.mv function? When using the\n> rma function, it turns up when adding verbose = T. And if it does not converge,\n> what would be ideal to do?\n>\n> Here is an example:\n> library(\"metafor\")\n> study_id",
+      "body_plain": "Dear Simona,\n\nDid you see my reply?\n\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000949.html\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Simona Frederiksen\nSent: Wednesday, 25 July, 2018 22:45\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Fwd: SV: Re:: Question: Metafor R package - rma and rma.mv function\n\nDear Michael,\n\nThank you for your fast reply. It is very appreciated. I should have changed it to plain text now.\n\nMaybe I’am not quite aware of how this is computed. The model that I am fitting is it as follows: yi = mean + uj[i] + ei for the i’th comparison and the j’th study when using the rma.mv function? And how is the weights applied to it or calculated?\n\nI tried to use the profile.rma.mv() function and I got one maxima. Can I then assume that it is converged?\n\nBest wishes,\n\nSimona\n________________________________\nFra: Michael Dewey <lists at dewey.myzen.co.uk<mailto:lists at dewey.myzen.co.uk>>\nSendt: Wednesday, July 25, 2018 3:06:06 PM\nTil: Simona Frederiksen; r-sig-meta-analysis at r-project.org<mailto:r-sig-meta-analysis at r-project.org>\nEmne: Re:: [R-meta] Question: Metafor R package - rma and rma.mv function\n\nSimona Frederiksen <simona.frederiksen at hotmail.com<mailto:simona.frederiksen at hotmail.com>> wrote :\n\nDear Simona\n\nGiven the calculated variances (vi) the weights seem quite OK to me.\n\nWould the question underlying the convergence issue be better answered by using profile.rma.mv()?\n\nPlease set your mailer to post in plain text not HTML as your post got mangled which made running your example rather tricky.\n\nMichael.\n\n> Hi,\n>\n> I have some question sthat I would like to get posted regarding the metafor R\n> package and the rma and rma.mv function. It goes like this:\n>\n> Hi,\n>\n> I am at the moment working in the R package 'metafor' in order to perform a\n> meta-analysis which I carry out in collaboration with the Danish Headache\n> Center. I just figured that I have to use the rma.mv function since I have\n> several effect sizes per study (for two studies).\n>\n> I have following questions that I hope you can help me answer:\n>\n>   1.  When I calculate the weights for each study, the studies that have more\n> effect sizes receive a really high weight compared to the other studies with\n> just one effect size. So it seems that these studies primarily are used to\n> calculate the overall effect size even though N seems to be quite small?\n>\n>   1.  How can I see convergence when I use the rma.mv function? When using the\n> rma function, it turns up when adding verbose = T. And if it does not converge,\n> what would be ideal to do?\n>\n> Here is an example:\n> library(\"metafor\")\n> study_id",
       "body_snippet": "Dear Simona,\n\nDid you see my reply?\n\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000949.html\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-a",
       "thread_id": "thread-b3fd9268e180",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000964.html"
     },
     {
       "id": "msg-790217215b25",
@@ -1397,7 +1467,8 @@
       "body_snippet": "Dear Howard,\n\n1) Not sure what this step is supposed to do. It is not a pooled variance in the usual sense (https://en.wikipedia.org/wiki/Pooled_variance). Also, I am not sure where this value is comi",
       "thread_id": "thread-f90e15859a1c",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000965.html"
     },
     {
       "id": "msg-1d083605a7a8",
@@ -1413,11 +1484,12 @@
         "<08fca7b4fd06420c81c87e9412ac8d08@UM-MAIL3214.unimaas.nl>",
         "<CAJn_xxkw4V9AZvxf0_7vHawTCNoSasyL6z5de=CqtQ0P8n9+Tw@mail.gmail.com>"
       ],
-      "body_plain": "Dear Howard,\n\nPlease always keep the mailing list in CC when replying.\n\nYes, the default is to use inverse-variance weighting. For a FE model, the weights are 1/vi, where vi is the sampling variance of the ith study. For a RE model, the weights are 1/(vi + tau^2), where tau^2 is the between-study variance (amount of heterogeneity).\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: Howard Friedman [mailto:howard.friedman at columbia.edu] \nSent: Monday, 30 July, 2018 13:40\nTo: Viechtbauer, Wolfgang (SP)\nSubject: Re: [R-meta] Question about inverse variance weighting using the Metafor package\n\nWolfgang,\n\nThank you very much for your patience as I come up to speed.? In order to make sure I have my current code 100% correct now, I would greatly appreciate it if you can confirm for me that the default setting for the rma function is variance-weighting.\nI have tested this with some dummy code and it appears to be the case but I want to be absolutely certain.\n\nSo, the code below computes the variance-weighted mean difference FE model\n\nfig_1 <- escalc(n1i = n_controls, n2i = n_treatment, m1i = mean_controls,?m2i = mean_ treatment,? sd1i = sd_controls, sd2i = sd_ treatment, data = input?measure = \"MD\", append = TRUE)?\n\nrma(yi, vi, method=\"FE\", data=fig_1) \n\nAnd this below computes the variance-weighted random effects model:\n\nrma(yi, vi, data=fig_1) \n\nAgain, I greatly appreciate your guidance and help.\n\nSincerely,\nHoward\n\nOn Mon, Jul 30, 2018 at 6:54 AM, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\nDear Howard,\n\n1) Not sure what this step is supposed to do. It is not a pooled variance in the usual sense (https://en.wikipedia.org/wiki/Pooled_variance). Also, I am not sure where this value is coming back in the further steps.\n\n2) This indeed computes the observed mean differences and corresponding sampling variances.\n\n3) Is 'var_total' what you compute under step 1? Then I wouldn't do that. You should use weights that correspond to the inverse of the sampling variances, not the sum of the two sample variances (note: sample variance != sampling variance of the mean difference -- the sampling variance involves the sample sizes). So, just use:\n\nrma(yi, vi, method=\"FE\", data=fig_1)\n\n4) Same thing, plus plus you are fitting a random-effects model here. Unless you have very good reasons for deviating from the default weights, just use:\n\nrma(yi, vi, data=fig_1)\n\n(method=\"REML\" is the default).\n\nAs for some discussion of the use of custom weights, see here:\n\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000909.html\n\nBut using 1/(sd_controls^2+sd_treatment^2) as weights makes little sense in any case.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Howard Friedman\nSent: Sunday, 29 July, 2018 21:25\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Question about inverse variance weighting using the Metafor package\n\nI am using the Metafor package for the first time.? I read the\ndocumentation and wanted to confirm that I am doing the correct steps to\ncomputing the weighted mean difference where the weights are inverse\nvariance.\n\nMy data set has inputs for each study of n_control, n_treatment,\nmean_controls, mean_treatment, sd_controls, and sd_treatment.? Am I correct\nthat to do the inverse weighting I need to do the following:\n\n(1)? ? Compute the pooled variance by defining variance= sd_controls^2+\nsd_treatment^2\n\n(2)? ? Define my variables as below:\n\nfig_1 <- escalc(n1i = n_controls, n2i = n_treatment, m1i = mean_controls,\nm2i = mean_ treatment,? sd1i = sd_controls, sd2i = sd_ treatment, data =\nfig_1, measure = \"MD\", append = TRUE)\n\n(3)? ? Then for my fixed effects model weighting by 1/variance, run\n\nrma(yi, vi, method=\"FE\",weights=1/var_total,data=fig_1)\n\n(4)? ? And for my variable effects model weighted by 1/variance, run\n\nrma(yi, vi, weights=1/var_total,data=fig_1)\n\nAppreciate you feedback or corrections on this approach.\n\nThank you,\n\nHoward\n\n-- \n\nColumbia University School of International and Public Affairs; School of\nPublic Health\nwww.linkedin.com/in/howard-friedman-590ba8\nwww.Howard-Friedman.com",
+      "body_plain": "Dear Howard,\n\nPlease always keep the mailing list in CC when replying.\n\nYes, the default is to use inverse-variance weighting. For a FE model, the weights are 1/vi, where vi is the sampling variance of the ith study. For a RE model, the weights are 1/(vi + tau^2), where tau^2 is the between-study variance (amount of heterogeneity).\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: Howard Friedman [mailto:howard.friedman at columbia.edu] \nSent: Monday, 30 July, 2018 13:40\nTo: Viechtbauer, Wolfgang (SP)\nSubject: Re: [R-meta] Question about inverse variance weighting using the Metafor package\n\nWolfgang,\n\nThank you very much for your patience as I come up to speed.  In order to make sure I have my current code 100% correct now, I would greatly appreciate it if you can confirm for me that the default setting for the rma function is variance-weighting.\nI have tested this with some dummy code and it appears to be the case but I want to be absolutely certain.\n\nSo, the code below computes the variance-weighted mean difference FE model\n\nfig_1 <- escalc(n1i = n_controls, n2i = n_treatment, m1i = mean_controls, m2i = mean_ treatment,  sd1i = sd_controls, sd2i = sd_ treatment, data = input measure = \"MD\", append = TRUE) \n\nrma(yi, vi, method=\"FE\", data=fig_1) \n\nAnd this below computes the variance-weighted random effects model:\n\nrma(yi, vi, data=fig_1) \n\nAgain, I greatly appreciate your guidance and help.\n\nSincerely,\nHoward\n\nOn Mon, Jul 30, 2018 at 6:54 AM, Viechtbauer, Wolfgang (SP) <wolfgang.viechtbauer at maastrichtuniversity.nl> wrote:\nDear Howard,\n\n1) Not sure what this step is supposed to do. It is not a pooled variance in the usual sense (https://en.wikipedia.org/wiki/Pooled_variance). Also, I am not sure where this value is coming back in the further steps.\n\n2) This indeed computes the observed mean differences and corresponding sampling variances.\n\n3) Is 'var_total' what you compute under step 1? Then I wouldn't do that. You should use weights that correspond to the inverse of the sampling variances, not the sum of the two sample variances (note: sample variance != sampling variance of the mean difference -- the sampling variance involves the sample sizes). So, just use:\n\nrma(yi, vi, method=\"FE\", data=fig_1)\n\n4) Same thing, plus plus you are fitting a random-effects model here. Unless you have very good reasons for deviating from the default weights, just use:\n\nrma(yi, vi, data=fig_1)\n\n(method=\"REML\" is the default).\n\nAs for some discussion of the use of custom weights, see here:\n\nhttps://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000909.html\n\nBut using 1/(sd_controls^2+sd_treatment^2) as weights makes little sense in any case.\n\nBest,\nWolfgang\n\n-----Original Message-----\nFrom: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On Behalf Of Howard Friedman\nSent: Sunday, 29 July, 2018 21:25\nTo: r-sig-meta-analysis at r-project.org\nSubject: [R-meta] Question about inverse variance weighting using the Metafor package\n\nI am using the Metafor package for the first time.  I read the\ndocumentation and wanted to confirm that I am doing the correct steps to\ncomputing the weighted mean difference where the weights are inverse\nvariance.\n\nMy data set has inputs for each study of n_control, n_treatment,\nmean_controls, mean_treatment, sd_controls, and sd_treatment.  Am I correct\nthat to do the inverse weighting I need to do the following:\n\n(1)    Compute the pooled variance by defining variance= sd_controls^2+\nsd_treatment^2\n\n(2)    Define my variables as below:\n\nfig_1 <- escalc(n1i = n_controls, n2i = n_treatment, m1i = mean_controls,\nm2i = mean_ treatment,  sd1i = sd_controls, sd2i = sd_ treatment, data =\nfig_1, measure = \"MD\", append = TRUE)\n\n(3)    Then for my fixed effects model weighting by 1/variance, run\n\nrma(yi, vi, method=\"FE\",weights=1/var_total,data=fig_1)\n\n(4)    And for my variable effects model weighted by 1/variance, run\n\nrma(yi, vi, weights=1/var_total,data=fig_1)\n\nAppreciate you feedback or corrections on this approach.\n\nThank you,\n\nHoward\n\n-- \n\nColumbia University School of International and Public Affairs; School of\nPublic Health\nwww.linkedin.com/in/howard-friedman-590ba8\nwww.Howard-Friedman.com",
       "body_snippet": "Dear Howard,\n\nPlease always keep the mailing list in CC when replying.\n\nYes, the default is to use inverse-variance weighting. For a FE model, the weights are 1/vi, where vi is the sampling variance o",
       "thread_id": "thread-1d083605a7a8",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000966.html"
     },
     {
       "id": "msg-d9df7e6a34f9",
@@ -1433,7 +1505,8 @@
       "body_snippet": "I'm using the Metafor package in R to run a metanalysis and generate a forest plot. I'm wondering if it is possible to use subset as an argument in the forest() function? It is not listed as one in th",
       "thread_id": "thread-d9df7e6a34f9",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000967.html"
     },
     {
       "id": "msg-4b541bcd421b",
@@ -1449,7 +1522,8 @@
       "body_snippet": "Hello all,\n\nI have a question about the effect size of a moderator in a meta-regression.\n\nIn my meta-analysis, I used Cohen's d as the effect size, I ran a\nmeta-regression with a number of moderators ",
       "thread_id": "thread-4b541bcd421b",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000968.html"
     },
     {
       "id": "msg-a57d60d5d3a3",
@@ -1467,7 +1541,8 @@
       "body_snippet": "Dear Julia,\n\nIndeed, forest.rma() (which is what you are implicitly using by passing an object of class 'rma' to the forest() function) does not have a 'subset' argument (see help(forest.rma) to confi",
       "thread_id": "thread-d9df7e6a34f9",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000969.html"
     },
     {
       "id": "msg-8d0711a8722f",
@@ -1485,7 +1560,8 @@
       "body_snippet": "Dear Angeline\n\nComments inline below\n\nOn 30/07/2018 18:08, Angeline Tsui wrote:\n> Hello all,\n> \n> I have a question about the effect size of a moderator in a meta-regression.\n> \n> In my meta-analysis,",
       "thread_id": "thread-4b541bcd421b",
       "thread_depth": 1,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000970.html"
     },
     {
       "id": "msg-b2429aeb02e5",
@@ -1504,7 +1580,8 @@
       "body_snippet": "Dear Michael,\n\nThank you so much for your reply. Yes, I agree that we should interpret the\nmagnitude of the effect size in the context of research area and overall\npicture!\n\nBest,\nAngeline\n\nOn Tue, Ju",
       "thread_id": "thread-4b541bcd421b",
       "thread_depth": 2,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000971.html"
     },
     {
       "id": "msg-ea7391d1469a",
@@ -1522,7 +1599,8 @@
       "body_snippet": "Hi Wolfgang,\n\nThank you for explaining this about the forest.rma() function. I have used your suggested code to instead subset outside of forest.rma() first and it works very well!\n\nThank you for your",
       "thread_id": "thread-ea7391d1469a",
       "thread_depth": 0,
-      "month": "2018-07"
+      "month": "2018-07",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2018-July/000972.html"
     }
   ],
   "threads": [
