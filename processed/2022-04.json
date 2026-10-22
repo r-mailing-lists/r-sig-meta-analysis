@@ -17,7 +17,8 @@
       "body_snippet": "Why do prediction intervals get so much wider when a multi-level approach is used?\n\nPrediction intervals are usually computed by +/- tau*1.96. Obtaining tau is straightforward when doing a random-effe",
       "thread_id": "thread-db645d6c987c",
       "thread_depth": 0,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004013.html"
     },
     {
       "id": "msg-31ba15331de8",
@@ -35,7 +36,8 @@
       "body_snippet": "Hi Paul,\n\nIn short, yes. The prediction interval incorporates two sources of\nuncertainty: uncertainty from the estimate of the mean effect (the center\nof the PI) and uncertainty from there being a dis",
       "thread_id": "thread-db645d6c987c",
       "thread_depth": 1,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004014.html"
     },
     {
       "id": "msg-f7b08cedab3b",
@@ -54,7 +56,8 @@
       "body_snippet": "Hi James,\n\nThank you, that is very useful.\n\nYour answer makes me however wonder whether there is much point of reporting one prediction interval, since its width seems quite strongly depend on the num",
       "thread_id": "thread-db645d6c987c",
       "thread_depth": 2,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004015.html"
     },
     {
       "id": "msg-780c1bf76f96",
@@ -70,7 +73,8 @@
       "body_snippet": "Hello,\n\nWhen running a standard random effects meta-analysis with one categorical dichotomous predictor/moderator, the estimate of the moderator is very similar to the difference that you get when run",
       "thread_id": "thread-780c1bf76f96",
       "thread_depth": 0,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004016.html"
     },
     {
       "id": "msg-30e5456e39da",
@@ -84,11 +88,12 @@
       "references": [
         "<mailman.4018.15.1649325610.58803.r-sig-meta-analysis@r-project.org>"
       ],
-      "body_plain": "Dear Paul,\n\nsuch discrepancies are to be expected when making group comparisons (not \nonly in the meta-analytic context). Subgroup analyses based on separate \ndata sets will sometimes lead to different estimates than the combined \ndata set, because the latter contains more information. Therefore, group \ncomparisons within one model are often recommended.\n\nIn the multi-level context there is a phenomenomen called shrinkage, \nwhich reduces extreme estimates. It is often regarded as a good thing, \nbecause extreme estimates might be unreliable. The extent of the \nshrinkage depends on the data and random effects that were included \nwhich could explain different estimates across analyses.\n\n\nBest,\nLukasz\n-- \nLukasz Stasielowicz\nOsnabr?ck University\nInstitute for Psychology\nResearch methods, psychological assessment, and evaluation\nSeminarstra?e 20\n49074 Osnabr?ck (Germany)\n\n\nAm 07.04.2022 um 12:00 schrieb r-sig-meta-analysis-request at r-project.org:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. Moderator/predictor in multi-level meta-analysis (Hanel, Paul H P)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Wed, 6 Apr 2022 22:51:11 +0000\n> From: \"Hanel, Paul H P\" <p.hanel at essex.ac.uk>\n> To: \"r-sig-meta-analysis at r-project.org\"\n> \t<r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] Moderator/predictor in multi-level meta-analysis\n> Message-ID:\n> \t<DB6PR0601MB23578B5ADC31A20006821A4DAEE79 at DB6PR0601MB2357.eurprd06.prod.outlook.com>\n> \t\n> Content-Type: text/plain; charset=\"utf-8\"\n> \n> Hello,\n> \n> When running a standard random effects meta-analysis with one categorical dichotomous predictor/moderator, the estimate of the moderator is very similar to the difference that you get when running a random effects meta-analysis for each level of the predictor separately. This is however different to when running a multi-level meta-analysis.\n> \n> I am running a meta-analysis with over 300 effect sizes in which all studies have a control and a treatment group. The mean differences between the control and the intervention group are quantified with Hedges' gs. One moderator/predictor of these differences is sample type: students vs non-students. When using a standard random-effects model we get:\n> dfm <- subset(df, sample_type == 0) # sample_type has two levels: students (coded as 0) vs other (coded as 1 in sample_type variable)\n> dft <- subset(df, sample_type == 1)\n> rma(yi, vi,  data = dfm) # gives us g = .3855. yi are Hedges' gs.\n> rma(yi, vi,  data = dft) # gives us g = .59.\n> rma(yi, vi, mods = sample_type, data=df) # Now full dataset with sample_type as categorical moderator/predictor. Estimate = .21, which is very close to .59 - .3855 = .20. Also, the intercept is very close sample_type = 0, intercept = .3861.\n> \n> However, when switching to a multi-level model with effect sizes nested in studies nested in papers, things get more complicated. Using the same datasets as above we get\n> rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=dfm) # gives us g = .45, 95%-CI [.33, .59]\n> rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=dft) # gives us g = .61, 95%-CI [.48, .73]\n> rma.mv(yi, vi, mods = ~ sample_type, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=df) # Now full dataset with sample_type as categorical moderator/predictor. Estimate = .08, 95%-CI[-.07, .24] which is quite a bit off from .61 - .45 = .16. Interestingly, the intercept is also off from sample_type = 0. Intercept = .48, even though I assumed it would be .45.\n> \n> In short, why is the estimate for the multi-level moderator test not similar to the difference between the two effect sizes obtained separately for each of the two subgroups - assuming there is no error in the code above? When looking at the confidence intervals, the difference between students vs others should be significant, but including the sample_type as moderator does not yield a significant finding.\n> \n> I got similar discrepancies when using a different moderator.\n> \n> Thank you,\n> Paul\n> \n> \n> \t[[alternative HTML version deleted]]\n> \n> \n> \n> \n> ------------------------------\n> \n> Subject: Digest Footer\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n> \n> ------------------------------\n> \n> End of R-sig-meta-analysis Digest, Vol 59, Issue 2\n> **************************************************",
+      "body_plain": "Dear Paul,\n\nsuch discrepancies are to be expected when making group comparisons (not \nonly in the meta-analytic context). Subgroup analyses based on separate \ndata sets will sometimes lead to different estimates than the combined \ndata set, because the latter contains more information. Therefore, group \ncomparisons within one model are often recommended.\n\nIn the multi-level context there is a phenomenomen called shrinkage, \nwhich reduces extreme estimates. It is often regarded as a good thing, \nbecause extreme estimates might be unreliable. The extent of the \nshrinkage depends on the data and random effects that were included \nwhich could explain different estimates across analyses.\n\n\nBest,\nLukasz\n-- \nLukasz Stasielowicz\nOsnabrück University\nInstitute for Psychology\nResearch methods, psychological assessment, and evaluation\nSeminarstraße 20\n49074 Osnabrück (Germany)\n\n\nAm 07.04.2022 um 12:00 schrieb r-sig-meta-analysis-request at r-project.org:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. Moderator/predictor in multi-level meta-analysis (Hanel, Paul H P)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Wed, 6 Apr 2022 22:51:11 +0000\n> From: \"Hanel, Paul H P\" <p.hanel at essex.ac.uk>\n> To: \"r-sig-meta-analysis at r-project.org\"\n> \t<r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] Moderator/predictor in multi-level meta-analysis\n> Message-ID:\n> \t<DB6PR0601MB23578B5ADC31A20006821A4DAEE79 at DB6PR0601MB2357.eurprd06.prod.outlook.com>\n> \t\n> Content-Type: text/plain; charset=\"utf-8\"\n> \n> Hello,\n> \n> When running a standard random effects meta-analysis with one categorical dichotomous predictor/moderator, the estimate of the moderator is very similar to the difference that you get when running a random effects meta-analysis for each level of the predictor separately. This is however different to when running a multi-level meta-analysis.\n> \n> I am running a meta-analysis with over 300 effect sizes in which all studies have a control and a treatment group. The mean differences between the control and the intervention group are quantified with Hedges' gs. One moderator/predictor of these differences is sample type: students vs non-students. When using a standard random-effects model we get:\n> dfm <- subset(df, sample_type == 0) # sample_type has two levels: students (coded as 0) vs other (coded as 1 in sample_type variable)\n> dft <- subset(df, sample_type == 1)\n> rma(yi, vi,  data = dfm) # gives us g = .3855. yi are Hedges' gs.\n> rma(yi, vi,  data = dft) # gives us g = .59.\n> rma(yi, vi, mods = sample_type, data=df) # Now full dataset with sample_type as categorical moderator/predictor. Estimate = .21, which is very close to .59 - .3855 = .20. Also, the intercept is very close sample_type = 0, intercept = .3861.\n> \n> However, when switching to a multi-level model with effect sizes nested in studies nested in papers, things get more complicated. Using the same datasets as above we get\n> rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=dfm) # gives us g = .45, 95%-CI [.33, .59]\n> rma.mv(yi, vi, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=dft) # gives us g = .61, 95%-CI [.48, .73]\n> rma.mv(yi, vi, mods = ~ sample_type, random = list(~ 1 | effectID, ~ 1 | StudyID, ~ 1 | PaperID), tdist = TRUE, data=df) # Now full dataset with sample_type as categorical moderator/predictor. Estimate = .08, 95%-CI[-.07, .24] which is quite a bit off from .61 - .45 = .16. Interestingly, the intercept is also off from sample_type = 0. Intercept = .48, even though I assumed it would be .45.\n> \n> In short, why is the estimate for the multi-level moderator test not similar to the difference between the two effect sizes obtained separately for each of the two subgroups - assuming there is no error in the code above? When looking at the confidence intervals, the difference between students vs others should be significant, but including the sample_type as moderator does not yield a significant finding.\n> \n> I got similar discrepancies when using a different moderator.\n> \n> Thank you,\n> Paul\n> \n> \n> \t[[alternative HTML version deleted]]\n> \n> \n> \n> \n> ------------------------------\n> \n> Subject: Digest Footer\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n> \n> ------------------------------\n> \n> End of R-sig-meta-analysis Digest, Vol 59, Issue 2\n> **************************************************",
       "body_snippet": "Dear Paul,\n\nsuch discrepancies are to be expected when making group comparisons (not \nonly in the meta-analytic context). Subgroup analyses based on separate \ndata sets will sometimes lead to differen",
       "thread_id": "thread-30e5456e39da",
       "thread_depth": 0,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004017.html"
     },
     {
       "id": "msg-69d05d167a35",
@@ -108,7 +113,8 @@
       "body_snippet": "Hi Paul,\n\nI would suggest reporting a prediction interval for whatever model\nspecification you think is appropriate for the synthesis. Which levels to\ninclude in the model is a broader question that y",
       "thread_id": "thread-db645d6c987c",
       "thread_depth": 3,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004018.html"
     },
     {
       "id": "msg-5544d6b64008",
@@ -129,7 +135,8 @@
       "body_snippet": "Hi James,\n\nThank you, this is very useful.\n\nBest,\nPaul\n\nFrom: James Pustejovsky <jepusto at gmail.com>\nSent: 07 April 2022 15:23\nTo: Hanel, Paul H P <p.hanel at essex.ac.uk>\nCc: r-sig-meta-analysis at",
       "thread_id": "thread-db645d6c987c",
       "thread_depth": 4,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004019.html"
     },
     {
       "id": "msg-bb409a72bf5f",
@@ -145,7 +152,8 @@
       "body_snippet": "Hi All,\n\nNeed help regarding calculation of z scores.\n\nWe are working on nma analysis with three treatments compared to placebo.\nWe are using netmeta package for stats. We have curated mean and sd val",
       "thread_id": "thread-bb409a72bf5f",
       "thread_depth": 0,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004020.html"
     },
     {
       "id": "msg-ccb6049246d5",
@@ -159,11 +167,12 @@
       "references": [
         "<CAHudoO0RQ6fzqHrUDRWjeMZ_EvxZvVjF+Hu0Xv6XddSeoUOv8w@mail.gmail.com>"
       ],
-      "body_plain": "Hi Roopa,\n\nFirst of all, I want to remind you of Wolfgang's e-mail referring to the \ntransparency rules of this mailing list. He wrote on 24 of March: \"When \nposting to the mailing list, please use your real name and include \ninformation about any institutional/organizational affiliation if possible.\"\n\nNow to your question: It is not fully clear to me what you want to do \nand why. If this is a network meta-analysis (NMA) of differences of \nmeans, you need mean, sd, and sample size (n) for each comparison. \nnetmeta will then provide the NMA estimates for all comparisons in the \nnetwork, again as differences of means (MD). The resulting z-scores are \njust tabulated with the printout, as you can see with the built-in \nexample data Senn2013:\n\nlibrary(netmeta)\ndata(Senn2013)\nnet1 <- netmeta(TE, seTE, treat1.long, treat2.long, studlab,\n ? data = Senn2013, sm = \"MD\", random = FALSE, nchar.trts = 4)\nnet1\n\nIsn't this what you want? If not, what else do you expect?\n\nBest,\n\nGerta\n\nAm 16.04.2022 um 12:23 schrieb Roopa Subbaiah:\n> Hi All,\n>\n> Need help regarding calculation of z scores.\n>\n> We are working on nma analysis with three treatments compared to placebo.\n> We are using netmeta package for stats. We have curated mean and sd values\n> for each endpoint w. r. t trt and placebo. Need help to calculate weighted\n> mean z scores with standard error. Please suggest ways of doing it. Thank\n> you\n>\n> \t[[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n-- \n\nDr. rer. nat. Gerta R?cker, Dipl.-Math.\n\nGuest Scientist\nInstitute of Medical Biometry and Statistics,\nFaculty of Medicine and Medical Center - University of Freiburg\n\nZinkmattenstr. 6a, D-79108 Freiburg, Germany\n\nMail:     ruecker at imbi.uni-freiburg.de\nHomepage: https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker",
+      "body_plain": "Hi Roopa,\n\nFirst of all, I want to remind you of Wolfgang's e-mail referring to the \ntransparency rules of this mailing list. He wrote on 24 of March: \"When \nposting to the mailing list, please use your real name and include \ninformation about any institutional/organizational affiliation if possible.\"\n\nNow to your question: It is not fully clear to me what you want to do \nand why. If this is a network meta-analysis (NMA) of differences of \nmeans, you need mean, sd, and sample size (n) for each comparison. \nnetmeta will then provide the NMA estimates for all comparisons in the \nnetwork, again as differences of means (MD). The resulting z-scores are \njust tabulated with the printout, as you can see with the built-in \nexample data Senn2013:\n\nlibrary(netmeta)\ndata(Senn2013)\nnet1 <- netmeta(TE, seTE, treat1.long, treat2.long, studlab,\n   data = Senn2013, sm = \"MD\", random = FALSE, nchar.trts = 4)\nnet1\n\nIsn't this what you want? If not, what else do you expect?\n\nBest,\n\nGerta\n\nAm 16.04.2022 um 12:23 schrieb Roopa Subbaiah:\n> Hi All,\n>\n> Need help regarding calculation of z scores.\n>\n> We are working on nma analysis with three treatments compared to placebo.\n> We are using netmeta package for stats. We have curated mean and sd values\n> for each endpoint w. r. t trt and placebo. Need help to calculate weighted\n> mean z scores with standard error. Please suggest ways of doing it. Thank\n> you\n>\n> \t[[alternative HTML version deleted]]\n>\n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n-- \n\nDr. rer. nat. Gerta Rücker, Dipl.-Math.\n\nGuest Scientist\nInstitute of Medical Biometry and Statistics,\nFaculty of Medicine and Medical Center - University of Freiburg\n\nZinkmattenstr. 6a, D-79108 Freiburg, Germany\n\nMail:     ruecker at imbi.uni-freiburg.de\nHomepage: https://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker",
       "body_snippet": "Hi Roopa,\n\nFirst of all, I want to remind you of Wolfgang's e-mail referring to the \ntransparency rules of this mailing list. He wrote on 24 of March: \"When \nposting to the mailing list, please use yo",
       "thread_id": "thread-bb409a72bf5f",
       "thread_depth": 1,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004021.html"
     },
     {
       "id": "msg-0bdcef2d309f",
@@ -179,7 +188,8 @@
       "body_snippet": "Hello\n\n\nI am trying to do a meta-regression to explore whether incidence rates are changing over time. Some of the estimates are correlated so I am using the rma.mv function. The moderator is a measur",
       "thread_id": "thread-0bdcef2d309f",
       "thread_depth": 0,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004022.html"
     },
     {
       "id": "msg-4e01eb1c2b23",
@@ -197,7 +207,8 @@
       "body_snippet": "Dear Adelina,\n\nSee below for my responses.\n\nBest,\nWolfgang\n\n>-----Original Message-----\n>From: R-sig-meta-analysis [mailto:r-sig-meta-analysis-bounces at r-project.org] On\n>Behalf Of Adelina Artenie\n>",
       "thread_id": "thread-0bdcef2d309f",
       "thread_depth": 1,
-      "month": "2022-04"
+      "month": "2022-04",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2022-April/004023.html"
     }
   ],
   "threads": [

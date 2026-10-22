@@ -17,7 +17,8 @@
       "body_snippet": "*Hi,\n**I need to modify the numbers in the columns of a forest plot made\nfrom a metaprop object.*\n\n*Please how can **I** add commas for numbers w**ith 5 or more digits\nin **column** of event and total",
       "thread_id": "thread-fd36e618050e",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/004994.html"
     },
     {
       "id": "msg-d19079be20b4",
@@ -31,11 +32,12 @@
       "references": [
         "<CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>"
       ],
-      "body_plain": "Dear Sofia,\n\nTry this code:\n\nlibrary(meta)\nevents <- c(12000, 5000, 800, 30000)  # Example event counts\nn <- c(50000, 10000, 5000, 40000)  # Example total sample sizes\n\nformatted_events <- format(events, big.mark=\",\")\nformatted_n <- format(n, big.mark=\",\")\n\nmeta_result <- metaprop(event = events, n = n)\nmeta_result$formatted_events <- formatted_events\nmeta_result$formatted_n <- formatted_n\n\nforest(meta_result, \n       leftcols = c(\"studlab\", \"formatted_events\", \"formatted_n\"),\n       leftlabs = c(\"Study\", \"Events\",\"Total\"))\n\nRemarks: \n- The formatted numbers should be list elements of the metaprop object, not of the data. \n- It makes sense to format also the sample sizes (n) in the same way.\n- It also makes sense to format *all* numbers equally, also those that are smaller than 10000.\n- It does not make sense to format the numbers as characters (as you did), because then don't become right-justified.\n\nBest,\nGerta\n\n\nUNIVERSIT?TSKLINIKUM FREIBURG\nInstitute for Medical Biometry and Statistics\n\nDr. Gerta R?cker\nGuest Scientist\n\nStefan-Meier-Stra?e 26 ? 79104 Freiburg\ngerta.ruecker at uniklinik-freiburg.de\n\nhttps://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker\n\n-----Urspr?ngliche Nachricht-----\nVon: Zoukal Sofia via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> \nGesendet: Freitag, 1. Dezember 2023 12:44\nAn: r-sig-meta-analysis at r-project.org\nCc: Zoukal Sofia <sofi.cap at gmail.com>\nBetreff: [R-meta] R-meta] add comma to numbers in forest plot from metaprop objet\n\n*Hi,\n**I need to modify the numbers in the columns of a forest plot made\nfrom a metaprop object.*\n\n*Please how can **I** add commas for numbers w**ith 5 or more digits\nin **column** of event and total to appear in the forest plot?*\n\n*#there is my data:*\n\nevents <- c(12000, 5000, 800, 30000)  # Example event counts\n\nn <- c(50000, 10000, 5000, 40000)  # Example total sample sizes\ndata <- data.frame( events = events, n = n)\n\n# Format event counts with commas for numbers with 5 or more digits\nformatted_events <- ifelse(events >= 10000, format(events,\nbig.mark=\",\"), as.character(events))\ndata$events_formatted <- formatIfNeeded(data$events)\nprint(data)\n\n# Run meta-analysis with the modified dataset\nmeta_result <- metaprop(event = formatted_events, n = n)\n\n# Plot the forest plot for the meta-analysis with formatted data\n\nforest(meta_result)\n\n\nUnfortunatlly, it does not work: \"Error: Non-numeric value for argument 'event'\"\n\nhelp me please!\n\nBest\n\n?\n\n\t[[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis",
+      "body_plain": "Dear Sofia,\n\nTry this code:\n\nlibrary(meta)\nevents <- c(12000, 5000, 800, 30000)  # Example event counts\nn <- c(50000, 10000, 5000, 40000)  # Example total sample sizes\n\nformatted_events <- format(events, big.mark=\",\")\nformatted_n <- format(n, big.mark=\",\")\n\nmeta_result <- metaprop(event = events, n = n)\nmeta_result$formatted_events <- formatted_events\nmeta_result$formatted_n <- formatted_n\n\nforest(meta_result, \n       leftcols = c(\"studlab\", \"formatted_events\", \"formatted_n\"),\n       leftlabs = c(\"Study\", \"Events\",\"Total\"))\n\nRemarks: \n- The formatted numbers should be list elements of the metaprop object, not of the data. \n- It makes sense to format also the sample sizes (n) in the same way.\n- It also makes sense to format *all* numbers equally, also those that are smaller than 10000.\n- It does not make sense to format the numbers as characters (as you did), because then don't become right-justified.\n\nBest,\nGerta\n\n\nUNIVERSITÄTSKLINIKUM FREIBURG\nInstitute for Medical Biometry and Statistics\n\nDr. Gerta Rücker\nGuest Scientist\n\nStefan-Meier-Straße 26 · 79104 Freiburg\ngerta.ruecker at uniklinik-freiburg.de\n\nhttps://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker\n\n-----Ursprüngliche Nachricht-----\nVon: Zoukal Sofia via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> \nGesendet: Freitag, 1. Dezember 2023 12:44\nAn: r-sig-meta-analysis at r-project.org\nCc: Zoukal Sofia <sofi.cap at gmail.com>\nBetreff: [R-meta] R-meta] add comma to numbers in forest plot from metaprop objet\n\n*Hi,\n**I need to modify the numbers in the columns of a forest plot made\nfrom a metaprop object.*\n\n*Please how can **I** add commas for numbers w**ith 5 or more digits\nin **column** of event and total to appear in the forest plot?*\n\n*#there is my data:*\n\nevents <- c(12000, 5000, 800, 30000)  # Example event counts\n\nn <- c(50000, 10000, 5000, 40000)  # Example total sample sizes\ndata <- data.frame( events = events, n = n)\n\n# Format event counts with commas for numbers with 5 or more digits\nformatted_events <- ifelse(events >= 10000, format(events,\nbig.mark=\",\"), as.character(events))\ndata$events_formatted <- formatIfNeeded(data$events)\nprint(data)\n\n# Run meta-analysis with the modified dataset\nmeta_result <- metaprop(event = formatted_events, n = n)\n\n# Plot the forest plot for the meta-analysis with formatted data\n\nforest(meta_result)\n\n\nUnfortunatlly, it does not work: \"Error: Non-numeric value for argument 'event'\"\n\nhelp me please!\n\nBest\n\nᐧ\n\n\t[[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis",
       "body_snippet": "Dear Sofia,\n\nTry this code:\n\nlibrary(meta)\nevents <- c(12000, 5000, 800, 30000)  # Example event counts\nn <- c(50000, 10000, 5000, 40000)  # Example total sample sizes\n\nformatted_events <- format(even",
       "thread_id": "thread-fd36e618050e",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/004995.html"
     },
     {
       "id": "msg-49bb6ded447d",
@@ -51,7 +53,8 @@
       "body_snippet": "Hello Wolfgang, I hope all is well. My name is Daniel, I am carrying out a multi-level meta-analysis using the metafor package, and I was hoping you could answer a quick question for me.\n\nI am trying ",
       "thread_id": "thread-49bb6ded447d",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/004996.html"
     },
     {
       "id": "msg-737df36a13f4",
@@ -69,7 +72,8 @@
       "body_snippet": "Hi Daniel,\n\nIn the original formulation of the regression test by Egger (which uses standard regression models), there are two numerically equivalent formulations, one using the standard errors as pre",
       "thread_id": "thread-49bb6ded447d",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/004997.html"
     },
     {
       "id": "msg-de2320d53885",
@@ -88,7 +92,8 @@
       "body_snippet": "Thank you! This resolves my issue.\n\n\n\n\n\n________________________________\nFrom: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>\nSent: Sunday, December 3, 2023 7:47 AM\nTo: R",
       "thread_id": "thread-49bb6ded447d",
       "thread_depth": 2,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/004998.html"
     },
     {
       "id": "msg-9e4348694b57",
@@ -106,7 +111,8 @@
       "body_snippet": "Sofia,\n\nYou can set argument 'big.mark' in settings.meta() which is considered in printouts and forest plots.\n\nevents <- c(12000, 5000, 800, 30000)\nn <- c(50000, 10000, 5000, 40000)\n\nlibrary(\"meta\")\ns",
       "thread_id": "thread-fd36e618050e",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/004999.html"
     },
     {
       "id": "msg-0c738a8c4417",
@@ -121,11 +127,12 @@
         "<CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>",
         "<686802B7-FA87-478A-B4AE-317ADE011322@uniklinik-freiburg.de>"
       ],
-      "body_plain": "Hi,\n\nThank you so much for your help!\n\nBest\n?\n\nLe lun. 4 d?c. 2023 ? 13:24, Dr. Guido Schwarzer <\nguido.schwarzer at uniklinik-freiburg.de> a ?crit :\n\n> Sofia,\n>\n> You can set argument 'big.mark' in settings.meta() which is considered in\n> printouts and forest plots.\n>\n> events <- c(12000, 5000, 800, 30000)\n> n <- c(50000, 10000, 5000, 40000)\n>\n> library(\"meta\")\n> settings.meta(big.mark = \",\")\n> m <- metaprop(events, n)\n> forest(m)\n>\n> Best,\n> Guido\n>\n>\n\n\t[[alternative HTML version deleted]]",
-      "body_snippet": "Hi,\n\nThank you so much for your help!\n\nBest\n?\n\nLe lun. 4 d?c. 2023 ? 13:24, Dr. Guido Schwarzer <\nguido.schwarzer at uniklinik-freiburg.de> a ?crit :\n\n> Sofia,\n>\n> You can set argument 'big.mark' in s",
+      "body_plain": "Hi,\n\nThank you so much for your help!\n\nBest\nᐧ\n\nLe lun. 4 déc. 2023 à 13:24, Dr. Guido Schwarzer <\nguido.schwarzer at uniklinik-freiburg.de> a écrit :\n\n> Sofia,\n>\n> You can set argument 'big.mark' in settings.meta() which is considered in\n> printouts and forest plots.\n>\n> events <- c(12000, 5000, 800, 30000)\n> n <- c(50000, 10000, 5000, 40000)\n>\n> library(\"meta\")\n> settings.meta(big.mark = \",\")\n> m <- metaprop(events, n)\n> forest(m)\n>\n> Best,\n> Guido\n>\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi,\n\nThank you so much for your help!\n\nBest\nᐧ\n\nLe lun. 4 déc. 2023 à 13:24, Dr. Guido Schwarzer <\nguido.schwarzer at uniklinik-freiburg.de> a écrit :\n\n> Sofia,\n>\n> You can set argument 'big.mark' in s",
       "thread_id": "thread-fd36e618050e",
       "thread_depth": 2,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005005.html"
     },
     {
       "id": "msg-9e275c4e9376",
@@ -140,11 +147,12 @@
         "<CAHTW070F+VjnXE_d=XSyEkaOr_gJD+-iYHsfx7msvvyiyKYccA@mail.gmail.com>",
         "<686802B7-FA87-478A-B4AE-317ADE011322@uniklinik-freiburg.de>"
       ],
-      "body_plain": "Hi,\n\nThank you so much for your help!\n\nBest\n?\n\nLe lun. 4 d?c. 2023 ? 13:24, Dr. Guido Schwarzer <\nguido.schwarzer at uniklinik-freiburg.de> a ?crit :\n\n> Sofia,\n>\n> You can set argument 'big.mark' in settings.meta() which is considered in\n> printouts and forest plots.\n>\n> events <- c(12000, 5000, 800, 30000)\n> n <- c(50000, 10000, 5000, 40000)\n>\n> library(\"meta\")\n> settings.meta(big.mark = \",\")\n> m <- metaprop(events, n)\n> forest(m)\n>\n> Best,\n> Guido\n>\n>\n\n\t[[alternative HTML version deleted]]",
-      "body_snippet": "Hi,\n\nThank you so much for your help!\n\nBest\n?\n\nLe lun. 4 d?c. 2023 ? 13:24, Dr. Guido Schwarzer <\nguido.schwarzer at uniklinik-freiburg.de> a ?crit :\n\n> Sofia,\n>\n> You can set argument 'big.mark' in s",
+      "body_plain": "Hi,\n\nThank you so much for your help!\n\nBest\nᐧ\n\nLe lun. 4 déc. 2023 à 13:24, Dr. Guido Schwarzer <\nguido.schwarzer at uniklinik-freiburg.de> a écrit :\n\n> Sofia,\n>\n> You can set argument 'big.mark' in settings.meta() which is considered in\n> printouts and forest plots.\n>\n> events <- c(12000, 5000, 800, 30000)\n> n <- c(50000, 10000, 5000, 40000)\n>\n> library(\"meta\")\n> settings.meta(big.mark = \",\")\n> m <- metaprop(events, n)\n> forest(m)\n>\n> Best,\n> Guido\n>\n>\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hi,\n\nThank you so much for your help!\n\nBest\nᐧ\n\nLe lun. 4 déc. 2023 à 13:24, Dr. Guido Schwarzer <\nguido.schwarzer at uniklinik-freiburg.de> a écrit :\n\n> Sofia,\n>\n> You can set argument 'big.mark' in s",
       "thread_id": "thread-fd36e618050e",
       "thread_depth": 2,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005004.html"
     },
     {
       "id": "msg-18c8b36d706b",
@@ -160,7 +168,8 @@
       "body_snippet": "Hello Wolfgang and all,\n\nI am carrying out multivariate multilevel meta-analysis using the\nrma.mv function in the metafor package, and I have come across an\nissue that has been giving me a lot of trou",
       "thread_id": "thread-18c8b36d706b",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005000.html"
     },
     {
       "id": "msg-18180259e97f",
@@ -178,7 +187,8 @@
       "body_snippet": "Hi Daniel,\n\nDidn't you ask the same question here?\n\nhttps://stats.stackexchange.com/q/633046/1934\n\nPlease see my answer there.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis",
       "thread_id": "thread-18c8b36d706b",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005001.html"
     },
     {
       "id": "msg-440cca80cac3",
@@ -197,7 +207,8 @@
       "body_snippet": "Hi Wolfgang,\n\nThank you! Sorry, I am new to Stack Exchange and did not realize that you had already provided a response. I deeply appreciate your insights.\n\nI do have a follow up question, if that's o",
       "thread_id": "thread-18c8b36d706b",
       "thread_depth": 2,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005002.html"
     },
     {
       "id": "msg-4f792198a279",
@@ -209,11 +220,12 @@
       "subject_clean": "[R-meta] PET-PEESE Question",
       "in_reply_to": null,
       "references": [],
-      "body_plain": "Hello,\n\nThank you again for all your guidance.\n\nI have been trying to conduct PET-PEESE analyses on several rma.mv objects\nby adding variance as a moderator.  The following code works well:\n\n#pet-peese test\nm_1_pet <- rma.mv(yi = yi,\n                     V = vi,\n                     mods = ~ vi,\n                     slab = STUDY.ID,\n                     data = Relationship_TE_Occurrence,\n                     random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n                     test = \"t\",\n                     method = \"REML\")\n\nsummary(m_1_pet, digits=3)\n\nHowever, when I try to conduct the PEESE part I receive this error message:\n\"Model matrix not of full rank. Cannot fit model\" for the following code:\n\nRelationship$SE_Mod <- Relationship$vi^2\n\nm_1_peese <- rma.mv(yi = yi,\n                     V = vi,\n                     mods = ~ SE_Mod,\n                     slab = STUDY.ID,\n                     data = Relationship_TE_Occurrence,\n                     random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n                     test = \"t\",\n                     method = \"REML\")\n\nsummary(m_1_peese, digits=3)\n\nDoes anyone have any insight into why the model would fit for the PET part\nbut not the PEESE? I'm not sure how to fix this issue.\n\nThanks,\nTori\n\n-- \n*Tori Pe?a, Ph.D. *(she/her/ella)\nCognitive Psychology\nDept. of Psychology\nStony Brook University\nStony Brook, NY 11790-2500\n[image: Stony Brook University logo]\n\n\t[[alternative HTML version deleted]]",
+      "body_plain": "Hello,\n\nThank you again for all your guidance.\n\nI have been trying to conduct PET-PEESE analyses on several rma.mv objects\nby adding variance as a moderator.  The following code works well:\n\n#pet-peese test\nm_1_pet <- rma.mv(yi = yi,\n                     V = vi,\n                     mods = ~ vi,\n                     slab = STUDY.ID,\n                     data = Relationship_TE_Occurrence,\n                     random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n                     test = \"t\",\n                     method = \"REML\")\n\nsummary(m_1_pet, digits=3)\n\nHowever, when I try to conduct the PEESE part I receive this error message:\n\"Model matrix not of full rank. Cannot fit model\" for the following code:\n\nRelationship$SE_Mod <- Relationship$vi^2\n\nm_1_peese <- rma.mv(yi = yi,\n                     V = vi,\n                     mods = ~ SE_Mod,\n                     slab = STUDY.ID,\n                     data = Relationship_TE_Occurrence,\n                     random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n                     test = \"t\",\n                     method = \"REML\")\n\nsummary(m_1_peese, digits=3)\n\nDoes anyone have any insight into why the model would fit for the PET part\nbut not the PEESE? I'm not sure how to fix this issue.\n\nThanks,\nTori\n\n-- \n*Tori Peña, Ph.D. *(she/her/ella)\nCognitive Psychology\nDept. of Psychology\nStony Brook University\nStony Brook, NY 11790-2500\n[image: Stony Brook University logo]\n\n\t[[alternative HTML version deleted]]",
       "body_snippet": "Hello,\n\nThank you again for all your guidance.\n\nI have been trying to conduct PET-PEESE analyses on several rma.mv objects\nby adding variance as a moderator.  The following code works well:\n\n#pet-pees",
       "thread_id": "thread-4f792198a279",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005003.html"
     },
     {
       "id": "msg-6a423bff46e2",
@@ -229,7 +241,8 @@
       "body_snippet": "Hello All,\n\nHope everyone is enjoying the holiday vibes!\n\nMost of the books or papers I have read so far deal with attempted causal relationships, such as those involving experiment/clinical trials. H",
       "thread_id": "thread-6a423bff46e2",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005006.html"
     },
     {
       "id": "msg-d734428b6389",
@@ -247,7 +260,8 @@
       "body_snippet": "Dear Zone,\n\nOne starting point is to search the topic \"meta-analytic structural\nequation model (MASEM).\" Here is an article summarizing it.\nhttps://osf.io/preprints/psyarxiv/epsqt\nThe metaSEM package ",
       "thread_id": "thread-6a423bff46e2",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005007.html"
     },
     {
       "id": "msg-03f7d9eb4e33",
@@ -266,7 +280,8 @@
       "body_snippet": "Dear Mike,\n\nThank you very much for sharing! ?\n\nCheers,\nZone\n-------------\n\n\nFrom: Mike Cheung <mikewlcheung at gmail.com>\nDate: Wednesday, December 6, 2023 at 11:45 AM\nTo: R Special Interest Group fo",
       "thread_id": "thread-6a423bff46e2",
       "thread_depth": 2,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005008.html"
     },
     {
       "id": "msg-17dc11a58593",
@@ -280,11 +295,12 @@
       "references": [
         "<mailman.5008.8751.1701834336.1361.r-sig-meta-analysis@r-project.org>"
       ],
-      "body_plain": "Dear Tori,\n\nvi refers to sampling variance in your code, right?\n\nIn that case, slight code adjustments seem necessary:\nPET: mods = ~sqrt(vi) #standard error as a moderator\nPEESE: PET: mods = ~vi #variance as a moderator\n\n\nFurther reading: \nhttps://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/pub-bias.html#pet-peese\n\n\nBest,\nLukasz\n-- \nLukasz Stasielowicz\nOsnabr?ck University\nInstitute for Psychology\nResearch methods, psychological assessment, and evaluation\nLise-Meitner-Stra?e 3\n49076 Osnabr?ck (Germany)\nTwitter: https://twitter.com/l_stasielowicz\nTel.: +49 541 969-7735\n\nOn 06.12.2023 04:45, r-sig-meta-analysis-request at r-project.org wrote:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. PET-PEESE Question (=?UTF-8?Q?Tori_Pe=C3=B1a?=)\n>     2. Re:  R-meta] add comma to numbers in forest plot from\n>        metaprop objet (Zoukal Sofia)\n>     3. Re:  R-meta] add comma to numbers in forest plot from\n>        metaprop objet (Zoukal Sofia)\n>     4. resources re. synthesis of cov/corr matrices (Sicong Liu)\n>     5. Re: resources re. synthesis of cov/corr matrices (Mike Cheung)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Tue, 5 Dec 2023 17:59:31 -0500\n> From: =?UTF-8?Q?Tori_Pe=C3=B1a?= <Tori.Pena at stonybrook.edu>\n> To: R Special Interest Group for Meta-Analysis\n> \t<r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] PET-PEESE Question\n> Message-ID:\n> \t<CAEmuQj8Waiq4Eho6bGbuUuvh81Ls2c0kYKGYvBPjcjw7OQVTcg at mail.gmail.com>\n> Content-Type: text/plain; charset=\"utf-8\"\n> \n> Hello,\n> \n> Thank you again for all your guidance.\n> \n> I have been trying to conduct PET-PEESE analyses on several rma.mv objects\n> by adding variance as a moderator.  The following code works well:\n> \n> #pet-peese test\n> m_1_pet <- rma.mv(yi = yi,\n>                       V = vi,\n>                       mods = ~ vi,\n>                       slab = STUDY.ID,\n>                       data = Relationship_TE_Occurrence,\n>                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n>                       test = \"t\",\n>                       method = \"REML\")\n> \n> summary(m_1_pet, digits=3)\n> \n> However, when I try to conduct the PEESE part I receive this error message:\n> \"Model matrix not of full rank. Cannot fit model\" for the following code:\n> \n> Relationship$SE_Mod <- Relationship$vi^2\n> \n> m_1_peese <- rma.mv(yi = yi,\n>                       V = vi,\n>                       mods = ~ SE_Mod,\n>                       slab = STUDY.ID,\n>                       data = Relationship_TE_Occurrence,\n>                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n>                       test = \"t\",\n>                       method = \"REML\")\n> \n> summary(m_1_peese, digits=3)\n> \n> Does anyone have any insight into why the model would fit for the PET part\n> but not the PEESE? I'm not sure how to fix this issue.\n> \n> Thanks,\n> Tori\n>",
+      "body_plain": "Dear Tori,\n\nvi refers to sampling variance in your code, right?\n\nIn that case, slight code adjustments seem necessary:\nPET: mods = ~sqrt(vi) #standard error as a moderator\nPEESE: PET: mods = ~vi #variance as a moderator\n\n\nFurther reading: \nhttps://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/pub-bias.html#pet-peese\n\n\nBest,\nLukasz\n-- \nLukasz Stasielowicz\nOsnabrück University\nInstitute for Psychology\nResearch methods, psychological assessment, and evaluation\nLise-Meitner-Straße 3\n49076 Osnabrück (Germany)\nTwitter: https://twitter.com/l_stasielowicz\nTel.: +49 541 969-7735\n\nOn 06.12.2023 04:45, r-sig-meta-analysis-request at r-project.org wrote:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. PET-PEESE Question (=?UTF-8?Q?Tori_Pe=C3=B1a?=)\n>     2. Re:  R-meta] add comma to numbers in forest plot from\n>        metaprop objet (Zoukal Sofia)\n>     3. Re:  R-meta] add comma to numbers in forest plot from\n>        metaprop objet (Zoukal Sofia)\n>     4. resources re. synthesis of cov/corr matrices (Sicong Liu)\n>     5. Re: resources re. synthesis of cov/corr matrices (Mike Cheung)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Tue, 5 Dec 2023 17:59:31 -0500\n> From: =?UTF-8?Q?Tori_Pe=C3=B1a?= <Tori.Pena at stonybrook.edu>\n> To: R Special Interest Group for Meta-Analysis\n> \t<r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] PET-PEESE Question\n> Message-ID:\n> \t<CAEmuQj8Waiq4Eho6bGbuUuvh81Ls2c0kYKGYvBPjcjw7OQVTcg at mail.gmail.com>\n> Content-Type: text/plain; charset=\"utf-8\"\n> \n> Hello,\n> \n> Thank you again for all your guidance.\n> \n> I have been trying to conduct PET-PEESE analyses on several rma.mv objects\n> by adding variance as a moderator.  The following code works well:\n> \n> #pet-peese test\n> m_1_pet <- rma.mv(yi = yi,\n>                       V = vi,\n>                       mods = ~ vi,\n>                       slab = STUDY.ID,\n>                       data = Relationship_TE_Occurrence,\n>                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n>                       test = \"t\",\n>                       method = \"REML\")\n> \n> summary(m_1_pet, digits=3)\n> \n> However, when I try to conduct the PEESE part I receive this error message:\n> \"Model matrix not of full rank. Cannot fit model\" for the following code:\n> \n> Relationship$SE_Mod <- Relationship$vi^2\n> \n> m_1_peese <- rma.mv(yi = yi,\n>                       V = vi,\n>                       mods = ~ SE_Mod,\n>                       slab = STUDY.ID,\n>                       data = Relationship_TE_Occurrence,\n>                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n>                       test = \"t\",\n>                       method = \"REML\")\n> \n> summary(m_1_peese, digits=3)\n> \n> Does anyone have any insight into why the model would fit for the PET part\n> but not the PEESE? I'm not sure how to fix this issue.\n> \n> Thanks,\n> Tori\n>",
       "body_snippet": "Dear Tori,\n\nvi refers to sampling variance in your code, right?\n\nIn that case, slight code adjustments seem necessary:\nPET: mods = ~sqrt(vi) #standard error as a moderator\nPEESE: PET: mods = ~vi #vari",
       "thread_id": "thread-17dc11a58593",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005009.html"
     },
     {
       "id": "msg-b54fbe9666d3",
@@ -300,7 +316,8 @@
       "body_snippet": "I have a question concerning whether to delete some of the data or not. I\nhave a dataset of 56 studies with a pooled effect size of g=1.25. Yet,\nthere are 4 data that reported an incredibly high effec",
       "thread_id": "thread-b54fbe9666d3",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005010.html"
     },
     {
       "id": "msg-d274497d22ee",
@@ -318,7 +335,8 @@
       "body_snippet": "Dear Nick\n\nApart from the two options you outline (include all, exclude four) I \nassume you have already investigated whether these four studies share \nsome common feature which might explain the diff",
       "thread_id": "thread-b54fbe9666d3",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005011.html"
     },
     {
       "id": "msg-5dda5a6841f3",
@@ -336,7 +354,8 @@
       "body_snippet": "Dear Nick,\n\nIt may be useful to add some additional context to your question for better\nassistance.\n\nFor example, do you have a multilevel data structure where each study could\nhave multiple rows or i",
       "thread_id": "thread-b54fbe9666d3",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005012.html"
     },
     {
       "id": "msg-0bc60f48f93f",
@@ -352,7 +371,8 @@
       "body_snippet": "Hello all,\n\nI am carrying out a multi-level meta-analysis and I have a question regarding publication bias in the context of subgroup analysis.\n\n\nI have noticed that many meta-regression models includ",
       "thread_id": "thread-0bc60f48f93f",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005013.html"
     },
     {
       "id": "msg-19f0b98cd646",
@@ -368,7 +388,8 @@
       "body_snippet": "Hello all,\n\nI am carrying out a multi-level meta-analysis and I have a question regarding publication bias in the context of subgroup analysis.\n\nI have noticed that many meta-regression models include",
       "thread_id": "thread-19f0b98cd646",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005014.html"
     },
     {
       "id": "msg-48560407f42b",
@@ -386,7 +407,8 @@
       "body_snippet": "Hi Daniel,\n\nI am not sure why you posted the same question twice -- I'll respond to this one.\n\nIn what sense do you mean 'subgroup analysis'? To me, a subgroup analysis is one where studies are split ",
       "thread_id": "thread-19f0b98cd646",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005015.html"
     },
     {
       "id": "msg-892db05b2177",
@@ -401,11 +423,12 @@
         "<mailman.5008.8751.1701834336.1361.r-sig-meta-analysis@r-project.org>",
         "<d6ed1565-c73c-47de-947f-07c2f1bc9f9f@uni-osnabrueck.de>"
       ],
-      "body_plain": "There is another issue:\n\nRelationship$SE_Mod <- Relationship$vi^2\n\nbut the dataset is called \"Relationship_TE_Occurrence\".\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Lukasz Stasielowicz via R-sig-meta-analysis\n> Sent: Wednesday, December 6, 2023 08:53\n> To: r-sig-meta-analysis at r-project.org\n> Cc: Lukasz Stasielowicz <lukasz.stasielowicz at uni-osnabrueck.de>\n> Subject: Re: [R-meta] PET-PEESE Question\n>\n> Dear Tori,\n>\n> vi refers to sampling variance in your code, right?\n>\n> In that case, slight code adjustments seem necessary:\n> PET: mods = ~sqrt(vi) #standard error as a moderator\n> PEESE: PET: mods = ~vi #variance as a moderator\n>\n>\n> Further reading:\n> https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/pub-bias.html#pet-\n> peese\n>\n>\n> Best,\n> Lukasz\n> --\n> Lukasz Stasielowicz\n> Osnabr?ck University\n> Institute for Psychology\n> Research methods, psychological assessment, and evaluation\n> Lise-Meitner-Stra?e 3\n> 49076 Osnabr?ck (Germany)\n> Twitter: https://twitter.com/l_stasielowicz\n> Tel.: +49 541 969-7735\n>\n> > Hello,\n> >\n> > Thank you again for all your guidance.\n> >\n> > I have been trying to conduct PET-PEESE analyses on several rma.mv objects\n> > by adding variance as a moderator.  The following code works well:\n> >\n> > #pet-peese test\n> > m_1_pet <- rma.mv(yi = yi,\n> >                       V = vi,\n> >                       mods = ~ vi,\n> >                       slab = STUDY.ID,\n> >                       data = Relationship_TE_Occurrence,\n> >                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n> >                       test = \"t\",\n> >                       method = \"REML\")\n> >\n> > summary(m_1_pet, digits=3)\n> >\n> > However, when I try to conduct the PEESE part I receive this error message:\n> > \"Model matrix not of full rank. Cannot fit model\" for the following code:\n> >\n> > Relationship$SE_Mod <- Relationship$vi^2\n> >\n> > m_1_peese <- rma.mv(yi = yi,\n> >                       V = vi,\n> >                       mods = ~ SE_Mod,\n> >                       slab = STUDY.ID,\n> >                       data = Relationship_TE_Occurrence,\n> >                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n> >                       test = \"t\",\n> >                       method = \"REML\")\n> >\n> > summary(m_1_peese, digits=3)\n> >\n> > Does anyone have any insight into why the model would fit for the PET part\n> > but not the PEESE? I'm not sure how to fix this issue.\n> >\n> > Thanks,\n> > Tori",
+      "body_plain": "There is another issue:\n\nRelationship$SE_Mod <- Relationship$vi^2\n\nbut the dataset is called \"Relationship_TE_Occurrence\".\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Lukasz Stasielowicz via R-sig-meta-analysis\n> Sent: Wednesday, December 6, 2023 08:53\n> To: r-sig-meta-analysis at r-project.org\n> Cc: Lukasz Stasielowicz <lukasz.stasielowicz at uni-osnabrueck.de>\n> Subject: Re: [R-meta] PET-PEESE Question\n>\n> Dear Tori,\n>\n> vi refers to sampling variance in your code, right?\n>\n> In that case, slight code adjustments seem necessary:\n> PET: mods = ~sqrt(vi) #standard error as a moderator\n> PEESE: PET: mods = ~vi #variance as a moderator\n>\n>\n> Further reading:\n> https://bookdown.org/MathiasHarrer/Doing_Meta_Analysis_in_R/pub-bias.html#pet-\n> peese\n>\n>\n> Best,\n> Lukasz\n> --\n> Lukasz Stasielowicz\n> Osnabrück University\n> Institute for Psychology\n> Research methods, psychological assessment, and evaluation\n> Lise-Meitner-Straße 3\n> 49076 Osnabrück (Germany)\n> Twitter: https://twitter.com/l_stasielowicz\n> Tel.: +49 541 969-7735\n>\n> > Hello,\n> >\n> > Thank you again for all your guidance.\n> >\n> > I have been trying to conduct PET-PEESE analyses on several rma.mv objects\n> > by adding variance as a moderator.  The following code works well:\n> >\n> > #pet-peese test\n> > m_1_pet <- rma.mv(yi = yi,\n> >                       V = vi,\n> >                       mods = ~ vi,\n> >                       slab = STUDY.ID,\n> >                       data = Relationship_TE_Occurrence,\n> >                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n> >                       test = \"t\",\n> >                       method = \"REML\")\n> >\n> > summary(m_1_pet, digits=3)\n> >\n> > However, when I try to conduct the PEESE part I receive this error message:\n> > \"Model matrix not of full rank. Cannot fit model\" for the following code:\n> >\n> > Relationship$SE_Mod <- Relationship$vi^2\n> >\n> > m_1_peese <- rma.mv(yi = yi,\n> >                       V = vi,\n> >                       mods = ~ SE_Mod,\n> >                       slab = STUDY.ID,\n> >                       data = Relationship_TE_Occurrence,\n> >                       random = ~ 1 | STUDY.ID/EFFECT_SIZE_ID,\n> >                       test = \"t\",\n> >                       method = \"REML\")\n> >\n> > summary(m_1_peese, digits=3)\n> >\n> > Does anyone have any insight into why the model would fit for the PET part\n> > but not the PEESE? I'm not sure how to fix this issue.\n> >\n> > Thanks,\n> > Tori",
       "body_snippet": "There is another issue:\n\nRelationship$SE_Mod <- Relationship$vi^2\n\nbut the dataset is called \"Relationship_TE_Occurrence\".\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-",
       "thread_id": "thread-17dc11a58593",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005016.html"
     },
     {
       "id": "msg-69b381be6627",
@@ -425,7 +448,8 @@
       "body_snippet": "Hi Daniel,\n\nI don't think you ever got a response to this.\n\nI don't have much to say about this anyway, except that *very rarely* does it ever make sense to run a meta-analysis on test statistics. In ",
       "thread_id": "thread-18c8b36d706b",
       "thread_depth": 3,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005017.html"
     },
     {
       "id": "msg-6bdd9bf74d9a",
@@ -440,11 +464,12 @@
         "<YT1PR01MB40126D728F940089E6D03D04EC88A@YT1PR01MB4012.CANPRD01.PROD.OUTLOOK.COM>",
         "<AS8PR08MB9193147AEE33499AF0C2DF3D8B88A@AS8PR08MB9193.eurprd08.prod.outlook.com>"
       ],
-      "body_plain": "Hi all,\n\nOnly to clarify notions: Cochrane uses the term \"subgroup analysis\" in both meanings, conducting separate meta-analyses within subgroups and meta-analysing all studies in one analysis, with \"subgroup\" as a covariate, i.e., meta-analysis with a categorial covariate. See https://training.cochrane.org/handbook/current/chapter-10#section-10-11-2 and https://training.cochrane.org/handbook/current/chapter-10#section-10-11-3-1 . R package meta also uses this terminology.\n\nBest,\nGerta\n\n\nUNIVERSIT?TSKLINIKUM FREIBURG\nInstitute for Medical Biometry and Statistics\n\nDr. Gerta R?cker\nGuest Scientist\n\nStefan-Meier-Stra?e 26 ? 79104 Freiburg\ngerta.ruecker at uniklinik-freiburg.de\n\nhttps://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker\n\n\n-----Urspr?ngliche Nachricht-----\nVon: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> Im Auftrag von Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis\nGesendet: Sonntag, 10. Dezember 2023 20:35\nAn: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>\nCc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>\nBetreff: Re: [R-meta] Publication bias in the context of subgroup analysis\n\nHi Daniel,\n\nI am not sure why you posted the same question twice -- I'll respond to this one.\n\nIn what sense do you mean 'subgroup analysis'? To me, a subgroup analysis is one where studies are split into subgroups and one fits models within these subgroups. This is not what you are doing below, at least the code doesn't reflect this.\n\nIf your question is about using something like SE (or SE^2) as a predictor in the context of a model that includes other moderators, then the answer is yes. A relevant article in this regard is:\n\nCoburn, K. M., & Vevea, J. L. (2015). Publication bias as a function of study characteristics. Psychological Methods, 20(3), 310-330. https://doi.org/10.1037/met0000046\n\nIt doesn't discuss multilevel models, but the point is that sometimes there might be a relationship between the effect sizes and the standard errors because of some confounding with other variables. For example, suppose we have two sets of studies in our meta-analysis, the first consisting of RCTs, the other non-randomized studies. Furthermore, assume that there is no publication bias going on. But now suppose that RCTs (which tend to be smaller due to the additional complexities of running a trial) tend to yield smaller (or larger) effects than the non-randomized studies (maybe the non-randomized studies are yielding somewhat biased estimates). In this situation, the funnel plot may look asymmetric, not because of publication bias, but because of the confounding of the SEs with study type. When including study type as a moderators, then this confounding is controlled for and we find no association between the effect sizes and SEs (rightly so). This shows that it may actually be very important to account for relevant moderators before examining the data for a relationship between the SEs and the effect sizes.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Daniel Foster via R-sig-meta-analysis\n> Sent: Sunday, December 10, 2023 18:48\n> To: Daniel Foster via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>\n> Cc: Daniel Foster <daniel.foster at utoronto.ca>\n> Subject: [R-meta] Publication bias in the context of subgroup analysis\n>\n> Hello all,\n>\n> I am carrying out a multi-level meta-analysis and I have a question regarding\n> publication bias in the context of subgroup analysis.\n>\n> I have noticed that many meta-regression models include a precision measure (SE\n> or SE^2) in their final model along with covariates. Is the same true for\n> subgroup analysis in a multi-level analysis wherein moderators are tested\n> individually?\n>\n> For example:\n> moderertorX <- rma.mv(yi, vi, mods = ~ SE + moderertorX, random = list(~ 1 |\n> EffectSize_ID, ~1 | Study_ID), tdist=TRUE, data=data)\n>\n> Thanks!\n> Daniel\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis",
+      "body_plain": "Hi all,\n\nOnly to clarify notions: Cochrane uses the term \"subgroup analysis\" in both meanings, conducting separate meta-analyses within subgroups and meta-analysing all studies in one analysis, with \"subgroup\" as a covariate, i.e., meta-analysis with a categorial covariate. See https://training.cochrane.org/handbook/current/chapter-10#section-10-11-2 and https://training.cochrane.org/handbook/current/chapter-10#section-10-11-3-1 . R package meta also uses this terminology.\n\nBest,\nGerta\n\n\nUNIVERSITÄTSKLINIKUM FREIBURG\nInstitute for Medical Biometry and Statistics\n\nDr. Gerta Rücker\nGuest Scientist\n\nStefan-Meier-Straße 26 · 79104 Freiburg\ngerta.ruecker at uniklinik-freiburg.de\n\nhttps://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker\n\n\n-----Ursprüngliche Nachricht-----\nVon: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> Im Auftrag von Viechtbauer, Wolfgang (NP) via R-sig-meta-analysis\nGesendet: Sonntag, 10. Dezember 2023 20:35\nAn: R Special Interest Group for Meta-Analysis <r-sig-meta-analysis at r-project.org>\nCc: Viechtbauer, Wolfgang (NP) <wolfgang.viechtbauer at maastrichtuniversity.nl>\nBetreff: Re: [R-meta] Publication bias in the context of subgroup analysis\n\nHi Daniel,\n\nI am not sure why you posted the same question twice -- I'll respond to this one.\n\nIn what sense do you mean 'subgroup analysis'? To me, a subgroup analysis is one where studies are split into subgroups and one fits models within these subgroups. This is not what you are doing below, at least the code doesn't reflect this.\n\nIf your question is about using something like SE (or SE^2) as a predictor in the context of a model that includes other moderators, then the answer is yes. A relevant article in this regard is:\n\nCoburn, K. M., & Vevea, J. L. (2015). Publication bias as a function of study characteristics. Psychological Methods, 20(3), 310-330. https://doi.org/10.1037/met0000046\n\nIt doesn't discuss multilevel models, but the point is that sometimes there might be a relationship between the effect sizes and the standard errors because of some confounding with other variables. For example, suppose we have two sets of studies in our meta-analysis, the first consisting of RCTs, the other non-randomized studies. Furthermore, assume that there is no publication bias going on. But now suppose that RCTs (which tend to be smaller due to the additional complexities of running a trial) tend to yield smaller (or larger) effects than the non-randomized studies (maybe the non-randomized studies are yielding somewhat biased estimates). In this situation, the funnel plot may look asymmetric, not because of publication bias, but because of the confounding of the SEs with study type. When including study type as a moderators, then this confounding is controlled for and we find no association between the effect sizes and SEs (rightly so). This shows that it may actually be very important to account for relevant moderators before examining the data for a relationship between the SEs and the effect sizes.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf\n> Of Daniel Foster via R-sig-meta-analysis\n> Sent: Sunday, December 10, 2023 18:48\n> To: Daniel Foster via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>\n> Cc: Daniel Foster <daniel.foster at utoronto.ca>\n> Subject: [R-meta] Publication bias in the context of subgroup analysis\n>\n> Hello all,\n>\n> I am carrying out a multi-level meta-analysis and I have a question regarding\n> publication bias in the context of subgroup analysis.\n>\n> I have noticed that many meta-regression models include a precision measure (SE\n> or SE^2) in their final model along with covariates. Is the same true for\n> subgroup analysis in a multi-level analysis wherein moderators are tested\n> individually?\n>\n> For example:\n> moderertorX <- rma.mv(yi, vi, mods = ~ SE + moderertorX, random = list(~ 1 |\n> EffectSize_ID, ~1 | Study_ID), tdist=TRUE, data=data)\n>\n> Thanks!\n> Daniel\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis",
       "body_snippet": "Hi all,\n\nOnly to clarify notions: Cochrane uses the term \"subgroup analysis\" in both meanings, conducting separate meta-analyses within subgroups and meta-analysing all studies in one analysis, with \"",
       "thread_id": "thread-19f0b98cd646",
       "thread_depth": 2,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005018.html"
     },
     {
       "id": "msg-e08063a72a48",
@@ -460,7 +485,8 @@
       "body_snippet": "Hello all,\n     As I read through the \"Doing meta in R\" website and to the part of\nmeta-regression, this is the example that the website provides in order to\nchange the categorical moderators into num",
       "thread_id": "thread-e08063a72a48",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005019.html"
     },
     {
       "id": "msg-0384be816d84",
@@ -478,7 +504,8 @@
       "body_snippet": "Dear Nick,\n\nOne does not have to manually change a categorical moderator into a numerical one to examine interactions. Of course, categorical moderators are represented in a model in terms of numerica",
       "thread_id": "thread-e08063a72a48",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005020.html"
     },
     {
       "id": "msg-07a207579bc8",
@@ -494,7 +521,8 @@
       "body_snippet": "Dear Wolfgang,\n     Sorry for another interruption. I ran into two more questions. First,\nwhen I was trying to write the code like this:\n\ndat$duration <- cut(dat$duration, breaks=c(0,4,8,12),\nlabels=c",
       "thread_id": "thread-07a207579bc8",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005021.html"
     },
     {
       "id": "msg-aae0ab63d814",
@@ -512,7 +540,8 @@
       "body_snippet": "An HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231212/4aba1735/attachment.html>",
       "thread_id": "thread-aae0ab63d814",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005022.html"
     },
     {
       "id": "msg-cd975c96eb9e",
@@ -530,7 +559,8 @@
       "body_snippet": "Comments in-line\n\nOn 11/12/2023 23:21, ?????? via R-sig-meta-analysis wrote:\n> Dear Wolfgang,\n>       Sorry for another interruption. I ran into two more questions. First,\n> when I was trying to write",
       "thread_id": "thread-07a207579bc8",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005023.html"
     },
     {
       "id": "msg-5652d300179e",
@@ -549,7 +579,8 @@
       "body_snippet": "Dear Alberto,\n\nNo, as far as I understand your question, CVLN and SDLN are not measures that are relevant for your meta-analysis. One would have to use the equations given in the article you reference",
       "thread_id": "thread-aae0ab63d814",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005024.html"
     },
     {
       "id": "msg-c59e6cb6b3ed",
@@ -565,7 +596,8 @@
       "body_snippet": "Hello Experts,\n\nI'm collecting the correlations between 8 variables from several studies.\nIf a study has used a single measure for all these 8 variables, I will need\n28 rows (assuming no missing) to c",
       "thread_id": "thread-c59e6cb6b3ed",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005025.html"
     },
     {
       "id": "msg-1875f26a75a6",
@@ -583,7 +615,8 @@
       "body_snippet": "Hi Yuhang,\n\nFirst of all, I would suggest to create two separate variables for the two variables, like this:\n\n    study    ri   ni  var1  var2\n1)  1        .1   85  1     2\n...\n28) 1        .2   85  7",
       "thread_id": "thread-c59e6cb6b3ed",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005026.html"
     },
     {
       "id": "msg-469fbf393c75",
@@ -599,7 +632,8 @@
       "body_snippet": "Hello everyone,\n\nI recently came across a paper that used \"ML\" estimation for a multi-level\nmeta-analysis, i.e. using \"ML\" with \"rma.mv\" function.\n\nAccording to \"metafor\" description, it says that, \"u",
       "thread_id": "thread-469fbf393c75",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005027.html"
     },
     {
       "id": "msg-46d3b6fd8acf",
@@ -613,11 +647,12 @@
       "references": [
         "<CADWK9cfzoa9oB-GRR1VjJT0vb_huQ8LYZYvm6TGiAMmxHdP9UQ@mail.gmail.com>"
       ],
-      "body_plain": "Hey Tharaka,\n\nTwo points for your consideration:\n\n1. ?Some simulation papers show that ML underestimates variance components, while REML does not. When sample sizes are not small, they should converge very well. Also, they do not show substantial discrepancy in the fixed effects estimation.\n\n2. In the context of model selection, conventional wisdom thinks ML and REML matter a lot, because you can not directly compare likelihoods from REML models with different fixed effects. Interestingly, there is also simulation work indicating that using REML as an estimator for model selection is doable.\n\nThere are quite a few papers on the heterogeneity estimator in the context of meta-analysis. For example,\n\nViechtbauer W. Bias and efficiency of meta-analytic variance estimators in the random-effects model[J]. Journal of Educational and Behavioral Statistics, 2005, 30(3): 261-293.\nVeroniki A A, Jackson D, Viechtbauer W, et al. Methods to estimate the between?study variance and its uncertainty in meta?analysis[J]. Research synthesis methods, 2016, 7(1): 55-79.\nPetropoulou M, Mavridis D. A comparison of 20 heterogeneity variance estimators in statistical synthesis of results from studies: a simulation study[J]. Statistics in medicine, 2017, 36(27): 4266-4280.\nLangan D, Higgins J P T, Jackson D, et al. A comparison of heterogeneity variance estimators in simulated random?effects meta?analyses[J]. Research synthesis methods, 2019, 10(1): 83-98.\n\nRegards,\nYefeng\n________________________________\nFrom: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Tharaka S. Priyadarshana via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>\nSent: 14 December 2023 8:16\nTo: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>\nCc: Tharaka S. Priyadarshana <tharakas.priyadarshana at gmail.com>\nSubject: [R-meta] ML or REML in rma.mv\n\nHello everyone,\n\nI recently came across a paper that used \"ML\" estimation for a multi-level\nmeta-analysis, i.e. using \"ML\" with \"rma.mv\" function.\n\nAccording to \"metafor\" description, it says that, \"use of restricted\nmaximum likelihood (REML) estimation is generally recommended\";\nhttps://wviechtb.github.io/metafor/reference/misc-recs.html#:~:text=When%20fitting%20models%20with%20the,method%3D%22REML%22%20\n).\n\nCould someone please explain to me whether is it possible to get\ndifferent results if someone uses \"ML\" estimation instead of \"REML\" with \"\"\nrma.mv\" function? If yes/no, why is that?\nThen, what are the major issues if \"ML\" estimation is used instead of\n\"REML\" with \"\"rma.mv\" function?\nCould you please also share if you have any references (or any other\nexamples) that discuss these points? I mean the use of \"ML\" or \"REML\"\nestimation in multi-level meta-analytic models.\n\nThank you very much.\n\nBest regards,\nTharaka\n\n        [[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n\t[[alternative HTML version deleted]]",
-      "body_snippet": "Hey Tharaka,\n\nTwo points for your consideration:\n\n1. ?Some simulation papers show that ML underestimates variance components, while REML does not. When sample sizes are not small, they should converge",
+      "body_plain": "Hey Tharaka,\n\nTwo points for your consideration:\n\n1. ​Some simulation papers show that ML underestimates variance components, while REML does not. When sample sizes are not small, they should converge very well. Also, they do not show substantial discrepancy in the fixed effects estimation.\n\n2. In the context of model selection, conventional wisdom thinks ML and REML matter a lot, because you can not directly compare likelihoods from REML models with different fixed effects. Interestingly, there is also simulation work indicating that using REML as an estimator for model selection is doable.\n\nThere are quite a few papers on the heterogeneity estimator in the context of meta-analysis. For example,\n\nViechtbauer W. Bias and efficiency of meta-analytic variance estimators in the random-effects model[J]. Journal of Educational and Behavioral Statistics, 2005, 30(3): 261-293.\nVeroniki A A, Jackson D, Viechtbauer W, et al. Methods to estimate the between‐study variance and its uncertainty in meta‐analysis[J]. Research synthesis methods, 2016, 7(1): 55-79.\nPetropoulou M, Mavridis D. A comparison of 20 heterogeneity variance estimators in statistical synthesis of results from studies: a simulation study[J]. Statistics in medicine, 2017, 36(27): 4266-4280.\nLangan D, Higgins J P T, Jackson D, et al. A comparison of heterogeneity variance estimators in simulated random‐effects meta‐analyses[J]. Research synthesis methods, 2019, 10(1): 83-98.\n\nRegards,\nYefeng\n________________________________\nFrom: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> on behalf of Tharaka S. Priyadarshana via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org>\nSent: 14 December 2023 8:16\nTo: r-sig-meta-analysis at r-project.org <r-sig-meta-analysis at r-project.org>\nCc: Tharaka S. Priyadarshana <tharakas.priyadarshana at gmail.com>\nSubject: [R-meta] ML or REML in rma.mv\n\nHello everyone,\n\nI recently came across a paper that used \"ML\" estimation for a multi-level\nmeta-analysis, i.e. using \"ML\" with \"rma.mv\" function.\n\nAccording to \"metafor\" description, it says that, \"use of restricted\nmaximum likelihood (REML) estimation is generally recommended\";\nhttps://wviechtb.github.io/metafor/reference/misc-recs.html#:~:text=When%20fitting%20models%20with%20the,method%3D%22REML%22%20\n).\n\nCould someone please explain to me whether is it possible to get\ndifferent results if someone uses \"ML\" estimation instead of \"REML\" with \"\"\nrma.mv\" function? If yes/no, why is that?\nThen, what are the major issues if \"ML\" estimation is used instead of\n\"REML\" with \"\"rma.mv\" function?\nCould you please also share if you have any references (or any other\nexamples) that discuss these points? I mean the use of \"ML\" or \"REML\"\nestimation in multi-level meta-analytic models.\n\nThank you very much.\n\nBest regards,\nTharaka\n\n        [[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n\n\t[[alternative HTML version deleted]]",
+      "body_snippet": "Hey Tharaka,\n\nTwo points for your consideration:\n\n1. ​Some simulation papers show that ML underestimates variance components, while REML does not. When sample sizes are not small, they should converge",
       "thread_id": "thread-469fbf393c75",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005028.html"
     },
     {
       "id": "msg-1938bbf0300b",
@@ -636,7 +671,8 @@
       "body_snippet": "Dear Wolfgang, thank you so much. A few observations.\n\n1- This is, as you said, \"very tedious to construct\". So, I really wonder\nif we \"*want* the model not to give us estimates of 'measure-specific'\n",
       "thread_id": "thread-c59e6cb6b3ed",
       "thread_depth": 2,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005029.html"
     },
     {
       "id": "msg-1f1e9413709a",
@@ -652,7 +688,8 @@
       "body_snippet": "Dear all,\n\n       When performing meta-regression analysis, I use this code to change\nturn a variable into a factor:\n\ndat$duration <- relevel\n<http://stat.ethz.ch/R-manual/R-devel/library/stats/html/r",
       "thread_id": "thread-1f1e9413709a",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005030.html"
     },
     {
       "id": "msg-3c2451b8ef0c",
@@ -672,7 +709,8 @@
       "body_snippet": "Please see my responses below.\n\nBest,\nWolfgang\n\n> -----Original Message-----\n> From: Yuhang Hu <yh342 at nau.edu>\n> Sent: Thursday, December 14, 2023 04:21\n> To: Viechtbauer, Wolfgang (NP) <wolfgang.v",
       "thread_id": "thread-c59e6cb6b3ed",
       "thread_depth": 3,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005031.html"
     },
     {
       "id": "msg-5b5953d84fd2",
@@ -690,7 +728,8 @@
       "body_snippet": "Dear Nick,\n\nPlease do not post in HTML format. See what this can do to posts -- makes things quite unreadable. See also the notes on the mailing list page: https://stat.ethz.ch/mailman/listinfo/r-sig-",
       "thread_id": "thread-1f1e9413709a",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005032.html"
     },
     {
       "id": "msg-8bd154ecd2b9",
@@ -706,7 +745,8 @@
       "body_snippet": "An HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231214/61da4c75/attachment.html>",
       "thread_id": "thread-8bd154ecd2b9",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005033.html"
     },
     {
       "id": "msg-20363466b686",
@@ -724,7 +764,8 @@
       "body_snippet": "Dear Marimuthu\n\nThere seems to be one in the metadat package (on CRAN). Look for \nobrien2003 in the manual.\n\nMichael\n\nOn 14/12/2023 16:50, Marimuthu S via R-sig-meta-analysis wrote:\n> Dear All,\n> \n> I",
       "thread_id": "thread-8bd154ecd2b9",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005034.html"
     },
     {
       "id": "msg-849888ccd955",
@@ -742,7 +783,8 @@
       "body_snippet": "Dear community,\n\nI have a question about the effect size distribution. It would be great if you would like to share your wisdom or just comment on it.\n\nI briefly describe my question as follows:\n\nI ha",
       "thread_id": "thread-849888ccd955",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005035.html"
     },
     {
       "id": "msg-f3f584f8e881",
@@ -756,11 +798,12 @@
       "references": [
         "<mailman.5037.7.1702638002.22263.r-sig-meta-analysis@r-project.org>"
       ],
-      "body_plain": "Dear Yefeng,\n\n\nEffect size benchmarks is an interesting topic.\n\nI will mention one potential question related to the third approach you \ndescribed: Is it really a realistic assumption that the effect sizes are \nnormally distributed?\n\nThe question follows from the work of Bosco and colleagues, e.g.\nBosco, F. A., Aguinis, H., Singh, K., Field, J. G., & Pierce, C. A. \n(2015). Correlational effect size benchmarks. Journal of Applied \nPsychology, 100(2), 431?449. https://doi.org/10.1037/a0038047\n\nIn one table (p. 436), they report percentiles for the distribution of \neffect sizes, which are based on approximately 150,000 effect sizes.\nIf we compare the distance between the 20th, 50th, and 80th percentiles, \nthen it seems that the distribution is not symmetrical:\n20th percentile vs. 50 percentile: r = .05 vs. r = .16 [Diff = .11]\n80th percentile vs. 50 percentile: r = .36 vs. r = .16 [Diff = .20]\nA similar pattern can be seen if we divide effect sizes into categories \n(e.g., construct type).\n\nOf course, it is possible that the effects are distributed normally in \nyour dataset or that you have already thought about the normality \nassumption. I just wanted to point out potential questions.\n\nAnother issue that comes to mind pertains to the Bayesian analysis. The \nchoice of the prior distribution (t, normal, Cauchy, etc.) might \ninfluence the shape of the posterior distribution. Therefore, one would \nneed a strong justification for testing only one prior. One possible \nsolution is to conduct sensitivity analyses with different distributions \nand parameter values (mean, sd, etc.). Similar posterior distributions \nwould indicate that the results are relatively robust.\n\n\n\n\nBest,\nLukasz\n-- \nLukasz Stasielowicz\nOsnabr?ck University\nInstitute for Psychology\nResearch methods, psychological assessment, and evaluation\nLise-Meitner-Stra?e 3\n49076 Osnabr?ck (Germany)\nTwitter: https://twitter.com/l_stasielowicz\nTel.: +49 541 969-7735\n\n\n\nOn 15.12.2023 12:00, r-sig-meta-analysis-request at r-project.org wrote:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. effect size estimates distribution and field-specific\n>        benchmarks (Yefeng Yang)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Thu, 14 Dec 2023 23:40:30 +0000\n> From: Yefeng Yang <yefeng.yang1 at unsw.edu.au>\n> To: \"r-sig-meta-analysis at r-project.org\"\n> \t<r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] effect size estimates distribution and\n> \tfield-specific benchmarks\n> Message-ID:\n> \t<SYCPR01MB54233D332FA8131F3559A0AA9D8CA at SYCPR01MB5423.ausprd01.prod.outlook.com>\n> \t\n> Content-Type: text/plain; charset=\"utf-8\"\n> \n> Dear community,\n> \n> I have a question about the effect size distribution. It would be great if you would like to share your wisdom or just comment on it.\n> \n> I briefly describe my question as follows:\n> \n> I have a collection of effect size estimates of a specific field, say using SMD. Somehow, the dataset is free of publication bias. Now I want to derive the empirical benchmarks to inform the magnitude of the effect size estimates.\n> I am clear about the pitfalls of using empirical benchmarks because the interpretation of effect size should be specific to the context of the question/field. But for now, let's discuss the technical approaches to get reliable benchmarks.\n> \n> At the moment, I am using four approaches:\n> \n>    1.  using the empirical distribution to get the relevant percentiles, say 25, 50, 75th\n>    2.  using the mixture model to approximate the distribution and get relevant percentiles\n>    3.  fitting a meta-analysis model to get mean and variance, and then recover the normal distribution to get the relevant percentiles\n>    4.  fitting a Bayesian MA and get the posterior distribution\n> \n> My purpose is to see whether different approaches converge in terms of the benchmarks (or more precisely, percentiles). Do you have any other approaches? General comments or suggestions are also welcome.\n> \n> Regards,\n> Yefeng\n> \n> \t[[alternative HTML version deleted]]\n> \n> \n> \n> \n> ------------------------------\n> \n> Subject: Digest Footer\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n> \n> ------------------------------\n> \n> End of R-sig-meta-analysis Digest, Vol 79, Issue 20\n> ***************************************************",
+      "body_plain": "Dear Yefeng,\n\n\nEffect size benchmarks is an interesting topic.\n\nI will mention one potential question related to the third approach you \ndescribed: Is it really a realistic assumption that the effect sizes are \nnormally distributed?\n\nThe question follows from the work of Bosco and colleagues, e.g.\nBosco, F. A., Aguinis, H., Singh, K., Field, J. G., & Pierce, C. A. \n(2015). Correlational effect size benchmarks. Journal of Applied \nPsychology, 100(2), 431–449. https://doi.org/10.1037/a0038047\n\nIn one table (p. 436), they report percentiles for the distribution of \neffect sizes, which are based on approximately 150,000 effect sizes.\nIf we compare the distance between the 20th, 50th, and 80th percentiles, \nthen it seems that the distribution is not symmetrical:\n20th percentile vs. 50 percentile: r = .05 vs. r = .16 [Diff = .11]\n80th percentile vs. 50 percentile: r = .36 vs. r = .16 [Diff = .20]\nA similar pattern can be seen if we divide effect sizes into categories \n(e.g., construct type).\n\nOf course, it is possible that the effects are distributed normally in \nyour dataset or that you have already thought about the normality \nassumption. I just wanted to point out potential questions.\n\nAnother issue that comes to mind pertains to the Bayesian analysis. The \nchoice of the prior distribution (t, normal, Cauchy, etc.) might \ninfluence the shape of the posterior distribution. Therefore, one would \nneed a strong justification for testing only one prior. One possible \nsolution is to conduct sensitivity analyses with different distributions \nand parameter values (mean, sd, etc.). Similar posterior distributions \nwould indicate that the results are relatively robust.\n\n\n\n\nBest,\nLukasz\n-- \nLukasz Stasielowicz\nOsnabrück University\nInstitute for Psychology\nResearch methods, psychological assessment, and evaluation\nLise-Meitner-Straße 3\n49076 Osnabrück (Germany)\nTwitter: https://twitter.com/l_stasielowicz\nTel.: +49 541 969-7735\n\n\n\nOn 15.12.2023 12:00, r-sig-meta-analysis-request at r-project.org wrote:\n> Send R-sig-meta-analysis mailing list submissions to\n> \tr-sig-meta-analysis at r-project.org\n> \n> To subscribe or unsubscribe via the World Wide Web, visit\n> \thttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> or, via email, send a message with subject or body 'help' to\n> \tr-sig-meta-analysis-request at r-project.org\n> \n> You can reach the person managing the list at\n> \tr-sig-meta-analysis-owner at r-project.org\n> \n> When replying, please edit your Subject line so it is more specific\n> than \"Re: Contents of R-sig-meta-analysis digest...\"\n> \n> \n> Today's Topics:\n> \n>     1. effect size estimates distribution and field-specific\n>        benchmarks (Yefeng Yang)\n> \n> ----------------------------------------------------------------------\n> \n> Message: 1\n> Date: Thu, 14 Dec 2023 23:40:30 +0000\n> From: Yefeng Yang <yefeng.yang1 at unsw.edu.au>\n> To: \"r-sig-meta-analysis at r-project.org\"\n> \t<r-sig-meta-analysis at r-project.org>\n> Subject: [R-meta] effect size estimates distribution and\n> \tfield-specific benchmarks\n> Message-ID:\n> \t<SYCPR01MB54233D332FA8131F3559A0AA9D8CA at SYCPR01MB5423.ausprd01.prod.outlook.com>\n> \t\n> Content-Type: text/plain; charset=\"utf-8\"\n> \n> Dear community,\n> \n> I have a question about the effect size distribution. It would be great if you would like to share your wisdom or just comment on it.\n> \n> I briefly describe my question as follows:\n> \n> I have a collection of effect size estimates of a specific field, say using SMD. Somehow, the dataset is free of publication bias. Now I want to derive the empirical benchmarks to inform the magnitude of the effect size estimates.\n> I am clear about the pitfalls of using empirical benchmarks because the interpretation of effect size should be specific to the context of the question/field. But for now, let's discuss the technical approaches to get reliable benchmarks.\n> \n> At the moment, I am using four approaches:\n> \n>    1.  using the empirical distribution to get the relevant percentiles, say 25, 50, 75th\n>    2.  using the mixture model to approximate the distribution and get relevant percentiles\n>    3.  fitting a meta-analysis model to get mean and variance, and then recover the normal distribution to get the relevant percentiles\n>    4.  fitting a Bayesian MA and get the posterior distribution\n> \n> My purpose is to see whether different approaches converge in terms of the benchmarks (or more precisely, percentiles). Do you have any other approaches? General comments or suggestions are also welcome.\n> \n> Regards,\n> Yefeng\n> \n> \t[[alternative HTML version deleted]]\n> \n> \n> \n> \n> ------------------------------\n> \n> Subject: Digest Footer\n> \n> _______________________________________________\n> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\n> To manage your subscription to this mailing list, go to:\n> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis\n> \n> \n> ------------------------------\n> \n> End of R-sig-meta-analysis Digest, Vol 79, Issue 20\n> ***************************************************",
       "body_snippet": "Dear Yefeng,\n\n\nEffect size benchmarks is an interesting topic.\n\nI will mention one potential question related to the third approach you \ndescribed: Is it really a realistic assumption that the effect ",
       "thread_id": "thread-f3f584f8e881",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005036.html"
     },
     {
       "id": "msg-f0453cad83d4",
@@ -776,7 +819,8 @@
       "body_snippet": "I'm doing a network meta-analysis, using netmeta (v2.9-0). There are a\nlarge number\nof potential comparisons in my network.\n\nMy current plot displays all comparisons (too many) where\nleast one study c",
       "thread_id": "thread-f0453cad83d4",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005037.html"
     },
     {
       "id": "msg-e4db6ecf6f7f",
@@ -795,7 +839,8 @@
       "body_snippet": "Dear Marimuthu,\n\nthe \"metadat\" package contains (at least) two additional data sets; if\nyou install the current version from github, via\n\n  remotes::install_github(\"wviechtb/metadat\", upgrade=FALSE)\n\n",
       "thread_id": "thread-8bd154ecd2b9",
       "thread_depth": 2,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005038.html"
     },
     {
       "id": "msg-231c03f16b06",
@@ -815,7 +860,8 @@
       "body_snippet": "An HTML attachment was scrubbed...\nURL: <https://stat.ethz.ch/pipermail/r-sig-meta-analysis/attachments/20231218/69ede982/attachment.html>",
       "thread_id": "thread-8bd154ecd2b9",
       "thread_depth": 3,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005039.html"
     },
     {
       "id": "msg-52ff55a81497",
@@ -831,7 +877,8 @@
       "body_snippet": "Dear all,\n       This is part of my meta-regression analysis result after I use the\nfollowing code:\n\n> m.gen.edu <- metareg(m.gen, ~edu)\n\n    Model results:\n                               estimate  ..",
       "thread_id": "thread-52ff55a81497",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005040.html"
     },
     {
       "id": "msg-0cf1be82fb84",
@@ -849,7 +896,8 @@
       "body_snippet": "Dear Nick\n\nComments in line\n\nOn 19/12/2023 11:51, ?????? via R-sig-meta-analysis wrote:\n> Dear all,\n>         This is part of my meta-regression analysis result after I use the\n> following code:\n> \n>>",
       "thread_id": "thread-52ff55a81497",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005041.html"
     },
     {
       "id": "msg-e46f0ff510cf",
@@ -869,7 +917,8 @@
       "body_snippet": "Dear Michael and all,\n\n       Thank you for the swift response. I do have some further questions\nto ask.\n       (a) So, in order to \"remove\" the intercept, what code should I use?\n       (b) Let's say",
       "thread_id": "thread-e46f0ff510cf",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005042.html"
     },
     {
       "id": "msg-a630d5c120b2",
@@ -890,7 +939,8 @@
       "body_snippet": "Dear Nick\n\nComments in-line\n\nOn 19/12/2023 14:31, ?????? via R-sig-meta-analysis wrote:\n> Dear Michael and all,\n> \n>         Thank you for the swift response. I do have some further questions\n> to ask",
       "thread_id": "thread-e46f0ff510cf",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005043.html"
     },
     {
       "id": "msg-2bb114c20362",
@@ -904,11 +954,12 @@
       "references": [
         "<CAK-DBaCqAcmPNS77+JVjrnqvsA6VNaiaaJbGtLbWRkse_Sx7CQ@mail.gmail.com>"
       ],
-      "body_plain": "Hi Dale,\n\nI don't know the answer to your question (perhaps Guido has an idea), but there is a different way to (hopefully) shorten your output. By\n\n> forest(ns1, only.reference = TRUE)\n\nyou see the results only for comparisons with the reference treatment.\n\nBest,\nGerta\n\n\nUNIVERSIT?TSKLINIKUM FREIBURG\nInstitute for Medical Biometry and Statistics\n\nDr. Gerta R?cker\nGuest Scientist\n\nStefan-Meier-Stra?e 26 ? 79104 Freiburg\ngerta.ruecker at uniklinik-freiburg.de\n\nhttps://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker\n\n\n-----Urspr?ngliche Nachricht-----\nVon: Dale Steele via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> \nGesendet: Samstag, 16. Dezember 2023 00:29\nAn: r-sig-meta-analysis at r-project.org\nCc: Dale Steele <dale.w.steele at gmail.com>\nBetreff: [R-meta] using netmeta::netsplit()\n\nI'm doing a network meta-analysis, using netmeta (v2.9-0). There are a\nlarge number\nof potential comparisons in my network.\n\nMy current plot displays all comparisons (too many) where\nleast one study contributes direct evidence.\n\nns1 <- netsplit(net1)\nforest(ns1, show = \"both\")\n\nMy goal is to produce a forest plot showing only comparisons for which there\nare at least 3 studies with direct evidence.\n\nI think I want the 7 comparisons where k > 2\n> which(ns1$k > 2)\n[1] 120 127 130 132 147 237 253\n\nThanks!\n\n--Dale\n\n\t[[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis",
+      "body_plain": "Hi Dale,\n\nI don't know the answer to your question (perhaps Guido has an idea), but there is a different way to (hopefully) shorten your output. By\n\n> forest(ns1, only.reference = TRUE)\n\nyou see the results only for comparisons with the reference treatment.\n\nBest,\nGerta\n\n\nUNIVERSITÄTSKLINIKUM FREIBURG\nInstitute for Medical Biometry and Statistics\n\nDr. Gerta Rücker\nGuest Scientist\n\nStefan-Meier-Straße 26 · 79104 Freiburg\ngerta.ruecker at uniklinik-freiburg.de\n\nhttps://www.uniklinik-freiburg.de/imbi-en/employees.html?imbiuser=ruecker\n\n\n-----Ursprüngliche Nachricht-----\nVon: Dale Steele via R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> \nGesendet: Samstag, 16. Dezember 2023 00:29\nAn: r-sig-meta-analysis at r-project.org\nCc: Dale Steele <dale.w.steele at gmail.com>\nBetreff: [R-meta] using netmeta::netsplit()\n\nI'm doing a network meta-analysis, using netmeta (v2.9-0). There are a\nlarge number\nof potential comparisons in my network.\n\nMy current plot displays all comparisons (too many) where\nleast one study contributes direct evidence.\n\nns1 <- netsplit(net1)\nforest(ns1, show = \"both\")\n\nMy goal is to produce a forest plot showing only comparisons for which there\nare at least 3 studies with direct evidence.\n\nI think I want the 7 comparisons where k > 2\n> which(ns1$k > 2)\n[1] 120 127 130 132 147 237 253\n\nThanks!\n\n--Dale\n\n\t[[alternative HTML version deleted]]\n\n_______________________________________________\nR-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org\nTo manage your subscription to this mailing list, go to:\nhttps://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis",
       "body_snippet": "Hi Dale,\n\nI don't know the answer to your question (perhaps Guido has an idea), but there is a different way to (hopefully) shorten your output. By\n\n> forest(ns1, only.reference = TRUE)\n\nyou see the r",
       "thread_id": "thread-f0453cad83d4",
       "thread_depth": 1,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005044.html"
     },
     {
       "id": "msg-8084e64ecf22",
@@ -927,7 +978,8 @@
       "body_snippet": "Dale,\n\nOn GitHub, I added a new argument 'subset' to forest.netsplit() and print.netsplit() which can be used to define a subset of comparisons to print. E.g.,\nforest(ns1, subset = k >= 3)\n\nBest,\nGuid",
       "thread_id": "thread-f0453cad83d4",
       "thread_depth": 2,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005045.html"
     },
     {
       "id": "msg-9f8a6e08e8c0",
@@ -947,7 +999,8 @@
       "body_snippet": "Guido,\n\nWorks like a charm!\n\nBest.\n\n--Dale\n\nOn Thu, Dec 21, 2023 at 12:30?PM Dr. Guido Schwarzer <\nguido.schwarzer at uniklinik-freiburg.de> wrote:\n\n> Dale,\n>\n> On GitHub, I added a new argument 'subs",
       "thread_id": "thread-f0453cad83d4",
       "thread_depth": 3,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005046.html"
     },
     {
       "id": "msg-29076ac7336d",
@@ -963,7 +1016,8 @@
       "body_snippet": "Dear all,\n\nI would be very grateful if you could help me clarify my calculations.\n\nI am conducting a meta-analysis using metafor and want to calculate Hedges g \nav (see Lakens, 2013 - doi: 10.3389/fps",
       "thread_id": "thread-29076ac7336d",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005047.html"
     },
     {
       "id": "msg-5f2ddeb7597b",
@@ -979,7 +1033,8 @@
       "body_snippet": "Hello everyone. I'm Martin from Argentina. I am wanting to do a meta-analysis of the difference in means, baseline-final CRP drug vs pacebo. The problem is that complete data is not reported in most s",
       "thread_id": "thread-5f2ddeb7597b",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005048.html"
     },
     {
       "id": "msg-3e4a715735b1",
@@ -995,7 +1050,8 @@
       "body_snippet": "Dear all,\n\n\n\nIn my meta-analysis, I have multiple effect sizes coming from the same\nstudy, and these effects are nested with the studies.\n\nSo, to account for both between-study and within-study\nvarian",
       "thread_id": "thread-3e4a715735b1",
       "thread_depth": 0,
-      "month": "2023-12"
+      "month": "2023-12",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2023-December/005049.html"
     }
   ],
   "threads": [

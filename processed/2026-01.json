@@ -17,7 +17,8 @@
       "body_snippet": "Dear all,\nWe are pleased to announce the upcoming online course ?Meta-analysis in R?, taking place from 11?14 May.\n \nThis hands-on course provides a practical introduction to modern methods for system",
       "thread_id": "thread-32142a4f25f7",
       "thread_depth": 0,
-      "month": "2026-01"
+      "month": "2026-01",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2026-January/005625.html"
     },
     {
       "id": "msg-2874cbeefef4",
@@ -33,7 +34,8 @@
       "body_snippet": "Hi Everyone,\n\nI am trying to run a Bayesian meta-analysis with effect sizes from both between-subjects and within-subjects study designs. I tried to do my due-diligence, but I am confused. I have writ",
       "thread_id": "thread-2874cbeefef4",
       "thread_depth": 0,
-      "month": "2026-01"
+      "month": "2026-01",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2026-January/005626.html"
     },
     {
       "id": "msg-d6c6bf5b27fd",
@@ -47,11 +49,12 @@
       "references": [
         "<f50b33c9-db76-416c-bb7e-ddb1e65ce81f@Spark>"
       ],
-      "body_plain": "Hi all,\n\nQuick question about metafor::vcalc(): is there a way to specify different within-study correlations for sampling errors depending on study design (e.g., rho = 0.5 for between-subject studies and rho = 0.7 for within-subject studies), rather than using my likely inefficient workaround using clubSandwich::pattern_covariance_matrix() to build V?\n\nI?m currently doing this (toy example below) and would appreciate any guidance on whether vcalc() can handle this directly.\n\nThanks in advance!\n\nZhouhan\n\nlibrary(metafor); library(tidyverse); library(clubSandwich)\n\ndat.smc <- read.table(header=T, text=\"\nstudy time_interval   group      ni   mpre    mpost  sdpre  sdpost  design    age\nA     pre-post1       treat      28   0.89     5.07   1.40   3.20   between   adult\nA     pre-post2       treat      28   0.89     3.64   1.40   3.15   between   adult\nA     pre-post1       contl      58   1.22     3.52   1.76   2.58   between   young\nA     pre-post2       contl      58   1.22     2.86   1.76   2.80   between   young\nB     pre-post1       treat      38   1.89     4.07   0.40   2.20   within    young\nB     pre-post1       contl      48   2.22     2.52   0.76   1.58   within    young\")\n\ndatT <- escalc(\"SMCRP\", ni=ni, m1i=mpost, m2i=mpre, sd1i=sdpre, sd2i=sdpost, ri=rep(.7,3), data=subset(dat.smc,group==\"treat\"))\n\ndatC <- escalc(\"SMCRP\", ni=ni, m1i=mpost, m2i=mpre, sd1i=sdpre, sd2i=sdpost, ri=rep(.7,3), data=subset(dat.smc,group==\"contl\"))\n\narm <- \"group\"\nid  <- c(\"study\",\"time_interval\")\n\ndat <- datT %>%\n  select(all_of(c(id, \"yi\", \"vi\")), everything()) %>%\n  left_join(datC %>% select(all_of(id), yiC = yi, viC = vi), by = id) %>%\n  mutate(yi = yi - yiC, vi = vi + viC, effect = row_number()) %>%\n  select(-yiC, -viC)\n\n# Define larger correlations among effect sizes from within-subjects (0.7)\n# than those from between-subjects designs (0.5)\ndat2 <- dat %>%\n  group_by(study) %>%\n  mutate(rho_study = if_else(first(design) == \"within\", 0.7, 0.5)) %>%\n  ungroup()\n\nr_pat <- matrix(c(\n  0.7, 0.5,\n  0.5, 0.5\n), nrow = 2, byrow = TRUE,\ndimnames = list(c(\"within\",\"between\"), c(\"within\",\"between\")))\n\nV <- with(dat2, pattern_covariance_matrix(\n  vi = vi, cluster = study, pattern_level = design, r_pattern = r_pat, check_PD = TRUE))\n\nm <- rma.mv<http://rma.mv>(yi ~ 0 + time_interval, V, random = ~1|study/effect, data=dat2)\n\n\t[[alternative HTML version deleted]]",
+      "body_plain": "Hi all,\n\nQuick question about metafor::vcalc(): is there a way to specify different within-study correlations for sampling errors depending on study design (e.g., rho = 0.5 for between-subject studies and rho = 0.7 for within-subject studies), rather than using my likely inefficient workaround using clubSandwich::pattern_covariance_matrix() to build V?\n\nI’m currently doing this (toy example below) and would appreciate any guidance on whether vcalc() can handle this directly.\n\nThanks in advance!\n\nZhouhan\n\nlibrary(metafor); library(tidyverse); library(clubSandwich)\n\ndat.smc <- read.table(header=T, text=\"\nstudy time_interval   group      ni   mpre    mpost  sdpre  sdpost  design    age\nA     pre-post1       treat      28   0.89     5.07   1.40   3.20   between   adult\nA     pre-post2       treat      28   0.89     3.64   1.40   3.15   between   adult\nA     pre-post1       contl      58   1.22     3.52   1.76   2.58   between   young\nA     pre-post2       contl      58   1.22     2.86   1.76   2.80   between   young\nB     pre-post1       treat      38   1.89     4.07   0.40   2.20   within    young\nB     pre-post1       contl      48   2.22     2.52   0.76   1.58   within    young\")\n\ndatT <- escalc(\"SMCRP\", ni=ni, m1i=mpost, m2i=mpre, sd1i=sdpre, sd2i=sdpost, ri=rep(.7,3), data=subset(dat.smc,group==\"treat\"))\n\ndatC <- escalc(\"SMCRP\", ni=ni, m1i=mpost, m2i=mpre, sd1i=sdpre, sd2i=sdpost, ri=rep(.7,3), data=subset(dat.smc,group==\"contl\"))\n\narm <- \"group\"\nid  <- c(\"study\",\"time_interval\")\n\ndat <- datT %>%\n  select(all_of(c(id, \"yi\", \"vi\")), everything()) %>%\n  left_join(datC %>% select(all_of(id), yiC = yi, viC = vi), by = id) %>%\n  mutate(yi = yi - yiC, vi = vi + viC, effect = row_number()) %>%\n  select(-yiC, -viC)\n\n# Define larger correlations among effect sizes from within-subjects (0.7)\n# than those from between-subjects designs (0.5)\ndat2 <- dat %>%\n  group_by(study) %>%\n  mutate(rho_study = if_else(first(design) == \"within\", 0.7, 0.5)) %>%\n  ungroup()\n\nr_pat <- matrix(c(\n  0.7, 0.5,\n  0.5, 0.5\n), nrow = 2, byrow = TRUE,\ndimnames = list(c(\"within\",\"between\"), c(\"within\",\"between\")))\n\nV <- with(dat2, pattern_covariance_matrix(\n  vi = vi, cluster = study, pattern_level = design, r_pattern = r_pat, check_PD = TRUE))\n\nm <- rma.mv<http://rma.mv>(yi ~ 0 + time_interval, V, random = ~1|study/effect, data=dat2)\n\n\t[[alternative HTML version deleted]]",
       "body_snippet": "Hi all,\n\nQuick question about metafor::vcalc(): is there a way to specify different within-study correlations for sampling errors depending on study design (e.g., rho = 0.5 for between-subject studies",
       "thread_id": "thread-d6c6bf5b27fd",
       "thread_depth": 0,
-      "month": "2026-01"
+      "month": "2026-01",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2026-January/005627.html"
     }
   ],
   "threads": [
