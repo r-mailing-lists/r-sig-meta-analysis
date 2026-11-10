@@ -68,3 +68,56 @@ either approach inherently wrong?
 Thank you!
 
 
+From |reder|k@z|rn @end|ng |rom un|-kon@t@nz@de  Mon Nov  9 09:30:38 2026
+From: |reder|k@z|rn @end|ng |rom un|-kon@t@nz@de (Frederik Zirn)
+Date: Mon, 09 Nov 2026 09:30:38 +0100
+Subject: [R-meta] =?utf-8?q?CHE_Model=2C_modified_standard_errors_for_fun?=
+ =?utf-8?q?nel__plot=2C_cluster_robust_tests_vs_CWB?=
+Message-ID: <2f7f8ec1-1fa5-1707-7afc-aac86388cd4b@uni-konstanz.de>
+
+Dear Mailing list, 
+
+I am conducting a meta-analysis of 28 reports/articles with 30 studies and 110 effect sizes (from POWC and PPWC designs). I would appreciate your advice on three topics.
+
+Topic 1: CHE model and clustering
+I account for the fact that ES are nested in studies and sampling errors are correlated (same control group, multiple measurement points, etc.) by using a CHE model with RVE (Pustejovsky & Tipton, 2022). I assume a constant sampling correlation of 0.7 and conduct sensitivity analyses with other values:
+V <- vcalc(vi=vi, cluster=Study, obs=ES_ID, rho=0.7, data=dat) 
+model <- rma.mv(yi=yi, V=V, random=~1|Study/ES_ID, test = "t?, dfs = "contain?, method="REML", data=dat)
+robust(model, cluster=Study, clubSandwich=TRUE)
+In almost all cases, a report/article corresponds to a study in my dataset. However, two articles each report two studies based on totally independent samples. For those, I treat the studies as separate clusters. Is this appropriate, or should I account for the shared report by introducing another hierarchical level (report)? Since this concerns only 2 reports, I lean toward my current solution. 
+
+Topic 2: Modified standard errors
+Following Chen and Pustejovsky (2026), I'd like to use modified SE for funnel plots and Egger's regression to avoid the artificial association between standardized mean differences and their estimated sampling variances. Here is how I calculate my ES:
+# Posttest only with control group designs
+POWC <- escalc(measure="SMD", m1i=T_mean, m2i=C_mean, sd1i=T_SD, sd2i=C_SD, n1i=T_N, n2i=C_N, data=POWC)
+# Pretest posttest with control group designs
+TRE <- escalc(measure="SMCR", m1i=T2_mean, m2i=T1_mean, sd1i=T1_SD, ni=T2_N, ri=corT1T2, data=PPWC)
+CON <- escalc(measure="SMCR", m1i=C2_mean, m2i=C1_mean, sd1i=C1_SD, ni=C2_N, ri=corC1C2, data=PPWC)
+PPWC$yi <- TRE$yi - CON$yi 
+PPWC$vi <- TRE$vi + CON$vi
+For POWC designs, does escalc() use the variance formula assumed by Chen and Pustejovsky, such that their proposed modification can be applied directly? For PPWC designs, how should the sampling variances be modified? 
+
+Topic 3: Subgroup analysis and statistical inference
+I use an established taxonomy to classify intervention components and examine their effectiveness. For each component, I estimate the pooled effect among interventions containing it and test whether effects differ depending on its presence. Both analyses use the CHE model described above. 
+# Model 1: Pooled effects for component absence and presence
+model_groups <- rma.mv(yi, V, mods=~current_component-1, random=~1|Study/ES_ID, test = "t?, dfs = "contain?, method="REML", data=dat)
+robust(model_groups, cluster=Study, clubSandwich=TRUE)
+# Model 2: Difference between component absence and presence
+model_difference <-  rma.mv(yi, V, mods=~current_component, random=~1|Study/ES_ID, test = "t?, dfs = "contain?, method="REML", data=dat)
+robust(model_difference, cluster=Study, clubSandwich=TRUE)
+Many of the cluster robust moderator tests in Model 2 yield low Satterthwaite df (<4). Would you recommend a cluster wild bootstrap for these comparisons (Joshi et al., 2022), and if so, for all components or only those with low df in the cluster robust test (e.g., <2 or <4)? Should CR2 adjustments also be used within CWB? Wald_test_cwb(full_model=model_difference, constraints=constrain_zero(2), R=1999, seed=12345)
+
+I would greatly appreciate any advice or relevant references.
+
+
+Best regards
+
+Frederk Zirn
+PhD student
+
+Literature:
+Chen, M., & Pustejovsky, J. E. (2026). Addressing selective reporting bias in meta-analysis of dependent effect sizes: A tutorial in R. Psychological Methods. https://doi.org/10.1037/met0000841
+Joshi, M., Pustejovsky, J. E., & Beretvas, S. N. (2022). Cluster wild bootstrapping to handle dependent effect sizes in meta-analysis with a small number of studies. Research Synthesis Methods, 13(4), 457?477. https://doi.org/10.1002/jrsm.1554
+Pustejovsky, J. E., & Tipton, E. (2022). Meta-analysis with robust variance estimation: Expanding the range of working models. Prevention Science, 23(3), 425?438. https://doi.org/10.1007/s11121-021-01246-3
+
+

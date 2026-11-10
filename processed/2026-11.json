@@ -19,6 +19,23 @@
       "thread_depth": 0,
       "month": "2026-11",
       "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2026-November/005659.html"
+    },
+    {
+      "id": "msg-37e63af3d64d",
+      "message_id": "<2f7f8ec1-1fa5-1707-7afc-aac86388cd4b@uni-konstanz.de>",
+      "from_name": "Frederik Zirn",
+      "from_email_hash": "8c09ae4193586d12934d9d709f7cb1a4ef714085719688aff6c64d00513d9f11",
+      "date": "2026-11-09T08:30:38Z",
+      "subject": "[R-meta] CHE Model, modified standard errors for funnel  plot, cluster robust tests vs CWB",
+      "subject_clean": "[R-meta] CHE Model, modified standard errors for funnel  plot, cluster robust tests vs CWB",
+      "in_reply_to": null,
+      "references": [],
+      "body_plain": "Dear Mailing list, \n\nI am conducting a meta-analysis of 28 reports/articles with 30 studies and 110 effect sizes (from POWC and PPWC designs). I would appreciate your advice on three topics.\n\nTopic 1: CHE model and clustering\nI account for the fact that ES are nested in studies and sampling errors are correlated (same control group, multiple measurement points, etc.) by using a CHE model with RVE (Pustejovsky & Tipton, 2022). I assume a constant sampling correlation of 0.7 and conduct sensitivity analyses with other values:\nV <- vcalc(vi=vi, cluster=Study, obs=ES_ID, rho=0.7, data=dat) \nmodel <- rma.mv(yi=yi, V=V, random=~1|Study/ES_ID, test = \"t?, dfs = \"contain?, method=\"REML\", data=dat)\nrobust(model, cluster=Study, clubSandwich=TRUE)\nIn almost all cases, a report/article corresponds to a study in my dataset. However, two articles each report two studies based on totally independent samples. For those, I treat the studies as separate clusters. Is this appropriate, or should I account for the shared report by introducing another hierarchical level (report)? Since this concerns only 2 reports, I lean toward my current solution. \n\nTopic 2: Modified standard errors\nFollowing Chen and Pustejovsky (2026), I'd like to use modified SE for funnel plots and Egger's regression to avoid the artificial association between standardized mean differences and their estimated sampling variances. Here is how I calculate my ES:\n# Posttest only with control group designs\nPOWC <- escalc(measure=\"SMD\", m1i=T_mean, m2i=C_mean, sd1i=T_SD, sd2i=C_SD, n1i=T_N, n2i=C_N, data=POWC)\n# Pretest posttest with control group designs\nTRE <- escalc(measure=\"SMCR\", m1i=T2_mean, m2i=T1_mean, sd1i=T1_SD, ni=T2_N, ri=corT1T2, data=PPWC)\nCON <- escalc(measure=\"SMCR\", m1i=C2_mean, m2i=C1_mean, sd1i=C1_SD, ni=C2_N, ri=corC1C2, data=PPWC)\nPPWC$yi <- TRE$yi - CON$yi \nPPWC$vi <- TRE$vi + CON$vi\nFor POWC designs, does escalc() use the variance formula assumed by Chen and Pustejovsky, such that their proposed modification can be applied directly? For PPWC designs, how should the sampling variances be modified? \n\nTopic 3: Subgroup analysis and statistical inference\nI use an established taxonomy to classify intervention components and examine their effectiveness. For each component, I estimate the pooled effect among interventions containing it and test whether effects differ depending on its presence. Both analyses use the CHE model described above. \n# Model 1: Pooled effects for component absence and presence\nmodel_groups <- rma.mv(yi, V, mods=~current_component-1, random=~1|Study/ES_ID, test = \"t?, dfs = \"contain?, method=\"REML\", data=dat)\nrobust(model_groups, cluster=Study, clubSandwich=TRUE)\n# Model 2: Difference between component absence and presence\nmodel_difference <-  rma.mv(yi, V, mods=~current_component, random=~1|Study/ES_ID, test = \"t?, dfs = \"contain?, method=\"REML\", data=dat)\nrobust(model_difference, cluster=Study, clubSandwich=TRUE)\nMany of the cluster robust moderator tests in Model 2 yield low Satterthwaite df (<4). Would you recommend a cluster wild bootstrap for these comparisons (Joshi et al., 2022), and if so, for all components or only those with low df in the cluster robust test (e.g., <2 or <4)? Should CR2 adjustments also be used within CWB? Wald_test_cwb(full_model=model_difference, constraints=constrain_zero(2), R=1999, seed=12345)\n\nI would greatly appreciate any advice or relevant references.\n\n\nBest regards\n\nFrederk Zirn\nPhD student\n\nLiterature:\nChen, M., & Pustejovsky, J. E. (2026). Addressing selective reporting bias in meta-analysis of dependent effect sizes: A tutorial in R. Psychological Methods. https://doi.org/10.1037/met0000841\nJoshi, M., Pustejovsky, J. E., & Beretvas, S. N. (2022). Cluster wild bootstrapping to handle dependent effect sizes in meta-analysis with a small number of studies. Research Synthesis Methods, 13(4), 457?477. https://doi.org/10.1002/jrsm.1554\nPustejovsky, J. E., & Tipton, E. (2022). Meta-analysis with robust variance estimation: Expanding the range of working models. Prevention Science, 23(3), 425?438. https://doi.org/10.1007/s11121-021-01246-3",
+      "body_snippet": "Dear Mailing list, \n\nI am conducting a meta-analysis of 28 reports/articles with 30 studies and 110 effect sizes (from POWC and PPWC designs). I would appreciate your advice on three topics.\n\nTopic 1:",
+      "thread_id": "thread-37e63af3d64d",
+      "thread_depth": 0,
+      "month": "2026-11",
+      "source_url": "https://stat.ethz.ch/pipermail/r-sig-meta-analysis/2026-November/005660.html"
     }
   ],
   "threads": [
@@ -32,6 +49,17 @@
       "started": "2026-11-04T08:41:20Z",
       "last_reply": "2026-11-04T08:41:20Z",
       "root_message_id": "msg-4443b5a3ab20"
+    },
+    {
+      "id": "thread-37e63af3d64d",
+      "subject": "[R-meta] CHE Model, modified standard errors for funnel  plot, cluster robust tests vs CWB",
+      "message_count": 1,
+      "participants": [
+        "Frederik Zirn"
+      ],
+      "started": "2026-11-09T08:30:38Z",
+      "last_reply": "2026-11-09T08:30:38Z",
+      "root_message_id": "msg-37e63af3d64d"
     }
   ]
 }
