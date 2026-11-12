@@ -121,3 +121,509 @@ Joshi, M., Pustejovsky, J. E., & Beretvas, S. N. (2022). Cluster wild bootstrapp
 Pustejovsky, J. E., & Tipton, E. (2022). Meta-analysis with robust variance estimation: Expanding the range of working models. Prevention Science, 23(3), 425?438. https://doi.org/10.1007/s11121-021-01246-3
 
 
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Nov 11 13:09:05 2026
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 11 Nov 2026 12:09:05 +0000
+Subject: [R-meta] To multivariate (MVMA) or to multi-level meta-analyse
+ (MLMA)
+In-Reply-To: <CAOYO_yDNn=edbHYcXT=w6-HRHUzXMf+g85bBx=fdFut8tu6-Pg@mail.gmail.com>
+References: <CAOYO_yDNn=edbHYcXT=w6-HRHUzXMf+g85bBx=fdFut8tu6-Pg@mail.gmail.com>
+Message-ID: <AMBPR08MB4921283108012757A2421E4FAA8B712@AMBPR08MB492128.eurprd08.prod.outlook.com>
+
+Hi,
+
+I am not entirely sure what distinction you are drawing between a multilevel vs multivariate meta-analysis. Some multivariate models are identical to certain multilevel models, so any comparison would require clearly describing what models are being contrasted.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Jorge Teixeira via R-sig-meta-analysis
+> Sent: Wednesday, November 4, 2026 09:41
+> To: R meta <r-sig-meta-analysis at r-project.org>
+> Cc: Jorge Teixeira <jorgemmtteixeira at gmail.com>
+> Subject: [R-meta] To multivariate (MVMA) or to multi-level meta-analyse (MLMA)
+> 
+> Hi,
+> 
+> Recently, I have come across several hypertrophy meta-analyses of RCTs
+> with the following structure:
+> 
+> Study TX?CON SE Location Muscle
+> A 100 5 Upper Biceps
+> B 80 4 Upper Triceps
+> B 90 5 Upper Biceps
+> C 108 6 Lower RF
+> C 80 4 Lower VL
+> D 10 1 Lower VL Type I
+> D 15 2 Lower VL Type II
+> D 10 1 Lower VL Type IIb
+> E 80 4 Trunk Pec
+> 
+> These are typically small meta-analyses. I was introduced to
+> multilevel meta-analysis (MLMA) through cases such as Study D, where a
+> study contributes multiple effect sizes to the same comparison (e.g.,
+> more than two arms).
+> 
+> However, authors are also including different outcomes, such as upper-
+> versus lower-body muscles, and different muscles within those
+> anatomical regions. Although these outcomes share an underlying
+> construct (muscle hypertrophy), they are not necessarily measuring the
+> same thing.
+> 
+> Given the differences in anatomical location (upper vs. lower body)
+> and the variation between individual muscles, should these data be
+> analysed using multilevel (MLMA) or multivariate meta-analysis (MVMA)?
+> 
+> For the purpose of this discussion, I will ignore differences in
+> assessment methods (CSA vs. muscle thickness vs. muscle volume).
+> 
+> Case II
+> A real example: https://gyazo.com/eccb4fe57fb9189d291c0929f6628056
+> 
+> Nu?ez reports data from seven different anatomical sites.
+> 
+> Would MLMA or MVMA be more appropriate? Is either approach inherently wrong?
+> 
+> Case III
+> 
+> Another example from the same paper:
+> https://gyazo.com/8da1840567fa5e2d4c5f1d48106769ca
+> 
+> The authors combined countermovement jump (CMJ), drop jump (DJ), and
+> squat jump (SJ) into a single outcome, "jump performance", which I
+> think is reasonable when using Hedges' g.
+> 
+> However, Ram?rez-Campillo, for example, contributed data from all
+> three jump tests (CMJ, DJ, and SJ).
+> 
+> The same questions apply: would MLMA or MVMA be more appropriate? Is
+> either approach inherently wrong?
+> 
+> Thank you!
+
+From wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n|  Wed Nov 11 13:48:13 2026
+From: wo||g@ng@v|echtb@uer @end|ng |rom m@@@tr|chtun|ver@|ty@n| (Viechtbauer, Wolfgang (NP))
+Date: Wed, 11 Nov 2026 12:48:13 +0000
+Subject: [R-meta] CHE Model, modified standard errors for funnel  plot,
+ cluster robust tests vs CWB
+In-Reply-To: <2f7f8ec1-1fa5-1707-7afc-aac86388cd4b@uni-konstanz.de>
+References: <2f7f8ec1-1fa5-1707-7afc-aac86388cd4b@uni-konstanz.de>
+Message-ID: <AMBPR08MB492128749EAEE89218B28C1D2C8B712@AMBPR08MB492128.eurprd08.prod.outlook.com>
+
+Hi Frederk,
+
+Please see my responses below.
+
+Best,
+Wolfgang
+
+> -----Original Message-----
+> From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org> On Behalf
+> Of Frederik Zirn via R-sig-meta-analysis
+> Sent: Monday, November 9, 2026 09:31
+> To: r-sig-meta-analysis at r-project.org
+> Cc: Frederik Zirn <frederik.zirn at uni-konstanz.de>
+> Subject: [R-meta] CHE Model, modified standard errors for funnel plot, cluster
+> robust tests vs CWB
+> 
+> Dear Mailing list,
+> 
+> I am conducting a meta-analysis of 28 reports/articles with 30 studies and 110
+> effect sizes (from POWC and PPWC designs). I would appreciate your advice on
+> three topics.
+> 
+> Topic 1: CHE model and clustering
+> I account for the fact that ES are nested in studies and sampling errors are
+> correlated (same control group, multiple measurement points, etc.) by using a
+> CHE model with RVE (Pustejovsky & Tipton, 2022). I assume a constant sampling
+> correlation of 0.7 and conduct sensitivity analyses with other values:
+> V <- vcalc(vi=vi, cluster=Study, obs=ES_ID, rho=0.7, data=dat)
+> model <- rma.mv(yi=yi, V=V, random=~1|Study/ES_ID, test = "t?, dfs = "contain?,
+> method="REML", data=dat)
+> robust(model, cluster=Study, clubSandwich=TRUE)
+> In almost all cases, a report/article corresponds to a study in my dataset.
+> However, two articles each report two studies based on totally independent
+> samples. For those, I treat the studies as separate clusters. Is this
+> appropriate, or should I account for the shared report by introducing another
+> hierarchical level (report)? Since this concerns only 2 reports, I lean toward
+> my current solution.
+
+I would also not bother introducing another level here. It would be very difficult to distinguish article level variance from study level variance in this case.
+ 
+> Topic 2: Modified standard errors
+> Following Chen and Pustejovsky (2026), I'd like to use modified SE for funnel
+> plots and Egger's regression to avoid the artificial association between
+> standardized mean differences and their estimated sampling variances. Here is
+> how I calculate my ES:
+> # Posttest only with control group designs
+> POWC <- escalc(measure="SMD", m1i=T_mean, m2i=C_mean, sd1i=T_SD, sd2i=C_SD,
+> n1i=T_N, n2i=C_N, data=POWC)
+> # Pretest posttest with control group designs
+> TRE <- escalc(measure="SMCR", m1i=T2_mean, m2i=T1_mean, sd1i=T1_SD, ni=T2_N,
+> ri=corT1T2, data=PPWC)
+> CON <- escalc(measure="SMCR", m1i=C2_mean, m2i=C1_mean, sd1i=C1_SD, ni=C2_N,
+> ri=corC1C2, data=PPWC)
+> PPWC$yi <- TRE$yi - CON$yi
+> PPWC$vi <- TRE$vi + CON$vi
+> For POWC designs, does escalc() use the variance formula assumed by Chen and
+> Pustejovsky, such that their proposed modification can be applied directly? 
+
+No, escalc(measure="SMD", ...) by default uses
+
+vi = 1/n1 + 1/n2 + g^2 / (2*(n1+n2)) 
+
+as the sampling variance (so without the J^2 term). If you want to use equation (4) from that paper, you would neeed to use vtype="LS2". But I would just directly compute the adjusted sampling variance as
+
+vi_mod = 1/n1 + 1/n2
+
+for funnel plots and Egger regression. In essence, we are just leaving out the second term, which is often quite negligible anyway (unless the g value is very large). Say n1=n2=10 and g=0.5. Then 1/10 + 1/10 + 0.5^2 / (2*(10+10)) is 0.20625 while 1/10 + 1/10 is 0.2. So the variance based on the full equation is about 3% larger than when leaving out the second term. So that really makes little difference (but removes the inherent relationship between yi and vi).
+
+> For PPWC designs, how should the sampling variances be modified?
+
+The sampling variance for escalc(measure="SMCR", ...) is computed with
+
+2*(1-r) / n + g^2 / (2*n).
+
+But we have this for each group and then take the sum, so the whole expression for vi is then:
+
+vi = 2*(1-r1) / n1 + g1^2 / (2*n1) + 2*(1-r2) / n2 + g2^2 / (2*n2),
+
+where I use 1 for the first and 2 for the second group in analogy to the POWC case. So leaving out again the term involving the SMCR values themselves, we get:
+
+vi_mod = 2*(1-r1) / n1 + 2*(1-r2) / n2
+
+as the adjusted variance for funnel plots and Egger regression.
+
+> Topic 3: Subgroup analysis and statistical inference
+> I use an established taxonomy to classify intervention components and examine
+> their effectiveness. For each component, I estimate the pooled effect among
+> interventions containing it and test whether effects differ depending on its
+> presence. Both analyses use the CHE model described above.
+> # Model 1: Pooled effects for component absence and presence
+> model_groups <- rma.mv(yi, V, mods=~current_component-1, random=~1|Study/ES_ID,
+> test = "t?, dfs = "contain?, method="REML", data=dat)
+> robust(model_groups, cluster=Study, clubSandwich=TRUE)
+> # Model 2: Difference between component absence and presence
+> model_difference <-  rma.mv(yi, V, mods=~current_component,
+> random=~1|Study/ES_ID, test = "t?, dfs = "contain?, method="REML", data=dat)
+> robust(model_difference, cluster=Study, clubSandwich=TRUE)
+
+Just as a sidenote: You don't actually have to refit the model to get the model 2 results. You can store the robust() results from model 1 and then use anova() / predict() to get the same results. An example:
+
+library(metafor)
+
+dat <- dat.assink2016
+V <- vcalc(vi, cluster=study, obs=esid, data=dat, rho=0.6)
+res <- rma.mv(yi, V, mods = ~ 0 + deltype, random = ~ 1 | study/esid, data=dat)
+rob <- robust(res, cluster=study, clubSandwich=TRUE)
+rob
+
+res <- rma.mv(yi, V, mods = ~ deltype, random = ~ 1 | study/esid, data=dat)
+robust(res, cluster=study, clubSandwich=TRUE)
+
+anova(rob, X=rbind(c(-1,1,0), c(-1,0,1)))
+predict(rob, newmods=rbind(c(-1,1,0), c(-1,0,1)))
+
+(and when using the robust results only, you can skip test = "t", dfs = "contain"). Nothing wrong with refitting the model, but the whole machinery for testing contrasts and so on is available in metafor.
+
+> Many of the cluster robust moderator tests in Model 2 yield low Satterthwaite df
+> (<4). Would you recommend a cluster wild bootstrap for these comparisons (Joshi
+> et al., 2022), and if so, for all components or only those with low df in the
+> cluster robust test (e.g., <2 or <4)? Should CR2 adjustments also be used within
+> CWB? Wald_test_cwb(full_model=model_difference, constraints=constrain_zero(2),
+> R=1999, seed=12345)
+
+Using CWB is indeed a useful alternative approach. Whether one uses this by default everywhere or just for cases where the difference may be more noticeable is debatable. Not sure about the CR2 question - that refers to the robust() methods, not? So I don't see how this plays a role with CWB.
+
+> I would greatly appreciate any advice or relevant references.
+> 
+> Best regards
+> Frederk Zirn
+> PhD student
+> 
+> Literature:
+> Chen, M., & Pustejovsky, J. E. (2026). Addressing selective reporting bias in
+> meta-analysis of dependent effect sizes: A tutorial in R. Psychological Methods.
+> https://doi.org/10.1037/met0000841
+> Joshi, M., Pustejovsky, J. E., & Beretvas, S. N. (2022). Cluster wild
+> bootstrapping to handle dependent effect sizes in meta-analysis with a small
+> number of studies. Research Synthesis Methods, 13(4), 457?477.
+> https://doi.org/10.1002/jrsm.1554
+> Pustejovsky, J. E., & Tipton, E. (2022). Meta-analysis with robust variance
+> estimation: Expanding the range of working models. Prevention Science, 23(3),
+> 425?438. https://doi.org/10.1007/s11121-021-01246-3
+
+From jepu@to @end|ng |rom gm@||@com  Wed Nov 11 16:43:50 2026
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 11 Nov 2026 09:43:50 -0600
+Subject: [R-meta] CHE Model, modified standard errors for funnel plot,
+ cluster robust tests vs CWB
+In-Reply-To: <2f7f8ec1-1fa5-1707-7afc-aac86388cd4b@uni-konstanz.de>
+References: <2f7f8ec1-1fa5-1707-7afc-aac86388cd4b@uni-konstanz.de>
+Message-ID: <CAFUVuJwQMJr=zzZBr8BMQ2mHs3XiUQNQghra6azapgTMphVo5A@mail.gmail.com>
+
+Hi Frederik,
+
+Please see below for some further comments, following up on Wolfgang's.
+
+James
+
+On Mon, Nov 9, 2026 at 2:30?AM Frederik Zirn via R-sig-meta-analysis <
+r-sig-meta-analysis at r-project.org> wrote:
+
+> Dear Mailing list,
+>
+> I am conducting a meta-analysis of 28 reports/articles with 30 studies and
+> 110 effect sizes (from POWC and PPWC designs). I would appreciate your
+> advice on three topics.
+>
+> Topic 1: CHE model and clustering
+> I account for the fact that ES are nested in studies and sampling errors
+> are correlated (same control group, multiple measurement points, etc.) by
+> using a CHE model with RVE (Pustejovsky & Tipton, 2022). I assume a
+> constant sampling correlation of 0.7 and conduct sensitivity analyses with
+> other values:
+> V <- vcalc(vi=vi, cluster=Study, obs=ES_ID, rho=0.7, data=dat)
+> model <- rma.mv(yi=yi, V=V, random=~1|Study/ES_ID, test = "t?, dfs =
+> "contain?, method="REML", data=dat)
+> robust(model, cluster=Study, clubSandwich=TRUE)
+> In almost all cases, a report/article corresponds to a study in my
+> dataset. However, two articles each report two studies based on totally
+> independent samples. For those, I treat the studies as separate clusters.
+> Is this appropriate, or should I account for the shared report by
+> introducing another hierarchical level (report)? Since this concerns only 2
+> reports, I lean toward my current solution.
+>
+>
+I agree with Wolfgang's response. If you were challenged on treating the
+samples as independent, you could do the following:
+1. Create the V matrix with cluster = Sample
+2. Specify the (working) model with random effects for Sample and ES but
+not for study: random = ~ 1 | Sample / ES_ID
+3. Cluster the standard errors by study (which works because it is a higher
+level factor in which Sample is nested) to account for the possibility of
+unmodeled dependence across the samples fin the two studies that have
+multiple samples.
+
+This approach would leave your point estimates and variance component
+estimates unchanged from your current implementation. Only the standard
+errors for average effects / moderator coefficients would change, but I
+would guess that the changes will be miniscule (relative to clustering the
+standard errors by sample, as in your current implementation).
+
+
+> Topic 2: Modified standard errors
+> Following Chen and Pustejovsky (2026), I'd like to use modified SE for
+> funnel plots and Egger's regression to avoid the artificial association
+> between standardized mean differences and their estimated sampling
+> variances. Here is how I calculate my ES:
+> # Posttest only with control group designs
+> POWC <- escalc(measure="SMD", m1i=T_mean, m2i=C_mean, sd1i=T_SD,
+> sd2i=C_SD, n1i=T_N, n2i=C_N, data=POWC)
+> # Pretest posttest with control group designs
+> TRE <- escalc(measure="SMCR", m1i=T2_mean, m2i=T1_mean, sd1i=T1_SD,
+> ni=T2_N, ri=corT1T2, data=PPWC)
+> CON <- escalc(measure="SMCR", m1i=C2_mean, m2i=C1_mean, sd1i=C1_SD,
+> ni=C2_N, ri=corC1C2, data=PPWC)
+> PPWC$yi <- TRE$yi - CON$yi
+> PPWC$vi <- TRE$vi + CON$vi
+> For POWC designs, does escalc() use the variance formula assumed by Chen
+> and Pustejovsky, such that their proposed modification can be applied
+> directly? For PPWC designs, how should the sampling variances be modified?
+>
+> I agree with Wolfgang. As he noted, the difference between the
+conventional SE and the modified SE is very small in most cases, although
+it is enough to introduce artifactual correlation between effects and SEs,
+thereby biasing Egger's regression test.
+
+
+> Topic 3: Subgroup analysis and statistical inference
+> I use an established taxonomy to classify intervention components and
+> examine their effectiveness. For each component, I estimate the pooled
+> effect among interventions containing it and test whether effects differ
+> depending on its presence. Both analyses use the CHE model described above.
+> # Model 1: Pooled effects for component absence and presence
+> model_groups <- rma.mv(yi, V, mods=~current_component-1,
+> random=~1|Study/ES_ID, test = "t?, dfs = "contain?, method="REML", data=dat)
+> robust(model_groups, cluster=Study, clubSandwich=TRUE)
+> # Model 2: Difference between component absence and presence
+> model_difference <-  rma.mv(yi, V, mods=~current_component,
+> random=~1|Study/ES_ID, test = "t?, dfs = "contain?, method="REML", data=dat)
+> robust(model_difference, cluster=Study, clubSandwich=TRUE)
+> Many of the cluster robust moderator tests in Model 2 yield low
+> Satterthwaite df (<4). Would you recommend a cluster wild bootstrap for
+> these comparisons (Joshi et al., 2022), and if so, for all components or
+> only those with low df in the cluster robust test (e.g., <2 or <4)? Should
+> CR2 adjustments also be used within CWB?
+> Wald_test_cwb(full_model=model_difference, constraints=constrain_zero(2),
+> R=1999, seed=12345)
+>
+> Joshi's simulations showed that CWB led to improvements in Type I error
+and power only for tests with more than 1 *numerator* degree of freedom. If
+each of your current_component predictors is a binary variable, then each
+test should have just 1 numerator degree of freedom, so I would expect that
+you will get very similar results from CWB as you do from just using Wald
+tests with Satterthwaite degrees of freedom.
+
+If some of your predictors have more levels, such that you do have multiple
+numerator degrees of freedom, then yes CWB is useful because it both better
+controls Type I error and improves power (something that doesn't happen
+that often in the world of statistics). If you do need to use CWB, then it
+is not necessary to use the CR2 correction as well (it will just slow down
+the bootstrap calculations, but is superfluous as far as Type I error
+control, per Joshi et al. 2022).
+
+I would greatly appreciate any advice or relevant references.
+>
+> Best regards
+> Frederk Zirn
+> PhD student
+>
+> Literature:
+> Chen, M., & Pustejovsky, J. E. (2026). Addressing selective reporting bias
+> in meta-analysis of dependent effect sizes: A tutorial in R. Psychological
+> Methods. https://doi.org/10.1037/met0000841
+> Joshi, M., Pustejovsky, J. E., & Beretvas, S. N. (2022). Cluster wild
+> bootstrapping to handle dependent effect sizes in meta-analysis with a
+> small number of studies. Research Synthesis Methods, 13(4), 457?477.
+> https://doi.org/10.1002/jrsm.1554
+> Pustejovsky, J. E., & Tipton, E. (2022). Meta-analysis with robust
+> variance estimation: Expanding the range of working models. Prevention
+> Science, 23(3), 425?438. https://doi.org/10.1007/s11121-021-01246-3
+>
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
+From jepu@to @end|ng |rom gm@||@com  Wed Nov 11 19:08:20 2026
+From: jepu@to @end|ng |rom gm@||@com (James Pustejovsky)
+Date: Wed, 11 Nov 2026 12:08:20 -0600
+Subject: [R-meta] To multivariate (MVMA) or to multi-level meta-analyse
+ (MLMA)
+In-Reply-To: <AMBPR08MB4921283108012757A2421E4FAA8B712@AMBPR08MB492128.eurprd08.prod.outlook.com>
+References: <CAOYO_yDNn=edbHYcXT=w6-HRHUzXMf+g85bBx=fdFut8tu6-Pg@mail.gmail.com>
+ <AMBPR08MB4921283108012757A2421E4FAA8B712@AMBPR08MB492128.eurprd08.prod.outlook.com>
+Message-ID: <CAFUVuJzCzNkqe82nhjCiBbDVgx7guPUW9p_SnVQfFsh3B=Gisw@mail.gmail.com>
+
+Indeed, the term "multivariate" is overloaded, even just within the
+meta-analysis literature. I recognize at least three distinct senses (as
+described here
+https://jepusto.com/posts/what-does-multivariate-mean/index.html).
+
+I suspect that Jorge's question might be using the term to mean a model
+with multivariate (correlated) sampling errors, as in the
+correlated-and-hierarchical effects model. Beth Tipton and I address the
+question of MLMA vs. CHE (or another multivariate working model) in this
+paper:
+https://jepusto.com/publications/RVE-Meta-analysis-expanding-the-range/
+The gist of our argument is that it's beneficial to try and build models
+with assumptions that are relatively believable (even if you're ultimately
+going to use clustered SEs), recognizing that you're often constrained by
+the information available in the primary study reports. In particular, more
+plausible working models should give better estimates of heterogeneity,
+prediction intervals, and the like.
+
+Following the principle would, I think, point towards using models that
+assume some correlation between effect size estimates involving different
+measures taken on the same participants, rather than using MLMA, which
+assumes zero correlation.
+
+James
+
+On Wed, Nov 11, 2026 at 6:10?AM Viechtbauer, Wolfgang (NP) via
+R-sig-meta-analysis <r-sig-meta-analysis at r-project.org> wrote:
+
+> Hi,
+>
+> I am not entirely sure what distinction you are drawing between a
+> multilevel vs multivariate meta-analysis. Some multivariate models are
+> identical to certain multilevel models, so any comparison would require
+> clearly describing what models are being contrasted.
+>
+> Best,
+> Wolfgang
+>
+> > -----Original Message-----
+> > From: R-sig-meta-analysis <r-sig-meta-analysis-bounces at r-project.org>
+> On Behalf
+> > Of Jorge Teixeira via R-sig-meta-analysis
+> > Sent: Wednesday, November 4, 2026 09:41
+> > To: R meta <r-sig-meta-analysis at r-project.org>
+> > Cc: Jorge Teixeira <jorgemmtteixeira at gmail.com>
+> > Subject: [R-meta] To multivariate (MVMA) or to multi-level meta-analyse
+> (MLMA)
+> >
+> > Hi,
+> >
+> > Recently, I have come across several hypertrophy meta-analyses of RCTs
+> > with the following structure:
+> >
+> > Study TX?CON SE Location Muscle
+> > A 100 5 Upper Biceps
+> > B 80 4 Upper Triceps
+> > B 90 5 Upper Biceps
+> > C 108 6 Lower RF
+> > C 80 4 Lower VL
+> > D 10 1 Lower VL Type I
+> > D 15 2 Lower VL Type II
+> > D 10 1 Lower VL Type IIb
+> > E 80 4 Trunk Pec
+> >
+> > These are typically small meta-analyses. I was introduced to
+> > multilevel meta-analysis (MLMA) through cases such as Study D, where a
+> > study contributes multiple effect sizes to the same comparison (e.g.,
+> > more than two arms).
+> >
+> > However, authors are also including different outcomes, such as upper-
+> > versus lower-body muscles, and different muscles within those
+> > anatomical regions. Although these outcomes share an underlying
+> > construct (muscle hypertrophy), they are not necessarily measuring the
+> > same thing.
+> >
+> > Given the differences in anatomical location (upper vs. lower body)
+> > and the variation between individual muscles, should these data be
+> > analysed using multilevel (MLMA) or multivariate meta-analysis (MVMA)?
+> >
+> > For the purpose of this discussion, I will ignore differences in
+> > assessment methods (CSA vs. muscle thickness vs. muscle volume).
+> >
+> > Case II
+> > A real example: https://gyazo.com/eccb4fe57fb9189d291c0929f6628056
+> >
+> > Nu?ez reports data from seven different anatomical sites.
+> >
+> > Would MLMA or MVMA be more appropriate? Is either approach inherently
+> wrong?
+> >
+> > Case III
+> >
+> > Another example from the same paper:
+> > https://gyazo.com/8da1840567fa5e2d4c5f1d48106769ca
+> >
+> > The authors combined countermovement jump (CMJ), drop jump (DJ), and
+> > squat jump (SJ) into a single outcome, "jump performance", which I
+> > think is reasonable when using Hedges' g.
+> >
+> > However, Ram?rez-Campillo, for example, contributed data from all
+> > three jump tests (CMJ, DJ, and SJ).
+> >
+> > The same questions apply: would MLMA or MVMA be more appropriate? Is
+> > either approach inherently wrong?
+> >
+> > Thank you!
+> _______________________________________________
+> R-sig-meta-analysis mailing list @ R-sig-meta-analysis at r-project.org
+> To manage your subscription to this mailing list, go to:
+> https://stat.ethz.ch/mailman/listinfo/r-sig-meta-analysis
+>
+
+	[[alternative HTML version deleted]]
+
+
